@@ -27,7 +27,8 @@ class LoginScreen extends StatelessWidget {
             const CustomField(
                 icon: Icons.alternate_email,
                 obscureText: false,
-                hinText: 'Enter Email'),
+                hinText: 'ADID'),
+            const SizedBox( height: 16,),
             const CustomField(
                 icon: Icons.lock, obscureText: true, hinText: 'Enter Password'),
             const SizedBox(

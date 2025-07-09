@@ -9,22 +9,40 @@ class CustomField extends StatelessWidget {
   });
 
   @override
+  // 
   Widget build(BuildContext context) {
-    return TextField(
-      cursorRadius: Radius.circular(20),
-      obscureText: obscureText,
-      style: TextStyle(
-        color: Common.blackColor,
+  return TextField(
+    cursorRadius: const Radius.circular(20),
+    obscureText: obscureText,
+    style: TextStyle(
+      color: Common.blackColor,
+    ),
+    decoration: InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      filled: true, // Bật nền fill
+      fillColor: Colors.white, // Màu nền
+      prefixIcon: Icon(
+        icon,
+        color: Common.blackColor.withOpacity(.3),
       ),
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        prefixIcon: Icon(
-          icon,
-          color: Common.blackColor.withOpacity(.3),
+      hintText: hinText,
+      border: OutlineInputBorder( // Sử dụng OutlineInputBorder thay vì InputBorder.none
+        borderRadius: BorderRadius.circular(30), // Độ bo tròn
+        borderSide: BorderSide.none, // Ẩn đường viền mặc định
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: BorderSide(
+          color: Common.blackColor.withOpacity(.5), // Màu viền khi focus
+          width: 1.0,
         ),
-        hintText: hinText,
       ),
-      cursorColor: Common.blackColor.withOpacity(.5),
-    );
-  }
+    ),
+    cursorColor: Common.blackColor.withOpacity(.5),
+  );
+}
 }
