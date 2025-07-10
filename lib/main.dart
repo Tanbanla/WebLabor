@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:web_labor_contract/Screen/User/Home/navigation_drawer.dart';
 import 'package:web_labor_contract/Screen/User/LoginScreen/login_screen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner:  false,
       home: Scaffold(
-        body: LoginScreen(),
+        body:  MenuScreen(),
       ),
     );
   }
