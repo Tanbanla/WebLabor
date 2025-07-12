@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
+import 'package:web_labor_contract/Screen/User/Home/navigation_drawer.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -70,7 +71,7 @@ class LoginScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const HomeScreen() ,
+                            builder: (_) => const MenuScreen() ,
                           ),
                         );
                   // Navigator.pushReplacement(

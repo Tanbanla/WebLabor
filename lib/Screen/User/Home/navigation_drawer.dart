@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Screen/User/Master/master_pthc.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -10,7 +11,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-//  
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,16 +25,48 @@ class _MenuScreenState extends State<MenuScreen> {
 
   AppBar appBar() {
     return AppBar(
-      iconTheme: IconTheme.of(context).copyWith(
-        color:Colors.white,
-      ),
+      iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
       title: Text(
         "LABOR CONTRACT EVALUATION",
-        style: TextStyle(
-        color: Colors.white,
-        ),
+        style: TextStyle(color: Colors.white),
       ),
       backgroundColor: Common.primaryColor.withOpacity(0.6),
+      actions: [
+        Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Button tiếng Anh
+              IconButton(
+                icon: Image.asset(
+                  'assets/img/jp.png',
+                  height: 24, // Giảm kích thước cho phù hợp AppBar
+                  width: 40,
+                  fit: BoxFit.cover,
+                ),
+                onPressed: () {
+                  setState(() {
+                    // Gọi hàm thay đổi ngôn ngữ ở đây
+                  });
+                },
+              ),
+              // Button tiếng Việt
+              IconButton(
+                icon: Image.asset(
+                  'assets/img/vn.jpg',
+                  height: 24, // Giảm kích thước cho phù hợp AppBar
+                  width: 40,
+                  fit: BoxFit.cover,
+                ),
+                onPressed: () {
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -44,10 +77,7 @@ class _MenuScreenState extends State<MenuScreen> {
           color: Common.primaryColor,
           backgroundBlendMode: BlendMode.saturation,
         ),
-        child: Container()
-        // FlutterLogo(
-        //   size: 150,
-        // ),
+        child: MasterPTHC(),
       ),
     );
   }
@@ -72,22 +102,24 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       // do dai menu
       //width: width/2,
       child: row(),
-      // color: 
+      // color:
       // Color.fromARGB(255, 119, 201, 146).withOpacity(0.2),
     );
   }
 
   Widget row() {
-    return Row(children: [
-      isExpanded ? blackIconTiles() : blackIconMenu(),
-      invisibleSubMenus(),
-    ]);
+    return Row(
+      children: [
+        isExpanded ? blackIconTiles() : blackIconMenu(),
+        invisibleSubMenus(),
+      ],
+    );
   }
 
   Widget blackIconTiles() {
     return Container(
       width: 300,
-      color: Common.primaryColor.withOpacity(0.6),
+      color: Color.fromARGB(255, 69, 136, 78),
       child: Column(
         children: [
           controlTile(),
@@ -99,27 +131,25 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
                 CDM cdm = cdms[index];
                 bool selected = selectedIndex == index;
                 return ExpansionTile(
-                    onExpansionChanged: (z) {
-                      setState(() {
-                        selectedIndex = z ? index : -1;
-                      });
-                    },
-                    leading: Icon(cdm.icon, color: Colors.white),
-                    title: Text(
-                      cdm.title,
-                      style: TextStyle(
-                      color: Colors.white,
-                      ),
-                    ),
-                    trailing: cdm.submenus.isEmpty
-                        ? null
-                        : Icon(
-                            selected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                            color: Colors.white,
-                          ),
-                    children: cdm.submenus.map((subMenu) {
-                      return sMenuButton(subMenu, false);
-                    }).toList());
+                  onExpansionChanged: (z) {
+                    setState(() {
+                      selectedIndex = z ? index : -1;
+                    });
+                  },
+                  leading: Icon(cdm.icon, color: Colors.white),
+                  title: Text(cdm.title, style: TextStyle(color: Colors.white)),
+                  trailing: cdm.submenus.isEmpty
+                      ? null
+                      : Icon(
+                          selected
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                        ),
+                  children: cdm.submenus.map((subMenu) {
+                    return sMenuButton(subMenu, false);
+                  }).toList(),
+                );
               },
             ),
           ),
@@ -133,7 +163,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     return Container(
       decoration: BoxDecoration(
         color: Common.primaryColor,
-        borderRadius:  BorderRadius.only(topRight: Radius.circular(8))
+        borderRadius: BorderRadius.only(topRight: Radius.circular(8)),
       ),
       child: Padding(
         padding: EdgeInsets.only(top: 20, bottom: 30),
@@ -142,10 +172,10 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           title: Text(
             "LABOR CONTRACT EVALUATION",
             style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           onTap: expandOrShrinkDrawer,
         ),
@@ -157,28 +187,29 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     return AnimatedContainer(
       duration: Duration(seconds: 1),
       width: 100,
-      color: Common.primaryColor.withOpacity(0.8),
+      color: Common.primaryColor,
       child: Column(
         children: [
           controlButton(),
           Expanded(
             child: ListView.builder(
-                itemCount: cdms.length,
-                itemBuilder: (contex, index) {
-                  // if(index==0) return controlButton();
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
-                    child: Container(
-                      height: 45,
-                      alignment: Alignment.center,
-                      child: Icon(cdms[index].icon, color: Colors.white),
-                    ),
-                  );
-                }),
+              itemCount: cdms.length,
+              itemBuilder: (contex, index) {
+                // if(index==0) return controlButton();
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
+                  child: Container(
+                    height: 45,
+                    alignment: Alignment.center,
+                    child: Icon(cdms[index].icon, color: Colors.white),
+                  ),
+                );
+              },
+            ),
           ),
           accountButton(),
         ],
@@ -191,22 +222,26 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
       width: isExpanded ? 0 : 200,
-      color:  Color.fromARGB(255, 119, 201, 146).withOpacity(0.4),
+      color: Color.fromARGB(255, 119, 201, 146).withOpacity(0.4),
       child: Column(
         children: [
           Container(height: 95),
           Expanded(
             child: ListView.builder(
-                itemCount: cdms.length,
-                itemBuilder: (context, index) {
-                  CDM cmd = cdms[index];
-                  // if(index==0) return Container(height:95);
-                  //controll button has 45 h + 20 top + 30 bottom = 95
+              itemCount: cdms.length,
+              itemBuilder: (context, index) {
+                CDM cmd = cdms[index];
+                // if(index==0) return Container(height:95);
+                //controll button has 45 h + 20 top + 30 bottom = 95
 
-                  bool selected = selectedIndex == index;
-                  bool isValidSubMenu = selected && cmd.submenus.isNotEmpty;
-                  return subMenuWidget([cmd.title]..addAll(cmd.submenus), isValidSubMenu);
-                }),
+                bool selected = selectedIndex == index;
+                bool isValidSubMenu = selected && cmd.submenus.isNotEmpty;
+                return subMenuWidget(
+                  [cmd.title]..addAll(cmd.submenus),
+                  isValidSubMenu,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -221,9 +256,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         child: Container(
           height: 45,
           alignment: Alignment.center,
-          child: FlutterLogo(
-            size: 40,
-          ),
+          child: FlutterLogo(size: 40),
         ),
       ),
     );
@@ -235,18 +268,22 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       height: isValidSubMenu ? submenus.length.toDouble() * 70 : 45,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: isValidSubMenu ? Common.primaryColor.withOpacity(0.7) : Colors.transparent,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(8),
-            bottomRight: Radius.circular(8),
-          )),
+        color: isValidSubMenu
+            ? Common.primaryColor.withOpacity(0.7)
+            : Colors.transparent,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+      ),
       child: ListView.builder(
-          padding: EdgeInsets.all(6),
-          itemCount: isValidSubMenu ? submenus.length : 0,
-          itemBuilder: (context, index) {
-            String subMenu = submenus[index];
-            return sMenuButton(subMenu, index == 0);
-          }),
+        padding: EdgeInsets.all(6),
+        itemCount: isValidSubMenu ? submenus.length : 0,
+        itemBuilder: (context, index) {
+          String subMenu = submenus[index];
+          return sMenuButton(subMenu, index == 0);
+        },
+      ),
     );
   }
 
@@ -262,9 +299,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         child: Text(
           subMenu,
           style: TextStyle(
-          fontSize: isTitle ? 17 : 14,
-          color: isTitle ? Colors.white : Colors.white70,
-          fontWeight: FontWeight.bold,
+            fontSize: isTitle ? 17 : 14,
+            color: isTitle ? Colors.white : Colors.white70,
+            fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.left,
         ),
@@ -282,7 +319,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         decoration: BoxDecoration(
           color: Colors.white70,
           image: DecorationImage(
-            //ảnh 
+            //ảnh
             image: AssetImage('assets/img/profile.jpg'),
             fit: BoxFit.cover,
           ),
@@ -297,28 +334,37 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       color: Common.primaryColor,
       child: ListTile(
         leading: accountButton(usePadding: false),
-        title: Text(
-          "Welocome",
-          style: TextStyle(
-            color: Colors.white,
-        ),
-        ),
+        title: Text("Welocome", style: TextStyle(color: Colors.white)),
         subtitle: Text(
           "Nguyễn Duy Khánh",
-          style: TextStyle(
-            color: Colors.white70,
-        ),
+          style: TextStyle(color: Colors.white70),
         ),
       ),
     );
   }
 
   static List<CDM> cdms = [
-    CDM(Icons.grid_view, "Master", ["Quản lý User","Thông tin PTHC","Danh sách màn hình"]),
-    CDM(Icons.subscriptions, "Lập đánh giá", ["Hợp đồng thử nghề & học việc", "Hợp đồng không xác định thời gian"]),
-    CDM(Icons.explore, "Điền đánh giá", ["Hợp đồng thử nghề & học việc", "Hợp đồng không xác định thời gian"]),
-    CDM(Icons.markunread_mailbox, "Phê duyệt", ["Hợp đồng thử nghề & học việc", "Hợp đồng không xác định thời gian"]),
-    CDM(Icons.pie_chart, "Báo cáo", ["Hợp đồng thử nghề & học việc", "Hợp đồng không xác định thời gian"]),
+    CDM(Icons.grid_view, "Master", [
+      "Quản lý User",
+      "Thông tin PTHC",
+      "Danh sách màn hình",
+    ]),
+    CDM(Icons.subscriptions, "Lập đánh giá", [
+      "Hợp đồng thử nghề & học việc",
+      "Hợp đồng không xác định thời gian",
+    ]),
+    CDM(Icons.explore, "Điền đánh giá", [
+      "Hợp đồng thử nghề & học việc",
+      "Hợp đồng không xác định thời gian",
+    ]),
+    CDM(Icons.markunread_mailbox, "Phê duyệt", [
+      "Hợp đồng thử nghề & học việc",
+      "Hợp đồng không xác định thời gian",
+    ]),
+    CDM(Icons.pie_chart, "Báo cáo", [
+      "Hợp đồng thử nghề & học việc",
+      "Hợp đồng không xác định thời gian",
+    ]),
     // CDM(Icons.trending_up, "Chart", []),
     // CDM(Icons.power, "Plugins", []),
     CDM(Icons.settings, "Setting", []),
