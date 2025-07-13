@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:web_labor_contract/Common/common.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/Common/common.dart';
 
 class MasterUser extends StatefulWidget {
   const MasterUser({super.key});
@@ -12,195 +14,440 @@ class MasterUser extends StatefulWidget {
 }
 
 class _MasterUserState extends State<MasterUser> {
+  final DashboardControllerUser controller = Get.put(DashboardControllerUser());
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.put(DashboardController());
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Center(
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Master quản lý thông tin User',
-                    style: TextStyle(
-                      color: Common.primaryColor.withOpacity(0.8),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  // Ô tìm kiếm
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: TextFormField(
-                        controller: controller.searchTextController,
-                        onChanged: (value) => controller.searchQuery(value),
-                        decoration: const InputDecoration(
-                          hintText: 'Tìm kiếm...',
-                          prefixIcon: Icon(Iconsax.search_normal, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Button Export
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.green[50],
-                      border: Border.all(color: Colors.green[100]!),
-                    ),
-                    child: IconButton(
-                      icon: Icon(Iconsax.export, color: Colors.green, size: 20),
-                      tooltip: 'Xuất dữ liệu',
-                      onPressed: () {
-                        // Xử lý xuất dữ liệu
-                        
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Button Import
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.blue[50],
-                      border: Border.all(color: Colors.blue[100]!),
-                    ),
-                    child: IconButton(
-                      icon: Icon(Iconsax.import, color: Colors.blue, size: 20),
-                      tooltip: 'Nhập dữ liệu',
-                      onPressed: () {
-                        // Xử lý nhập dữ liệu
-                        
-                      },
-                    ),
-                  ),
-                ],
-              ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header Section
+            _buildHeader(),
+            const SizedBox(height: 16),
+            
+            // Search and Action Buttons
+            _buildSearchAndActions(),
+            const SizedBox(height: 16),
+            
+            // Data Table
+            Expanded(
+              child:  
               Obx(() {
                 Visibility(
-                  visible: false,
-                  child: Text(controller.filterdataList.length.toString()),
+                    visible: false,
+                    child: Text(controller.filterdataList.length.toString()),
                 );
-                return SizedBox(
-                  height: 760,
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      cardTheme: const CardThemeData(
-                        color: Colors.white,
-                        elevation: 0,
-                      ),
-                    ),
-                    child: PaginatedDataTable2(
-                      columnSpacing: 12,
-                      minWidth: 100,
-                      dividerThickness: 0,
-                      horizontalMargin: 12,
-                      dataRowHeight: 56,
-                      headingTextStyle: Theme.of(context).textTheme.titleMedium,
-                      headingRowColor: WidgetStateProperty.resolveWith(
-                        (states) => Colors.transparent, // mau heading
-                      ),
-                      headingRowDecoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
-                      ),
-                      // checkbox column
-                      showCheckboxColumn: true,
+                  return _buildDataTable();
+                }
+              )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                      // PAGINATION
-                      showFirstLastButtons: true,
-                      onPageChanged: (value) {},
-                      renderEmptyRowsInTheEnd: false,
-                      availableRowsPerPage: const [5, 10, 15, 20, 25, 50, 100],
-                      onRowsPerPageChanged:(value) {
-                      },
-                      //rowsPerPage: 11, // number rows seen
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Master Quản Lý Thông Tin User',
+          style: TextStyle(
+            color:  Common.primaryColor.withOpacity(0.8),
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Quản lý thông tin người dùng hệ thống',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
 
-                      // Sorting
-                      sortAscending: controller.sortAscending.value,
-                      sortArrowAlwaysVisible: false,
-                      sortArrowIcon: Icons.line_axis,
-                      sortColumnIndex: controller.sortCloumnIndex.value,
-                      sortArrowBuilder: (ascending, sorted) {
-                        if (sorted) {
-                          return Icon(
-                            ascending ? Iconsax.arrow_up3 : Iconsax.arrow_down,
-                            size: 16,
-                          );
-                        } else {
-                          return const Icon(Iconsax.arrow_3, size: 16);
-                        }
-                      },
+  Widget _buildSearchAndActions() {
+    return 
+    Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: 
+            TextField(
+              controller: controller.searchTextController,
+              onChanged:  (value) {
+                controller.searchQuery(value);
+              }, 
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm theo mã, tên nhân viên...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Iconsax.search_normal, color: Colors.grey[500]),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                suffixIcon: controller.searchTextController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.close, size: 20, color: Colors.grey[500]),
+                        onPressed: () {
+                          controller.searchTextController.clear();
+                          controller.searchQuery('');
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        
+        // Action Buttons
+        _buildActionButton(
+          icon: Iconsax.import,
+          color: Colors.blue,
+          tooltip: 'Import dữ liệu',
+          onPressed: () => _showImportDialog(),
+        ),
+        const SizedBox(width: 8),
+        _buildActionButton(
+          icon: Iconsax.export,
+          color: Colors.green,
+          tooltip: 'Export dữ liệu',
+          onPressed: () => _showExportDialog(),
+        ),
+        const SizedBox(width: 8),
+        _buildActionButton(
+          icon: Iconsax.add,
+          color: Colors.orange,
+          tooltip: 'Thêm mới',
+          onPressed: () => _showAddDialog(),
+        ),
+      ],
+    );
+  }
 
-                      columns: [
-                        DataColumn2(
-                          label: Text(
-                            "Phòng ban",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                          fixedWidth: 130,
-                          onSort: (columnIndex, ascending) =>
-                              controller.sortById(columnIndex, ascending),
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            "Mail to",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            "Mail CC",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const DataColumn2(
-                          label: Text(
-                            "Hành động",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                          fixedWidth: 200,
-                        ),
-                      ],
-                      source: MyData(),
-                    ),
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: color.withOpacity(0.1),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: color),
+        tooltip: tooltip,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _buildDataTable() {
+    double width = MediaQuery.of(context).size.width;
+    return Theme(
+      data: Theme.of(context).copyWith(
+        cardTheme: const CardThemeData(
+          color: Colors.white,
+          elevation: 0,
+        ),
+        dividerTheme: DividerThemeData(
+          color: Colors.grey[200],
+          thickness: 1,
+          space: 0,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Scrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: width-34,
+              child: PaginatedDataTable2(
+                columnSpacing: 12,
+                minWidth: 1000,
+                horizontalMargin: 12,
+                dataRowHeight: 56,
+                headingRowHeight: 56,
+                headingTextStyle: TextStyle(
+                  color: Colors.blue[800],
+                  fontWeight: FontWeight.bold,
+                ),
+                headingRowDecoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  color: Colors.blue[50],
+                ),
+                showCheckboxColumn: true,
+                showFirstLastButtons: true,
+                renderEmptyRowsInTheEnd: false,
+                rowsPerPage: 10,
+                availableRowsPerPage: const [5, 10, 20, 50],
+                onRowsPerPageChanged: (value) {},
+                sortColumnIndex: controller.sortCloumnIndex.value,
+                sortAscending: controller.sortAscending.value,
+                sortArrowBuilder: (ascending, sorted) {
+                  return Icon(
+                    sorted 
+                      ? ascending 
+                        ? Iconsax.arrow_up_2 
+                        : Iconsax.arrow_down_1
+                      : Iconsax.row_horizontal,
+                    size: 16,
+                    color: sorted ? Colors.blue[800] : Colors.grey,
+                  );
+                },
+                columns: [
+                  DataColumn2(
+                    label: const Text('Phòng ban'),
+                    fixedWidth: 150,
+                    onSort: controller.sortById,
                   ),
-                );
-              }),
+                  DataColumn2(
+                    label: const Text('Mã nhân viên'),
+                    // fixedWidth: 150,
+                  ),
+                  DataColumn2(
+                    label: const Text('Tên nhân viên'),
+                    // fixedWidth: 200,
+                  ),
+                  DataColumn2(
+                    label: const Text('ADID'),
+                    // fixedWidth: 150,
+                  ),
+                  DataColumn2(
+                    label: const Text('Nhóm quyền'),
+                    // fixedWidth: 150,
+                  ),
+                  const DataColumn2(
+                    label: Text('Trạng thái'),
+                    fixedWidth: 120,
+                  ),
+                  const DataColumn2(
+                    label: Text('Hành động'),
+                    fixedWidth: 180,
+                  ),
+                ],
+                source: MyData(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImportDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Import Dữ Liệu'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Chọn file Excel để import dữ liệu', style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(Iconsax.document_upload),
+              label: const Text('Chọn File'),
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Import logic
+              Get.back();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExportDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Export Dữ Liệu'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Chọn định dạng export', style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildExportOption(Iconsax.document_text, 'Excel'),
+                _buildExportOption(Iconsax.document2, 'PDF'),
+                _buildExportOption(Iconsax.document_text, 'CSV'),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Export logic
+              Get.back();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Export'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExportOption(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, size: 30, color: Colors.blue),
+        const SizedBox(height: 8),
+        Text(label, style: TextStyle(color: Colors.grey[700])),
+      ],
+    );
+  }
+
+  void _showAddDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Thêm User Mới'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Mã nhân viên',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Tên nhân viên',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField(
+                decoration: InputDecoration(
+                  labelText: 'Phòng ban',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                items: ['RD', 'HR', 'Finance', 'Marketing']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {},
+              ),
             ],
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Add logic
+              Get.back();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Thêm'),
+          ),
+        ],
       ),
     );
   }
 }
 
 class MyData extends DataTableSource {
-  final DashboardController controller = Get.find();
+  final DashboardControllerUser controller = Get.find();
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     return DataRow2(
-      onTap: () {},
+      color: MaterialStateProperty.resolveWith<Color?>(
+        (Set<MaterialState> states) {
+          if (index.isEven) {
+            return Colors.grey[50];
+          }
+          return null;
+        },
+      ),
+      onTap: () => _showDetailDialog(data),
       selected: controller.selectRows[index],
       onSelectChanged: (value) {
         controller.selectRows[index] = value ?? false;
@@ -208,48 +455,201 @@ class MyData extends DataTableSource {
         notifyListeners();
       },
       cells: [
-        DataCell(Text(data['Column1'] ?? "")),
+        DataCell(Text(data['Column1'] ?? "", style: TextStyle(color: Colors.blue[800]))),
         DataCell(Text(data['Column2'] ?? "")),
         DataCell(Text(data['Column3'] ?? "")),
+        DataCell(Text(data['Column4'] ?? "")),
+        DataCell(Text(data['Column5'] ?? "")),
+        DataCell(
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green[100]!),
+            ),
+            child: Text(
+              'Active',
+              style: TextStyle(color: Colors.green[800]),
+            ),
+          ),
+        ),
         DataCell(
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Nút Sửa
-              ElevatedButton.icon(
-                icon: Icon(Icons.edit, size: 16),
-                label: Text("Sửa"),
+              _buildActionButton(
+                icon: Iconsax.edit_2,
+                color: Colors.blue,
                 onPressed: () => _handleEdit(data),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.blue[50],
-                  backgroundColor: Colors.blue,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
               ),
-              SizedBox(width: 8),
-              // Nút Xóa
-              ElevatedButton.icon(
-                icon: Icon(Icons.delete, size: 16),
-                label: Text("Xóa"),
+              const SizedBox(width: 8),
+              _buildActionButton(
+                icon: Iconsax.trash,
+                color: Colors.red,
                 onPressed: () => _handleDelete(data),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.red[50],
-                  backgroundColor: Colors.red,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              ),
+              const SizedBox(width: 8),
+              _buildActionButton(
+                icon: Iconsax.eye,
+                color: Colors.green,
+                onPressed: () => _showDetailDialog(data),
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 18, color: color),
+        onPressed: onPressed,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+      ),
+    );
+  }
+
+  void _showDetailDialog(Map<String, String> data) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Chi tiết: ${data['Column3']}'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
+              _buildDetailRow('Mã nhân viên:', data['Column2'] ?? ""),
+              _buildDetailRow('Tên nhân viên:', data['Column3'] ?? ""),
+              _buildDetailRow('ADID:', data['Column4'] ?? ""),
+              _buildDetailRow('Nhóm quyền:', data['Column5'] ?? ""),
+              const SizedBox(height: 16),
+              const Text('Lịch sử hoạt động:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              ...List.generate(3, (index) => _buildActivityItem('Hoạt động ${index + 1}')),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Đóng'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(label, style: TextStyle(color: Colors.grey[600])),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.circle, size: 8, color: Colors.blue),
+          const SizedBox(width: 8),
+          Text(text),
+        ],
+      ),
+    );
+  }
+
+  void _handleEdit(Map<String, String> data) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Chỉnh sửa thông tin'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Tên nhân viên',
+                border: OutlineInputBorder(),
+              ),
+              controller: TextEditingController(text: data['Column3']),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField(
+              decoration: InputDecoration(
+                labelText: 'Nhóm quyền',
+                border: OutlineInputBorder(),
+              ),
+              value: data['Column5'],
+              items: ['QL', 'NV', 'Admin', 'Guest']
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Save logic
+              Get.back();
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleDelete(Map<String, String> data) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Xác nhận xóa'),
+        content: Text('Bạn chắc chắn muốn xóa ${data['Column3']}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[50],
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () {
+              controller.deleteItem(data);
+              Get.back();
+            },
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -261,83 +661,44 @@ class MyData extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
-  void _handleEdit(Map<String, String> data) {
-    // Hiển thị dialog hoặc mở màn hình chỉnh sửa
-    Get.dialog(
-      AlertDialog(
-        title: Text("Sửa dữ liệu"),
-        content: Text("Bạn muốn sửa ${data['Column1']}?"),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text("Hủy")),
-          ElevatedButton(
-            onPressed: () {
-              // Logic sửa dữ liệu
-              Get.back();
-            },
-            child: Text("Xác nhận"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleDelete(Map<String, String> data) {
-    // Hiển thị dialog xác nhận xóa
-    Get.dialog(
-      AlertDialog(
-        title: Text("Xóa dữ liệu"),
-        content: Text("Bạn chắc chắn muốn xóa ${data['Column1']}?"),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text("Hủy")),
-          ElevatedButton(
-            onPressed: () {
-              // Logic xóa dữ liệu
-              controller.deleteItem(data);
-              Get.back();
-            },
-            child: Text("Xóa", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class DashboardController extends GetxController {
+class DashboardControllerUser extends GetxController {
   var dataList = <Map<String, String>>[].obs;
   var filterdataList = <Map<String, String>>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
-
-  RxInt sortCloumnIndex = 1.obs;
+  RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
-    fetchDumyData();
+    fetchDummyData();
   }
 
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
-    filterdataList.sort((a, d) {
-      if (ascending) {
-        return filterdataList[0]['Column1'].toString().toLowerCase().compareTo(
-          filterdataList[0]['Column1'].toString().toLowerCase(),
-        );
-      } else {
-        return filterdataList[0]['Column1'].toString().toLowerCase().compareTo(
-          filterdataList[0]['Column1'].toString().toLowerCase(),
-        );
-      }
+    filterdataList.sort((a, b) {
+      final aValue = a['Column1']?.toLowerCase() ?? '';
+      final bValue = b['Column1']?.toLowerCase() ?? '';
+      return ascending 
+          ? aValue.compareTo(bValue) 
+          : bValue.compareTo(aValue);
     });
     this.sortCloumnIndex.value = sortColumnIndex;
   }
 
   void searchQuery(String query) {
-    filterdataList.assignAll(
-      dataList.where((item) => item['Column2']!.contains(query.toLowerCase())),
-    );
+      if (query.isEmpty) {
+        filterdataList.assignAll(dataList);
+      } else {
+        filterdataList.assignAll(
+          dataList.where((item) =>
+            (item['Column1']?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
+            (item['Column2']?.toLowerCase().contains(query.toLowerCase()) ?? false)),
+        );
+      }
   }
 
   void deleteItem(Map<String, String> item) {
@@ -346,27 +707,25 @@ class DashboardController extends GetxController {
     selectRows.removeAt(dataList.indexOf(item));
   }
 
-  void fetchDumyData() {
-    selectRows.assignAll(List.generate(36, (index) => false));
-    dataList.addAll(
-      List.generate(
-        36,
-        (index) => {
-          'Column1': 'RD ${index + 1}-1',
-          'Column2': 'exempler@${index + 1}-2@gmail.com',
-          'Column3': 'exempler@${index + 1}-3@gmail.com',
-        },
-      ),
+  void fetchDummyData() {
+    final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
+    final roles = ['Admin', 'QL', 'NV', 'Guest'];
+    
+    dataList.assignAll(
+      List.generate(50, (index) {
+        final dept = departments[index % departments.length];
+        final role = roles[index % roles.length];
+        return {
+          'Column1': '$dept ${index + 1}-${index % 3 + 1}',
+          'Column2': 'EMP${1000 + index}',
+          'Column3': 'Nguyễn Văn ${String.fromCharCode(65 + index % 26)}',
+          'Column4': 'AD${10000 + index}',
+          'Column5': role,
+        };
+      }),
     );
-    filterdataList.addAll(
-      List.generate(
-        36,
-        (index) => {
-          'Column1': 'RD ${index + 1}-1',
-          'Column2': 'exempler@${index + 1}-2@gmail.com',
-          'Column3': 'exempler@${index + 1}-3@gmail.com',
-        },
-      ),
-    );
+    
+    filterdataList.assignAll(dataList);
+    selectRows.assignAll(List.generate(dataList.length, (index) => false));
   }
 }
