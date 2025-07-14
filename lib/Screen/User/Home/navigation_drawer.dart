@@ -13,7 +13,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  Widget _currentBody = MasterUser(); 
+  Widget _currentBody = TwoContractScreen(); 
 
     // Hàm này sẽ được truyền xuống drawer
   void _changeBody(Widget newBody) {
@@ -385,6 +385,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     CDM(Icons.subscriptions, "Lập đánh giá", [
       "Hợp đồng thử nghề & học việc",
       "Hợp đồng không xác định thời gian",
+      "Phê duyệt chuẩn bị"
     ]),
     CDM(Icons.explore, "Điền đánh giá", [
       "Hợp đồng thử nghề & học việc",
