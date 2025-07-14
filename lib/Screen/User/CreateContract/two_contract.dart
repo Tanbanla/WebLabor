@@ -547,7 +547,7 @@ class MyData extends DataTableSource {
         DataCell(Text(data['unpaidLeaveDays']?.toString() ?? "")),
         DataCell(Text(data['unreportedLeaveDays']?.toString() ?? "")),
         DataCell(Text(data['violationCount']?.toString() ?? "")),
-        // 5 thuộc tính đánh giá
+        //5 thuộc tính đánh giá
         DataCell(
           TextFormField(
             decoration: InputDecoration(
@@ -581,31 +581,78 @@ class MyData extends DataTableSource {
           ),
         ),
 DataCell(
-  DropdownButton<String>(
-    value: data['evaluationStatus'] ?? 'OK', // Giá trị mặc định
-    underline: Container(), // Loại bỏ gạch chân mặc định
-    isDense: true, // Thu gọn kích thước
-    items: const [
-      DropdownMenuItem(
-        value: 'OK',
-        child: Text('OK'),
+  Obx(() {
+    // Lấy dữ liệu từ controller thay vì trực tiếp từ data map
+    final item = controller.filterdataList.firstWhereOrNull(
+      (element) => element['id'] == data['id']
+    );
+    
+    final status = item?['evaluationStatus'] as String? ?? 'OK';
+    final id = item?['id'] as String? ?? '';
+
+    return DropdownButton<String>(
+      value: status,
+      underline: Container(),
+      isDense: true,
+      style: TextStyle(
+        fontSize: 14, // Tăng kích thước font cho dễ đọc
+        color: _getStatusColor(status),
       ),
-      DropdownMenuItem(
-        value: 'NG',
-        child: Text('NG'),
+      dropdownColor: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      icon: Icon(
+        Icons.arrow_drop_down,
+        color: _getStatusColor(status),
       ),
-      DropdownMenuItem(
-        value: 'Stop Working',
-        child: Text('Stop Working'),
-      ),
-      DropdownMenuItem(
-        value: 'Finish L/C',
-        child: Text('Finish L/C'),
-      ),
-    ],
-    onChanged: (newValue) {
-    },
-  ),
+      items: const [
+        DropdownMenuItem(
+          value: 'OK',
+          child: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 16),
+              SizedBox(width: 4),
+              Text('OK'),
+            ],
+          ),
+        ),
+        DropdownMenuItem(
+          value: 'NG',
+          child: Row(
+            children: [
+              Icon(Icons.cancel, color: Colors.red, size: 16),
+              SizedBox(width: 4),
+              Text('NG'),
+            ],
+          ),
+        ),
+        DropdownMenuItem(
+          value: 'Stop Working',
+          child: Row(
+            children: [
+              Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+              SizedBox(width: 4),
+              Text('Stop Working'),
+            ],
+          ),
+        ),
+        DropdownMenuItem(
+          value: 'Finish L/C',
+          child: Row(
+            children: [
+              Icon(Icons.done_all, color: Colors.blue, size: 16),
+              SizedBox(width: 4),
+              Text('Finish L/C'),
+            ],
+          ),
+        ),
+      ],
+      onChanged: (newValue) {
+        if (newValue != null && id.isNotEmpty) {
+          controller.updateEvaluationStatus(id, newValue);
+        }
+      },
+    );
+  }),
 ),
         DataCell(Text("")),
         DataCell(Text("")),
@@ -638,7 +685,15 @@ DataCell(
       ],
     );
   }
-
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'OK': return Colors.green;
+      case 'NG': return Colors.red;
+      case 'Stop Working': return Colors.orange;
+      case 'Finish L/C': return Colors.blue;
+      default: return Colors.grey;
+    }
+  }
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -847,7 +902,48 @@ class DashboardControllerTwo extends GetxController {
     filterdataList.remove(item);
     selectRows.removeAt(dataList.indexOf(item));
   }
+  // các trường đánh giá
+  void updateReason(String employeeCode, String reason) {
+    final index = dataList.indexWhere((item) => item['employeeCode'] == employeeCode);
+    if (index != -1) {
+      dataList[index]['reason'] = reason;
+      dataList.refresh();
+    }
+  }
 
+  void updateHealthStatus(String employeeCode, String status) {
+    final index = dataList.indexWhere((item) => item['employeeCode'] == employeeCode);
+    if (index != -1) {
+      dataList[index]['healthStatus'] = status;
+      dataList.refresh();
+    }
+  }
+
+  void updateEvaluationStatus(String employeeCode, String status) {
+    final index = dataList.indexWhere((item) => item['employeeCode'] == employeeCode);
+    if (index != -1) {
+      dataList[index]['evaluationStatus'] = status;
+      dataList.refresh();
+    }
+  }
+
+  void updateRehireStatus(String employeeCode, bool value) {
+    final index = dataList.indexWhere((item) => item['employeeCode'] == employeeCode);
+    if (index != -1) {
+      dataList[index]['notRehire'] = value as String;
+      dataList.refresh();
+    }
+  }
+
+  void updateNotRehireReason(String employeeCode, String reason) {
+    final index = dataList.indexWhere((item) => item['employeeCode'] == employeeCode);
+    if (index != -1) {
+      dataList[index]['notRehireReason'] = reason;
+      dataList.refresh();
+    }
+  }
+
+//
   void fetchDummyData() {
     final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
     final genders = ['M', 'F'];
@@ -872,13 +968,18 @@ class DashboardControllerTwo extends GetxController {
           'salaryGrade': (index % 10 + 1).toString(),
           'contractValidity': 'Còn hiệu lực',
           'contractEndDate':
-              '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
+          '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
           'earlyLeaveCount': (index % 5).toString(),
           'paidLeaveDays': (index % 10).toString(),
           'unpaidLeaveDays': (index % 3).toString(),
           'unreportedLeaveDays': (index % 2).toString(),
           'violationCount': (index % 4).toString(),
-        };
+          'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
+          'healthStatus': 'Đạt',
+          'notRehire': 'false',
+          'notRehireReason': '',
+          'reason': '',
+          };
       }),
     );
 
