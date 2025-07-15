@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Screen/User/CreateContract/apprentice_contract.dart';
 import 'package:web_labor_contract/Screen/User/CreateContract/two_contract.dart';
 import 'package:web_labor_contract/Screen/User/Master/master_pthc.dart';
 import 'package:web_labor_contract/Screen/User/Master/master_user.dart';
@@ -320,6 +321,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               }
               break;
             case "Hợp đồng thử nghề & học việc":
+              if(title == "Lập đánh giá"){
+                widget.changeBody(ApprenticeContract());
+              }
               break;
             default:
               widget.changeBody(MasterUser());

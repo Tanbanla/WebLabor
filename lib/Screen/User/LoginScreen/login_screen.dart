@@ -71,11 +71,6 @@ class LoginScreen extends StatelessWidget {
                             builder: (_) => const MenuScreen() ,
                           ),
                         );
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   PageTransition(
-                  //       child: const HomeScreen(),
-                  //       type: PageTransitionType.bottomToTop));
                 },
                 child: Container(
                   width: size.width / 5,
