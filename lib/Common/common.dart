@@ -8,7 +8,8 @@ class Common {
   static var grayColor = Colors.grey;
   //API
   static const String API = "http://172.26.248.62:8501/api/";
-
+  // font size
+  static double sizeColumn = 12;
   // cloumn
   static const List<String> ColumnTwoVn = ["STT","Mã nhân viên","M/F","Họ và tên",
   "Phòng ban","Nhóm","Tuổi","Vị trí","Bậc lương","Hiệu lực HD","Ngày kết thúc hợp đồng","Số lần đi muộn, về sớm","Nghỉ hưởng lương","Nghỉ không lương","Nghỉ không báo cáo"

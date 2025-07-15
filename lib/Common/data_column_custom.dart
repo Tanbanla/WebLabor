@@ -15,6 +15,7 @@ class DataColumnCustom extends StatelessWidget {
   final int? maxLines;
   final double? verticalPadding;
   final double? horizontalPadding;
+  final void Function(int, bool)? onSort; // Added onSort property
 
   const DataColumnCustom({
     super.key,
@@ -30,6 +31,7 @@ class DataColumnCustom extends StatelessWidget {
     this.maxLines = 2,
     this.verticalPadding = 4,
     this.horizontalPadding = 8,
+    this.onSort, // Added to constructor
   });
 
   DataColumn2 toDataColumn2() {
@@ -56,6 +58,7 @@ class DataColumnCustom extends StatelessWidget {
       fixedWidth: fixedWidth ? width : null,
       numeric: numeric,
       tooltip: maxLines != null && maxLines! > 1 ? title : null,
+      onSort: onSort, // Added onSort to DataColumn2
     );
   }
 

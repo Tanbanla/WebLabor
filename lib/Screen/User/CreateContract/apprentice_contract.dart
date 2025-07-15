@@ -315,7 +315,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
   }
 
   Widget _buildDataTable() {
-    double width = MediaQuery.of(context).size.width;
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -345,7 +344,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3725,
+              width: 3350,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -382,198 +381,158 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                   );
                 },
                 columns: [
-                  DataColumn2(
-                    label: const Text('STT',style: TextStyle(fontSize: 10),),
-                    fixedWidth: 60,
+                  DataColumnCustom(
+                    title: 'STT',
+                    width: 70,
                     onSort: controller.sortById,
-                  ),
-                  // DataColumn2(label: const Text('Hành động'), fixedWidth: 150),
-                  // DataColumn2(label: const Text('Mã NV'), fixedWidth: 100),
-                  // DataColumn2(label: const Text('M/F'), fixedWidth: 60),
-                  // DataColumn2(label: const Text('Họ và tên'), fixedWidth: 180),
-                  // DataColumn2(label: const Text('Phòng ban'), fixedWidth: 150),
-                  // DataColumn2(label: const Text('Nhóm'), fixedWidth: 100),
-                  // DataColumn2(
-                  //   label: const Text('Tuổi'),
-                  //   fixedWidth: 80,
-                  //   numeric: true,
-                  // ),
-                  // DataColumn2(label: const Text('Vị trí'), fixedWidth: 150),
-                  // DataColumn2(label: const Text('Bậc lương'), fixedWidth: 100),
-                  // DataColumn2(
-                  //   label: const Text('Hiệu lực HD'),
-                  //   fixedWidth: 120,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text('Ngày kết thúc HD'),
-                  //   fixedWidth: 150,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Số lần đi mượn, về sớm',
-                  //     style: TextStyle(height: 1.5),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 110,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Nghỉ hưởng lương',
-                  //     style: TextStyle(height: 1.5),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 90,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Nghỉ không lương',
-                  //     style: TextStyle(height: 1.5),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 90,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Nghỉ không báo cáo',
-                  //     style: TextStyle(height: 1.5),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 90,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Số lần vi phạm nội quy công ty',
-                  //     style: TextStyle(height: 1.5),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 130,
-                  // ),
-                  // DataColumn2(label: const Text('Đào tạo lý thuyết',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Đào tạo thực hành',
-                  //     style: TextStyle(height: 1.5, fontSize: 10),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 120,
-                  // ),
-                  // DataColumn2(label: const Text('Hoàn thành công việc',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(label: const Text('Khả năng học hỏi',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(label: const Text('Khả năng thích nghi',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Tinh thần hỗ trợ, quan hệ với đồng nghiệp',style: TextStyle(fontSize: 10)
-                  //   ),
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text('Báo cáo, liên lạc, thảo thuận',style: TextStyle(fontSize: 10)),
-                  // ),
-                  // DataColumn2(label: const Text('Chấp hành nội quy công ty',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(label: const Text('Kết quả cuối cùng',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(label: const Text('Ghi chú',style: TextStyle(fontSize: 10))),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Trường hợp không tuyển dụng lại điền "X"',
-                  //     style: TextStyle(height: 1.5, fontSize: 10),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 170,
-                  // ),
-                  // DataColumn2(
-                  //   label: const Text(
-                  //     'Lý do không tuyển dụng lại',
-                  //     style: TextStyle(height: 1.5, fontSize: 10),
-                  //     maxLines: 2, // Giới hạn số dòng hiển thị
-                  //     overflow: TextOverflow.ellipsis,
-                  //   ),
-                  //   fixedWidth: 170,
-                  // ),
-                    DataColumnCustom(title: 'Hành động', width: 150).toDataColumn2(),
-                    DataColumnCustom(title: 'Mã NV', width: 100).toDataColumn2(),
-                    DataColumnCustom(title: 'M/F', width: 60).toDataColumn2(),
-                    DataColumnCustom(title: 'Họ và tên', width: 180).toDataColumn2(),
-                    DataColumnCustom(title: 'Phòng ban', width: 150).toDataColumn2(),
-                    DataColumnCustom(title: 'Nhóm', width: 100).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Tuổi',
-                      width: 80,
-                      numeric: true,
-                    ).toDataColumn2(),
-                    DataColumnCustom(title: 'Vị trí', width: 150).toDataColumn2(),
-                    DataColumnCustom(title: 'Bậc lương', width: 100).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Hiệu lực HD',
-                      width: 120,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Ngày kết thúc HD',
-                      width: 150,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Số lần đi mượn, về sớm',
-                      width: 110,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Nghỉ hưởng lương',
-                      width: 90,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Nghỉ không lương',
-                      width: 90,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Nghỉ không báo cáo',
-                      width: 90,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Số lần vi phạm nội quy công ty',
-                      width: 130,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(title: 'Đào tạo lý thuyết', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Đào tạo thực hành',
-                      width: 120,
-                      fontSize: 10,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(title: 'Hoàn thành công việc', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(title: 'Khả năng học hỏi', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(title: 'Khả năng thích nghi', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Tinh thần hỗ trợ, quan hệ với đồng nghiệp',
-                      fontSize: 10,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Báo cáo, liên lạc, thảo thuận',
-                      fontSize: 10,
-                    ).toDataColumn2(),
-                    DataColumnCustom(title: 'Chấp hành nội quy công ty', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(title: 'Kết quả cuối cùng', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(title: 'Ghi chú', fontSize: 10).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Trường hợp không tuyển dụng lại điền "X"',
-                      width: 170,
-                      fontSize: 10,
-                      maxLines: 2,
-                    ).toDataColumn2(),
-                    DataColumnCustom(
-                      title: 'Lý do không tuyển dụng lại',
-                      width: 170,
-                      fontSize: 10,
-                      maxLines: 2,
-                    ).toDataColumn2(),
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  // DataColumn2
+                  DataColumnCustom(
+                    title: 'Hành động',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Mã NV',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'M/F',
+                    width: 60,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Họ và tên',
+                    width: 180,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Phòng ban',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nhóm',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Tuổi',
+                    width: 70,
+                    numeric: true,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Vị trí',
+                    width:100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Bậc lương',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Hiệu lực HD',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Ngày kết thúc HD',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Số lần đi mượn, về sớm',
+                    width: 110,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ hưởng lương',
+                    width: 100,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ không lương',
+                    width: 90,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ không báo cáo',
+                    width: 90,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Số lần vi phạm nội quy công ty',
+                    width: 130,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Đào tạo lý thuyết',
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Đào tạo thực hành',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Hoàn thành công việc',
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Khả năng học hỏi',
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Khả năng thích nghi',
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Tinh thần hỗ trợ, quan hệ với đồng nghiệp',
+                    fontSize: Common.sizeColumn,
+                    width: 150,
+                    maxLines: 3,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Báo cáo, liên lạc, thảo thuận',
+                    fontSize: Common.sizeColumn,
+                    width: 130,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Chấp hành nội quy công ty',
+                    fontSize: Common.sizeColumn,
+                    width: 130,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Kết quả cuối cùng',
+                    fontSize: Common.sizeColumn,
+                    width: 150,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Ghi chú',
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Trường hợp không tuyển dụng lại điền "X"',
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do không tuyển dụng lại',
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
                 ],
                 source: MyData(),
               ),
@@ -765,10 +724,222 @@ class MyData extends DataTableSource {
         notifyListeners();
       },
       cells: [
+        // DataCell(
+        //   Text(
+        //     (index + 1).toString(),
+        //     style: TextStyle(color: Colors.blue[800]),
+        //   ),
+        // ),
+        // //Action
+        // DataCell(
+        //   Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       _buildActionButton(
+        //         icon: Iconsax.edit_2,
+        //         color: Colors.blue,
+        //         onPressed: () => _handleEdit(data),
+        //       ),
+        //       const SizedBox(width: 8),
+        //       _buildActionButton(
+        //         icon: Iconsax.trash,
+        //         color: Colors.red,
+        //         onPressed: () => _handleDelete(data),
+        //       ),
+        //       const SizedBox(width: 8),
+        //       _buildActionButton(
+        //         icon: Iconsax.eye,
+        //         color: Colors.green,
+        //         onPressed: () => _showDetailDialog(data),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // DataCell(Text(data['employeeCode'] ?? "")),
+        // DataCell(Text(data['gender'] ?? "")),
+        // DataCell(Text(data['fullName'] ?? "")),
+        // DataCell(Text(data['department'] ?? "")),
+        // DataCell(Text(data['group'] ?? "")),
+        // DataCell(Text(data['age']?.toString() ?? "")),
+        // DataCell(Text(data['position'] ?? "")),
+        // DataCell(Text(data['salaryGrade']?.toString() ?? "")),
+        // DataCell(Text(data['contractValidity'] ?? "")),
+        // DataCell(Text(data['contractEndDate'] ?? "")),
+        // DataCell(Text(data['earlyLeaveCount']?.toString() ?? "")),
+        // DataCell(Text(data['paidLeaveDays']?.toString() ?? "")),
+        // DataCell(Text(data['unpaidLeaveDays']?.toString() ?? "")),
+        // DataCell(Text(data['unreportedLeaveDays']?.toString() ?? "")),
+        // DataCell(Text(data['violationCount']?.toString() ?? "")),
+        // //5 thuộc tính đánh giá
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(Text("")),
+        // DataCell(
+        //   Obx(() {
+        //     final item = controller.filterdataList[index];
+        //     Visibility(
+        //       visible: false,
+        //       child: Text(controller.filterdataList[index].toString()),
+        //     );
+        //     final status = item?['evaluationStatus'] as String? ?? 'OK';
+        //     final id = item?['employeeCode'] as String? ?? '';
+
+        //     return DropdownButton<String>(
+        //       value: status,
+        //       underline: Container(),
+        //       isDense: true,
+        //       style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+        //       dropdownColor: Colors.white,
+        //       borderRadius: BorderRadius.circular(8),
+        //       icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
+        //       items: const [
+        //         DropdownMenuItem(
+        //           value: 'OK',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.check_circle, color: Colors.green, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('OK'),
+        //             ],
+        //           ),
+        //         ),
+        //         DropdownMenuItem(
+        //           value: 'NG',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.cancel, color: Colors.red, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('NG'),
+        //             ],
+        //           ),
+        //         ),
+        //         DropdownMenuItem(
+        //           value: 'Stop Working',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('Stop Working'),
+        //             ],
+        //           ),
+        //         ),
+        //         DropdownMenuItem(
+        //           value: 'Finish L/C',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.done_all, color: Colors.blue, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('Finish L/C'),
+        //             ],
+        //           ),
+        //         ),
+        //       ],
+        //       onChanged: (newValue) {
+        //         if (newValue != null && id.isNotEmpty) {
+        //           controller.updateEvaluationStatus(id, newValue);
+        //           controller.filterdataList.refresh();
+        //         }
+        //       },
+        //     );
+        //   }),
+        // ),
+        // DataCell(
+        //   TextFormField(
+        //     decoration: InputDecoration(
+        //       labelText: 'Ghi chú',
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(8),
+        //       ),
+        //     ),
+        //     validator: (value) {
+        //       if (value == null || value.isEmpty) {
+        //         return 'Vui lòng nhập ghi chú';
+        //       }
+        //       return null;
+        //     },
+        //   ),
+        // ),
+        // DataCell(
+        //   Obx(() {
+        //     final item = controller.filterdataList[index];
+        //     Visibility(
+        //       visible: false,
+        //       child: Text(controller.filterdataList[index].toString()),
+        //     );
+        //     // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
+        //     final rawStatus = item['notRehire'] as String?;
+        //     final status = (rawStatus == 'OK' || rawStatus == 'NG')
+        //         ? rawStatus
+        //         : 'NG';
+        //     final employeeCode = item['employeeCode'] as String? ?? '';
+
+        //     return DropdownButton<String>(
+        //       value: status,
+        //       underline: Container(),
+        //       isDense: true,
+        //       style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+        //       dropdownColor: Colors.white,
+        //       borderRadius: BorderRadius.circular(8),
+        //       icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
+        //       items: const [
+        //         DropdownMenuItem(
+        //           value: 'OK',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.check_circle, color: Colors.green, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('O'),
+        //             ],
+        //           ),
+        //         ),
+        //         DropdownMenuItem(
+        //           value: 'NG',
+        //           child: Row(
+        //             children: [
+        //               Icon(Icons.cancel, color: Colors.red, size: 16),
+        //               SizedBox(width: 4),
+        //               Text('X'),
+        //             ],
+        //           ),
+        //         ),
+        //       ],
+        //       onChanged: (newValue) {
+        //         if (newValue != null && employeeCode.isNotEmpty) {
+        //           controller.updateRehireStatus(employeeCode, newValue);
+        //           controller.filterdataList.refresh();
+        //         }
+        //       },
+        //     );
+        //   }),
+        // ),
+        // DataCell(
+        //   TextFormField(
+        //     decoration: InputDecoration(
+        //       labelText: 'Lý do',
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(8),
+        //       ),
+        //     ),
+        //     validator: (value) {
+        //       if (value == null || value.isEmpty) {
+        //         return 'Vui lòng nhập lý do';
+        //       }
+        //       return null;
+        //     },
+        //   ),
+        // ),
         DataCell(
           Text(
             (index + 1).toString(),
-            style: TextStyle(color: Colors.blue[800]),
+            style: TextStyle(
+              color: Colors.blue[800],
+              fontSize: 12, // Added fontSize 12
+            ),
           ),
         ),
         //Action
@@ -796,30 +967,70 @@ class MyData extends DataTableSource {
             ],
           ),
         ),
-        DataCell(Text(data['employeeCode'] ?? "")),
-        DataCell(Text(data['gender'] ?? "")),
-        DataCell(Text(data['fullName'] ?? "")),
-        DataCell(Text(data['department'] ?? "")),
-        DataCell(Text(data['group'] ?? "")),
-        DataCell(Text(data['age']?.toString() ?? "")),
-        DataCell(Text(data['position'] ?? "")),
-        DataCell(Text(data['salaryGrade']?.toString() ?? "")),
-        DataCell(Text(data['contractValidity'] ?? "")),
-        DataCell(Text(data['contractEndDate'] ?? "")),
-        DataCell(Text(data['earlyLeaveCount']?.toString() ?? "")),
-        DataCell(Text(data['paidLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['unpaidLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['unreportedLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['violationCount']?.toString() ?? "")),
+        DataCell(
+          Text(data['employeeCode'] ?? "", style: TextStyle(fontSize: 12)),
+        ),
+        DataCell(Text(data['gender'] ?? "", style: TextStyle(fontSize: 12))),
+        DataCell(Text(data['fullName'] ?? "", style: TextStyle(fontSize: 12))),
+        DataCell(
+          Text(data['department'] ?? "", style: TextStyle(fontSize: 12)),
+        ),
+        DataCell(Text(data['group'] ?? "", style: TextStyle(fontSize: 12))),
+        DataCell(
+          Text(data['age']?.toString() ?? "", style: TextStyle(fontSize: 12)),
+        ),
+        DataCell(Text(data['position'] ?? "", style: TextStyle(fontSize: 12))),
+        DataCell(
+          Text(
+            data['salaryGrade']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        DataCell(
+          Text(data['contractValidity'] ?? "", style: TextStyle(fontSize: 12)),
+        ),
+        DataCell(
+          Text(data['contractEndDate'] ?? "", style: TextStyle(fontSize: 12)),
+        ),
+        DataCell(
+          Text(
+            data['earlyLeaveCount']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['paidLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['unpaidLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['unreportedLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['violationCount']?.toString() ?? "",
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
         //5 thuộc tính đánh giá
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
-        DataCell(Text("")),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
+        DataCell(Text("", style: TextStyle(fontSize: 12))),
         DataCell(
           Obx(() {
             final item = controller.filterdataList[index];
@@ -834,7 +1045,10 @@ class MyData extends DataTableSource {
               value: status,
               underline: Container(),
               isDense: true,
-              style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+              style: TextStyle(
+                fontSize: 12,
+                color: _getStatusColor(status),
+              ), // Changed to 12
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
@@ -845,7 +1059,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('OK'),
+                      Text(
+                        'OK',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -855,7 +1072,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('NG'),
+                      Text(
+                        'NG',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -865,7 +1085,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.pause_circle, color: Colors.orange, size: 16),
                       SizedBox(width: 4),
-                      Text('Stop Working'),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -875,7 +1098,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.done_all, color: Colors.blue, size: 16),
                       SizedBox(width: 4),
-                      Text('Finish L/C'),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -891,8 +1117,10 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           TextFormField(
+            style: TextStyle(fontSize: 12), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Ghi chú',
+              labelStyle: TextStyle(fontSize: 12), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -923,7 +1151,10 @@ class MyData extends DataTableSource {
               value: status,
               underline: Container(),
               isDense: true,
-              style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+              style: TextStyle(
+                fontSize: 12,
+                color: _getStatusColor(status),
+              ), // Changed to 12
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
@@ -934,7 +1165,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('O'),
+                      Text(
+                        'O',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -944,7 +1178,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('X'),
+                      Text(
+                        'X',
+                        style: TextStyle(fontSize: 12),
+                      ), // Added fontSize 12
                     ],
                   ),
                 ),
@@ -960,8 +1197,10 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           TextFormField(
+            style: TextStyle(fontSize: 12), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Lý do',
+              labelStyle: TextStyle(fontSize: 12), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
