@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 
-class ApprenticeContract extends StatefulWidget {
-  const ApprenticeContract({super.key});
+class ApprovalPrepartionScreen extends StatefulWidget {
+  const ApprovalPrepartionScreen({super.key});
 
   @override
-  State<ApprenticeContract> createState() => _ApprenticeContractState();
+  State<ApprovalPrepartionScreen> createState() =>
+      _ApprovalPrepartionScreenState();
 }
 
-class _ApprenticeContractState extends State<ApprenticeContract> {
-  final DashboardControllerApprentice controller = Get.put(
-    DashboardControllerApprentice(),
+class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
+  final DashboardControllerApporverPer controller = Get.put(
+    DashboardControllerApporverPer(),
   );
   final ScrollController _scrollController = ScrollController();
 
@@ -62,10 +62,12 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
 
     // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
     final List<Map<String, String>> _confirmersList = [
-      {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-      {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-      {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-      {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
+      {'id': '1', 'name': 'Hợp đồng học nghề, thử việc'},
+      {'id': '2', 'name': 'Hợp đồng 2 năm'},
+    ];
+    final List<Map<String, String>> _sectionsList = [
+      {'id': '1', 'name': 'R&D-IT'},
+      {'id': '2', 'name': 'R&D-EE'},
     ];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,7 +96,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Người xác nhận: ',
+              'Loại hợp đồng: ',
               style: TextStyle(
                 color: Common.primaryColor,
                 fontWeight: FontWeight.bold,
@@ -115,7 +117,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 Icons.arrow_drop_down,
                 color: Common.primaryColor.withOpacity(0.8),
               ),
-              hint: const Text('Chọn người xác nhận'),
+              hint: const Text('Chọn loại hợp đồng'),
               items: _confirmersList.map((confirmer) {
                 return DropdownMenuItem<String>(
                   value: confirmer['id'],
@@ -135,13 +137,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                               confirmer['name'] ?? '',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              confirmer['position'] ?? '',
-                              style: TextStyle(
-                                fontSize: Common.sizeColumn,
-                                color: Colors.grey,
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -153,7 +148,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 setState(() {
                   _selectedConfirmer = newValue;
                 });
-                // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
               },
             ),
             if (_selectedConfirmer != null) const SizedBox(width: 8),
@@ -168,12 +162,241 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
               ),
           ],
         ),
+        // tim kiem theo phong ban
         const SizedBox(width: 30),
-        // Button gửi
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Phòng ban: ',
+              style: TextStyle(
+                color: Common.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            DropdownButton<String>(
+              value: _selectedConfirmer,
+              underline: Container(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              hint: const Text('Chọn phòng ban'),
+              items: _sectionsList.map((confirmer) {
+                return DropdownMenuItem<String>(
+                  value: confirmer['id'],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedConfirmer = newValue;
+                });
+              },
+            ),
+            if (_selectedConfirmer != null) const SizedBox(width: 8),
+            if (_selectedConfirmer != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedConfirmer = null;
+                  });
+                },
+              ),
+          ],
+        ),
+        // tim kiem theo nhóm
+        const SizedBox(width: 30),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Nhóm: ',
+              style: TextStyle(
+                color: Common.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            DropdownButton<String>(
+              value: _selectedConfirmer,
+              underline: Container(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              hint: const Text('Chọn nhóm'),
+              items: _sectionsList.map((confirmer) {
+                return DropdownMenuItem<String>(
+                  value: confirmer['id'],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedConfirmer = newValue;
+                });
+              },
+            ),
+            if (_selectedConfirmer != null) const SizedBox(width: 8),
+            if (_selectedConfirmer != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedConfirmer = null;
+                  });
+                },
+              ),
+          ],
+        ),
+        // tim kien theo vi tri
+        const SizedBox(width: 30),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Vị trí: ',
+              style: TextStyle(
+                color: Common.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            DropdownButton<String>(
+              value: _selectedConfirmer,
+              underline: Container(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              hint: const Text('Chọn vị trí'),
+              items: _sectionsList.map((confirmer) {
+                return DropdownMenuItem<String>(
+                  value: confirmer['id'],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedConfirmer = newValue;
+                });
+              },
+            ),
+            if (_selectedConfirmer != null) const SizedBox(width: 8),
+            if (_selectedConfirmer != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedConfirmer = null;
+                  });
+                },
+              ),
+          ],
+        ),
+
+        const SizedBox(width: 30),
+        // Button xác nhận
         GestureDetector(
           onTap: () {},
           child: Container(
-            width: 130,
+            width: 150,
             height: 36,
             decoration: BoxDecoration(
               color: Common.primaryColor,
@@ -182,7 +405,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: const Center(
               child: Text(
-                'Gửi',
+                'Xác nhận',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -201,16 +424,16 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Lập đánh giá kết thúc hợp đồng học nghề, thử việc',
+          'Phê duyệt chuẩn bị',
           style: TextStyle(
-            color: Colors.blue.withOpacity(0.9),
+            color: Common.primaryColor.withOpacity(0.8),
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
         ),
         const SizedBox(height: 4),
         Text(
-          'Lập danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm',
+          'Phê duyệt của nhân sự cho danh sách đánh giá các công nhân viên chuyển sang loại hợp đồng mới',
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
       ],
@@ -269,31 +492,10 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
           ),
         ),
         const SizedBox(width: 12),
-
-        // Action Buttons
-        buildActionButton(
-          icon: Iconsax.import,
-          color: Colors.blue,
-          tooltip: 'Import dữ liệu',
-          onPressed: () => _showImportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.export,
-          color: Colors.green,
-          tooltip: 'Export dữ liệu',
-          onPressed: () => _showExportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.add,
-          color: Colors.orange,
-          tooltip: 'Thêm mới',
-          onPressed: () => _showAddDialog(),
-        ),
       ],
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -324,7 +526,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3350,
+              width: 2470,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -405,7 +607,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: 'Vị trí',
-                    width:100,
+                    width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -454,63 +656,28 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Đào tạo lý thuyết',
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Đào tạo thực hành',
-                    width: 120,
-                    fontSize: Common.sizeColumn,
-                    maxLines: 2,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Hoàn thành công việc',
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Khả năng học hỏi',
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Khả năng thích nghi',
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Tinh thần hỗ trợ, quan hệ với đồng nghiệp',
-                    fontSize: Common.sizeColumn,
-                    width: 150,
-                    maxLines: 3,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Báo cáo, liên lạc, thảo thuận',
-                    fontSize: Common.sizeColumn,
+                    title: 'Lý do',
                     width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Chấp hành nội quy công ty',
-                    fontSize: Common.sizeColumn,
-                    width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Kết quả cuối cùng',
-                    fontSize: Common.sizeColumn,
-                    width: 150,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Ghi chú',
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: 'Trường hợp không tuyển dụng lại điền "X"',
-                    width: 170,
-                    fontSize: Common.sizeColumn,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do không tuyển dụng lại',
+                    title: 'Loại hợp đồng',
                     width: 170,
-                    fontSize: Common.sizeColumn,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Trường hợp không đồng ý điền "X"',
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do không đồng ý',
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                 ],
                 source: MyData(),
@@ -521,167 +688,10 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       ),
     );
   }
-
-  void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn file Excel để import dữ liệu',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Iconsax.document_upload),
-              label: const Text('Chọn File'),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showExportDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Export Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn định dạng export',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildExportOption(Iconsax.document_text, 'Excel'),
-                _buildExportOption(Iconsax.document2, 'PDF'),
-                _buildExportOption(Iconsax.document_text, 'CSV'),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Export logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Export'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExportOption(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
-      ],
-    );
-  }
-
-  void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class MyData extends DataTableSource {
-  final DashboardControllerApprentice controller = Get.find();
+  final DashboardControllerApporverPer controller = Get.find();
 
   @override
   DataRow? getRow(int index) {
@@ -708,7 +718,7 @@ class MyData extends DataTableSource {
             (index + 1).toString(),
             style: TextStyle(
               color: Colors.blue[800],
-              fontSize: Common.sizeColumn, // Added fontSize 12
+              fontSize: Common.sizeColumn,
             ),
           ),
         ),
@@ -738,18 +748,47 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['employeeCode'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['employeeCode'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['gender'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text(data['fullName'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['department'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['gender'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['group'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['age']?.toString() ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['fullName'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['position'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(
+          Text(
+            data['department'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['group'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['age']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['position'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         DataCell(
           Text(
             data['salaryGrade']?.toString() ?? "",
@@ -757,10 +796,16 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['contractValidity'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractValidity'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
-          Text(data['contractEndDate'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractEndDate'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
           Text(
@@ -792,15 +837,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        //5 thuộc tính đánh giá
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        // thuộc tính approver
         DataCell(
           Obx(() {
             final item = controller.filterdataList[index];
@@ -808,109 +847,6 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
-
-            return DropdownButton<String>(
-              value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn,
-                color: _getStatusColor(status),
-              ), // Changed to 12
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(fontSize: Common.sizeColumn,),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.cancel, color: Colors.red, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: (newValue) {
-                if (newValue != null && id.isNotEmpty) {
-                  controller.updateEvaluationStatus(id, newValue);
-                  controller.filterdataList.refresh();
-                }
-              },
-            );
-          }),
-        ),
-        DataCell(
-          TextFormField(
-            style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
-            decoration: InputDecoration(
-              labelText: 'Ghi chú',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập ghi chú';
-              }
-              return null;
-            },
-          ),
-        ),
-        DataCell(
-          Obx(() {
-            final item = controller.filterdataList[index];
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
             final rawStatus = item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
@@ -922,23 +858,20 @@ class MyData extends DataTableSource {
               underline: Container(),
               isDense: true,
               style: TextStyle(
-                fontSize: Common.sizeColumn,
+                fontSize: Common.sizeColumn, // Cập nhật font size
                 color: _getStatusColor(status),
-              ), // Changed to 12
+              ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items:  [
+              items: [
                 DropdownMenuItem(
                   value: 'OK',
                   child: Row(
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
+                      Text('O', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -948,10 +881,7 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
+                      Text('X', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -967,10 +897,14 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           TextFormField(
-            style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+            style: TextStyle(
+              fontSize: Common.sizeColumn,
+            ), // Thêm cho TextFormField
             decoration: InputDecoration(
               labelText: 'Lý do',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Thêm cho label
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1163,7 +1097,7 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class DashboardControllerApprentice extends GetxController {
+class DashboardControllerApporverPer extends GetxController {
   var dataList = <Map<String, String>>[].obs;
   var filterdataList = <Map<String, String>>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
@@ -1212,35 +1146,6 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // các trường đánh giá
-  void updateReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['reason'] = reason;
-      dataList.refresh();
-    }
-  }
-
-  void updateHealthStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['healthStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateEvaluationStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['evaluationStatus'] = status;
-      dataList.refresh();
-    }
-  }
 
   void updateRehireStatus(String employeeCode, String value) {
     final index = dataList.indexWhere(
@@ -1293,11 +1198,8 @@ class DashboardControllerApprentice extends GetxController {
           'unpaidLeaveDays': (index % 3).toString(),
           'unreportedLeaveDays': (index % 2).toString(),
           'violationCount': (index % 4).toString(),
-          'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
-          'healthStatus': 'Đạt',
-          'notRehire': 'NG',
+          'notRehire': 'OK',
           'notRehireReason': '',
-          'reason': '',
         };
       }),
     );

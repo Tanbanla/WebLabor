@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
+import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
+import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
 import 'package:web_labor_contract/Screen/User/CreateContract/apprentice_contract.dart';
 import 'package:web_labor_contract/Screen/User/CreateContract/two_contract.dart';
-import 'package:web_labor_contract/Screen/User/Master/master_pthc.dart';
-import 'package:web_labor_contract/Screen/User/Master/master_user.dart';
+import 'package:web_labor_contract/Screen/Admin/Master/master_pthc.dart';
+import 'package:web_labor_contract/Screen/Admin/Master/master_user.dart';
+import 'package:web_labor_contract/Screen/User/Fill_Review/fill_apprentice.dart';
+import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
+import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -14,15 +20,16 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  Widget _currentBody = TwoContractScreen(); 
+  Widget _currentBody = HomeScreen(); //TwoContractScreen();
 
-    // Hàm này sẽ được truyền xuống drawer
+  // Hàm này sẽ được truyền xuống drawer
   void _changeBody(Widget newBody) {
     setState(() {
       _currentBody = newBody;
       Navigator.of(context).pop();
     });
   }
+
   //
   @override
   Widget build(BuildContext context) {
@@ -91,7 +98,7 @@ class _MenuScreenState extends State<MenuScreen> {
           color: Common.primaryColor,
           backgroundBlendMode: BlendMode.saturation,
         ),
-        child:  _currentBody,
+        child: _currentBody,
       ),
     );
   }
@@ -162,7 +169,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
                           color: Colors.white,
                         ),
                   children: cdm.submenus.map((subMenu) {
-                    return sMenuButton(subMenu, false,cdm.title);
+                    return sMenuButton(subMenu, false, cdm.title);
                   }).toList(),
                 );
               },
@@ -254,7 +261,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
                 return subMenuWidget(
                   [cmd.title]..addAll(cmd.submenus),
                   isValidSubMenu,
-                  cmd.title
+                  cmd.title,
                 );
               },
             ),
@@ -278,7 +285,11 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     );
   }
 
-  Widget subMenuWidget(List<String> submenus, bool isValidSubMenu, String title) {
+  Widget subMenuWidget(
+    List<String> submenus,
+    bool isValidSubMenu,
+    String title,
+  ) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
       height: isValidSubMenu ? submenus.length.toDouble() * 70 : 45,
@@ -297,18 +308,19 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         itemCount: isValidSubMenu ? submenus.length : 0,
         itemBuilder: (context, index) {
           String subMenu = submenus[index];
-          
+
           return sMenuButton(subMenu, index == 0, title);
         },
       ),
     );
   }
+
   Widget sMenuButton(String subMenu, bool isTitle, String title) {
     return InkWell(
       onTap: () {
-      if (!isTitle) {
-        // Xử lý chuyển đổi giao diện dựa trên subMenu được chọn
-        switch (subMenu) {
+        if (!isTitle) {
+          // Xử lý chuyển đổi giao diện dựa trên subMenu được chọn
+          switch (subMenu) {
             case "Quản lý User":
               widget.changeBody(MasterUser());
               break;
@@ -316,19 +328,34 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               widget.changeBody(MasterPTHC());
               break;
             case "Hợp đồng không xác định thời gian":
-              if(title == "Lập đánh giá"){
+              if (title == "Lập đánh giá") {
                 widget.changeBody(TwoContractScreen());
+              }
+              if (title == "Điền đánh giá") {
+                widget.changeBody(FillTwoScreen());
+              }
+              if (title == "Phê duyệt") {
+                widget.changeBody(ApprovalTwoScreen());
               }
               break;
             case "Hợp đồng thử nghề & học việc":
-              if(title == "Lập đánh giá"){
+              if (title == "Lập đánh giá") {
                 widget.changeBody(ApprenticeContract());
               }
+              if (title == "Điền đánh giá") {
+                widget.changeBody(FillApprenticeScreen());
+              }
+              if (title == "Phê duyệt") {
+                widget.changeBody(ApprovalTrialScreen());
+              }
+              break;
+            case "Phê duyệt chuẩn bị":
+              widget.changeBody(ApprovalPrepartionScreen());
               break;
             default:
               widget.changeBody(MasterUser());
+          }
         }
-      }
       },
       child: Container(
         width: 200,
@@ -389,7 +416,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     CDM(Icons.subscriptions, "Lập đánh giá", [
       "Hợp đồng thử nghề & học việc",
       "Hợp đồng không xác định thời gian",
-      "Phê duyệt chuẩn bị"
+      "Phê duyệt chuẩn bị",
     ]),
     CDM(Icons.explore, "Điền đánh giá", [
       "Hợp đồng thử nghề & học việc",

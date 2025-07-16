@@ -7,16 +7,16 @@ import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 
-class ApprenticeContract extends StatefulWidget {
-  const ApprenticeContract({super.key});
+class ApprovalTrialScreen extends StatefulWidget {
+  const ApprovalTrialScreen({super.key});
 
   @override
-  State<ApprenticeContract> createState() => _ApprenticeContractState();
+  State<ApprovalTrialScreen> createState() => _ApprovalTrialScreenState();
 }
 
-class _ApprenticeContractState extends State<ApprenticeContract> {
-  final DashboardControllerApprentice controller = Get.put(
-    DashboardControllerApprentice(),
+class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
+  final DashboardControllerTrial controller = Get.put(
+    DashboardControllerTrial(),
   );
   final ScrollController _scrollController = ScrollController();
 
@@ -61,11 +61,9 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
     String? _selectedConfirmer;
 
     // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
-    final List<Map<String, String>> _confirmersList = [
-      {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-      {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-      {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-      {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
+    final List<Map<String, String>> _sectionsList = [
+      {'id': '1', 'name': 'R&D-IT'},
+      {'id': '2', 'name': 'R&D-EE'},
     ];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -89,12 +87,13 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             ),
           ],
         ),
+        // tim kiem theo phong ban
         const SizedBox(width: 30),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Người xác nhận: ',
+              'Phòng ban: ',
               style: TextStyle(
                 color: Common.primaryColor,
                 fontWeight: FontWeight.bold,
@@ -115,15 +114,19 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 Icons.arrow_drop_down,
                 color: Common.primaryColor.withOpacity(0.8),
               ),
-              hint: const Text('Chọn người xác nhận'),
-              items: _confirmersList.map((confirmer) {
+              hint: const Text('Chọn phòng ban'),
+              items: _sectionsList.map((confirmer) {
                 return DropdownMenuItem<String>(
                   value: confirmer['id'],
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Center(
-                        child: Icon(Icons.person, color: Colors.blue, size: 16),
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Center(
@@ -134,13 +137,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                             Text(
                               confirmer['name'] ?? '',
                               style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              confirmer['position'] ?? '',
-                              style: TextStyle(
-                                fontSize: Common.sizeColumn,
-                                color: Colors.grey,
-                              ),
                             ),
                           ],
                         ),
@@ -153,7 +149,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 setState(() {
                   _selectedConfirmer = newValue;
                 });
-                // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
               },
             ),
             if (_selectedConfirmer != null) const SizedBox(width: 8),
@@ -168,12 +163,165 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
               ),
           ],
         ),
+        // tim kiem theo nhóm
         const SizedBox(width: 30),
-        // Button gửi
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Nhóm: ',
+              style: TextStyle(
+                color: Common.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            DropdownButton<String>(
+              value: _selectedConfirmer,
+              underline: Container(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              hint: const Text('Chọn nhóm'),
+              items: _sectionsList.map((confirmer) {
+                return DropdownMenuItem<String>(
+                  value: confirmer['id'],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedConfirmer = newValue;
+                });
+              },
+            ),
+            if (_selectedConfirmer != null) const SizedBox(width: 8),
+            if (_selectedConfirmer != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedConfirmer = null;
+                  });
+                },
+              ),
+          ],
+        ),
+        // tim kien theo vi tri
+        const SizedBox(width: 30),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Vị trí: ',
+              style: TextStyle(
+                color: Common.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            DropdownButton<String>(
+              value: _selectedConfirmer,
+              underline: Container(),
+              isDense: true,
+              style: TextStyle(
+                fontSize: 14,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Common.primaryColor.withOpacity(0.8),
+              ),
+              hint: const Text('Chọn vị trí'),
+              items: _sectionsList.map((confirmer) {
+                return DropdownMenuItem<String>(
+                  value: confirmer['id'],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.room_preferences,
+                          color: Colors.blue,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedConfirmer = newValue;
+                });
+              },
+            ),
+            if (_selectedConfirmer != null) const SizedBox(width: 8),
+            if (_selectedConfirmer != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  setState(() {
+                    _selectedConfirmer = null;
+                  });
+                },
+              ),
+          ],
+        ),
+
+        const SizedBox(width: 30),
+        // Button xác nhận
         GestureDetector(
           onTap: () {},
           child: Container(
-            width: 130,
+            width: 150,
             height: 36,
             decoration: BoxDecoration(
               color: Common.primaryColor,
@@ -182,7 +330,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: const Center(
               child: Text(
-                'Gửi',
+                'Xác nhận',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -201,7 +349,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Lập đánh giá kết thúc hợp đồng học nghề, thử việc',
+          'Phê duyệt đánh giá kết thúc hợp đồng học nghề, thử việc',
           style: TextStyle(
             color: Colors.blue.withOpacity(0.9),
             fontWeight: FontWeight.bold,
@@ -210,7 +358,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Lập danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm',
+          'Phê duyệt danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm',
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
       ],
@@ -271,12 +419,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
         const SizedBox(width: 12),
 
         // Action Buttons
-        buildActionButton(
-          icon: Iconsax.import,
-          color: Colors.blue,
-          tooltip: 'Import dữ liệu',
-          onPressed: () => _showImportDialog(),
-        ),
         const SizedBox(width: 8),
         buildActionButton(
           icon: Iconsax.export,
@@ -284,16 +426,10 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
           tooltip: 'Export dữ liệu',
           onPressed: () => _showExportDialog(),
         ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.add,
-          color: Colors.orange,
-          tooltip: 'Thêm mới',
-          onPressed: () => _showAddDialog(),
-        ),
       ],
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -405,7 +541,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: 'Vị trí',
-                    width:100,
+                    width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -521,55 +657,6 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       ),
     );
   }
-
-  void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn file Excel để import dữ liệu',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Iconsax.document_upload),
-              label: const Text('Chọn File'),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showExportDialog() {
     Get.dialog(
       AlertDialog(
@@ -619,69 +706,10 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       ],
     );
   }
-
-  void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class MyData extends DataTableSource {
-  final DashboardControllerApprentice controller = Get.find();
+  final DashboardControllerTrial controller = Get.find();
 
   @override
   DataRow? getRow(int index) {
@@ -738,18 +766,47 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['employeeCode'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['employeeCode'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['gender'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text(data['fullName'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['department'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['gender'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['group'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['age']?.toString() ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['fullName'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['position'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(
+          Text(
+            data['department'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['group'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['age']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['position'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         DataCell(
           Text(
             data['salaryGrade']?.toString() ?? "",
@@ -757,10 +814,16 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['contractValidity'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractValidity'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
-          Text(data['contractEndDate'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractEndDate'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
           Text(
@@ -827,11 +890,15 @@ class MyData extends DataTableSource {
                   value: 'OK',
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 16,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'OK',
-                        style: TextStyle(fontSize: Common.sizeColumn,),
+                        style: TextStyle(fontSize: Common.sizeColumn),
                       ), // Added fontSize 12
                     ],
                   ),
@@ -853,7 +920,11 @@ class MyData extends DataTableSource {
                   value: 'Stop Working',
                   child: Row(
                     children: [
-                      const Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      const Icon(
+                        Icons.pause_circle,
+                        color: Colors.orange,
+                        size: 16,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Stop Working',
@@ -890,7 +961,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Ghi chú',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -928,7 +1001,7 @@ class MyData extends DataTableSource {
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items:  [
+              items: [
                 DropdownMenuItem(
                   value: 'OK',
                   child: Row(
@@ -970,7 +1043,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Lý do',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1163,7 +1238,7 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class DashboardControllerApprentice extends GetxController {
+class DashboardControllerTrial extends GetxController {
   var dataList = <Map<String, String>>[].obs;
   var filterdataList = <Map<String, String>>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
@@ -1295,7 +1370,7 @@ class DashboardControllerApprentice extends GetxController {
           'violationCount': (index % 4).toString(),
           'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
           'healthStatus': 'Đạt',
-          'notRehire': 'NG',
+          'notRehire': 'OK',
           'notRehireReason': '',
           'reason': '',
         };

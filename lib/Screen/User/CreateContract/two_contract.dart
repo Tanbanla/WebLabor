@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
+import 'package:web_labor_contract/Common/data_column_custom.dart';
 
 class TwoContractScreen extends StatefulWidget {
   const TwoContractScreen({super.key});
@@ -118,7 +120,9 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Center(child: Icon(Icons.person, color: Colors.blue, size: 16)),
+                      Center(
+                        child: Icon(Icons.person, color: Colors.blue, size: 16),
+                      ),
                       const SizedBox(width: 8),
                       Center(
                         child: Column(
@@ -131,7 +135,10 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                             ),
                             Text(
                               confirmer['position'] ?? '',
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),
@@ -262,21 +269,21 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         const SizedBox(width: 12),
 
         // Action Buttons
-        _buildActionButton(
+        buildActionButton(
           icon: Iconsax.import,
           color: Colors.blue,
           tooltip: 'Import dữ liệu',
           onPressed: () => _showImportDialog(),
         ),
         const SizedBox(width: 8),
-        _buildActionButton(
+        buildActionButton(
           icon: Iconsax.export,
           color: Colors.green,
           tooltip: 'Export dữ liệu',
           onPressed: () => _showExportDialog(),
         ),
         const SizedBox(width: 8),
-        _buildActionButton(
+        buildActionButton(
           icon: Iconsax.add,
           color: Colors.orange,
           tooltip: 'Thêm mới',
@@ -285,29 +292,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       ],
     );
   }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required String tooltip,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: color.withOpacity(0.1),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color),
-        tooltip: tooltip,
-        onPressed: onPressed,
-      ),
-    );
-  }
-
   Widget _buildDataTable() {
-    double width = MediaQuery.of(context).size.width;
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -337,7 +322,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2725,
+              width: 2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -374,106 +359,128 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   );
                 },
                 columns: [
-                  DataColumn2(
-                    label: const Text('STT'),
-                    fixedWidth: 60,
+                  DataColumnCustom(
+                    title: 'STT',
+                    width: 70,
                     onSort: controller.sortById,
-                  ),
-                  DataColumn2(label: const Text('Hành động'), fixedWidth: 150),
-                  DataColumn2(label: const Text('Mã NV'), fixedWidth: 100),
-                  DataColumn2(label: const Text('M/F'), fixedWidth: 60),
-                  DataColumn2(label: const Text('Họ và tên'), fixedWidth: 180),
-                  DataColumn2(label: const Text('Phòng ban'), fixedWidth: 150),
-                  DataColumn2(label: const Text('Nhóm'), fixedWidth: 100),
-                  DataColumn2(
-                    label: const Text('Tuổi'),
-                    fixedWidth: 80,
-                    numeric: true,
-                  ),
-                  DataColumn2(label: const Text('Vị trí'), fixedWidth: 150),
-                  DataColumn2(label: const Text('Bậc lương'), fixedWidth: 100),
-                  DataColumn2(
-                    label: const Text('Hiệu lực HD'),
-                    fixedWidth: 120,
-                  ),
-                  DataColumn2(
-                    label: const Text('Ngày kết thúc HD'),
-                    fixedWidth: 150,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Số lần đi mượn, về sớm',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 110,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Nghỉ hưởng lương',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 90,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Nghỉ không lương',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 90,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Nghỉ không báo cáo',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 90,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Số lần vi phạm nội quy công ty',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 130,
-                  ),
-                  DataColumn2(label: const Text('Lý do')),
-                  DataColumn2(
-                    label: const Text(
-                      'Kết quả khám sức khỏe',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 120,
-                  ),
-                  DataColumn2(label: const Text('Kết quả đánh giá')),
-                  DataColumn2(
-                    label: const Text(
-                      'Trường hợp không tuyển dụng lại điền "X"',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 170,
-                  ),
-                  DataColumn2(
-                    label: const Text(
-                      'Lý do không tuyển dụng lại',
-                      style: TextStyle(height: 1.5),
-                      maxLines: 2, // Giới hạn số dòng hiển thị
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    fixedWidth: 170,
-                  ),
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  // DataColumn2
+                  DataColumnCustom(
+                    title: 'Hành động',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Mã NV',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'M/F',
+                    width: 60,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Họ và tên',
+                    width: 180,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Phòng ban',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nhóm',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Tuổi',
+                    width: 70,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Vị trí',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Bậc lương',
+                    width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Hiệu lực HD',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Ngày kết thúc HD',
+                    width: 120,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Số lần đi mượn, về sớm',
+                    width: 110,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ hưởng lương',
+                    width: 100,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ không lương',
+                    width: 90,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Nghỉ không báo cáo',
+                    width: 90,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Số lần vi phạm nội quy công ty',
+                    width: 130,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do',
+                    width: 130,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Kết quả khám sức khỏe',
+                    width: 120,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Kết quả đánh giá',
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Trường hợp không tuyển dụng lại điền "X"',
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do không tuyển dụng lại',
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
                 ],
                 source: MyData(),
               ),
@@ -668,7 +675,10 @@ class MyData extends DataTableSource {
         DataCell(
           Text(
             (index + 1).toString(),
-            style: TextStyle(color: Colors.blue[800]),
+            style: TextStyle(
+              color: Colors.blue[800],
+              fontSize: Common.sizeColumn,
+            ),
           ),
         ),
         //Action
@@ -696,27 +706,108 @@ class MyData extends DataTableSource {
             ],
           ),
         ),
-        DataCell(Text(data['employeeCode'] ?? "")),
-        DataCell(Text(data['gender'] ?? "")),
-        DataCell(Text(data['fullName'] ?? "")),
-        DataCell(Text(data['department'] ?? "")),
-        DataCell(Text(data['group'] ?? "")),
-        DataCell(Text(data['age']?.toString() ?? "")),
-        DataCell(Text(data['position'] ?? "")),
-        DataCell(Text(data['salaryGrade']?.toString() ?? "")),
-        DataCell(Text(data['contractValidity'] ?? "")),
-        DataCell(Text(data['contractEndDate'] ?? "")),
-        DataCell(Text(data['earlyLeaveCount']?.toString() ?? "")),
-        DataCell(Text(data['paidLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['unpaidLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['unreportedLeaveDays']?.toString() ?? "")),
-        DataCell(Text(data['violationCount']?.toString() ?? "")),
+        DataCell(
+          Text(
+            data['employeeCode'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['gender'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['fullName'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['department'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['group'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['age']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['position'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['salaryGrade']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['contractValidity'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['contractEndDate'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['earlyLeaveCount']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['paidLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['unpaidLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['unreportedLeaveDays']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['violationCount']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         //5 thuộc tính đánh giá
-        DataCell(Text("")),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           TextFormField(
+            style: TextStyle(
+              fontSize: Common.sizeColumn,
+            ), // Thêm cho TextFormField
             decoration: InputDecoration(
               labelText: 'Sức khỏe',
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Thêm cho label
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -743,18 +834,21 @@ class MyData extends DataTableSource {
               value: status,
               underline: Container(),
               isDense: true,
-              style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+              style: TextStyle(
+                fontSize: Common.sizeColumn, // Cập nhật font size
+                color: _getStatusColor(status),
+              ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'OK',
                   child: Row(
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('OK'),
+                      Text('OK', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -764,7 +858,7 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('NG'),
+                      Text('NG', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -774,7 +868,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.pause_circle, color: Colors.orange, size: 16),
                       SizedBox(width: 4),
-                      Text('Stop Working'),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(fontSize: Common.sizeColumn),
+                      ),
                     ],
                   ),
                 ),
@@ -784,7 +881,10 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.done_all, color: Colors.blue, size: 16),
                       SizedBox(width: 4),
-                      Text('Finish L/C'),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(fontSize: Common.sizeColumn),
+                      ),
                     ],
                   ),
                 ),
@@ -805,7 +905,6 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
             final rawStatus = item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
@@ -816,18 +915,21 @@ class MyData extends DataTableSource {
               value: status,
               underline: Container(),
               isDense: true,
-              style: TextStyle(fontSize: 14, color: _getStatusColor(status)),
+              style: TextStyle(
+                fontSize: Common.sizeColumn, // Cập nhật font size
+                color: _getStatusColor(status),
+              ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'OK',
                   child: Row(
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('O'),
+                      Text('O', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -837,7 +939,7 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('X'),
+                      Text('X', style: TextStyle(fontSize: Common.sizeColumn)),
                     ],
                   ),
                 ),
@@ -853,8 +955,14 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           TextFormField(
+            style: TextStyle(
+              fontSize: Common.sizeColumn,
+            ), // Thêm cho TextFormField
             decoration: InputDecoration(
               labelText: 'Lý do',
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Thêm cho label
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
