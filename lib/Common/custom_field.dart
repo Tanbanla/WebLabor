@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -18,7 +19,8 @@ class CustomField extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      width: size.width / 5,
+      width: max(size.width / 5, 350),
+      constraints: BoxConstraints(minWidth: 350),
       child: TextField(
         cursorRadius: const Radius.circular(20),
         obscureText: obscureText,

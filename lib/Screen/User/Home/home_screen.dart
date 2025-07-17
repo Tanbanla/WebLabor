@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Common.primaryColor.withOpacity(0.4),
+      backgroundColor: Common.greenColor.withOpacity(0.4),
       body: Row(children: [Column(), Column()]),
     );
   }
