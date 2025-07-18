@@ -1,57 +1,94 @@
 import 'dart:math';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:web_labor_contract/Common/common.dart';
 
 class CustomField extends StatelessWidget {
+  final TextEditingController? controller;
   final IconData icon;
   final bool obscureText;
   final String hinText;
+  final String? Function(String?)? validator;
+  final TextStyle? textStyle;
+  final Color? cursorColor;
+  final Radius? cursorRadius;
+  final InputDecoration? decoration;
+
   const CustomField({
     super.key,
+    this.controller,
     required this.icon,
     required this.obscureText,
     required this.hinText,
+    this.validator,
+    this.textStyle,
+    this.cursorColor,
+    this.cursorRadius,
+    this.decoration,
   });
 
   @override
-  //
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Container(
-      width: max(size.width / 5, 350),
-      constraints: BoxConstraints(minWidth: 350),
-      child: TextField(
-        cursorRadius: const Radius.circular(20),
+      width: math.max(size.width / 5, 350),
+      constraints: const BoxConstraints(minWidth: 350),
+      child: TextFormField(
+        // Đổi từ TextField sang TextFormField để hỗ trợ validator
+        controller: controller,
         obscureText: obscureText,
-        style: TextStyle(color: Common.blackColor),
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 15,
-            horizontal: 20,
-          ),
-          filled: true, // Bật nền fill
-          fillColor: Common.greenColor.withOpacity(.2), // Màu nền
-          prefixIcon: Icon(icon, color: Common.blackColor.withOpacity(.3)),
-          hintText: hinText,
-          border: OutlineInputBorder(
-            // Sử dụng OutlineInputBorder thay vì InputBorder.none
-            borderRadius: BorderRadius.circular(30), // Độ bo tròn
-            borderSide: BorderSide.none, // Ẩn đường viền mặc định
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: Common.blackColor.withOpacity(.5), // Màu viền khi focus
-              width: 1.0,
+        validator: validator,
+        style: textStyle ?? TextStyle(color: Common.blackColor),
+        cursorRadius: cursorRadius ?? const Radius.circular(20),
+        cursorColor: cursorColor ?? Common.blackColor.withOpacity(.5),
+        decoration:
+            decoration ??
+            InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 20,
+              ),
+              filled: true,
+              fillColor: Common.greenColor.withOpacity(.2),
+              prefixIcon: Icon(
+                icon,
+                color: Common.blackColor.withOpacity(.3),
+                size: 20,
+              ),
+              hintText: hinText,
+              hintStyle: TextStyle(
+                color: Common.blackColor.withOpacity(.4),
+                fontSize: 13,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+                gapPadding: 4,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Common.blackColor.withOpacity(.5),
+                  width: 1.0,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                // style cho lỗi validation
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.red, width: 1.0),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                // style khi có lỗi và focus
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              ),
             ),
-          ),
-        ),
-        cursorColor: Common.blackColor.withOpacity(.5),
       ),
     );
   }
@@ -121,4 +158,3 @@ class CustomField1 extends StatelessWidget {
     );
   }
 }
-
