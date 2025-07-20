@@ -15,12 +15,21 @@ class ApprovalTwoScreen extends StatefulWidget {
 }
 
 class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
-  final DashboardControllerTwoApprovel controller = Get.put(DashboardControllerTwoApprovel());
+  final DashboardControllerTwoApprovel controller = Get.put(
+    DashboardControllerTwoApprovel(),
+  );
   final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Phê duyệt hợp đồng'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       backgroundColor: Colors.grey[50],
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -55,7 +64,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     );
   }
 
-Widget _buildApproverPer() {
+  Widget _buildApproverPer() {
     String? _selectedConfirmer;
 
     // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
@@ -425,6 +434,7 @@ Widget _buildApproverPer() {
       ],
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(

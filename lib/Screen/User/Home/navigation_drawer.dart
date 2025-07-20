@@ -20,13 +20,31 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  Widget _currentBody = HomeScreen(); //TwoContractScreen();
+  // Widget _currentBody = HomeScreen(changeBody: (newBody) {},); //TwoContractScreen();
 
-  // Hàm này sẽ được truyền xuống drawer
+  // // Hàm này sẽ được truyền xuống drawer
+  // void _changeBody(Widget newBody) {
+  //   setState(() {
+  //     _currentBody = newBody;
+  //     Navigator.of(context).pop();
+  //   });
+  // }
+  late Widget _currentBody; // Sử dụng late thay vì khởi tạo ngay
+
+  @override
+  void initState() {
+    super.initState();
+    _currentBody = HomeScreen(
+      changeBody: _changeBody,
+    ); // Khởi tạo trong initState
+  }
+
   void _changeBody(Widget newBody) {
+    if (!mounted) return; // Kiểm tra mounted trước khi setState
+
     setState(() {
       _currentBody = newBody;
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(); // Đóng drawer nếu đang mở
     });
   }
 
@@ -35,7 +53,11 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      body: body(),
+      //body: body(),
+      body: _currentBody,
+      // is HomeScreen
+      //     ? HomeScreen(changeBody: _changeBody) // Truyền callback khi là HomeScreen
+      //     : body(),
       drawer: ComplexDrawer(
         changeBody: _changeBody, // Truyền hàm callback xuống drawer
       ),
@@ -352,8 +374,13 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             case "Phê duyệt chuẩn bị":
               widget.changeBody(ApprovalPrepartionScreen());
               break;
+            case "Trang chủ"://changeBody: (newPage) {}
+              widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+              return;
             default:
-              widget.changeBody(MasterUser());
+              //if (title == "Home") {
+              widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+            //}
           }
         }
       },
@@ -408,6 +435,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   }
 
   static List<CDM> cdms = [
+    CDM(Icons.home, "Home", ["Trang chủ"]),
     CDM(Icons.grid_view, "Master", [
       "Quản lý User",
       "Thông tin PTHC",
@@ -430,7 +458,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       "Hợp đồng thử nghề & học việc",
       "Hợp đồng không xác định thời gian",
     ]),
-    // CDM(Icons.trending_up, "Chart", []),
     // CDM(Icons.power, "Plugins", []),
     CDM(Icons.settings, "Setting", []),
   ];
