@@ -30,6 +30,25 @@ class Common {
   static const String DeleteMultiID = "User/delete-multi/";
   static const String DeleteMultiIDLogic = "User/delete-logic-multi/";
 
+
+  // Master PTHC
+    //GET
+  static const String PTHCGetAll = "PthcSection/get-all";
+  static const String GetPTHCCount = "PthcSection/get-count-all";
+  static const String GetByIdPTHC = "PthcSection/get/";
+  static const String PTHCGetByCount = "PthcSection/get-count-by-condition";
+  static const String PTHCSreachBy = "PthcSection/search-by-condition";
+  // POST
+  static const String AddPTHC = "PthcSection/add";
+  static const String AddListPTHC = "PthcSection/add-multi";
+  //PUST
+  static const String UpdatePTHC = "PthcSection/update/";
+  static const String UpdataListPTHC = "PthcSection/update-multi";
+  //DELETE
+  static const String DeletePTHCID = "PthcSection/delete/";
+  static const String DeletePTHCIDLogic = "PthcSection/delete-logic/";
+  static const String DeletePTHCMultiID = "PthcSection/delete-multi/";
+  static const String DeletePTHCMultiIDLogic = "PthcSection/delete-logic-multi/";
   // font size
   static double sizeColumn = 12;
 }

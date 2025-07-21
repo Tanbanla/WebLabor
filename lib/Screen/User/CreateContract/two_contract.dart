@@ -6,6 +6,7 @@ import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
+import 'package:web_labor_contract/class/Two_Contract.dart';
 
 class TwoContractScreen extends StatefulWidget {
   const TwoContractScreen({super.key});
@@ -689,13 +690,13 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.edit_2,
                 color: Colors.blue,
-                onPressed: () => _handleEdit(data),
+                onPressed: () {},
               ),
               const SizedBox(width: 8),
               _buildActionButton(
                 icon: Iconsax.trash,
                 color: Colors.red,
-                onPressed: () => _handleDelete(data),
+                onPressed: (){},
               ),
               const SizedBox(width: 8),
               _buildActionButton(
@@ -1077,74 +1078,6 @@ class MyData extends DataTableSource {
     );
   }
 
-  void _handleEdit(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Chỉnh sửa thông tin'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Tên nhân viên',
-                border: OutlineInputBorder(),
-              ),
-              controller: TextEditingController(text: data['Column3']),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                labelText: 'Nhóm quyền',
-                border: OutlineInputBorder(),
-              ),
-              value: data['Column5'],
-              items: [
-                'QL',
-                'NV',
-                'Admin',
-                'Guest',
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) {},
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Save logic
-              Get.back();
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleDelete(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn chắc chắn muốn xóa ${data['Column3']}?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[50],
-              foregroundColor: Colors.red,
-            ),
-            onPressed: () {
-              controller.deleteItem(data);
-              Get.back();
-            },
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   bool get isRowCountApproximate => false;
 
@@ -1156,8 +1089,8 @@ class MyData extends DataTableSource {
 }
 
 class DashboardControllerTwo extends GetxController {
-  var dataList = <Map<String, String>>[].obs;
-  var filterdataList = <Map<String, String>>[].obs;
+  var dataList = <TwoContract>[].obs;
+  var filterdataList = <TwoContract>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -1172,8 +1105,8 @@ class DashboardControllerTwo extends GetxController {
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     filterdataList.sort((a, b) {
-      final aValue = a['employeeCode']?.toLowerCase() ?? '';
-      final bValue = b['employeeCode']?.toLowerCase() ?? '';
+      final aValue = a.vchREmployeeId ?.toLowerCase() ?? '';
+      final bValue = b.vchREmployeeId?.toLowerCase() ?? '';
       return ascending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
     });
     this.sortCloumnIndex.value = sortColumnIndex;
@@ -1186,11 +1119,11 @@ class DashboardControllerTwo extends GetxController {
       filterdataList.assignAll(
         dataList.where(
           (item) =>
-              (item['employeeCode']?.toLowerCase().contains(
+              (item.vchREmployeeId?.toLowerCase().contains(
                     query.toLowerCase(),
                   ) ??
                   false) ||
-              (item['fullName']?.toLowerCase().contains(query.toLowerCase()) ??
+              (item.vchREmployeeName?.toLowerCase().contains(query.toLowerCase()) ??
                   false),
         ),
       );
@@ -1206,95 +1139,28 @@ class DashboardControllerTwo extends GetxController {
   // các trường đánh giá
   void updateReason(String employeeCode, String reason) {
     final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
+      (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
-      dataList[index]['reason'] = reason;
+      dataList[index].chRCostCenterName = reason;
       dataList.refresh();
     }
   }
 
-  void updateHealthStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['healthStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateEvaluationStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['evaluationStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateRehireStatus(String employeeCode, String value) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['notRehire'] = value;
-      dataList.refresh();
-    }
-  }
+  
 
   void updateNotRehireReason(String employeeCode, String reason) {
     final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
+      (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
-      dataList[index]['notRehireReason'] = reason;
+      dataList[index].nvchRPthcSection = reason;
       dataList.refresh();
     }
   }
 
   //
   void fetchDummyData() {
-    final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
-    final genders = ['M', 'F'];
-    final groups = ['Nhóm 1', 'Nhóm 2', 'Nhóm 3'];
-    final positions = ['Nhân viên', 'Trưởng nhóm', 'Quản lý', 'Giám đốc'];
-
-    dataList.assignAll(
-      List.generate(50, (index) {
-        final dept = departments[index % departments.length];
-        final gender = genders[index % genders.length];
-        final group = groups[index % groups.length];
-        final position = positions[index % positions.length];
-
-        return {
-          'employeeCode': 'NV${1000 + index}',
-          'gender': gender,
-          'fullName': 'Nguyễn Văn ${String.fromCharCode(65 + index % 26)}',
-          'department': dept,
-          'group': group,
-          'age': (25 + index % 20).toString(),
-          'position': position,
-          'salaryGrade': (index % 10 + 1).toString(),
-          'contractValidity': 'Còn hiệu lực',
-          'contractEndDate':
-              '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
-          'earlyLeaveCount': (index % 5).toString(),
-          'paidLeaveDays': (index % 10).toString(),
-          'unpaidLeaveDays': (index % 3).toString(),
-          'unreportedLeaveDays': (index % 2).toString(),
-          'violationCount': (index % 4).toString(),
-          'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
-          'healthStatus': 'Đạt',
-          'notRehire': 'NG',
-          'notRehireReason': '',
-          'reason': '',
-        };
-      }),
-    );
-
-    filterdataList.assignAll(dataList);
-    selectRows.assignAll(List.generate(dataList.length, (index) => false));
+    
   }
 }

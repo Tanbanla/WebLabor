@@ -36,7 +36,6 @@ class _MasterUserState extends State<MasterUser> {
             // Search and Action Buttons
             _buildSearchAndActions(),
             const SizedBox(height: 16),
-
             // Data Table
             Expanded(
               child: Obx(() {
@@ -266,7 +265,7 @@ class _MasterUserState extends State<MasterUser> {
                   const DataColumn2(label: Text('Trạng thái'), fixedWidth: 120),
                   const DataColumn2(label: Text('Hành động'), fixedWidth: 180),
                 ],
-                source: MyData(),
+                source: MyData(context),
               ),
             ),
           ),
@@ -276,8 +275,9 @@ class _MasterUserState extends State<MasterUser> {
   }
 
   void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Import Dữ Liệu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -306,11 +306,15 @@ class _MasterUserState extends State<MasterUser> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
           ElevatedButton(
             onPressed: () {
               // Import logic
-              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -324,8 +328,9 @@ class _MasterUserState extends State<MasterUser> {
   }
 
   void _showExportDialog() {
-    Get.dialog(
-      AlertDialog(
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Export Dữ Liệu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -374,8 +379,9 @@ class _MasterUserState extends State<MasterUser> {
   }
 
   void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Thêm User Mới'),
         content: SingleChildScrollView(
           child: Column(
@@ -390,15 +396,15 @@ class _MasterUserState extends State<MasterUser> {
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
+              // TextField(
+              //   decoration: InputDecoration(
+              //     labelText: 'Tên nhân viên',
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 12),
               DropdownButtonFormField(
                 decoration: InputDecoration(
                   labelText: 'Phòng ban',
@@ -415,7 +421,12 @@ class _MasterUserState extends State<MasterUser> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
           ElevatedButton(
             onPressed: () {
               // Add logic
@@ -435,7 +446,9 @@ class _MasterUserState extends State<MasterUser> {
 
 class MyData extends DataTableSource {
   final DashboardControllerUser controller = Get.find();
+  final BuildContext context; // Thêm biến context
 
+  MyData(this.context); // Thêm constructor
   @override
   DataRow? getRow(int index) {
     final data = controller.filteredUserList[index];
@@ -457,22 +470,33 @@ class MyData extends DataTableSource {
       },
       cells: [
         DataCell(
-          Text(data.chR_SEC_CODE, style: TextStyle(color: Colors.blue[800])),
+          Text(
+            data.chRSecCode ?? '',
+            style: TextStyle(color: Colors.blue[800]),
+          ),
         ),
-        DataCell(Text(data.chR_EMPLOYEE_ID)),
-        DataCell(Text(data.nvchR_NAME_ID)),
-        DataCell(Text(data.chR_USERID)),
-        DataCell(Text(data.chR_GROUP)),
+        DataCell(Text(data.chREmployeeId ?? '')),
+        DataCell(Text(data.nvchRNameId ?? '')),
+        DataCell(Text(data.chRUserid ?? '')),
+        DataCell(Text(data.chRGroup ?? '')),
         DataCell(
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: data.inT_LOCK == 0 ? Colors.green[50] : Colors.red[50],
+              color: data.inTLock == 0 ? Colors.green[50] : Colors.red[50],
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: data.inT_LOCK == 0 ? Colors.green[100]! : Colors.red[100]! ),
+              border: Border.all(
+                color: data.inTLock == 0
+                    ? Colors.green[100]!
+                    : Colors.red[100]!,
+              ),
             ),
-            child: 
-            Text(data.inT_LOCK == 0 ? 'Active' :'Delete', style: TextStyle(color: data.inT_LOCK == 0 ? Colors.green[800] : Colors.red[800] )),
+            child: Text(
+              data.inTLock == 0 ? 'Active' : 'Delete',
+              style: TextStyle(
+                color: data.inTLock == 0 ? Colors.green[800] : Colors.red[800],
+              ),
+            ),
           ),
         ),
         DataCell(
@@ -482,19 +506,23 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.edit_2,
                 color: Colors.blue,
-                onPressed: () {}, // => _handleEdit(data),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => _EditUserDialog(user: data),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               _buildActionButton(
                 icon: Iconsax.trash,
                 color: Colors.red,
-                onPressed: () {}, //=> _handleDelete(data),
-              ),
-              const SizedBox(width: 8),
-              _buildActionButton(
-                icon: Iconsax.eye,
-                color: Colors.green,
-                onPressed: () {}, //=> _showDetailDialog(data),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => _DeleteUserDialog(id: (data.id ?? 0)),
+                  );
+                },
               ),
             ],
           ),
@@ -508,148 +536,18 @@ class MyData extends DataTableSource {
     required Color color,
     required VoidCallback onPressed,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 18, color: color),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-      ),
-    );
-  }
-
-  void _showDetailDialog(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Chi tiết: ${data['Column3']}'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
-              _buildDetailRow('Mã nhân viên:', data['Column2'] ?? ""),
-              _buildDetailRow('Tên nhân viên:', data['Column3'] ?? ""),
-              _buildDetailRow('ADID:', data['Column4'] ?? ""),
-              _buildDetailRow('Nhóm quyền:', data['Column5'] ?? ""),
-              const SizedBox(height: 16),
-              const Text(
-                'Lịch sử hoạt động:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(
-                3,
-                (index) => _buildActivityItem('Hoạt động ${index + 1}'),
-              ),
-            ],
-          ),
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(6),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Đóng')),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(Icons.circle, size: 8, color: Colors.blue),
-          const SizedBox(width: 8),
-          Text(text),
-        ],
-      ),
-    );
-  }
-
-  void _handleEdit(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Chỉnh sửa thông tin'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Tên nhân viên',
-                border: OutlineInputBorder(),
-              ),
-              controller: TextEditingController(text: data['Column3']),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                labelText: 'Nhóm quyền',
-                border: OutlineInputBorder(),
-              ),
-              value: data['Column5'],
-              items: [
-                'QL',
-                'NV',
-                'Admin',
-                'Guest',
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) {},
-            ),
-          ],
+        child: IconButton(
+          icon: Icon(icon, size: 20, color: color),
+          onPressed: onPressed,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Save logic
-              Get.back();
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleDelete(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn chắc chắn muốn xóa ${data['Column3']}?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[50],
-              foregroundColor: Colors.red,
-            ),
-            onPressed: () {
-              controller.deleteUser(1); // truyen id
-              Get.back();
-            },
-            child: const Text('Xóa'),
-          ),
-        ],
       ),
     );
   }
@@ -672,6 +570,7 @@ class DashboardControllerUser extends GetxController {
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
   var isLoading = false.obs;
+  var isLoadingExport = false.obs;
 
   @override
   void onInit() {
@@ -714,15 +613,17 @@ class DashboardControllerUser extends GetxController {
     filteredUserList.sort((a, b) {
       switch (columnIndex) {
         case 0: // ID
-          return ascending ? a.id.compareTo(b.id) : b.id.compareTo(a.id);
+          return ascending
+              ? (a.id ?? 0).compareTo(b.id ?? 0)
+              : (b.id ?? 0).compareTo(a.id ?? 0);
         case 1: // User ID
           return ascending
-              ? a.chR_USERID.compareTo(b.chR_USERID)
-              : b.chR_USERID.compareTo(a.chR_USERID);
+              ? (a.chRUserid ?? '').compareTo(b.chRUserid ?? '')
+              : (b.chRUserid ?? '').compareTo(a.chRUserid ?? '');
         case 2: // Name
           return ascending
-              ? a.nvchR_NAME_ID.compareTo(b.nvchR_NAME_ID)
-              : b.nvchR_NAME_ID.compareTo(a.nvchR_NAME_ID);
+              ? (a.nvchRNameId ?? '').compareTo(b.nvchRNameId ?? '')
+              : (b.nvchRNameId ?? '').compareTo(a.nvchRNameId ?? '');
         default:
           return 0;
       }
@@ -736,17 +637,314 @@ class DashboardControllerUser extends GetxController {
       filteredUserList.assignAll(
         userList.where(
           (user) =>
-              user.chR_USERID.toLowerCase().contains(query.toLowerCase()) ||
-              user.nvchR_NAME_ID.toLowerCase().contains(query.toLowerCase()) ||
-              user.chR_EMPLOYEE_ID.toLowerCase().contains(query.toLowerCase()),
+              (user.chRUserid ?? '').toLowerCase().contains(
+                query.toLowerCase(),
+              ) ||
+              (user.nvchRNameId ?? '').toLowerCase().contains(
+                query.toLowerCase(),
+              ) ||
+              (user.chREmployeeId ?? '').toLowerCase().contains(
+                query.toLowerCase(),
+              ),
         ),
       );
     }
   }
 
-  void deleteUser(int id) {
-    userList.removeWhere((user) => user.id == id);
-    filteredUserList.removeWhere((user) => user.id == id);
-    selectRows.removeAt(userList.indexWhere((user) => user.id == id));
+  Future<void> updateUser(User user) async {
+    try {
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdateUser}${user.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(user.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        fetchUserData();
+        Get.snackbar(
+          'Success',
+          'User updated successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Failed to update user: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> exportToExcel() async {
+    try {
+      isLoadingExport(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.UserGetAll}?export=excel'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Xử lý file Excel
+        Get.snackbar(
+          'Success',
+          'Exported successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Export failed: $e');
+    } finally {
+      isLoadingExport(false);
+    }
+  }
+
+  Future<void> addUser(User newUser) async {
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse('${Common.API}${Common.AddUser}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(newUser.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        fetchUserData();
+        Get.snackbar(
+          'Success',
+          'User added successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Failed to add user: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void showError(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+  }
+
+  Future<void> deleteUser(int id, {bool logical = true}) async {
+    try {
+      isLoading(true);
+      //final endpoint = logical ? Common.DeleteIDLogic : Common.DeleteID;
+      final response = await http.delete(
+        Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        fetchUserData();
+        Get.snackbar(
+          'Success',
+          'User deleted successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Failed to delete user: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+}
+
+class _EditUserDialog extends StatelessWidget {
+  final User user;
+  final DashboardControllerUser controller = Get.find();
+
+  _EditUserDialog({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final editedUser = User.fromJson(user.toJson());
+
+    return AlertDialog(
+      title: Text('Chỉnh sửa thông tin ${user.nvchRNameId}'),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: user.chRSecCode,
+                decoration: const InputDecoration(
+                  labelText: 'Phòng ban',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => editedUser.chRSecCode = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: user.chREmployeeId,
+                decoration: const InputDecoration(
+                  labelText: 'Mã nhân viên',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => editedUser.chREmployeeId = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: user.chRUserid,
+                decoration: const InputDecoration(
+                  labelText: 'ADID nhân viên',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => editedUser.chRUserid = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: user.nvchRNameId,
+                decoration: const InputDecoration(
+                  labelText: 'Tên nhân viên',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => editedUser.nvchRNameId = value,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                value: user.inTLock,
+                decoration: const InputDecoration(
+                  labelText: 'Trạng thái',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 0, child: Text('Active')),
+                  DropdownMenuItem(value: 1, child: Text('Delete')),
+                ],
+                onChanged: (value) => editedUser.inTLock = value ?? 0,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value:
+                    [
+                      'Admin',
+                      'Per',
+                      'Chief Per',
+                      'PTHC',
+                      'Leader',
+                      'Chief Section',
+                      'Manager Section',
+                      'Director',
+                    ].contains(user.chRGroup)
+                    ? user.chRGroup
+                    : 'Per',
+                decoration: const InputDecoration(
+                  labelText: 'Nhóm quyền',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+                  DropdownMenuItem(value: 'Per', child: Text('Per')),
+                  DropdownMenuItem(
+                    value: 'Chief Per',
+                    child: Text('Chief Per'),
+                  ),
+                  DropdownMenuItem(value: 'PTHC', child: Text('PTHC')),
+                  DropdownMenuItem(value: 'Leader', child: Text('Leader')),
+                  DropdownMenuItem(
+                    value: 'Chief Section',
+                    child: Text('Chief Section'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Manager Section',
+                    child: Text('Manager Section'),
+                  ),
+                  DropdownMenuItem(value: 'Director', child: Text('Director')),
+                ],
+                validator: (value) =>
+                    value == null ? 'Vui lòng chọn nhóm quyền' : null,
+                onChanged: (value) => editedUser.chRGroup = value,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: const Text('Hủy'),
+        ),
+        Obx(
+          () => ElevatedButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    try {
+                      await controller.updateUser(editedUser);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: const Text('Lưu'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeleteUserDialog extends StatelessWidget {
+  final int id;
+  final DashboardControllerUser controller = Get.find();
+
+  _DeleteUserDialog({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      // Thêm Obx để theo dõi trạng thái loading
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return AlertDialog(
+        title: const Text('Xác nhận xóa'),
+        content: const Text('Bạn có chắc chắn muốn xóa user này?'),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    try {
+                      await controller.deleteUser(id);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: const Text('Xóa'),
+          ),
+        ],
+      );
+    });
   }
 }

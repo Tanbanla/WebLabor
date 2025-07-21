@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Screen/Admin/Master/temp_pthc.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
@@ -374,13 +375,11 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             case "Phê duyệt chuẩn bị":
               widget.changeBody(ApprovalPrepartionScreen());
               break;
-            case "Trang chủ"://changeBody: (newPage) {}
+            case "Trang chủ":
               widget.changeBody(HomeScreen(changeBody: (newPage) {}));
               return;
             default:
-              //if (title == "Home") {
               widget.changeBody(HomeScreen(changeBody: (newPage) {}));
-            //}
           }
         }
       },

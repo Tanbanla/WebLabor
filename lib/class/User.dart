@@ -1,75 +1,87 @@
 class User {
-  final int id;
-  final String chR_USERID;
-  final String chR_PASS;
-  final String nvchR_NAME_ID;
-  final String chR_EMPLOYEE_ID;
-  final String chR_GROUP;
-  final int inT_USERID_COMMON;
-  final String chR_SEC_CODE;
-  final DateTime dtM_LAST_LOGIN;
-  final int inT_LOCK;
-  final int inT_LOCK_DAY;
-  final String? vchR_USER_CREATE;
-  final DateTime dtM_CREATE;
-  final String? vchR_USER_UPDATE;
-  final DateTime dtM_UPDATE;
+  int? id;
+  String? chRUserid;
+  String? chRPass;
+  String? nvchRNameId;
+  String? chREmployeeId;
+  String? chRGroup;
+  int? inTUseridCommon;
+  String? chRSecCode;
+  String? dtMLastLogin;
+  int? inTLock;
+  int? inTLockDay;
+  dynamic vchRUserCreate;
+  String? dtMCreate;
+  dynamic vchRUserUpdate;
+  String? dtMUpdate;
 
-  User({
-    required this.id,
-    required this.chR_USERID,
-    required this.chR_PASS,
-    required this.nvchR_NAME_ID,
-    required this.chR_EMPLOYEE_ID,
-    required this.chR_GROUP,
-    required this.inT_USERID_COMMON,
-    required this.chR_SEC_CODE,
-    required this.dtM_LAST_LOGIN,
-    required this.inT_LOCK,
-    required this.inT_LOCK_DAY,
-    this.vchR_USER_CREATE,
-    required this.dtM_CREATE,
-    this.vchR_USER_UPDATE,
-    required this.dtM_UPDATE,
-  });
+  User({this.id, this.chRUserid, this.chRPass, this.nvchRNameId, this.chREmployeeId, this.chRGroup, this.inTUseridCommon, this.chRSecCode, this.dtMLastLogin, this.inTLock, this.inTLockDay, this.vchRUserCreate, this.dtMCreate, this.vchRUserUpdate, this.dtMUpdate});
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      chR_USERID: json['chR_USERID'],
-      chR_PASS: json['chR_PASS'],
-      nvchR_NAME_ID: json['nvchR_NAME_ID'],
-      chR_EMPLOYEE_ID: json['chR_EMPLOYEE_ID'],
-      chR_GROUP: json['chR_GROUP'],
-      inT_USERID_COMMON: json['inT_USERID_COMMON'],
-      chR_SEC_CODE: json['chR_SEC_CODE'],
-      dtM_LAST_LOGIN: DateTime.parse(json['dtM_LAST_LOGIN']),
-      inT_LOCK: json['inT_LOCK'],
-      inT_LOCK_DAY: json['inT_LOCK_DAY'],
-      vchR_USER_CREATE: json['vchR_USER_CREATE'],
-      dtM_CREATE: DateTime.parse(json['dtM_CREATE']),
-      vchR_USER_UPDATE: json['vchR_USER_UPDATE'],
-      dtM_UPDATE: DateTime.parse(json['dtM_UPDATE']),
-    );
+  User.fromJson(Map<String, dynamic> json) {
+    if(json["id"] is int) {
+      id = json["id"];
+    }
+    if(json["chR_USERID"] is String) {
+      chRUserid = json["chR_USERID"];
+    }
+    if(json["chR_PASS"] is String) {
+      chRPass = json["chR_PASS"];
+    }
+    if(json["nvchR_NAME_ID"] is String) {
+      nvchRNameId = json["nvchR_NAME_ID"];
+    }
+    if(json["chR_EMPLOYEE_ID"] is String) {
+      chREmployeeId = json["chR_EMPLOYEE_ID"];
+    }
+    if(json["chR_GROUP"] is String) {
+      chRGroup = json["chR_GROUP"];
+    }
+    if(json["inT_USERID_COMMON"] is int) {
+      inTUseridCommon = json["inT_USERID_COMMON"];
+    }
+    if(json["chR_SEC_CODE"] is String) {
+      chRSecCode = json["chR_SEC_CODE"];
+    }
+    if(json["dtM_LAST_LOGIN"] is String) {
+      dtMLastLogin = json["dtM_LAST_LOGIN"];
+    }
+    if(json["inT_LOCK"] is int) {
+      inTLock = json["inT_LOCK"];
+    }
+    if(json["inT_LOCK_DAY"] is int) {
+      inTLockDay = json["inT_LOCK_DAY"];
+    }
+    vchRUserCreate = json["vchR_USER_CREATE"];
+    if(json["dtM_CREATE"] is String) {
+      dtMCreate = json["dtM_CREATE"];
+    }
+    vchRUserUpdate = json["vchR_USER_UPDATE"];
+    if(json["dtM_UPDATE"] is String) {
+      dtMUpdate = json["dtM_UPDATE"];
+    }
+  }
+
+  static List<User> fromList(List<Map<String, dynamic>> list) {
+    return list.map(User.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'chR_USERID': chR_USERID,
-      'chR_PASS': chR_PASS,
-      'nvchR_NAME_ID': nvchR_NAME_ID,
-      'chR_EMPLOYEE_ID': chR_EMPLOYEE_ID,
-      'chR_GROUP': chR_GROUP,
-      'inT_USERID_COMMON': inT_USERID_COMMON,
-      'chR_SEC_CODE': chR_SEC_CODE,
-      'dtM_LAST_LOGIN': dtM_LAST_LOGIN.toIso8601String(),
-      'inT_LOCK': inT_LOCK,
-      'inT_LOCK_DAY': inT_LOCK_DAY,
-      'vchR_USER_CREATE': vchR_USER_CREATE,
-      'dtM_CREATE': dtM_CREATE.toIso8601String(),
-      'vchR_USER_UPDATE': vchR_USER_UPDATE,
-      'dtM_UPDATE': dtM_UPDATE.toIso8601String(),
-    };
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["chR_USERID"] = chRUserid;
+    _data["chR_PASS"] = chRPass;
+    _data["nvchR_NAME_ID"] = nvchRNameId;
+    _data["chR_EMPLOYEE_ID"] = chREmployeeId;
+    _data["chR_GROUP"] = chRGroup;
+    _data["inT_USERID_COMMON"] = inTUseridCommon;
+    _data["chR_SEC_CODE"] = chRSecCode;
+    _data["dtM_LAST_LOGIN"] = dtMLastLogin;
+    _data["inT_LOCK"] = inTLock;
+    _data["inT_LOCK_DAY"] = inTLockDay;
+    _data["vchR_USER_CREATE"] = vchRUserCreate;
+    _data["dtM_CREATE"] = dtMCreate;
+    _data["vchR_USER_UPDATE"] = vchRUserUpdate;
+    _data["dtM_UPDATE"] = dtMUpdate;
+    return _data;
   }
 }
