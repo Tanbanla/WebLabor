@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,9 @@ import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
+import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 
 class ApprenticeContract extends StatefulWidget {
   const ApprenticeContract({super.key});
@@ -294,6 +299,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       ],
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -405,7 +411,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: 'Vị trí',
-                    width:100,
+                    width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -522,9 +528,65 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
     );
   }
 
+  // void _showImportDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Import Dữ Liệu'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text(
+  //             'Chọn file Excel để import dữ liệu',
+  //             style: TextStyle(color: Colors.grey[600]),
+  //           ),
+  //           const SizedBox(height: 20),
+  //           ElevatedButton.icon(
+  //             icon: const Icon(Iconsax.document_upload),
+  //             label: const Text('Chọn File'),
+  //             onPressed: () {},
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.blue,
+  //               foregroundColor: Colors.white,
+  //               padding: const EdgeInsets.symmetric(
+  //                 horizontal: 20,
+  //                 vertical: 12,
+  //               ),
+  //               shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: controller.isLoading.value
+  //               ? null
+  //               : () => Navigator.of(context).pop(),
+  //           child: const Text('Hủy'),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             // Import logic
+  //             Get.back();
+  //           },
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.green,
+  //             foregroundColor: Colors.white,
+  //           ),
+  //           child: const Text('Import'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
+    final controller = Get.find<DashboardControllerApprentice>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Import Dữ Liệu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -537,7 +599,82 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             ElevatedButton.icon(
               icon: const Icon(Iconsax.document_upload),
               label: const Text('Chọn File'),
-              onPressed: () {},
+              onPressed: () async {
+                try {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['xlsx'],
+                      );
+
+                  if (result != null) {
+                    controller.isLoading.value = true;
+
+                    // Đọc file Excel
+                    final file = File(result.files.single.path!);
+                    final bytes = await file.readAsBytes();
+                    final excel = Excel.decodeBytes(bytes);
+
+                    // Lấy sheet đầu tiên
+                    final sheet = excel.tables[excel.tables.keys.first]!;
+
+                    // Chuẩn bị danh sách dữ liệu mới
+                    List<Map<String, String>> newData = [];
+
+                    // Bắt đầu từ hàng thứ 2 (bỏ qua header)
+                    for (var i = 1; i < sheet.rows.length; i++) {
+                      final row = sheet.rows[i];
+                      newData.add({
+                        'employeeCode': row[1]?.value.toString() ?? '',
+                        'fullName': row[2]?.value.toString() ?? '',
+                        'department': row[3]?.value.toString() ?? '',
+                        'group': row[4]?.value.toString() ?? '',
+                        'age': row[5]?.value.toString() ?? '',
+                        'position': row[6]?.value.toString() ?? '',
+                        'salaryGrade': row[7]?.value.toString() ?? '',
+                        'contractValidity': row[8]?.value.toString() ?? '',
+                        'contractEndDate': row[9]?.value.toString() ?? '',
+                        'earlyLeaveCount': row[10]?.value.toString() ?? '',
+                        'paidLeaveDays': row[11]?.value.toString() ?? '',
+                        'unpaidLeaveDays': row[12]?.value.toString() ?? '',
+                        'unreportedLeaveDays': row[13]?.value.toString() ?? '',
+                        'violationCount': row[14]?.value.toString() ?? '',
+                        'healthStatus': row[15]?.value.toString() ?? 'Đạt',
+                        'evaluationStatus': row[16]?.value.toString() ?? 'OK',
+                        'notRehire': row[17]?.value.toString() ?? 'NG',
+                        'notRehireReason': row[18]?.value.toString() ?? '',
+                        'reason': '',
+                        'gender': '', // Có thể thêm logic xác định giới tính
+                      });
+                    }
+
+                    // Cập nhật dữ liệu vào controller
+                    controller.dataList.assignAll(newData);
+                    controller.filterdataList.assignAll(newData);
+                    controller.selectRows.assignAll(
+                      List.generate(newData.length, (index) => false),
+                    );
+
+                    Get.back();
+                    Get.snackbar(
+                      'Thành công',
+                      'Đã import ${newData.length} bản ghi',
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 3),
+                    );
+                  }
+                } catch (e) {
+                  Get.snackbar(
+                    'Lỗi',
+                    'Import thất bại: ${e.toString()}',
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                } finally {
+                  controller.isLoading.value = false;
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
@@ -553,17 +690,11 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
           ),
         ],
       ),
@@ -571,8 +702,11 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
   }
 
   void _showExportDialog() {
-    Get.dialog(
-      AlertDialog(
+    final controller = Get.find<DashboardControllerApprentice>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Export Dữ Liệu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -584,26 +718,128 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildExportOption(Iconsax.document_text, 'Excel'),
-                _buildExportOption(Iconsax.document2, 'PDF'),
-                _buildExportOption(Iconsax.document_text, 'CSV'),
-              ],
+              children: [_buildExportOption(Iconsax.document_text, 'Excel')],
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
           ElevatedButton(
-            onPressed: () {
-              // Export logic
-              Get.back();
+            onPressed: () async {
+              try {
+                controller.isLoading.value = true;
+
+                // Tạo file Excel
+                final excel = Excel.createExcel();
+                final sheet = excel['Sheet1'];
+
+                // Thêm tiêu đề các cột
+                sheet.appendRow([
+                  TextCellValue('STT'),
+                  TextCellValue('Mã NV'),
+                  TextCellValue('Họ và tên'),
+                  TextCellValue('Phòng ban'),
+                  TextCellValue('Nhóm'),
+                  TextCellValue('Tuổi'),
+                  TextCellValue('Vị trí'),
+                  TextCellValue('Bậc lương'),
+                  TextCellValue('Hiệu lực HD'),
+                  TextCellValue('Ngày kết thúc HD'),
+                  TextCellValue('Số lần đi mượn, về sớm'),
+                  TextCellValue('Nghỉ hưởng lương'),
+                  TextCellValue('Nghỉ không lương'),
+                  TextCellValue('Nghỉ không báo cáo'),
+                  TextCellValue('Số lần vi phạm'),
+                  TextCellValue('Kết quả khám sức khỏe'),
+                  TextCellValue('Kết quả đánh giá'),
+                  TextCellValue('Tuyển dụng lại'),
+                  TextCellValue('Lý do không tuyển dụng lại'),
+                ]);
+
+                // Thêm dữ liệu từ controller
+                for (int i = 0; i < controller.filterdataList.length; i++) {
+                  final item = controller.filterdataList[i];
+                  sheet.appendRow([
+                    TextCellValue((i + 1).toString()),
+                    TextCellValue(item['employeeCode'] ?? ''),
+                    TextCellValue(item['fullName'] ?? ''),
+                    TextCellValue(item['department'] ?? ''),
+                    TextCellValue(item['group'] ?? ''),
+                    TextCellValue(item['age'] ?? ''),
+                    TextCellValue(item['position'] ?? ''),
+                    TextCellValue(item['salaryGrade'] ?? ''),
+                    TextCellValue(item['contractValidity'] ?? ''),
+                    TextCellValue(item['contractEndDate'] ?? ''),
+                    TextCellValue(item['earlyLeaveCount'] ?? ''),
+                    TextCellValue(item['paidLeaveDays'] ?? ''),
+                    TextCellValue(item['unpaidLeaveDays'] ?? ''),
+                    TextCellValue(item['unreportedLeaveDays'] ?? ''),
+                    TextCellValue(item['violationCount'] ?? ''),
+                    TextCellValue(item['healthStatus'] ?? ''),
+                    TextCellValue(item['evaluationStatus'] ?? ''),
+                    TextCellValue(item['notRehire'] ?? ''),
+                    TextCellValue(item['notRehireReason'] ?? ''),
+                  ]);
+                }
+
+                // Lưu file tạm
+                final bytes = excel.save();
+                if (bytes == null) throw Exception('Không thể tạo file Excel');
+
+                // Cho phép người dùng chọn nơi lưu
+                final String? outputFile = await FilePicker.platform.saveFile(
+                  dialogTitle: 'Lưu file Excel',
+                  fileName:
+                      'DanhSachNhanVienHocNgheThuViec_${DateTime.now().toString().replaceAll(':', '-')}.xlsx',
+                  type: FileType.custom,
+                  allowedExtensions: ['xlsx'],
+                );
+
+                if (outputFile != null) {
+                  final file = File(outputFile);
+                  await file.writeAsBytes(bytes);
+
+                  Get.back();
+                  Get.snackbar(
+                    'Thành công',
+                    'Đã export ${controller.filterdataList.length} nhân viên ra file Excel',
+                    backgroundColor: Colors.green,
+                    colorText: Colors.white,
+                    duration: const Duration(seconds: 3),
+                  );
+                }
+              } catch (e) {
+                Get.snackbar(
+                  'Lỗi',
+                  'Export thất bại: ${e.toString()}',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              } finally {
+                controller.isLoading.value = false;
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Export'),
+            child: Obx(
+              () => controller.isLoading.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Export'),
+            ),
           ),
         ],
       ),
@@ -738,18 +974,47 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['employeeCode'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['employeeCode'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['gender'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text(data['fullName'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['department'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['gender'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['group'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          Text(data['age']?.toString() ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['fullName'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
-        DataCell(Text(data['position'] ?? "", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(
+          Text(
+            data['department'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['group'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['age']?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data['position'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         DataCell(
           Text(
             data['salaryGrade']?.toString() ?? "",
@@ -757,10 +1022,16 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data['contractValidity'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractValidity'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
-          Text(data['contractEndDate'] ?? "", style: TextStyle(fontSize: Common.sizeColumn)),
+          Text(
+            data['contractEndDate'] ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
         ),
         DataCell(
           Text(
@@ -827,11 +1098,15 @@ class MyData extends DataTableSource {
                   value: 'OK',
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 16,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'OK',
-                        style: TextStyle(fontSize: Common.sizeColumn,),
+                        style: TextStyle(fontSize: Common.sizeColumn),
                       ), // Added fontSize 12
                     ],
                   ),
@@ -853,7 +1128,11 @@ class MyData extends DataTableSource {
                   value: 'Stop Working',
                   child: Row(
                     children: [
-                      const Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      const Icon(
+                        Icons.pause_circle,
+                        color: Colors.orange,
+                        size: 16,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Stop Working',
@@ -890,7 +1169,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Ghi chú',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -928,7 +1209,7 @@ class MyData extends DataTableSource {
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(8),
               icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items:  [
+              items: [
                 DropdownMenuItem(
                   value: 'OK',
                   child: Row(
@@ -970,7 +1251,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
               labelText: 'Lý do',
-              labelStyle: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
+              labelStyle: TextStyle(
+                fontSize: Common.sizeColumn,
+              ), // Added fontSize 12
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1170,6 +1453,7 @@ class DashboardControllerApprentice extends GetxController {
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
+  var isLoading = false.obs;
 
   @override
   void onInit() {

@@ -665,7 +665,7 @@ class MyData extends DataTableSource {
         }
         return null;
       }),
-      onTap: () => _showDetailDialog(data),
+      onTap: () {},//=> _showDetailDialog(data),
       selected: controller.selectRows[index],
       onSelectChanged: (value) {
         controller.selectRows[index] = value ?? false;
@@ -702,98 +702,98 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.eye,
                 color: Colors.green,
-                onPressed: () => _showDetailDialog(data),
+                onPressed: () {},//=> _showDetailDialog(data),
               ),
             ],
           ),
         ),
         DataCell(
           Text(
-            data['employeeCode'] ?? "",
+            data.vchREmployeeId??'',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['gender'] ?? "",
+            data.chRCodeGrade?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['fullName'] ?? "",
+            data.vchREmployeeName??'',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['department'] ?? "",
+            data.vchRNameSection ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['group'] ?? "",
+            data.chRPosition?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['age']?.toString() ?? "",
+            data.dtMBrithday?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['position'] ?? "",
+            data.chRCostCenterName ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['salaryGrade']?.toString() ?? "",
+            data.chRPosition?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['contractValidity'] ?? "",
+            data.dtMJoinDate?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['contractEndDate'] ?? "",
+            data.dtMEndDate?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['earlyLeaveCount']?.toString() ?? "",
+            data.fLGoLeaveLate?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['paidLeaveDays']?.toString() ?? "",
+            data.fLPaidLeave?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['unpaidLeaveDays']?.toString() ?? "",
+            data.fLNotPaidLeave?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['unreportedLeaveDays']?.toString() ?? "",
+            data.fLNotLeaveDay?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['violationCount']?.toString() ?? "",
+            data.inTViolation?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
@@ -828,8 +828,8 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
+            final status = item.nvarchaRHealthResults?? 'OK';
+            final id = item.vchREmployeeId ?? '';
 
             return DropdownButton<String>(
               value: status,
@@ -892,7 +892,7 @@ class MyData extends DataTableSource {
               ],
               onChanged: (newValue) {
                 if (newValue != null && id.isNotEmpty) {
-                  controller.updateEvaluationStatus(id, newValue);
+                  //controller.updateEvaluationStatus(id, newValue);
                   controller.filterdataList.refresh();
                 }
               },
@@ -906,11 +906,11 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = item.vchRReasultsLeader;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = item.vchREmployeeId??'';
 
             return DropdownButton<String>(
               value: status,
@@ -947,7 +947,7 @@ class MyData extends DataTableSource {
               ],
               onChanged: (newValue) {
                 if (newValue != null && employeeCode.isNotEmpty) {
-                  controller.updateRehireStatus(employeeCode, newValue);
+                 // controller.updateRehireStatus(employeeCode, newValue);
                   controller.filterdataList.refresh();
                 }
               },

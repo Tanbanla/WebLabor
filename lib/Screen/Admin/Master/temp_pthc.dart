@@ -998,3 +998,164 @@ class _DeleteUserDialog extends StatelessWidget {
     );
   }
 }
+
+
+
+// void _showImportDialog() {
+//   final controller = Get.find<DashboardControllerApprentice>();
+
+//   Get.dialog(
+//     AlertDialog(
+//       title: const Text('Import Dữ Liệu'),
+//       content: SingleChildScrollView(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Text(
+//               'Chọn file Excel để import dữ liệu',
+//               style: TextStyle(color: Colors.grey[600]),
+//             ),
+//             const SizedBox(height: 20),
+//             Obx(() => ElevatedButton.icon(
+//                   icon: controller.isLoading.value
+//                       ? const SizedBox(
+//                           width: 20,
+//                           height: 20,
+//                           child: CircularProgressIndicator(
+//                             strokeWidth: 2,
+//                             color: Colors.white,
+//                           ),
+//                         )
+//                       : const Icon(Iconsax.document_upload),
+//                   label: controller.isLoading.value
+//                       ? const Text('Đang xử lý...')
+//                       : const Text('Chọn File'),
+//                   onPressed: controller.isLoading.value
+//                       ? null
+//                       : () async {
+//                           try {
+//                             FilePickerResult? result =
+//                                 await FilePicker.platform.pickFiles(
+//                               type: FileType.custom,
+//                               allowedExtensions: ['xlsx'],
+//                               allowMultiple: false,
+//                             );
+
+//                             if (result != null && result.files.isNotEmpty) {
+//                               controller.isLoading.value = true;
+
+//                               // Đọc file Excel
+//                               final file = File(result.files.first.path!);
+//                               final bytes = await file.readAsBytes();
+//                               final excel = Excel.decodeBytes(bytes);
+
+//                               if (excel.tables.isEmpty) {
+//                                 throw Exception('File Excel không có dữ liệu');
+//                               }
+
+//                               // Lấy sheet đầu tiên
+//                               final sheet = excel.tables.values.first;
+
+//                               // Chuẩn bị danh sách dữ liệu mới
+//                               List<Map<String, String>> newData = [];
+
+//                               // Bắt đầu từ hàng thứ 2 (bỏ qua header)
+//                               for (var i = 1; i < sheet!.rows.length; i++) {
+//                                 final row = sheet.rows[i];
+//                                 if (row.isEmpty) continue;
+
+//                                 newData.add({
+//                                   'employeeCode':
+//                                       _getCellValue(row[1]) ?? 'NV${1000 + i}',
+//                                   'gender': _getCellValue(row[2]) ?? '',
+//                                   'fullName': _getCellValue(row[3]) ??
+//                                       'Nguyễn Văn ${String.fromCharCode(65 + i % 26)}',
+//                                   'department': _getCellValue(row[4]) ?? '',
+//                                   'group': _getCellValue(row[5]) ?? '',
+//                                   'age': _getCellValue(row[6]) ?? '',
+//                                   'position': _getCellValue(row[7]) ?? '',
+//                                   'salaryGrade': _getCellValue(row[8]) ?? '',
+//                                   'contractValidity': _getCellValue(row[9]) ??
+//                                       'Còn hiệu lực',
+//                                   'contractEndDate': _getCellValue(row[10]) ??
+//                                       '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
+//                                   'earlyLeaveCount': _getCellValue(row[11]) ??
+//                                       '0',
+//                                   'paidLeaveDays': _getCellValue(row[12]) ??
+//                                       '0',
+//                                   'unpaidLeaveDays': _getCellValue(row[13]) ??
+//                                       '0',
+//                                   'unreportedLeaveDays':
+//                                       _getCellValue(row[14]) ?? '0',
+//                                   'violationCount': _getCellValue(row[15]) ??
+//                                       '0',
+//                                   'healthStatus': _getCellValue(row[16]) ??
+//                                       'Đạt',
+//                                   'evaluationStatus': _getCellValue(row[17]) ??
+//                                       'OK',
+//                                   'notRehire': _getCellValue(row[18]) ?? 'NG',
+//                                   'notRehireReason': _getCellValue(row[19]) ??
+//                                       '',
+//                                   'reason': '',
+//                                 });
+//                               }
+
+//                               if (newData.isNotEmpty) {
+//                                 controller.dataList.assignAll(newData);
+//                                 controller.filterdataList.assignAll(newData);
+//                                 controller.selectRows.assignAll(
+//                                     List.generate(newData.length, (index) => false));
+
+//                                 Get.back();
+//                                 Get.snackbar(
+//                                   'Thành công',
+//                                   'Đã import ${newData.length} bản ghi',
+//                                   backgroundColor: Colors.green,
+//                                   colorText: Colors.white,
+//                                   duration: const Duration(seconds: 3),
+//                                 );
+//                               } else {
+//                                 throw Exception('Không có dữ liệu hợp lệ để import');
+//                               }
+//                             }
+//                           } catch (e) {
+//                             Get.snackbar(
+//                               'Lỗi',
+//                               'Import thất bại: ${e.toString()}',
+//                               backgroundColor: Colors.red,
+//                               colorText: Colors.white,
+//                               duration: const Duration(seconds: 3),
+//                             );
+//                           } finally {
+//                             controller.isLoading.value = false;
+//                           }
+//                         },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: Colors.blue,
+//                     foregroundColor: Colors.white,
+//                     padding: const EdgeInsets.symmetric(
+//                       horizontal: 20,
+//                       vertical: 12,
+//                     ),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(10),
+//                     ),
+//                   ),
+//                 )),
+//           ],
+//         ),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: controller.isLoading.value ? null : () => Get.back(),
+//           child: const Text('Hủy'),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+// String? _getCellValue(CellValue? cell) {
+//   if (cell == null) return null;
+//   return cell.value.toString();
+// }
