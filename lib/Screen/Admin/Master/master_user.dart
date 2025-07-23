@@ -1,13 +1,19 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/User.dart';
+import 'package:excel/excel.dart' hide Border;
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:intl/intl.dart';
+import 'package:universal_html/html.dart' as html;
 
 class MasterUser extends StatefulWidget {
   const MasterUser({super.key});
@@ -274,60 +280,272 @@ class _MasterUserState extends State<MasterUser> {
     );
   }
 
+  // void _showImportDialog() {
+  //   final controller = Get.find<DashboardControllerUser>();
+  //   Rx<File?> selectedFile = Rx<File?>(null);
+  //   RxString fileName = ''.obs;
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => Obx(
+  //       () => AlertDialog(
+  //         title: const Text('Import Dữ Liệu'),
+  //         content: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Text(
+  //                 'Chọn file Excel để import dữ liệu',
+  //                 style: TextStyle(color: Colors.grey[600]),
+  //               ),
+  //               const SizedBox(height: 20),
+  //               if (fileName.isNotEmpty)
+  //                 Padding(
+  //                   padding: const EdgeInsets.only(bottom: 10),
+  //                   child: Text(
+  //                     'File đã chọn: ${fileName.value}',
+  //                     style: const TextStyle(fontWeight: FontWeight.bold),
+  //                   ),
+  //                 ),
+  //               ElevatedButton.icon(
+  //                 icon: const Icon(Iconsax.document_upload),
+  //                 label: const Text('Chọn File'),
+  //                 onPressed: controller.isLoading.value
+  //                     ? null
+  //                     : () async {
+  //                         try {
+  //                           final result = await FilePicker.platform.pickFiles(
+  //                             type: FileType.custom,
+  //                             allowedExtensions: ['xlsx'],
+  //                             allowMultiple: false,
+  //                           );
+
+  //                           if (result != null) {
+  //                             selectedFile.value = File(
+  //                               result.files.single.path!,
+  //                             );
+  //                             fileName.value = result.files.single.name;
+  //                           }
+  //                         } catch (e) {
+  //                           controller.showError('Lỗi khi chọn file: $e');
+  //                         }
+  //                       },
+  //                 style: ElevatedButton.styleFrom(
+  //                   backgroundColor: Colors.blue,
+  //                   foregroundColor: Colors.white,
+  //                   padding: const EdgeInsets.symmetric(
+  //                     horizontal: 20,
+  //                     vertical: 12,
+  //                   ),
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                 ),
+  //               ),
+  //               if (controller.isLoading.value) ...[
+  //                 const SizedBox(height: 20),
+  //                 const CircularProgressIndicator(),
+  //                 const SizedBox(height: 10),
+  //                 const Text('Đang xử lý...'),
+  //               ],
+  //             ],
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: controller.isLoading.value
+  //                 ? null
+  //                 : () => Navigator.of(context).pop(),
+  //             child: const Text('Hủy'),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed:
+  //                 (controller.isLoading.value || selectedFile.value == null)
+  //                 ? null
+  //                 : () async {
+  //                     try {
+  //                       controller.isLoading(true);
+  //                       await controller.importFromExcel(selectedFile.value!);
+
+  //                       // Close the dialog after successful import
+  //                       if (mounted) {
+  //                         Navigator.of(context).pop();
+  //                       }
+  //                     } catch (e) {
+  //                       controller.showError('Lỗi khi import: $e');
+  //                       showDialog(
+  //                           context: context,
+  //                           builder: (context) => AlertDialog(
+  //                             title: Text('Lỗi Import file'),
+  //                             content: Text('$e'),
+  //                           ),
+  //                         );
+  //                     } finally {
+  //                       controller.isLoading(false);
+  //                     }
+  //                   },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.green,
+  //               foregroundColor: Colors.white,
+  //             ),
+  //             child: const Text('Import'),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
   void _showImportDialog() {
+    final controller = Get.find<DashboardControllerUser>();
+    Rx<File?> selectedFile = Rx<File?>(null);
+    Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
+    RxString fileName = ''.obs;
+    RxString errorMessage = ''.obs;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn file Excel để import dữ liệu',
-              style: TextStyle(color: Colors.grey[600]),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          title: const Text('Import Dữ Liệu'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Chọn file Excel để import dữ liệu',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 20),
+                if (fileName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      'File đã chọn: ${fileName.value}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      errorMessage.value,
+                      style: TextStyle(color: Colors.red, fontSize: 14),
+                    ),
+                  ),
+                ElevatedButton.icon(
+                  icon: const Icon(Iconsax.document_upload),
+                  label: const Text('Chọn File'),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () async {
+                          errorMessage.value = '';
+                          try {
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['xlsx', 'xls'],
+                              allowMultiple: false,
+                            );
+
+                            if (result != null &&
+                                result.files.single.path != null) {
+                              selectedFile.value = File(
+                                result.files.single.path!,
+                              );
+                              fileName.value = result.files.single.name;
+                              if (isSkiaWeb) {
+                                selectedFileData.value =
+                                    result.files.single.bytes;
+                              }
+                            }
+                          } on PlatformException catch (e) {
+                            errorMessage.value =
+                                'Lỗi truy cập file: ${e.message}';
+                          } catch (e) {
+                            errorMessage.value =
+                                'Lỗi khi chọn file: ${e.toString().replaceAll('_Namespace', '')}';
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                if (controller.isLoading.value) ...[
+                  const SizedBox(height: 20),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 10),
+                  const Text('Đang xử lý...'),
+                ],
+              ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Iconsax.document_upload),
-              label: const Text('Chọn File'),
-              onPressed: () {},
+          ),
+          actions: [
+            TextButton(
+              onPressed: controller.isLoading.value
+                  ? null
+                  : () => Navigator.of(context).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed:
+                  (controller.isLoading.value || selectedFile.value == null)
+                  ? null
+                  : () async {
+                      errorMessage.value = '';
+                      try {
+                        controller.isLoading(true);
+                        //await controller.importFromExcel(selectedFile.value!);
+                        if (kIsWeb) {
+                          // Xử lý web
+                          await controller.importFromExcelWeb(
+                            selectedFileData.value!,
+                          );
+                        } else {
+                          // Xử lý mobile/desktop
+                          await controller.importFromExcel(selectedFile.value!);
+                        }
+                        // Close the dialog after successful import
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                          Get.snackbar(
+                            'Thành công',
+                            'Import dữ liệu thành công',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                        }
+                      } on PlatformException catch (e) {
+                        errorMessage.value = 'Lỗi hệ thống: ${e.message}';
+                      } catch (e) {
+                        errorMessage.value =
+                            'Lỗi khi import: ${e.toString().replaceAll('', '')}';
+                      } finally {
+                        controller.isLoading(false);
+                      }
+                    },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
               ),
+              child: const Text('Import'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: controller.isLoading.value
-                ? null
-                : () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
-          ),
-        ],
       ),
     );
   }
 
   void _showExportDialog() {
+    final controller = Get.find<DashboardControllerUser>();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -342,26 +560,137 @@ class _MasterUserState extends State<MasterUser> {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildExportOption(Iconsax.document_text, 'Excel'),
-                _buildExportOption(Iconsax.document2, 'PDF'),
-                _buildExportOption(Iconsax.document_text, 'CSV'),
-              ],
+              children: [_buildExportOption(Iconsax.document_text, 'Excel')],
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
           ElevatedButton(
-            onPressed: () {
-              // Export logic
-              Get.back();
+            onPressed: () async {
+              try {
+                controller.isLoadingExport.value = true;
+
+                // Tạo file Excel
+                final excel = Excel.createExcel();
+                final sheet = excel['Sheet1'];
+
+                // Thêm tiêu đề các cột
+                sheet.appendRow([
+                  TextCellValue('STT'),
+                  TextCellValue('Phòng ban'),
+                  TextCellValue('Mã nhân viên'),
+                  TextCellValue('Tên nhân viên'),
+                  TextCellValue('ADID'),
+                  TextCellValue('Nhóm quyền'),
+                  TextCellValue('Trạng thái'),
+                  TextCellValue('Số ngày khóa'),
+                  TextCellValue('User đăng ký'),
+                  TextCellValue('Thời gian đăng ký'),
+                ]);
+
+                // Thêm dữ liệu từ controller
+                for (int i = 0; i < controller.filteredUserList.length; i++) {
+                  final item = controller.filteredUserList[i];
+                  sheet.appendRow([
+                    TextCellValue((i + 1).toString()),
+                    TextCellValue(item.chRSecCode ?? ''),
+                    TextCellValue(item.chREmployeeId ?? ''),
+                    TextCellValue(item.nvchRNameId ?? ''),
+                    TextCellValue(item.chRUserid ?? ''),
+                    TextCellValue(item.chRGroup ?? ''),
+                    TextCellValue(item.inTLock == 1 ? 'Delete' : 'Active'),
+                    TextCellValue(item.inTLockDay?.toString() ?? ''),
+                    TextCellValue(item.vchRUserCreate ?? ''),
+                    TextCellValue(item.dtMCreate?.toString() ?? ''),
+                  ]);
+                }
+
+                // Lưu file
+                final bytes = excel.encode(); // Sử dụng encode() thay vì save()
+                if (bytes == null) throw Exception('Không thể tạo file Excel');
+
+                // Tạo tên file
+                final fileName =
+                    'DanhUserHeThong_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+                // Xử lý tải file xuống
+                if (kIsWeb) {
+                  // Cho trình duyệt web
+                  final blob = html.Blob(
+                    [bytes],
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  );
+                  final url = html.Url.createObjectUrlFromBlob(blob);
+                  final anchor = html.AnchorElement(href: url)
+                    ..setAttribute('download', fileName)
+                    ..click();
+                  html.Url.revokeObjectUrl(url);
+                } else {
+                  // Cho mobile/desktop
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: 'Lưu file Excel',
+                    fileName: fileName,
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                  );
+
+                  if (outputFile != null) {
+                    final file = File(outputFile);
+                    await file.writeAsBytes(bytes, flush: true);
+                  }
+                }
+
+                // Đóng dialog sau khi export thành công
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+
+                Get.snackbar(
+                  'Thành công',
+                  'Đã export ${controller.filteredUserList.length} nhân viên ra file Excel',
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                  duration: const Duration(seconds: 3),
+                );
+              } catch (e) {
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Lỗi Export thất bại: ${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Đóng'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } finally {
+                controller.isLoadingExport.value = false;
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Export'),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Export'),
+            ),
           ),
         ],
       ),
@@ -698,6 +1027,7 @@ class DashboardControllerUser extends GetxController {
     }
   }
 
+  // thêm người dùng
   Future<void> addUser(User newUser) async {
     try {
       isLoading(true);
@@ -717,6 +1047,177 @@ class DashboardControllerUser extends GetxController {
       }
     } catch (e) {
       showError('Failed to add user: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> importFromExcel(File file) async {
+    try {
+      isLoading(true);
+      // Implement your Excel parsing and data import logic here
+      // 1. Parse the Excel file
+      final bytes = await file.readAsBytes();
+      final excel = Excel.decodeBytes(bytes);
+      // 2. Validate the data
+      final sheet = excel.tables.keys.first;
+      final rows = excel.tables[sheet]!.rows;
+      // 3. Send to API or update local state
+      if (rows.isEmpty || rows[0].length < 4) {
+        throw Exception('File Excel không đúng định dạng');
+      }
+      // 4. Refresh data
+      final List<User> importedUsers = [];
+      // Start from row 1 (skip header row) and process until empty row
+      for (int i = 1; i < rows.length; i++) {
+        final row = rows[i];
+
+        // Check if we've reached an empty row (end of data)
+        if (row.isEmpty || row[2]?.value?.toString().isEmpty == true) {
+          break;
+        }
+
+        // Skip rows that don't have enough columns (adjust 10 to your required minimum)
+        if (row.length < 10) {
+          continue;
+        }
+
+        // Create and populate user
+        final user = User()
+          ..chRSecCode = row[1]?.value?.toString()
+          ..chREmployeeId = row[2]?.value?.toString()
+          ..nvchRNameId = row[3]?.value?.toString()
+          ..chRUserid = row[4]?.value?.toString()
+          ..chRGroup = row[5]?.value?.toString()
+          ..inTLock =
+              (row[6]?.value?.toString() ?? '').toLowerCase() == "delete"
+              ? 1
+              : 0
+          ..inTLockDay = 90
+          ..vchRUserCreate = 'khanhmf'
+          ..dtMCreate = DateTime.now().toString()
+          ..vchRUserUpdate = null
+          ..dtMUpdate = DateTime.now().toString()
+          ..dtMLastLogin = DateTime.now().toString();
+
+        // Validate required fields
+        if (user.chRUserid?.isEmpty == true ||
+            user.nvchRNameId?.isEmpty == true ||
+            user.chREmployeeId?.isEmpty == true) {
+          continue; // Skip invalid rows
+        }
+
+        importedUsers.add(user);
+      }
+      // 5. Send to API
+      if (importedUsers.isEmpty) {
+        throw Exception('Không có dữ liệu hợp lệ để import');
+      }
+
+      final response = await http.post(
+        Uri.parse('${Common.API}${Common.AddListUser}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'users': importedUsers.map((user) => user.toJson()).toList(),
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Lỗi khi gửi dữ liệu lên server');
+      }
+
+      //6 reset data
+      await fetchUserData();
+    } catch (e) {
+      showError('Import failed: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // add list user web
+  Future<void> importFromExcelWeb(Uint8List bytes) async {
+    try {
+      isLoading(true);
+
+      // 1. Decode Excel file from bytes
+      final excel = Excel.decodeBytes(bytes);
+
+      // 2. Get the first sheet
+      final sheet = excel.tables.keys.first;
+      final rows = excel.tables[sheet]!.rows;
+      // 3. Send to API or update local state
+      if (rows.isEmpty || rows[0].length < 4) {
+        throw Exception('File Excel không đúng định dạng');
+      }
+      // 4. Refresh data
+      final List<User> importedUsers = [];
+      // Start from row 1 (skip header row) and process until empty row
+      for (int i = 1; i < rows.length; i++) {
+        final row = rows[i];
+
+        // Check if we've reached an empty row (end of data)
+        if (row.isEmpty || row[2]?.value?.toString().isEmpty == true) {
+          break;
+        }
+
+        // Skip rows that don't have enough columns (adjust 10 to your required minimum)
+        if (row.length < 10) {
+          continue;
+        }
+
+        // Create and populate user
+        final user = User()
+          ..chRSecCode = row[1]?.value?.toString()
+          ..chREmployeeId = row[2]?.value?.toString()
+          ..nvchRNameId = row[3]?.value?.toString()
+          ..chRUserid = row[4]?.value?.toString()
+          ..chRGroup = row[5]?.value?.toString()
+          ..inTLock =
+              (row[6]?.value?.toString() ?? '').toLowerCase() == "delete"
+              ? 1
+              : 0
+          ..inTLockDay = 90
+          ..vchRUserCreate = 'khanhmf'
+          ..dtMCreate = DateTime.now().toString()
+          ..vchRUserUpdate = null
+          ..dtMUpdate = DateTime.now().toString()
+          ..dtMLastLogin = null;
+
+        // Validate required fields
+        if (user.chRUserid?.isEmpty == true ||
+            user.nvchRNameId?.isEmpty == true ||
+            user.chREmployeeId?.isEmpty == true) {
+          continue; // Skip invalid rows
+        }
+
+        importedUsers.add(user);
+      }
+      // 5. Send to API
+      if (importedUsers.isEmpty) {
+        throw Exception('Không có dữ liệu hợp lệ để import');
+      }
+
+      final response = await http.post(
+        Uri.parse('${Common.API}${Common.AddListUser}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'users': importedUsers.map((user) => user.toJson()).toList(),
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Lỗi khi gửi dữ liệu lên server');
+      }
+
+      //6 reset data
+      await fetchUserData();
+    } catch (e) {
+      showError(
+        'Import thất bại: ${e.toString().replaceAll(RegExp(r'^_Namespace:?\s*'), '')}',
+      );
+      rethrow;
     } finally {
       isLoading(false);
     }

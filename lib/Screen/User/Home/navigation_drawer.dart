@@ -35,9 +35,10 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    _currentBody = HomeScreen(
-      changeBody: _changeBody,
-    ); // Khởi tạo trong initState
+    _currentBody = MasterUser();
+    // HomeScreen(
+    //   changeBody: _changeBody,
+    // ); // Khởi tạo trong initState
   }
 
   void _changeBody(Widget newBody) {
@@ -424,7 +425,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       color: Common.primaryColor,
       child: ListTile(
         leading: accountButton(usePadding: false),
-        title: Text("Welocome", style: TextStyle(color: Colors.white)),
+        title: Text("Welcome", style: TextStyle(color: Colors.white)),
         subtitle: Text(
           "Nguyễn Duy Khánh",
           style: TextStyle(color: Colors.white70),

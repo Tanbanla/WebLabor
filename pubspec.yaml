@@ -56,6 +56,8 @@ dev_dependencies:
   excel: ^4.0.6
   file_picker: ^10.2.0
   path_provider: ^2.1.5
+  intl: ^0.20.2
+  universal_html: ^2.2.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
