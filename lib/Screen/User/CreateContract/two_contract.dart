@@ -1,12 +1,22 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
+import 'package:excel/excel.dart' hide Border;
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:intl/intl.dart';
+import 'package:universal_html/html.dart' as html;
 
 class TwoContractScreen extends StatefulWidget {
   const TwoContractScreen({super.key});
@@ -70,24 +80,6 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Mã đợt phát hành: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            const CustomField1(
-              icon: Icons.apartment,
-              obscureText: false,
-              hinText: 'Nhập mã đợt',
-            ),
-          ],
-        ),
         const SizedBox(width: 30),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -293,6 +285,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       ],
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -541,8 +534,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   }
 
   void _showExportDialog() {
-    Get.dialog(
-      AlertDialog(
+    final controller = Get.find<DashboardControllerTwo>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: const Text('Export Dữ Liệu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -554,30 +550,217 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildExportOption(Iconsax.document_text, 'Excel'),
-                _buildExportOption(Iconsax.document2, 'PDF'),
-                _buildExportOption(Iconsax.document_text, 'CSV'),
-              ],
+              children: [_buildExportOption(Iconsax.document_text, 'Excel')],
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
           ElevatedButton(
-            onPressed: () {
-              // Export logic
-              Get.back();
+            onPressed: () async {
+              try {
+                controller.isLoadingExport.value = true;
+
+                // Tạo file Excel
+                final excel = Excel.createExcel();
+                final sheet = excel['Sheet1'];
+
+                // Thêm tiêu đề các cột
+                sheet.appendRow([
+                  TextCellValue('STT'),
+                  TextCellValue('Mã nhân viên'),
+                  TextCellValue('M/F'),
+                  TextCellValue('Họ và tên'),
+                  TextCellValue('Phòng ban'),
+                  TextCellValue('Nhóm'),
+                  TextCellValue('Tuổi'),
+                  TextCellValue('Vị trí'),
+                  TextCellValue('Bậc lương'),
+                  TextCellValue('Hiệu lực hợp đồng'),
+                  TextCellValue('Ngày kết thúc hợp đồng'),
+                  TextCellValue('Số lần đi muộn, về sớm'),
+                  TextCellValue('Nghỉ hưởng lương'),
+                  TextCellValue('Nghỉ không lương'),
+                  TextCellValue('Ngày không báo cáo'),
+                  TextCellValue('Số lần vi phạm nội quy Công ty'),
+                  TextCellValue('Lý do'),
+                  TextCellValue('Kết quả khám sức khỏe'),
+                  TextCellValue('Kết quả đánh giá'),
+                  TextCellValue('Trường hợp không thuyển dụng lại điền"X"'),
+                  TextCellValue('Lý do không tuyển dụng lại'),
+                ]);
+
+                // Thêm dữ liệu từ controller
+                for (int i = 0; i < controller.filterdataList.length; i++) {
+                  final item = controller.filterdataList[i];
+                  sheet.appendRow([
+                    TextCellValue((i + 1).toString()),
+                    TextCellValue(item.vchREmployeeId ?? ''),
+                    TextCellValue(item.vchRTyperId ?? ''),
+                    TextCellValue(item.vchREmployeeName ?? ''),
+                    TextCellValue(item.vchRNameSection ?? ''),
+                    TextCellValue(item.chRCostCenterName ?? ''),
+                    TextCellValue(
+                      getAgeFromBirthday(item.dtMBrithday).toString(),
+                    ),
+                    TextCellValue(item.chRPosition ?? ''),
+                    TextCellValue(item.chRCodeGrade ?? ''),
+                    TextCellValue(
+                      item.dtMJoinDate != null
+                          ? DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.parse(item.dtMJoinDate!))
+                          : '',
+                    ),
+                    TextCellValue(
+                      item.dtMEndDate != null
+                          ? DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.parse(item.dtMEndDate!))
+                          : '',
+                    ),
+                    TextCellValue(item.fLGoLeaveLate.toString()),
+                    TextCellValue(item.fLPaidLeave.toString()),
+                    TextCellValue(item.fLNotPaidLeave.toString()),
+                    TextCellValue(item.fLNotLeaveDay.toString()),
+                    TextCellValue(item.inTViolation.toString()),
+                    TextCellValue(item.nvarchaRViolation ?? ''),
+                    TextCellValue(item.nvarchaRHealthResults ?? ''),
+                    TextCellValue(item.vchRReasultsLeader ?? ''),
+                    TextCellValue(item.biTNoReEmployment.toString()),
+                    TextCellValue(item.nvchRNoReEmpoyment ?? ''),
+                  ]);
+                }
+
+                // Lưu file
+                final bytes = excel.encode(); // Sử dụng encode() thay vì save()
+                if (bytes == null) throw Exception('Không thể tạo file Excel');
+
+                // Tạo tên file
+                final fileName =
+                    'DanhSachDanhGiaHopDongKhongXD_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+                // Xử lý tải file xuống
+                if (kIsWeb) {
+                  // Cho trình duyệt web
+                  final blob = html.Blob(
+                    [bytes],
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  );
+                  final url = html.Url.createObjectUrlFromBlob(blob);
+                  final anchor = html.AnchorElement(href: url)
+                    ..setAttribute('download', fileName)
+                    ..click();
+                  html.Url.revokeObjectUrl(url);
+                } else {
+                  // Cho mobile/desktop
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: 'Lưu file Excel',
+                    fileName: fileName,
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                  );
+
+                  if (outputFile != null) {
+                    final file = File(outputFile);
+                    await file.writeAsBytes(bytes, flush: true);
+                  }
+                }
+
+                // Đóng dialog sau khi export thành công
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    icon: const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 50,
+                    ),
+                    title: const Text(
+                      'Thành công',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Export dữ liệu thành công'),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Đóng'),
+                      ),
+                    ],
+                  ),
+                );
+              } catch (e) {
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Lỗi Export thất bại: ${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Đóng'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } finally {
+                controller.isLoadingExport.value = false;
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Export'),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Export'),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  // Thêm hàm này vào file helper
+  String getAgeFromBirthday(String? birthday) {
+    if (birthday == null || birthday.isEmpty) return '';
+    try {
+      final birthDate = DateTime.parse(birthday);
+      final now = DateTime.now();
+      int age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+      return '$age tuổi';
+    } catch (e) {
+      return 'Invalid date';
+    }
   }
 
   Widget _buildExportOption(IconData icon, String label) {
@@ -665,7 +848,7 @@ class MyData extends DataTableSource {
         }
         return null;
       }),
-      onTap: () {},//=> _showDetailDialog(data),
+      onTap: () {}, //=> _showDetailDialog(data),
       selected: controller.selectRows[index],
       onSelectChanged: (value) {
         controller.selectRows[index] = value ?? false;
@@ -696,32 +879,32 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.trash,
                 color: Colors.red,
-                onPressed: (){},
+                onPressed: () {},
               ),
               const SizedBox(width: 8),
               _buildActionButton(
                 icon: Iconsax.eye,
                 color: Colors.green,
-                onPressed: () {},//=> _showDetailDialog(data),
+                onPressed: () {}, //=> _showDetailDialog(data),
               ),
             ],
           ),
         ),
         DataCell(
           Text(
-            data.vchREmployeeId??'',
+            data.vchREmployeeId ?? '',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data.chRCodeGrade?? "",
+            data.vchRTyperId ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data.vchREmployeeName??'',
+            data.vchREmployeeName ?? '',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
@@ -733,37 +916,47 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-            data.chRPosition?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.dtMBrithday?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
             data.chRCostCenterName ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data.chRPosition?.toString() ?? "",
+            data.dtMBrithday != null
+                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data.dtMJoinDate?? "",
+            data.chRPosition ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data.dtMEndDate?? "",
+            data.chRCodeGrade?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.dtMJoinDate != null
+                ? DateFormat(
+                    'yyyy-MM-dd',
+                  ).format(DateTime.parse(data.dtMJoinDate!))
+                : "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.dtMEndDate != null
+                ? DateFormat(
+                    'yyyy-MM-dd',
+                  ).format(DateTime.parse(data.dtMEndDate!))
+                : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
@@ -821,139 +1014,8 @@ class MyData extends DataTableSource {
             },
           ),
         ),
-        DataCell(
-          Obx(() {
-            final item = controller.filterdataList[index];
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final status = item.nvarchaRHealthResults?? 'OK';
-            final id = item.vchREmployeeId ?? '';
-
-            return DropdownButton<String>(
-              value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn, // Cập nhật font size
-                color: _getStatusColor(status),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text('OK', style: TextStyle(fontSize: Common.sizeColumn)),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text('NG', style: TextStyle(fontSize: Common.sizeColumn)),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: (newValue) {
-                if (newValue != null && id.isNotEmpty) {
-                  //controller.updateEvaluationStatus(id, newValue);
-                  controller.filterdataList.refresh();
-                }
-              },
-            );
-          }),
-        ),
-        DataCell(
-          Obx(() {
-            final item = controller.filterdataList[index];
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus = item.vchRReasultsLeader;
-            final status = (rawStatus == 'OK' || rawStatus == 'NG')
-                ? rawStatus
-                : 'NG';
-            final employeeCode = item.vchREmployeeId??'';
-
-            return DropdownButton<String>(
-              value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn, // Cập nhật font size
-                color: _getStatusColor(status),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text('O', style: TextStyle(fontSize: Common.sizeColumn)),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text('X', style: TextStyle(fontSize: Common.sizeColumn)),
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: (newValue) {
-                if (newValue != null && employeeCode.isNotEmpty) {
-                 // controller.updateRehireStatus(employeeCode, newValue);
-                  controller.filterdataList.refresh();
-                }
-              },
-            );
-          }),
-        ),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           TextFormField(
             style: TextStyle(
@@ -980,21 +1042,6 @@ class MyData extends DataTableSource {
     );
   }
 
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'OK':
-        return Colors.green;
-      case 'NG':
-        return Colors.red;
-      case 'Stop Working':
-        return Colors.orange;
-      case 'Finish L/C':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
-
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -1010,70 +1057,6 @@ class MyData extends DataTableSource {
         onPressed: onPressed,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
-      ),
-    );
-  }
-
-  void _showDetailDialog(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Chi tiết: ${data['Column3']}'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
-              _buildDetailRow('Mã nhân viên:', data['Column2'] ?? ""),
-              _buildDetailRow('Tên nhân viên:', data['Column3'] ?? ""),
-              _buildDetailRow('ADID:', data['Column4'] ?? ""),
-              _buildDetailRow('Nhóm quyền:', data['Column5'] ?? ""),
-              const SizedBox(height: 16),
-              const Text(
-                'Lịch sử hoạt động:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(
-                3,
-                (index) => _buildActivityItem('Hoạt động ${index + 1}'),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Đóng')),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(Icons.circle, size: 8, color: Colors.blue),
-          const SizedBox(width: 8),
-          Text(text),
-        ],
       ),
     );
   }
@@ -1095,6 +1078,8 @@ class DashboardControllerTwo extends GetxController {
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
+  var isLoading = false.obs;
+  var isLoadingExport = false.obs;
 
   @override
   void onInit() {
@@ -1102,16 +1087,42 @@ class DashboardControllerTwo extends GetxController {
     fetchDummyData();
   }
 
-  void sortById(int sortColumnIndex, bool ascending) {
-    sortAscending.value = ascending;
-    filterdataList.sort((a, b) {
-      final aValue = a.vchREmployeeId ?.toLowerCase() ?? '';
-      final bValue = b.vchREmployeeId?.toLowerCase() ?? '';
-      return ascending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
-    });
-    this.sortCloumnIndex.value = sortColumnIndex;
+  void showError(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
   }
 
+  //sap xep du lieu
+  void sortById(int sortColumnIndex, bool ascending) {
+    sortAscending.value = ascending;
+    sortCloumnIndex.value = sortColumnIndex;
+
+    dataList.sort((a, b) {
+      switch (sortColumnIndex) {
+        case 0: // ID
+          return ascending
+              ? (a.id ?? 0).compareTo(b.id ?? 0)
+              : (b.id ?? 0).compareTo(a.id ?? 0);
+        case 1: // employee ID
+          return ascending
+              ? (a.vchREmployeeId ?? '').compareTo(b.vchREmployeeId ?? '')
+              : (b.vchREmployeeId ?? '').compareTo(a.vchREmployeeId ?? '');
+        case 2: // Name
+          return ascending
+              ? (a.vchREmployeeName ?? '').compareTo(b.vchREmployeeName ?? '')
+              : (b.vchREmployeeName ?? '').compareTo(a.vchREmployeeName ?? '');
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // so sanh du lieu
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);
@@ -1123,44 +1134,100 @@ class DashboardControllerTwo extends GetxController {
                     query.toLowerCase(),
                   ) ??
                   false) ||
-              (item.vchREmployeeName?.toLowerCase().contains(query.toLowerCase()) ??
+              (item.vchREmployeeName?.toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ??
+                  false) ||
+              (item.vchRNameSection?.toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ??
                   false),
         ),
       );
     }
   }
 
-  void deleteItem(Map<String, String> item) {
-    dataList.remove(item);
-    filterdataList.remove(item);
-    selectRows.removeAt(dataList.indexOf(item));
-  }
+  // lay du lieu
+  Future<void> fetchDummyData() async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.TwoGetAll),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-  // các trường đánh giá
-  void updateReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].chRCostCenterName = reason;
-      dataList.refresh();
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          dataList.assignAll(
+            data
+                .map((twocontract) => TwoContract.fromJson(twocontract))
+                .toList(),
+          );
+          filterdataList.assignAll(dataList);
+          selectRows.assignAll(
+            List.generate(dataList.length, (index) => false),
+          );
+        }
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
     }
   }
 
-  
+  // xuat fiel
+  Future<void> exportToExcel() async {
+    try {
+      isLoadingExport(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.UserGetAll}?export=excel'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-  void updateNotRehireReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].nvchRPthcSection = reason;
-      dataList.refresh();
+      if (response.statusCode == 200) {
+        // Xử lý file Excel
+        Get.snackbar(
+          'Success',
+          'Exported successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Export failed: $e');
+    } finally {
+      isLoadingExport(false);
     }
   }
 
-  //
-  void fetchDummyData() {
-    
+  // update thông tin
+  Future<void> updateTwoContract() async {}
+
+  // xuat file
+  Future<void> exportToExcelTwoContract() async {
+    try {
+      isLoadingExport(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.TwoGetAll}?export=excel'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Xử lý file Excel
+        Get.snackbar(
+          'Success',
+          'Exported successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      showError('Export failed: $e');
+    } finally {
+      isLoadingExport(false);
+    }
   }
 }

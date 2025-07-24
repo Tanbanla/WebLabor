@@ -49,6 +49,24 @@ class Common {
   static const String DeletePTHCIDLogic = "PthcSection/delete-logic/";
   static const String DeletePTHCMultiID = "PthcSection/delete-multi/";
   static const String DeletePTHCMultiIDLogic = "PthcSection/delete-logic-multi/";
+
+  // Contract Two year
+    static const String TwoGetAll = "ContractTwoYear/get-all";
+  static const String GetTwoCount = "ContractTwoYear/get-count-all";
+  static const String GetByIdTwo = "ContractTwoYear/get/";
+  static const String TwoGetByCount = "ContractTwoYear/get-count-by-condition";
+  static const String TwoSreachBy = "ContractTwoYear/search-by-condition";
+  // POST
+  static const String AddTwo = "ContractTwoYear/add";
+  static const String AddListTwo = "ContractTwoYear/add-multi";
+  //PUST
+  static const String UpdateTwo = "ContractTwoYear/update/";
+  static const String UpdataListTwo = "ContractTwoYear/update-multi";
+  //DELETE
+  static const String DeleteTwoID = "ContractTwoYear/delete/";
+  static const String DeleteTwoIDLogic = "ContractTwoYear/delete-logic/";
+  static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi/";
+  static const String DeleteTwoMultiIDLogic = "ContractTwoYear/delete-logic-multi/";
   // font size
   static double sizeColumn = 12;
 }

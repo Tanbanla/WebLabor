@@ -35,7 +35,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    _currentBody = MasterUser();
+    _currentBody = TwoContractScreen();
     // HomeScreen(
     //   changeBody: _changeBody,
     // ); // Khởi tạo trong initState
@@ -75,7 +75,7 @@ class _MenuScreenState extends State<MenuScreen> {
         "LABOR CONTRACT EVALUATION",
         style: TextStyle(color: Colors.white),
       ),
-      backgroundColor: Common.primaryColor.withOpacity(0.6),
+      backgroundColor: Common.primaryColor,//.withOpacity(0.6),
       actions: [
         Padding(
           padding: EdgeInsets.only(right: 20),

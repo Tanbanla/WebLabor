@@ -268,6 +268,10 @@ class _MasterUserState extends State<MasterUser> {
                     label: const Text('Nhóm quyền'),
                     // fixedWidth: 150,
                   ),
+                  DataColumn2(
+                    label: const Text('Loại User'),
+                    // fixedWidth: 150,
+                  ),
                   const DataColumn2(label: Text('Trạng thái'), fixedWidth: 120),
                   const DataColumn2(label: Text('Hành động'), fixedWidth: 180),
                 ],
@@ -280,121 +284,6 @@ class _MasterUserState extends State<MasterUser> {
     );
   }
 
-  // void _showImportDialog() {
-  //   final controller = Get.find<DashboardControllerUser>();
-  //   Rx<File?> selectedFile = Rx<File?>(null);
-  //   RxString fileName = ''.obs;
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => Obx(
-  //       () => AlertDialog(
-  //         title: const Text('Import Dữ Liệu'),
-  //         content: SingleChildScrollView(
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Text(
-  //                 'Chọn file Excel để import dữ liệu',
-  //                 style: TextStyle(color: Colors.grey[600]),
-  //               ),
-  //               const SizedBox(height: 20),
-  //               if (fileName.isNotEmpty)
-  //                 Padding(
-  //                   padding: const EdgeInsets.only(bottom: 10),
-  //                   child: Text(
-  //                     'File đã chọn: ${fileName.value}',
-  //                     style: const TextStyle(fontWeight: FontWeight.bold),
-  //                   ),
-  //                 ),
-  //               ElevatedButton.icon(
-  //                 icon: const Icon(Iconsax.document_upload),
-  //                 label: const Text('Chọn File'),
-  //                 onPressed: controller.isLoading.value
-  //                     ? null
-  //                     : () async {
-  //                         try {
-  //                           final result = await FilePicker.platform.pickFiles(
-  //                             type: FileType.custom,
-  //                             allowedExtensions: ['xlsx'],
-  //                             allowMultiple: false,
-  //                           );
-
-  //                           if (result != null) {
-  //                             selectedFile.value = File(
-  //                               result.files.single.path!,
-  //                             );
-  //                             fileName.value = result.files.single.name;
-  //                           }
-  //                         } catch (e) {
-  //                           controller.showError('Lỗi khi chọn file: $e');
-  //                         }
-  //                       },
-  //                 style: ElevatedButton.styleFrom(
-  //                   backgroundColor: Colors.blue,
-  //                   foregroundColor: Colors.white,
-  //                   padding: const EdgeInsets.symmetric(
-  //                     horizontal: 20,
-  //                     vertical: 12,
-  //                   ),
-  //                   shape: RoundedRectangleBorder(
-  //                     borderRadius: BorderRadius.circular(10),
-  //                   ),
-  //                 ),
-  //               ),
-  //               if (controller.isLoading.value) ...[
-  //                 const SizedBox(height: 20),
-  //                 const CircularProgressIndicator(),
-  //                 const SizedBox(height: 10),
-  //                 const Text('Đang xử lý...'),
-  //               ],
-  //             ],
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: controller.isLoading.value
-  //                 ? null
-  //                 : () => Navigator.of(context).pop(),
-  //             child: const Text('Hủy'),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed:
-  //                 (controller.isLoading.value || selectedFile.value == null)
-  //                 ? null
-  //                 : () async {
-  //                     try {
-  //                       controller.isLoading(true);
-  //                       await controller.importFromExcel(selectedFile.value!);
-
-  //                       // Close the dialog after successful import
-  //                       if (mounted) {
-  //                         Navigator.of(context).pop();
-  //                       }
-  //                     } catch (e) {
-  //                       controller.showError('Lỗi khi import: $e');
-  //                       showDialog(
-  //                           context: context,
-  //                           builder: (context) => AlertDialog(
-  //                             title: Text('Lỗi Import file'),
-  //                             content: Text('$e'),
-  //                           ),
-  //                         );
-  //                     } finally {
-  //                       controller.isLoading(false);
-  //                     }
-  //                   },
-  //             style: ElevatedButton.styleFrom(
-  //               backgroundColor: Colors.green,
-  //               foregroundColor: Colors.white,
-  //             ),
-  //             child: const Text('Import'),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
   void _showImportDialog() {
     final controller = Get.find<DashboardControllerUser>();
     Rx<File?> selectedFile = Rx<File?>(null);
@@ -445,7 +334,6 @@ class _MasterUserState extends State<MasterUser> {
                               allowedExtensions: ['xlsx', 'xls'],
                               allowMultiple: false,
                             );
-
                             if (result != null &&
                                 result.files.single.path != null) {
                               selectedFile.value = File(
@@ -501,7 +389,6 @@ class _MasterUserState extends State<MasterUser> {
                       errorMessage.value = '';
                       try {
                         controller.isLoading(true);
-                        //await controller.importFromExcel(selectedFile.value!);
                         if (kIsWeb) {
                           // Xử lý web
                           await controller.importFromExcelWeb(
@@ -513,13 +400,39 @@ class _MasterUserState extends State<MasterUser> {
                         }
                         // Close the dialog after successful import
                         if (mounted) {
-                          Navigator.of(context).pop();
-                          Get.snackbar(
-                            'Thành công',
-                            'Import dữ liệu thành công',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the import dialog first
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              icon: const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 50,
+                              ),
+                              title: const Text(
+                                'Thành công',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('Import dữ liệu thành công'),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('Đóng'),
+                                ),
+                              ],
+                            ),
                           );
                         }
                       } on PlatformException catch (e) {
@@ -586,6 +499,7 @@ class _MasterUserState extends State<MasterUser> {
                   TextCellValue('Tên nhân viên'),
                   TextCellValue('ADID'),
                   TextCellValue('Nhóm quyền'),
+                  TextCellValue('Loại user'),
                   TextCellValue('Trạng thái'),
                   TextCellValue('Số ngày khóa'),
                   TextCellValue('User đăng ký'),
@@ -602,10 +516,19 @@ class _MasterUserState extends State<MasterUser> {
                     TextCellValue(item.nvchRNameId ?? ''),
                     TextCellValue(item.chRUserid ?? ''),
                     TextCellValue(item.chRGroup ?? ''),
+                    TextCellValue(
+                      item.inTUseridCommon == 1 ? 'Dùng chung' : 'Dùng riêng',
+                    ),
                     TextCellValue(item.inTLock == 1 ? 'Delete' : 'Active'),
                     TextCellValue(item.inTLockDay?.toString() ?? ''),
                     TextCellValue(item.vchRUserCreate ?? ''),
-                    TextCellValue(item.dtMCreate?.toString() ?? ''),
+                    TextCellValue(
+                      item.dtMCreate != null
+                          ? DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.parse(item.dtMCreate!))
+                          : '',
+                    ),
                   ]);
                 }
 
@@ -648,13 +571,36 @@ class _MasterUserState extends State<MasterUser> {
                 if (context.mounted) {
                   Navigator.of(context).pop();
                 }
-
-                Get.snackbar(
-                  'Thành công',
-                  'Đã export ${controller.filteredUserList.length} nhân viên ra file Excel',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                  duration: const Duration(seconds: 3),
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    icon: const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 50,
+                    ),
+                    title: const Text(
+                      'Thành công',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Export dữ liệu thành công'),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Đóng'),
+                      ),
+                    ],
+                  ),
                 );
               } catch (e) {
                 if (context.mounted) {
@@ -708,66 +654,164 @@ class _MasterUserState extends State<MasterUser> {
   }
 
   void _showAddDialog() {
+    final controller = Get.find<DashboardControllerUser>();
+    var userAdd = User();
+    RxString errorMessage = ''.obs;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          title: const Text('Thêm User Mới'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Nhập ADID',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                  onChanged: (value) => userAdd.chRUserid = value,
                 ),
-              ),
-              const SizedBox(height: 12),
-              // TextField(
-              //   decoration: InputDecoration(
-              //     labelText: 'Tên nhân viên',
-              //     border: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 12),
+                DropdownButtonFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Loại User',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                  items: ['0: Dùng riêng', '1: Dùng chung']
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (value) {
+                    switch (value) {
+                      case "0: Dùng riêng":
+                        userAdd.inTUseridCommon = 0;
+                      case "1: Dùng chung":
+                        userAdd.inTUseridCommon = 1;
+                    }
+                  },
                 ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: controller.isLoading.value
-                ? null
-                : () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
+                const SizedBox(height: 12),
+                DropdownButtonFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Nhóm quyền',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  items:
+                      [
+                            'Admin',
+                            'Per',
+                            'Chief Per',
+                            'PTHC',
+                            'Leader',
+                            'Chief Section',
+                            'Manager Section',
+                            'Director',
+                          ]
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    userAdd.chRGroup = value;
+                  },
+                ),
+                const SizedBox(height: 12),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      errorMessage.value,
+                      style: TextStyle(color: Colors.red, fontSize: 14),
+                    ),
+                  ),
+              ],
             ),
-            child: const Text('Thêm'),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: controller.isLoading.value
+                  ? null
+                  : () => Navigator.of(context).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: (controller.isLoading.value)
+                  ? null
+                  : () async {
+                      errorMessage.value = '';
+                      controller.isLoading(false);
+                      try {
+                        await controller.addUser(userAdd);
+                        if (mounted) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the import dialog first
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              icon: const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 50,
+                              ),
+                              title: const Text(
+                                'Thành công',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('Thêm user thành công'),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('Đóng'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        errorMessage.value =
+                            'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                      } finally {
+                        controller.isLoading(false);
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+              child: Obx(
+                () => controller.isLoadingExport.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Thêm'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -808,6 +852,13 @@ class MyData extends DataTableSource {
         DataCell(Text(data.nvchRNameId ?? '')),
         DataCell(Text(data.chRUserid ?? '')),
         DataCell(Text(data.chRGroup ?? '')),
+        DataCell(
+          Text(
+            (data.inTUseridCommon ?? 0) == 1
+                ? '1: Dùng chung'
+                : '0: Dùng riêng',
+          ),
+        ),
         DataCell(
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -983,6 +1034,10 @@ class DashboardControllerUser extends GetxController {
   Future<void> updateUser(User user) async {
     try {
       isLoading(true);
+      user.vchRUserUpdate = 'khanhmf';
+      if (user.vchRUserCreate.toString().isEmpty) {
+        user.vchRUserCreate = 'khanhmf';
+      }
       final response = await http.put(
         Uri.parse('${Common.API}${Common.UpdateUser}${user.id}'),
         headers: {'Content-Type': 'application/json'},
@@ -990,11 +1045,11 @@ class DashboardControllerUser extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        fetchUserData();
-        Get.snackbar(
-          'Success',
-          'User updated successfully',
-          snackPosition: SnackPosition.BOTTOM,
+        await fetchUserData();
+      } else {
+        final errorResponse = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
         );
       }
     } catch (e) {
@@ -1031,22 +1086,39 @@ class DashboardControllerUser extends GetxController {
   Future<void> addUser(User newUser) async {
     try {
       isLoading(true);
+      final user = User()
+        ..id = 0
+        ..chRSecCode = null
+        ..chREmployeeId = null
+        ..nvchRNameId = null
+        ..chRUserid = newUser.chRUserid
+        ..chRPass = ''
+        ..chRGroup = newUser.chRGroup
+        ..inTLock = 0
+        ..inTLockDay = 90
+        ..inTUseridCommon = newUser.inTUseridCommon
+        ..vchRUserCreate = 'khanhmf'
+        ..dtMCreate = formatDateTime(DateTime.now())
+        ..vchRUserUpdate = 'khanhmf'
+        ..dtMUpdate = formatDateTime(DateTime.now())
+        ..dtMLastLogin = formatDateTime(DateTime.now());
       final response = await http.post(
         Uri.parse('${Common.API}${Common.AddUser}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(newUser.toJson()),
+        body: json.encode(user.toJson()),
       );
 
       if (response.statusCode == 200) {
         fetchUserData();
-        Get.snackbar(
-          'Success',
-          'User added successfully',
-          snackPosition: SnackPosition.BOTTOM,
+      } else {
+        final errorResponse = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
         );
       }
     } catch (e) {
       showError('Failed to add user: $e');
+      rethrow;
     } finally {
       isLoading(false);
     }
@@ -1068,46 +1140,44 @@ class DashboardControllerUser extends GetxController {
       }
       // 4. Refresh data
       final List<User> importedUsers = [];
+      int _i = 1;
       // Start from row 1 (skip header row) and process until empty row
-      for (int i = 1; i < rows.length; i++) {
-        final row = rows[i];
-
-        // Check if we've reached an empty row (end of data)
-        if (row.isEmpty || row[2]?.value?.toString().isEmpty == true) {
-          break;
-        }
-
-        // Skip rows that don't have enough columns (adjust 10 to your required minimum)
-        if (row.length < 10) {
-          continue;
-        }
-
+      while (rows[_i][2]?.value?.toString().isEmpty == false) {
+        final row = rows[_i];
         // Create and populate user
         final user = User()
+          ..id = 0
           ..chRSecCode = row[1]?.value?.toString()
           ..chREmployeeId = row[2]?.value?.toString()
           ..nvchRNameId = row[3]?.value?.toString()
           ..chRUserid = row[4]?.value?.toString()
+          ..chRPass = ''
           ..chRGroup = row[5]?.value?.toString()
           ..inTLock =
-              (row[6]?.value?.toString() ?? '').toLowerCase() == "delete"
+              (row[7]?.value?.toString() ?? '').toLowerCase() == "delete"
               ? 1
               : 0
           ..inTLockDay = 90
+          ..inTUseridCommon =
+              (row[6]?.value?.toString() ?? '').toLowerCase() == "dùng chung"
+              ? 1
+              : 0
           ..vchRUserCreate = 'khanhmf'
-          ..dtMCreate = DateTime.now().toString()
-          ..vchRUserUpdate = null
-          ..dtMUpdate = DateTime.now().toString()
-          ..dtMLastLogin = DateTime.now().toString();
+          ..dtMCreate = formatDateTime(DateTime.now())
+          ..vchRUserUpdate = 'khanhmf'
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..dtMLastLogin = formatDateTime(DateTime.now());
 
         // Validate required fields
         if (user.chRUserid?.isEmpty == true ||
             user.nvchRNameId?.isEmpty == true ||
             user.chREmployeeId?.isEmpty == true) {
+          _i++;
           continue; // Skip invalid rows
         }
 
         importedUsers.add(user);
+        _i++;
       }
       // 5. Send to API
       if (importedUsers.isEmpty) {
@@ -1117,13 +1187,14 @@ class DashboardControllerUser extends GetxController {
       final response = await http.post(
         Uri.parse('${Common.API}${Common.AddListUser}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'users': importedUsers.map((user) => user.toJson()).toList(),
-        }),
+        body: json.encode(importedUsers),
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Lỗi khi gửi dữ liệu lên server');
+        final errorResponse = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
+        );
       }
 
       //6 reset data
@@ -1153,46 +1224,45 @@ class DashboardControllerUser extends GetxController {
       }
       // 4. Refresh data
       final List<User> importedUsers = [];
+      int _i = 1;
       // Start from row 1 (skip header row) and process until empty row
-      for (int i = 1; i < rows.length; i++) {
-        final row = rows[i];
-
-        // Check if we've reached an empty row (end of data)
-        if (row.isEmpty || row[2]?.value?.toString().isEmpty == true) {
-          break;
-        }
-
-        // Skip rows that don't have enough columns (adjust 10 to your required minimum)
-        if (row.length < 10) {
-          continue;
-        }
-
+      while (rows[_i][2]?.value?.toString().isEmpty == false) {
+        final row = rows[_i];
         // Create and populate user
         final user = User()
+          ..id = 0
           ..chRSecCode = row[1]?.value?.toString()
           ..chREmployeeId = row[2]?.value?.toString()
           ..nvchRNameId = row[3]?.value?.toString()
           ..chRUserid = row[4]?.value?.toString()
+          ..chRPass = ''
           ..chRGroup = row[5]?.value?.toString()
           ..inTLock =
-              (row[6]?.value?.toString() ?? '').toLowerCase() == "delete"
+              (row[7]?.value?.toString() ?? '').toLowerCase() == "delete"
               ? 1
               : 0
           ..inTLockDay = 90
+          ..inTUseridCommon =
+              (row[6]?.value?.toString() ?? '').toLowerCase() == "dùng chung"
+              ? 1
+              : 0
+          ..inTUseridCommon = 0
           ..vchRUserCreate = 'khanhmf'
-          ..dtMCreate = DateTime.now().toString()
-          ..vchRUserUpdate = null
-          ..dtMUpdate = DateTime.now().toString()
-          ..dtMLastLogin = null;
+          ..dtMCreate = formatDateTime(DateTime.now())
+          ..vchRUserUpdate = 'khanhmf'
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..dtMLastLogin = formatDateTime(DateTime.now());
 
         // Validate required fields
         if (user.chRUserid?.isEmpty == true ||
             user.nvchRNameId?.isEmpty == true ||
             user.chREmployeeId?.isEmpty == true) {
+          _i++;
           continue; // Skip invalid rows
         }
 
         importedUsers.add(user);
+        _i++;
       }
       // 5. Send to API
       if (importedUsers.isEmpty) {
@@ -1202,13 +1272,14 @@ class DashboardControllerUser extends GetxController {
       final response = await http.post(
         Uri.parse('${Common.API}${Common.AddListUser}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'users': importedUsers.map((user) => user.toJson()).toList(),
-        }),
+        body: json.encode(importedUsers),
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Lỗi khi gửi dữ liệu lên server');
+        final errorResponse = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
+        );
       }
 
       //6 reset data
@@ -1236,9 +1307,12 @@ class DashboardControllerUser extends GetxController {
   Future<void> deleteUser(int id, {bool logical = true}) async {
     try {
       isLoading(true);
-      //final endpoint = logical ? Common.DeleteIDLogic : Common.DeleteID;
+      final endpoint = logical
+          ? Common.DeleteIDLogic
+          : Common.DeleteID; //logical ? Common.DeleteIDLogic :
       final response = await http.delete(
-        Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
+        // Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
+        Uri.parse('${Common.API}$endpoint$id'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -1256,6 +1330,29 @@ class DashboardControllerUser extends GetxController {
       isLoading(false);
     }
   }
+
+  String? formatDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value.toIso8601String();
+    if (value is String) {
+      // Try various common datetime formats
+      final formats = [
+        'yyyy-MM-dd HH:mm:ss.SSS',
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy-MM-dd',
+      ];
+
+      for (var format in formats) {
+        try {
+          final date = DateFormat(format).parse(value.replaceAll(' ', ''));
+          return date.toIso8601String();
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 class _EditUserDialog extends StatelessWidget {
@@ -1267,6 +1364,7 @@ class _EditUserDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final editedUser = User.fromJson(user.toJson());
+    RxString errorMessage = ''.obs;
 
     return AlertDialog(
       title: Text('Chỉnh sửa thông tin ${user.nvchRNameId}'),
@@ -1324,6 +1422,19 @@ class _EditUserDialog extends StatelessWidget {
                 onChanged: (value) => editedUser.inTLock = value ?? 0,
               ),
               const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                value: user.inTUseridCommon,
+                decoration: const InputDecoration(
+                  labelText: 'Loại User',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 0, child: Text('0: Dùng riêng')),
+                  DropdownMenuItem(value: 1, child: Text('1: Dùng chung')),
+                ],
+                onChanged: (value) => editedUser.inTUseridCommon = value ?? 0,
+              ),
+              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value:
                     [
@@ -1365,6 +1476,14 @@ class _EditUserDialog extends StatelessWidget {
                     value == null ? 'Vui lòng chọn nhóm quyền' : null,
                 onChanged: (value) => editedUser.chRGroup = value,
               ),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
             ],
           ),
         ),
@@ -1387,10 +1506,8 @@ class _EditUserDialog extends StatelessWidget {
                         Navigator.of(context).pop();
                       }
                     } catch (e) {
-                      // Xử lý lỗi nếu cần
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
+                      errorMessage.value =
+                          'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
                     }
                   },
             child: const Text('Lưu'),
