@@ -1317,11 +1317,11 @@ class DashboardControllerUser extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        fetchUserData();
-        Get.snackbar(
-          'Success',
-          'User deleted successfully',
-          snackPosition: SnackPosition.BOTTOM,
+        await fetchUserData();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
         );
       }
     } catch (e) {

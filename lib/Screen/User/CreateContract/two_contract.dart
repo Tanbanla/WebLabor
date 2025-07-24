@@ -476,7 +476,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                 ],
-                source: MyData(),
+                source: MyData(context),
               ),
             ),
           ),
@@ -835,7 +835,9 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
 class MyData extends DataTableSource {
   final DashboardControllerTwo controller = Get.find();
+  final BuildContext context;
 
+  MyData(this.context);
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -879,7 +881,12 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.trash,
                 color: Colors.red,
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>_DeleteTwoContractDialog(id: (data.id ?? 0)),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               _buildActionButton(
@@ -1180,32 +1187,80 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-  // xuat fiel
-  Future<void> exportToExcel() async {
+  // them danh gia
+  Future<void> addTwoContract(TwoContract twocontract) async {
     try {
-      isLoadingExport(true);
-      final response = await http.get(
-        Uri.parse('${Common.API}${Common.UserGetAll}?export=excel'),
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.AddTwo}'),
         headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract.toJson()),
       );
-
       if (response.statusCode == 200) {
-        // Xử lý file Excel
-        Get.snackbar(
-          'Success',
-          'Exported successfully',
-          snackPosition: SnackPosition.BOTTOM,
+        await fetchDummyData();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
         );
       }
     } catch (e) {
-      showError('Export failed: $e');
+      showError('Failed to update two contract: $e');
+      rethrow;
     } finally {
-      isLoadingExport(false);
+      isLoading(false);
     }
   }
 
   // update thông tin
-  Future<void> updateTwoContract() async {}
+  Future<void> updateTwoContract(TwoContract twocontract) async {
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract.toJson()),
+      );
+      if (response.statusCode == 200) {
+        await fetchDummyData();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // delete
+  Future<void> deleteTwoContract(int id) async {
+    try {
+      isLoading(true);
+      final endpoint = Common.DeleteTwoID;
+      final response = await http.delete(
+        Uri.parse('${Common.API}$endpoint$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        await fetchDummyData();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to delete user: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
 
   // xuat file
   Future<void> exportToExcelTwoContract() async {
@@ -1226,8 +1281,60 @@ class DashboardControllerTwo extends GetxController {
       }
     } catch (e) {
       showError('Export failed: $e');
+      rethrow;
     } finally {
       isLoadingExport(false);
     }
+  }
+}
+
+class _DeleteTwoContractDialog extends StatelessWidget {
+  final int id;
+  final DashboardControllerTwo controller = Get.find();
+
+  _DeleteTwoContractDialog({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      // Thêm Obx để theo dõi trạng thái loading
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return AlertDialog(
+        title: const Text('Xác nhận xóa'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa thông tin đánh già này?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    try {
+                      await controller.deleteTwoContract(id);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: const Text('Xóa'),
+          ),
+        ],
+      );
+    });
   }
 }
