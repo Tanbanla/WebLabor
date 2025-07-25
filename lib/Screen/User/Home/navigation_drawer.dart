@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/Common/common.dart';
-import 'package:web_labor_contract/Screen/Admin/Master/temp_pthc.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
@@ -12,6 +11,7 @@ import 'package:web_labor_contract/Screen/User/Fill_Review/fill_apprentice.dart'
 import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -72,10 +72,11 @@ class _MenuScreenState extends State<MenuScreen> {
     return AppBar(
       iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
       title: Text(
-        "LABOR CONTRACT EVALUATION",
+        'appTitle'.tr(),
+        //"LABOR CONTRACT EVALUATION",
         style: TextStyle(color: Colors.white),
       ),
-      backgroundColor: Common.primaryColor,//.withOpacity(0.6),
+      backgroundColor: Common.primaryColor, //.withOpacity(0.6),
       actions: [
         Padding(
           padding: EdgeInsets.only(right: 20),
@@ -91,9 +92,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   fit: BoxFit.cover,
                 ),
                 onPressed: () {
-                  setState(() {
-                    // Gọi hàm thay đổi ngôn ngữ ở đây
-                  });
+                  context.setLocale(Locale('ja'));
                 },
               ),
               // Button tiếng Việt
@@ -105,7 +104,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   fit: BoxFit.cover,
                 ),
                 onPressed: () {
-                  setState(() {});
+                  context.setLocale(Locale('vi'));
                 },
               ),
             ],
@@ -141,6 +140,34 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   int selectedIndex = -1; //dont set it to 0
 
   bool isExpanded = false;
+  List<CDM> get cdms {
+    return [
+      CDM(Icons.home, 'home'.tr(), ['home'.tr()]),
+      CDM(Icons.grid_view, "master".tr(), [
+        "userManagement".tr(),
+        "pthcInfo".tr(),
+        "screenList".tr(),
+      ]),
+      CDM(Icons.subscriptions, 'createEvaluation'.tr(), [
+        "trialContract".tr(),
+        "indefiniteContract".tr(),
+        "preparationApproval".tr(),
+      ]),
+      CDM(Icons.explore, "fillEvaluation".tr(), [
+        "trialContract".tr(),
+        "indefiniteContract".tr(),
+      ]),
+      CDM(Icons.markunread_mailbox, "approval".tr(), [
+        "trialContract".tr(),
+        "indefiniteContract".tr(),
+      ]),
+      CDM(Icons.pie_chart, "report".tr(), [
+        "trialContract".tr(),
+        "indefiniteContract".tr(),
+      ]),
+      CDM(Icons.settings, "settings".tr(), []),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +291,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   }
 
   Widget invisibleSubMenus() {
-    // List<CDM> _cmds = cdms..removeAt(0);
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
       width: isExpanded ? 0 : 200,
@@ -277,9 +303,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               itemCount: cdms.length,
               itemBuilder: (context, index) {
                 CDM cmd = cdms[index];
-                // if(index==0) return Container(height:95);
-                //controll button has 45 h + 20 top + 30 bottom = 95
-
                 bool selected = selectedIndex == index;
                 bool isValidSubMenu = selected && cmd.submenus.isNotEmpty;
                 return subMenuWidget(
@@ -344,43 +367,57 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       onTap: () {
         if (!isTitle) {
           // Xử lý chuyển đổi giao diện dựa trên subMenu được chọn
-          switch (subMenu) {
-            case "Quản lý User":
-              widget.changeBody(MasterUser());
-              break;
-            case "Thông tin PTHC":
-              widget.changeBody(MasterPTHC());
-              break;
-            case "Hợp đồng không xác định thời gian":
-              if (title == "Lập đánh giá") {
-                widget.changeBody(TwoContractScreen());
-              }
-              if (title == "Điền đánh giá") {
-                widget.changeBody(FillTwoScreen());
-              }
-              if (title == "Phê duyệt") {
-                widget.changeBody(ApprovalTwoScreen());
-              }
-              break;
-            case "Hợp đồng thử nghề & học việc":
-              if (title == "Lập đánh giá") {
-                widget.changeBody(ApprenticeContract());
-              }
-              if (title == "Điền đánh giá") {
-                widget.changeBody(FillApprenticeScreen());
-              }
-              if (title == "Phê duyệt") {
-                widget.changeBody(ApprovalTrialScreen());
-              }
-              break;
-            case "Phê duyệt chuẩn bị":
-              widget.changeBody(ApprovalPrepartionScreen());
-              break;
-            case "Trang chủ":
-              widget.changeBody(HomeScreen(changeBody: (newPage) {}));
-              return;
-            default:
-              widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+          final currentLang = context.locale.languageCode;
+          final userManagementText = currentLang == 'vi'
+              ? 'Quản lý User'
+              : 'ユーザー管理';
+          final pthcInfoText = currentLang == 'vi'
+              ? 'Thông tin PTHC'
+              : 'PTHC情報';
+          final indefiniteContractText = currentLang == 'vi'
+              ? 'Hợp đồng không xác định thời gian'
+              : '期間不定の契約';
+          final trialContractText = currentLang == 'vi'
+              ? 'Hợp đồng học nghề & thử việc'
+              : '試用・研修契約';
+          final preparationApprovalText = currentLang == 'vi'
+              ? 'Phê duyệt chuẩn bị'
+              : '準備承認';
+          final homeText = currentLang == 'vi' ? 'Trang chủ' : 'ホーム';
+          final createEvaluationText = currentLang == 'vi'
+              ? 'Lập đánh giá'
+              : '評価作成';
+          final fillEvaluationText = currentLang == 'vi'
+              ? 'Điền đánh giá'
+              : '評価記入';
+          final approvalText = currentLang == 'vi' ? 'Phê duyệt' : '承認';
+
+          if (subMenu == userManagementText) {
+            widget.changeBody(MasterUser());
+          } else if (subMenu == pthcInfoText) {
+            widget.changeBody(MasterPTHC());
+          } else if (subMenu == indefiniteContractText) {
+            if (title == createEvaluationText) {
+              widget.changeBody(TwoContractScreen());
+            } else if (title == fillEvaluationText) {
+              widget.changeBody(FillTwoScreen());
+            } else if (title == approvalText) {
+              widget.changeBody(ApprovalTwoScreen());
+            }
+          } else if (subMenu == trialContractText) {
+            if (title == createEvaluationText) {
+              widget.changeBody(ApprenticeContract());
+            } else if (title == fillEvaluationText) {
+              widget.changeBody(FillApprenticeScreen());
+            } else if (title == approvalText) {
+              widget.changeBody(ApprovalTrialScreen());
+            }
+          } else if (subMenu == preparationApprovalText) {
+            widget.changeBody(ApprovalPrepartionScreen());
+          } else if (subMenu == homeText) {
+            widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+          } else {
+            widget.changeBody(HomeScreen(changeBody: (newPage) {}));
           }
         }
       },
@@ -425,7 +462,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       color: Common.primaryColor,
       child: ListTile(
         leading: accountButton(usePadding: false),
-        title: Text("Welcome", style: TextStyle(color: Colors.white)),
+        title: Text('welcome'.tr(), style: TextStyle(color: Colors.white)),
         subtitle: Text(
           "Nguyễn Duy Khánh",
           style: TextStyle(color: Colors.white70),
@@ -433,35 +470,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       ),
     );
   }
-
-  static List<CDM> cdms = [
-    CDM(Icons.home, "Home", ["Trang chủ"]),
-    CDM(Icons.grid_view, "Master", [
-      "Quản lý User",
-      "Thông tin PTHC",
-      "Danh sách màn hình",
-    ]),
-    CDM(Icons.subscriptions, "Lập đánh giá", [
-      "Hợp đồng thử nghề & học việc",
-      "Hợp đồng không xác định thời gian",
-      "Phê duyệt chuẩn bị",
-    ]),
-    CDM(Icons.explore, "Điền đánh giá", [
-      "Hợp đồng thử nghề & học việc",
-      "Hợp đồng không xác định thời gian",
-    ]),
-    CDM(Icons.markunread_mailbox, "Phê duyệt", [
-      "Hợp đồng thử nghề & học việc",
-      "Hợp đồng không xác định thời gian",
-    ]),
-    CDM(Icons.pie_chart, "Báo cáo", [
-      "Hợp đồng thử nghề & học việc",
-      "Hợp đồng không xác định thời gian",
-    ]),
-    // CDM(Icons.power, "Plugins", []),
-    CDM(Icons.settings, "Setting", []),
-  ];
-
   void expandOrShrinkDrawer() {
     setState(() {
       isExpanded = !isExpanded;

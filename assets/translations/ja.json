@@ -1,0 +1,18 @@
+{
+  "appTitle": "労働契約評価",
+  "home": "ホーム",
+  "master": "マスター",
+  "userManagement": "ユーザー管理",
+  "pthcInfo": "PTHC情報",
+  "screenList": "画面一覧",
+  "createEvaluation": "評価作成",
+  "fillEvaluation": "評価記入",
+  "approval": "承認",
+  "report": "レポート",
+  "settings": "設定",
+  "indefiniteContract": "期間不定の契約",
+  "trialContract": "試用・研修契約",
+  "preparationApproval": "準備承認",
+  "welcome": "ようこそ",
+  "profile": "プロフィール"
+}

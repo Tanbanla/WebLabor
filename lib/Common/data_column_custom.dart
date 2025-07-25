@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:web_labor_contract/Common/common.dart';
 // DataColumn2 custom
 class DataColumnCustom extends StatelessWidget {
   final String title;

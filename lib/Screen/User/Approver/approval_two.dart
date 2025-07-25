@@ -23,13 +23,13 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Phê duyệt hợp đồng'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Phê duyệt hợp đồng'),
+      //   leading: IconButton(
+      //     icon: Icon(Icons.arrow_back),
+      //     onPressed: () => Navigator.pop(context),
+      //   ),
+      // ),
       backgroundColor: Colors.grey[50],
       body: Padding(
         padding: const EdgeInsets.all(16),

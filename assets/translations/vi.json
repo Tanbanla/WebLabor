@@ -1,0 +1,18 @@
+{
+  "appTitle": "LABOR CONTRACT EVALUATION",
+  "home": "Trang chủ",
+  "master": "Quản lý",
+  "userManagement": "Quản lý User",
+  "pthcInfo": "Thông tin PTHC",
+  "screenList": "Danh sách màn hình",
+  "createEvaluation": "Lập đánh giá",
+  "fillEvaluation": "Điền đánh giá",
+  "approval": "Phê duyệt",
+  "report": "Báo cáo",
+  "settings": "Cài đặt",
+  "indefiniteContract": "Hợp đồng không xác định thời gian",
+  "trialContract": "Hợp đồng học nghề & thử việc",
+  "preparationApproval": "Phê duyệt chuẩn bị",
+  "welcome": "Xin chào",
+  "profile": "Hồ sơ"
+}

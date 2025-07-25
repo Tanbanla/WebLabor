@@ -467,93 +467,93 @@ class _MasterPTHCState extends State<MasterPTHC> {
     );
   }
 
-  void _showEditDialog(Map<String, String> data) {
-    final emailController = TextEditingController(text: data['Column2']);
-    final ccController = TextEditingController(text: data['Column3']);
-    final deptController = TextEditingController(text: data['Column1']);
+  // void _showEditDialog(Map<String, String> data) {
+  //   final emailController = TextEditingController(text: data['Column2']);
+  //   final ccController = TextEditingController(text: data['Column3']);
+  //   final deptController = TextEditingController(text: data['Column1']);
 
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Chỉnh sửa PTHC'),
-        content: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: deptController,
-                  decoration: InputDecoration(
-                    labelText: 'Phòng ban',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập phòng ban';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail To',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Email không hợp lệ';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: ccController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail CC',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                controller.updateItem(data, {
-                  'Column1': deptController.text,
-                  'Column2': emailController.text,
-                  'Column3': ccController.text,
-                });
-                Get.back();
-                Get.snackbar(
-                  'Thành công',
-                  'Đã cập nhật PTHC',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                );
-              }
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-  }
+  //   Get.dialog(
+  //     AlertDialog(
+  //       title: const Text('Chỉnh sửa PTHC'),
+  //       content: Form(
+  //         key: _formKey,
+  //         child: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               TextFormField(
+  //                 controller: deptController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Phòng ban',
+  //                   border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 validator: (value) {
+  //                   if (value == null || value.isEmpty) {
+  //                     return 'Vui lòng nhập phòng ban';
+  //                   }
+  //                   return null;
+  //                 },
+  //               ),
+  //               const SizedBox(height: 12),
+  //               TextFormField(
+  //                 controller: emailController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Mail To',
+  //                   border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 validator: (value) {
+  //                   if (value == null || value.isEmpty) {
+  //                     return 'Vui lòng nhập email';
+  //                   }
+  //                   if (!value.contains('@')) {
+  //                     return 'Email không hợp lệ';
+  //                   }
+  //                   return null;
+  //                 },
+  //               ),
+  //               const SizedBox(height: 12),
+  //               TextFormField(
+  //                 controller: ccController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Mail CC',
+  //                   border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       actions: [
+  //         TextButton(onPressed: Get.back, child: const Text('Hủy')),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             if (_formKey.currentState!.validate()) {
+  //               controller.updateItem(data, {
+  //                 'Column1': deptController.text,
+  //                 'Column2': emailController.text,
+  //                 'Column3': ccController.text,
+  //               });
+  //               Get.back();
+  //               Get.snackbar(
+  //                 'Thành công',
+  //                 'Đã cập nhật PTHC',
+  //                 backgroundColor: Colors.green,
+  //                 colorText: Colors.white,
+  //               );
+  //             }
+  //           },
+  //           child: const Text('Lưu'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _showDetailDialog(Map<String, String> data) {
     Get.dialog(
