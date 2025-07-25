@@ -29,10 +29,11 @@ class Common {
   static const String DeleteIDLogic = "User/delete-logic/";
   static const String DeleteMultiID = "User/delete-multi/";
   static const String DeleteMultiIDLogic = "User/delete-logic-multi/";
-
+  // Người phê duyệt
+  static const String UserApprover ="User/get-employee-section-manager-by-section";
 
   // Master PTHC
-    //GET
+  //GET
   static const String PTHCGetAll = "PthcSection/get-all";
   static const String GetPTHCCount = "PthcSection/get-count-all";
   static const String GetByIdPTHC = "PthcSection/get/";
@@ -48,10 +49,10 @@ class Common {
   static const String DeletePTHCID = "PthcSection/delete/";
   static const String DeletePTHCIDLogic = "PthcSection/delete-logic/";
   static const String DeletePTHCMultiID = "PthcSection/delete-multi/";
-  static const String DeletePTHCMultiIDLogic = "PthcSection/delete-logic-multi/";
+  static const String DeletePTHCMultiIDLogic ="PthcSection/delete-logic-multi/";
 
   // Contract Two year
-    static const String TwoGetAll = "ContractTwoYear/get-all";
+  static const String TwoGetAll = "ContractTwoYear/get-all";
   static const String GetTwoCount = "ContractTwoYear/get-count-all";
   static const String GetByIdTwo = "ContractTwoYear/get/";
   static const String TwoGetByCount = "ContractTwoYear/get-count-by-condition";
@@ -66,7 +67,7 @@ class Common {
   static const String DeleteTwoID = "ContractTwoYear/delete/";
   static const String DeleteTwoIDLogic = "ContractTwoYear/delete-logic/";
   static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi/";
-  static const String DeleteTwoMultiIDLogic = "ContractTwoYear/delete-logic-multi/";
+  static const String DeleteTwoMultiIDLogic ="ContractTwoYear/delete-logic-multi/";
   // font size
   static double sizeColumn = 12;
 }

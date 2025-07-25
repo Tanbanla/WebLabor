@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
+import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
-import 'package:http/http.dart' as http;
-import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:excel/excel.dart' hide Border;
@@ -66,125 +65,259 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  Widget _buildApproverPer() {
-    String? _selectedConfirmer;
+  // Widget _buildApproverPer() {
+  //   String? _selectedConfirmer;
 
-    // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
-    final List<Map<String, String>> _confirmersList = [
-      {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-      {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-      {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-      {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
-    ];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const SizedBox(width: 30),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Người xác nhận: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            DropdownButton<String>(
-              value: _selectedConfirmer,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: 14,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              hint: const Text('Chọn người xác nhận'),
-              items: _confirmersList.map((confirmer) {
-                return DropdownMenuItem<String>(
-                  value: confirmer['id'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Icon(Icons.person, color: Colors.blue, size: 16),
-                      ),
-                      const SizedBox(width: 8),
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              confirmer['name'] ?? '',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              confirmer['position'] ?? '',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+  //   // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
+  //   final List<Map<String, String>> _confirmersList = [
+  //     {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
+  //     {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
+  //     {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
+  //     {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
+  //   ];
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.center,
+  //     mainAxisAlignment: MainAxisAlignment.start,
+  //     children: [
+  //       const SizedBox(width: 30),
+  //       Row(
+  //         crossAxisAlignment: CrossAxisAlignment.center,
+  //         children: [
+  //           Text(
+  //             'Người xác nhận: ',
+  //             style: TextStyle(
+  //               color: Common.primaryColor,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 6),
+  //           DropdownButton<String>(
+  //             value: _selectedConfirmer,
+  //             underline: Container(),
+  //             isDense: true,
+  //             style: TextStyle(
+  //               fontSize: 14,
+  //               color: Common.primaryColor.withOpacity(0.8),
+  //             ),
+  //             dropdownColor: Colors.white,
+  //             borderRadius: BorderRadius.circular(8),
+  //             icon: Icon(
+  //               Icons.arrow_drop_down,
+  //               color: Common.primaryColor.withOpacity(0.8),
+  //             ),
+  //             hint: const Text('Chọn người xác nhận'),
+  //             items: _confirmersList.map((confirmer) {
+  //               return DropdownMenuItem<String>(
+  //                 value: confirmer['id'],
+  //                 child: Row(
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   children: [
+  //                     Center(
+  //                       child: Icon(Icons.person, color: Colors.blue, size: 16),
+  //                     ),
+  //                     const SizedBox(width: 8),
+  //                     Center(
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         mainAxisAlignment: MainAxisAlignment.center,
+  //                         children: [
+  //                           Text(
+  //                             confirmer['name'] ?? '',
+  //                             style: TextStyle(fontWeight: FontWeight.bold),
+  //                           ),
+  //                           Text(
+  //                             confirmer['position'] ?? '',
+  //                             style: TextStyle(
+  //                               fontSize: 12,
+  //                               color: Colors.grey,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             }).toList(),
+  //             onChanged: (String? newValue) {
+  //               setState(() {
+  //                 _selectedConfirmer = newValue;
+  //               });
+  //               // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
+  //             },
+  //           ),
+  //           if (_selectedConfirmer != null) const SizedBox(width: 8),
+  //           if (_selectedConfirmer != null)
+  //             IconButton(
+  //               icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   _selectedConfirmer = null;
+  //                 });
+  //               },
+  //             ),
+  //         ],
+  //       ),
+  //       const SizedBox(width: 30),
+  //       // Button gửi
+  //       GestureDetector(
+  //         onTap: () {},
+  //         child: Container(
+  //           width: 130,
+  //           height: 36,
+  //           decoration: BoxDecoration(
+  //             color: Common.primaryColor,
+  //             borderRadius: BorderRadius.circular(10),
+  //           ),
+  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+  //           child: const Center(
+  //             child: Text(
+  //               'Gửi',
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+  Widget _buildApproverPer() {
+    // Initialize the controller
+    final controller = Get.put(DashboardControllerUserApprover());
+    // Sử dụng RxString thay vì String? để có thể reactive
+    final _selectedConfirmer = RxString('');
+
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(width: 10),
+          Container(
+            width: 400,
+            child: Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Người xác nhận: ',
+                    style: TextStyle(
+                      color: Common.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedConfirmer = newValue;
-                });
-                // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
-              },
-            ),
-            if (_selectedConfirmer != null) const SizedBox(width: 8),
-            if (_selectedConfirmer != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  setState(() {
-                    _selectedConfirmer = null;
-                  });
-                },
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      value: _selectedConfirmer.value.isEmpty
+                          ? null
+                          : _selectedConfirmer.value,
+                      underline: Container(),
+                      isDense: true,
+                      isExpanded: true,
+                      style: TextStyle(
+                        fontSize: Common.sizeColumn,
+                        color: Common.primaryColor.withOpacity(0.8),
+                      ),
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Common.primaryColor.withOpacity(0.8),
+                      ),
+                      hint: const Text('Chọn người xác nhận'),
+                      items: controller.filterdataList.map((approver) {
+                        return DropdownMenuItem<String>(
+                          value: approver.chREmployeeId,
+                          child: Row(
+                            children: [
+                              Icon(Icons.person, color: Colors.blue, size: 14),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      approver.chREmployeeName ?? 'Không có tên',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        _selectedConfirmer.value = newValue ?? '';
+                      },
+                    ),
+                  ),
+                  if (_selectedConfirmer.value.isNotEmpty)
+                    const SizedBox(width: 8),
+                  if (_selectedConfirmer.value.isNotEmpty)
+                    IconButton(
+                      icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                      onPressed: () {
+                        _selectedConfirmer.value = '';
+                      },
+                    ),
+                ],
               ),
-          ],
-        ),
-        const SizedBox(width: 30),
-        // Button gửi
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 130,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Common.primaryColor,
-              borderRadius: BorderRadius.circular(10),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: const Center(
-              child: Text(
-                'Gửi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          ),
+          const SizedBox(width: 30),
+          GestureDetector(
+            onTap: () {
+              if (_selectedConfirmer.value.isEmpty) {
+                Get.snackbar(
+                  'Thông báo',
+                  'Vui lòng chọn người xác nhận',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+                return;
+              }
+              final selectedApprover = controller.filterdataList.firstWhere(
+                (approver) =>
+                approver.chREmployeeId == _selectedConfirmer.value,
+              );
+              // Xử lý khi gửi
+            },
+            child: Container(
+              width: 130,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Common.primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: const Center(
+                child: Text(
+                  'Gửi',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   Widget _buildHeader() {
@@ -316,7 +449,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2570,
+              width: 2620,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -447,7 +580,6 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: 'Lý do',
-                    width: 130,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
@@ -486,49 +618,175 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   }
 
   void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn file Excel để import dữ liệu',
-              style: TextStyle(color: Colors.grey[600]),
+    final controller = Get.find<DashboardControllerTwo>();
+    Rx<File?> selectedFile = Rx<File?>(null);
+    Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
+    RxString fileName = ''.obs;
+    RxString errorMessage = ''.obs;
+
+    showDialog(
+      context: context,
+      builder: (context) => Obx(
+        () => AlertDialog(
+          title: const Text('Import Dữ Liệu'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Chọn file Excel để import dữ liệu',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 20),
+                if (fileName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      'File đã chọn: ${fileName.value}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      errorMessage.value,
+                      style: TextStyle(color: Colors.red, fontSize: 14),
+                    ),
+                  ),
+                ElevatedButton.icon(
+                  icon: const Icon(Iconsax.document_upload),
+                  label: const Text('Chọn File'),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () async {
+                          errorMessage.value = '';
+                          try {
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['xlsx', 'xls'],
+                              allowMultiple: false,
+                            );
+                            if (result != null &&
+                                result.files.single.path != null) {
+                              selectedFile.value = File(
+                                result.files.single.path!,
+                              );
+                              fileName.value = result.files.single.name;
+                              if (isSkiaWeb) {
+                                selectedFileData.value =
+                                    result.files.single.bytes;
+                              }
+                            }
+                          } on PlatformException catch (e) {
+                            errorMessage.value =
+                                'Lỗi truy cập file: ${e.message}';
+                          } catch (e) {
+                            errorMessage.value =
+                                'Lỗi khi chọn file: ${e.toString().replaceAll('_Namespace', '')}';
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                if (controller.isLoading.value) ...[
+                  const SizedBox(height: 20),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 10),
+                  const Text('Đang xử lý...'),
+                ],
+              ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Iconsax.document_upload),
-              label: const Text('Chọn File'),
-              onPressed: () {},
+          ),
+          actions: [
+            TextButton(
+              onPressed: controller.isLoading.value
+                  ? null
+                  : () => Navigator.of(context).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed:
+                  (controller.isLoading.value || selectedFile.value == null)
+                  ? null
+                  : () async {
+                      errorMessage.value = '';
+                      try {
+                        controller.isLoading(true);
+                        if (kIsWeb) {
+                          // Xử lý web
+                          await controller.importFromExcelWeb(
+                            selectedFileData.value!,
+                          );
+                        } else {
+                          // Xử lý mobile/desktop
+                          await controller.importExcelMobileTwoContract(
+                            selectedFile.value!,
+                          );
+                        }
+                        // Close the dialog after successful import
+                        if (mounted) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the import dialog first
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              icon: const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 50,
+                              ),
+                              title: const Text(
+                                'Thành công',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('Import dữ liệu thành công'),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('Đóng'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      } on PlatformException catch (e) {
+                        errorMessage.value = 'Lỗi hệ thống: ${e.message}';
+                      } catch (e) {
+                        errorMessage.value =
+                            'Lỗi khi import: ${e.toString().replaceAll('', '')}';
+                      } finally {
+                        controller.isLoading(false);
+                      }
+                    },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
               ),
+              child: const Text('Import'),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
-          ),
-        ],
       ),
     );
   }
@@ -746,7 +1004,6 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  // Thêm hàm này vào file helper
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -757,7 +1014,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
           (now.month == birthDate.month && now.day < birthDate.day)) {
         age--;
       }
-      return '$age tuổi';
+      return '$age';
     } catch (e) {
       return 'Invalid date';
     }
@@ -875,7 +1132,13 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.edit_2,
                 color: Colors.blue,
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        _EditTwoContractDialog(twoContract: data),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               _buildActionButton(
@@ -884,7 +1147,8 @@ class MyData extends DataTableSource {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) =>_DeleteTwoContractDialog(id: (data.id ?? 0)),
+                    builder: (context) =>
+                        _DeleteTwoContractDialog(id: (data.id ?? 0)),
                   );
                 },
               ),
@@ -904,9 +1168,11 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.vchRTyperId ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRTyperId ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
@@ -928,77 +1194,102 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.dtMBrithday != null
-                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
-                : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.dtMBrithday != null
+                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.chRPosition ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.chRPosition ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.chRCodeGrade?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.chRCodeGrade?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.dtMJoinDate != null
-                ? DateFormat(
-                    'yyyy-MM-dd',
-                  ).format(DateTime.parse(data.dtMJoinDate!))
-                : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.dtMJoinDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMJoinDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.dtMEndDate != null
-                ? DateFormat(
-                    'yyyy-MM-dd',
-                  ).format(DateTime.parse(data.dtMEndDate!))
-                : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.dtMEndDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMEndDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.fLGoLeaveLate?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLGoLeaveLate?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.fLPaidLeave?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLPaidLeave?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.fLNotPaidLeave?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLNotPaidLeave?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.fLNotLeaveDay?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLNotLeaveDay?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.inTViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.inTViolation?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         //5 thuộc tính đánh giá
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(
+          Text(
+            data.nvarchaRViolation?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         DataCell(
           TextFormField(
             style: TextStyle(
@@ -1078,213 +1369,166 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class DashboardControllerTwo extends GetxController {
-  var dataList = <TwoContract>[].obs;
-  var filterdataList = <TwoContract>[].obs;
-  RxList<bool> selectRows = <bool>[].obs;
-  RxInt sortCloumnIndex = 0.obs;
-  RxBool sortAscending = true.obs;
-  final searchTextController = TextEditingController();
-  var isLoading = false.obs;
-  var isLoadingExport = false.obs;
+class _EditTwoContractDialog extends StatelessWidget {
+  final TwoContract twoContract;
+  final DashboardControllerTwo controller = Get.find();
+
+  _EditTwoContractDialog({required this.twoContract});
 
   @override
-  void onInit() {
-    super.onInit();
-    fetchDummyData();
-  }
+  Widget build(BuildContext context) {
+    final edited = TwoContract.fromJson(twoContract.toJson());
+    RxString errorMessage = ''.obs;
 
-  void showError(String message) {
-    Get.snackbar(
-      'Error',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  }
-
-  //sap xep du lieu
-  void sortById(int sortColumnIndex, bool ascending) {
-    sortAscending.value = ascending;
-    sortCloumnIndex.value = sortColumnIndex;
-
-    dataList.sort((a, b) {
-      switch (sortColumnIndex) {
-        case 0: // ID
-          return ascending
-              ? (a.id ?? 0).compareTo(b.id ?? 0)
-              : (b.id ?? 0).compareTo(a.id ?? 0);
-        case 1: // employee ID
-          return ascending
-              ? (a.vchREmployeeId ?? '').compareTo(b.vchREmployeeId ?? '')
-              : (b.vchREmployeeId ?? '').compareTo(a.vchREmployeeId ?? '');
-        case 2: // Name
-          return ascending
-              ? (a.vchREmployeeName ?? '').compareTo(b.vchREmployeeName ?? '')
-              : (b.vchREmployeeName ?? '').compareTo(a.vchREmployeeName ?? '');
-        default:
-          return 0;
-      }
-    });
-  }
-
-  // so sanh du lieu
-  void searchQuery(String query) {
-    if (query.isEmpty) {
-      filterdataList.assignAll(dataList);
-    } else {
-      filterdataList.assignAll(
-        dataList.where(
-          (item) =>
-              (item.vchREmployeeId?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.vchREmployeeName?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.vchRNameSection?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false),
+    return AlertDialog(
+      title: Text('Chỉnh sửa thông tin ${twoContract.vchREmployeeName}'),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: twoContract.vchRCodeSection,
+                decoration: const InputDecoration(
+                  labelText: 'Phòng ban',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => edited.vchRCodeSection = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: twoContract.vchREmployeeId,
+                decoration: const InputDecoration(
+                  labelText: 'Mã nhân viên',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => edited.vchREmployeeId = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: twoContract.vchREmployeeName,
+                decoration: const InputDecoration(
+                  labelText: 'Tên nhân viên',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => edited.vchREmployeeName = value,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: twoContract.chRPosition,
+                decoration: const InputDecoration(
+                  labelText: 'Chức vụ',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => edited.chRPosition = value,
+              ),
+              // const SizedBox(height: 12),
+              // DropdownButtonFormField<int>(
+              //   value: twoContract.inTLock,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Trạng thái',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   items: const [
+              //     DropdownMenuItem(value: 0, child: Text('Active')),
+              //     DropdownMenuItem(value: 1, child: Text('Delete')),
+              //   ],
+              //   onChanged: (value) => editedUser.inTLock = value ?? 0,
+              // ),
+              // const SizedBox(height: 12),
+              // DropdownButtonFormField<int>(
+              //   value: twoContract.inTUseridCommon,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Loại User',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   items: const [
+              //     DropdownMenuItem(value: 0, child: Text('0: Dùng riêng')),
+              //     DropdownMenuItem(value: 1, child: Text('1: Dùng chung')),
+              //   ],
+              //   onChanged: (value) => editedUser.inTUseridCommon = value ?? 0,
+              // ),
+              // const SizedBox(height: 12),
+              // DropdownButtonFormField<String>(
+              //   value:
+              //       [
+              //         'Admin',
+              //         'Per',
+              //         'Chief Per',
+              //         'PTHC',
+              //         'Leader',
+              //         'Chief Section',
+              //         'Manager Section',
+              //         'Director',
+              //       ].contains(twoContract.chRGroup)
+              //       ? twoContract.chRGroup
+              //       : 'Per',
+              //   decoration: const InputDecoration(
+              //     labelText: 'Nhóm quyền',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   items: const [
+              //     DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+              //     DropdownMenuItem(value: 'Per', child: Text('Per')),
+              //     DropdownMenuItem(
+              //       value: 'Chief Per',
+              //       child: Text('Chief Per'),
+              //     ),
+              //     DropdownMenuItem(value: 'PTHC', child: Text('PTHC')),
+              //     DropdownMenuItem(value: 'Leader', child: Text('Leader')),
+              //     DropdownMenuItem(
+              //       value: 'Chief Section',
+              //       child: Text('Chief Section'),
+              //     ),
+              //     DropdownMenuItem(
+              //       value: 'Manager Section',
+              //       child: Text('Manager Section'),
+              //     ),
+              //     DropdownMenuItem(value: 'Director', child: Text('Director')),
+              //   ],
+              //   validator: (value) =>
+              //       value == null ? 'Vui lòng chọn nhóm quyền' : null,
+              //   onChanged: (value) => editedUser.chRGroup = value,
+              // ),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
         ),
-      );
-    }
-  }
-
-  // lay du lieu
-  Future<void> fetchDummyData() async {
-    try {
-      isLoading(true);
-      final response = await http.get(
-        Uri.parse(Common.API + Common.TwoGetAll),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          final List<dynamic> data = jsonData['data'];
-          dataList.assignAll(
-            data
-                .map((twocontract) => TwoContract.fromJson(twocontract))
-                .toList(),
-          );
-          filterdataList.assignAll(dataList);
-          selectRows.assignAll(
-            List.generate(dataList.length, (index) => false),
-          );
-        }
-      } else {
-        throw Exception('Failed to load users');
-      }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch data: $e');
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  // them danh gia
-  Future<void> addTwoContract(TwoContract twocontract) async {
-    try {
-      isLoading(true);
-      final response = await http.put(
-        Uri.parse('${Common.API}${Common.AddTwo}'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract.toJson()),
-      );
-      if (response.statusCode == 200) {
-        await fetchDummyData();
-      } else {
-        final error = json.decode(response.body);
-        throw Exception(
-          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
-        );
-      }
-    } catch (e) {
-      showError('Failed to update two contract: $e');
-      rethrow;
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  // update thông tin
-  Future<void> updateTwoContract(TwoContract twocontract) async {
-    try {
-      isLoading(true);
-      final response = await http.post(
-        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract.toJson()),
-      );
-      if (response.statusCode == 200) {
-        await fetchDummyData();
-      } else {
-        final error = json.decode(response.body);
-        throw Exception(
-          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
-        );
-      }
-    } catch (e) {
-      showError('Failed to update two contract: $e');
-      rethrow;
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  // delete
-  Future<void> deleteTwoContract(int id) async {
-    try {
-      isLoading(true);
-      final endpoint = Common.DeleteTwoID;
-      final response = await http.delete(
-        Uri.parse('${Common.API}$endpoint$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        await fetchDummyData();
-      } else {
-        final error = json.decode(response.body);
-        throw Exception(
-          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
-        );
-      }
-    } catch (e) {
-      showError('Failed to delete user: $e');
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  // xuat file
-  Future<void> exportToExcelTwoContract() async {
-    try {
-      isLoadingExport(true);
-      final response = await http.get(
-        Uri.parse('${Common.API}${Common.TwoGetAll}?export=excel'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        // Xử lý file Excel
-        Get.snackbar(
-          'Success',
-          'Exported successfully',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } catch (e) {
-      showError('Export failed: $e');
-      rethrow;
-    } finally {
-      isLoadingExport(false);
-    }
+      ),
+      actions: [
+        TextButton(
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: const Text('Hủy'),
+        ),
+        Obx(
+          () => ElevatedButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    try {
+                      await controller.updateTwoContract(edited);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                    }
+                  },
+            child: const Text('Lưu'),
+          ),
+        ),
+      ],
+    );
   }
 }
 

@@ -35,10 +35,10 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    _currentBody = TwoContractScreen();
-    // HomeScreen(
-    //   changeBody: _changeBody,
-    // ); // Khởi tạo trong initState
+    _currentBody = //TwoContractScreen();
+    HomeScreen(
+      changeBody: _changeBody,
+    ); // Khởi tạo trong initState
   }
 
   void _changeBody(Widget newBody) {

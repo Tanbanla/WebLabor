@@ -22,14 +22,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MenuScreen()
-      // Consumer<AuthState>(
-      //   builder: (context, authState, child) {
-      //     return authState.isAuthenticated
-      //         ? const MenuScreen()
-      //         : const SignInScreen();
-      //   },
-      // ),
+      home: //MenuScreen()
+      Consumer<AuthState>(
+        builder: (context, authState, child) {
+          return authState.isAuthenticated
+              ? const MenuScreen()
+              : const SignInScreen();
+        },
+      ),
     );
   }
 }
