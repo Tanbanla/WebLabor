@@ -16,6 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:web_labor_contract/class/User_Approver.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class TwoContractScreen extends StatefulWidget {
   const TwoContractScreen({super.key});
@@ -65,256 +67,154 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  // Widget _buildApproverPer() {
-  //   String? _selectedConfirmer;
-
-  //   // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
-  //   final List<Map<String, String>> _confirmersList = [
-  //     {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-  //     {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-  //     {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-  //     {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
-  //   ];
-  //   return Row(
-  //     crossAxisAlignment: CrossAxisAlignment.center,
-  //     mainAxisAlignment: MainAxisAlignment.start,
-  //     children: [
-  //       const SizedBox(width: 30),
-  //       Row(
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         children: [
-  //           Text(
-  //             'Người xác nhận: ',
-  //             style: TextStyle(
-  //               color: Common.primaryColor,
-  //               fontWeight: FontWeight.bold,
-  //             ),
-  //           ),
-  //           const SizedBox(width: 6),
-  //           DropdownButton<String>(
-  //             value: _selectedConfirmer,
-  //             underline: Container(),
-  //             isDense: true,
-  //             style: TextStyle(
-  //               fontSize: 14,
-  //               color: Common.primaryColor.withOpacity(0.8),
-  //             ),
-  //             dropdownColor: Colors.white,
-  //             borderRadius: BorderRadius.circular(8),
-  //             icon: Icon(
-  //               Icons.arrow_drop_down,
-  //               color: Common.primaryColor.withOpacity(0.8),
-  //             ),
-  //             hint: const Text('Chọn người xác nhận'),
-  //             items: _confirmersList.map((confirmer) {
-  //               return DropdownMenuItem<String>(
-  //                 value: confirmer['id'],
-  //                 child: Row(
-  //                   crossAxisAlignment: CrossAxisAlignment.center,
-  //                   children: [
-  //                     Center(
-  //                       child: Icon(Icons.person, color: Colors.blue, size: 16),
-  //                     ),
-  //                     const SizedBox(width: 8),
-  //                     Center(
-  //                       child: Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         mainAxisAlignment: MainAxisAlignment.center,
-  //                         children: [
-  //                           Text(
-  //                             confirmer['name'] ?? '',
-  //                             style: TextStyle(fontWeight: FontWeight.bold),
-  //                           ),
-  //                           Text(
-  //                             confirmer['position'] ?? '',
-  //                             style: TextStyle(
-  //                               fontSize: 12,
-  //                               color: Colors.grey,
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             }).toList(),
-  //             onChanged: (String? newValue) {
-  //               setState(() {
-  //                 _selectedConfirmer = newValue;
-  //               });
-  //               // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
-  //             },
-  //           ),
-  //           if (_selectedConfirmer != null) const SizedBox(width: 8),
-  //           if (_selectedConfirmer != null)
-  //             IconButton(
-  //               icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-  //               onPressed: () {
-  //                 setState(() {
-  //                   _selectedConfirmer = null;
-  //                 });
-  //               },
-  //             ),
-  //         ],
-  //       ),
-  //       const SizedBox(width: 30),
-  //       // Button gửi
-  //       GestureDetector(
-  //         onTap: () {},
-  //         child: Container(
-  //           width: 130,
-  //           height: 36,
-  //           decoration: BoxDecoration(
-  //             color: Common.primaryColor,
-  //             borderRadius: BorderRadius.circular(10),
-  //           ),
-  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-  //           child: const Center(
-  //             child: Text(
-  //               'Gửi',
-  //               style: TextStyle(
-  //                 color: Colors.white,
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
   Widget _buildApproverPer() {
-    // Initialize the controller
-    final controller = Get.put(DashboardControllerUserApprover());
-    // Sử dụng RxString thay vì String? để có thể reactive
-    final _selectedConfirmer = RxString('');
+    final controller = Get.put(
+      DashboardControllerUserApprover(
+        section: 'ADM-PER',
+        chucvu: 'Chief,Section Manager',
+      ),
+    );
+    final RxString selectedConfirmerId = RxString('');
+    final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
+    RxString errorMessage = ''.obs;
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const SizedBox(width: 10),
-          Container(
-            width: 400,
-            child: Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Người xác nhận: ',
-                    style: TextStyle(
-                      color: Common.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: DropdownButton<String>(
-                      value: _selectedConfirmer.value.isEmpty
-                          ? null
-                          : _selectedConfirmer.value,
-                      underline: Container(),
-                      isDense: true,
-                      isExpanded: true,
-                      style: TextStyle(
-                        fontSize: Common.sizeColumn,
-                        color: Common.primaryColor.withOpacity(0.8),
-                      ),
-                      dropdownColor: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: Common.primaryColor.withOpacity(0.8),
-                      ),
-                      hint: const Text('Chọn người xác nhận'),
-                      items: controller.filterdataList.map((approver) {
-                        return DropdownMenuItem<String>(
-                          value: approver.chREmployeeId,
-                          child: Row(
-                            children: [
-                              Icon(Icons.person, color: Colors.blue, size: 14),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      approver.chREmployeeName ?? 'Không có tên',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        _selectedConfirmer.value = newValue ?? '';
-                      },
-                    ),
-                  ),
-                  if (_selectedConfirmer.value.isNotEmpty)
-                    const SizedBox(width: 8),
-                  if (_selectedConfirmer.value.isNotEmpty)
-                    IconButton(
-                      icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                      onPressed: () {
-                        _selectedConfirmer.value = '';
-                      },
-                    ),
-                ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                tr('approver'),
+                style: TextStyle(
+                  color: Common.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+              const SizedBox(width: 6),
+              DropdownButton<ApproverUser>(
+                value: selectedConfirmer.value,
+                underline: Container(),
+                isDense: true,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Common.primaryColor.withOpacity(0.8),
+                ),
+                dropdownColor: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Common.primaryColor.withOpacity(0.8),
+                ),
+                hint: Text(tr('pickapprover')),
+                items: controller.filterdataList.map((confirmer) {
+                  return DropdownMenuItem<ApproverUser>(
+                    value: confirmer,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person, color: Colors.blue, size: 16),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              confirmer.chREmployeeName?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (ApproverUser? newValue) {
+                  selectedConfirmer.value = newValue;
+                  selectedConfirmerId.value = newValue?.chREmployeeAdid ?? '';
+                },
+              ),
+              if (selectedConfirmer.value != null) const SizedBox(width: 8),
+              if (selectedConfirmer.value != null)
+                IconButton(
+                  icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                  onPressed: () {
+                    selectedConfirmer.value = null;
+                    selectedConfirmerId.value = '';
+                  },
+                ),
+            ],
           ),
           const SizedBox(width: 30),
+          // Send button
           GestureDetector(
-            onTap: () {
-              if (_selectedConfirmer.value.isEmpty) {
-                Get.snackbar(
-                  'Thông báo',
-                  'Vui lòng chọn người xác nhận',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
+            onTap: () async {
+              errorMessage.value = '';
+              if (selectedConfirmer.value == null) {
+                errorMessage.value = tr('pleasecomfirm');
                 return;
               }
-              final selectedApprover = controller.filterdataList.firstWhere(
-                (approver) =>
-                approver.chREmployeeId == _selectedConfirmer.value,
-              );
-              // Xử lý khi gửi
+              try {
+                final controllerTwo = Get.find<DashboardControllerTwo>();
+                await controllerTwo.updateListTwoContract(
+                  selectedConfirmerId.value.toString(),
+                );
+              } catch (e) {
+                errorMessage.value =
+                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+              }
             },
-            child: Container(
-              width: 130,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Common.primaryColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              child: const Center(
-                child: Text(
-                  'Gửi',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: Obx(
+              () => Container(
+                width: 130,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: controller.isLoading.value
+                      ? Colors.grey
+                      : Common.primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          tr('send'),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
           ),
+          const SizedBox(width: 8),
+          if (errorMessage.isNotEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 1),
+                child:
+                Text(
+                  errorMessage.value,
+                  style: TextStyle(color: Colors.red, fontSize: 14),
+                ),
+              ),
+            ),
         ],
       );
     });
@@ -325,7 +225,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Lập đánh giá hợp đồng không xác định thời hạn',
+          tr('createEvaluation') + ' ' + tr('indefiniteContract'),
           style: TextStyle(
             color: Common.primaryColor.withOpacity(0.8),
             fontWeight: FontWeight.bold,
@@ -334,7 +234,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Lập danh sách đánh giá các công nhân viên từ hợp đồng 2 năm lên hợp đồng không xác định thời hạn',
+          tr('hinttwocreate'),
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
       ],
@@ -364,7 +264,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                 controller.searchQuery(value);
               },
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm theo mã, tên nhân viên...',
+                hintText: tr('searchhint'),
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 prefixIcon: Icon(
                   Iconsax.search_normal,
@@ -398,22 +298,27 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         buildActionButton(
           icon: Iconsax.import,
           color: Colors.blue,
-          tooltip: 'Import dữ liệu',
+          tooltip: tr('import'),
           onPressed: () => _showImportDialog(),
         ),
         const SizedBox(width: 8),
         buildActionButton(
           icon: Iconsax.export,
           color: Colors.green,
-          tooltip: 'Export dữ liệu',
+          tooltip: tr('export'),
           onPressed: () => _showExportDialog(),
         ),
         const SizedBox(width: 8),
         buildActionButton(
           icon: Iconsax.add,
           color: Colors.orange,
-          tooltip: 'Thêm mới',
-          onPressed: () => _showAddDialog(),
+          tooltip: tr('add'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => _showAddDialog(),
+            );
+          },
         ),
       ],
     );
@@ -487,122 +392,122 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                 },
                 columns: [
                   DataColumnCustom(
-                    title: 'STT',
+                    title: tr('stt'),
                     width: 70,
                     onSort: controller.sortById,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   // DataColumn2
                   DataColumnCustom(
-                    title: 'Hành động',
+                    title: tr('action'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Mã NV',
+                    title: tr('employeeCode'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'M/F',
+                    title: tr('gender'),
                     width: 60,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Họ và tên',
+                    title: tr('fullName'),
                     width: 180,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Phòng ban',
+                    title: tr('department'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nhóm',
+                    title: tr('group'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Tuổi',
+                    title: tr('age'),
                     width: 70,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Vị trí',
+                    title: tr('position'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Bậc lương',
+                    title: tr('salaryGrade'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Hiệu lực HD',
+                    title: tr('contractEffective'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Ngày kết thúc HD',
+                    title: tr('contractEndDate'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Số lần đi mượn, về sớm',
+                    title: tr('earlyLateCount'),
                     width: 110,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ hưởng lương',
+                    title: tr('paidLeave'),
                     width: 100,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ không lương',
+                    title: tr('unpaidLeave'),
                     width: 90,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ không báo cáo',
+                    title: tr('unreportedLeave'),
                     width: 90,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Số lần vi phạm nội quy công ty',
+                    title: tr('violationCount'),
                     width: 130,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do',
+                    title: tr('reason'),
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Kết quả khám sức khỏe',
+                    title: tr('healthCheckResult'),
                     width: 120,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Kết quả đánh giá',
+                    title: tr('evaluationResult'),
                     width: 150,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Trường hợp không tuyển dụng lại điền "X"',
+                    title: tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do không tuyển dụng lại',
+                    title: tr('notRehirableReason'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -628,21 +533,18 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       context: context,
       builder: (context) => Obx(
         () => AlertDialog(
-          title: const Text('Import Dữ Liệu'),
+          title: Text(tr('import')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Chọn file Excel để import dữ liệu',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
+                Text(tr('pickFile'), style: TextStyle(color: Colors.grey[600])),
                 const SizedBox(height: 20),
                 if (fileName.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Text(
-                      'File đã chọn: ${fileName.value}',
+                      '${tr('pickedFile')}${fileName.value}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -656,7 +558,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   ),
                 ElevatedButton.icon(
                   icon: const Icon(Iconsax.document_upload),
-                  label: const Text('Chọn File'),
+                  label: Text(tr('pick')),
                   onPressed: controller.isLoading.value
                       ? null
                       : () async {
@@ -680,10 +582,10 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                             }
                           } on PlatformException catch (e) {
                             errorMessage.value =
-                                'Lỗi truy cập file: ${e.message}';
+                                tr('ConnectFile') + '${e.message}';
                           } catch (e) {
                             errorMessage.value =
-                                'Lỗi khi chọn file: ${e.toString().replaceAll('_Namespace', '')}';
+                                '${tr('ErrorPick')}${e.toString().replaceAll('_Namespace', '')}';
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -702,7 +604,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   const SizedBox(height: 20),
                   const CircularProgressIndicator(),
                   const SizedBox(height: 10),
-                  const Text('Đang xử lý...'),
+                  Text(tr('Doing')),
                 ],
               ],
             ),
@@ -712,7 +614,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
               onPressed: controller.isLoading.value
                   ? null
                   : () => Navigator.of(context).pop(),
-              child: const Text('Hủy'),
+              child: Text(tr('Cancel')),
             ),
             ElevatedButton(
               onPressed:
@@ -746,14 +648,14 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                                 color: Colors.green,
                                 size: 50,
                               ),
-                              title: const Text(
-                                'Thành công',
+                              title: Text(
+                                tr('Done'),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Text('Import dữ liệu thành công'),
+                                  Text(tr('DoneImport')),
                                   const SizedBox(height: 10),
                                 ],
                               ),
@@ -764,17 +666,17 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                                     backgroundColor: Colors.green,
                                     foregroundColor: Colors.white,
                                   ),
-                                  child: const Text('Đóng'),
+                                  child: Text(tr('Cancel')),
                                 ),
                               ],
                             ),
                           );
                         }
                       } on PlatformException catch (e) {
-                        errorMessage.value = 'Lỗi hệ thống: ${e.message}';
+                        errorMessage.value = '${tr('ErrorSys')}${e.message}';
                       } catch (e) {
                         errorMessage.value =
-                            'Lỗi khi import: ${e.toString().replaceAll('', '')}';
+                            '${tr('ErrorImport')}${e.toString().replaceAll('', '')}';
                       } finally {
                         controller.isLoading(false);
                       }
@@ -797,14 +699,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Export Dữ Liệu'),
+        title: Text(tr('export')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Chọn định dạng export',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -815,7 +714,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
+            child: Text(tr('Cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -828,27 +727,27 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
                 // Thêm tiêu đề các cột
                 sheet.appendRow([
-                  TextCellValue('STT'),
-                  TextCellValue('Mã nhân viên'),
-                  TextCellValue('M/F'),
-                  TextCellValue('Họ và tên'),
-                  TextCellValue('Phòng ban'),
-                  TextCellValue('Nhóm'),
-                  TextCellValue('Tuổi'),
-                  TextCellValue('Vị trí'),
-                  TextCellValue('Bậc lương'),
-                  TextCellValue('Hiệu lực hợp đồng'),
-                  TextCellValue('Ngày kết thúc hợp đồng'),
-                  TextCellValue('Số lần đi muộn, về sớm'),
-                  TextCellValue('Nghỉ hưởng lương'),
-                  TextCellValue('Nghỉ không lương'),
-                  TextCellValue('Ngày không báo cáo'),
-                  TextCellValue('Số lần vi phạm nội quy Công ty'),
-                  TextCellValue('Lý do'),
-                  TextCellValue('Kết quả khám sức khỏe'),
-                  TextCellValue('Kết quả đánh giá'),
-                  TextCellValue('Trường hợp không thuyển dụng lại điền"X"'),
-                  TextCellValue('Lý do không tuyển dụng lại'),
+                  TextCellValue(tr('stt')),
+                  TextCellValue(tr('employeeCode')),
+                  TextCellValue(tr('gender')),
+                  TextCellValue(tr('fullName')),
+                  TextCellValue(tr('department')),
+                  TextCellValue(tr('group')),
+                  TextCellValue(tr('age')),
+                  TextCellValue(tr('position')),
+                  TextCellValue(tr('salaryGrade')),
+                  TextCellValue(tr('contractEffective')),
+                  TextCellValue(tr('contractEndDate')),
+                  TextCellValue(tr('earlyLateCount')),
+                  TextCellValue(tr('paidLeave')),
+                  TextCellValue(tr('unpaidLeave')),
+                  TextCellValue(tr('unreportedLeave')),
+                  TextCellValue(tr('violationCount')),
+                  TextCellValue(tr('reason')),
+                  TextCellValue(tr('healthCheckResult')),
+                  TextCellValue(tr('evaluationResult')),
+                  TextCellValue(tr('notRehirable')),
+                  TextCellValue(tr('notRehirableReason')),
                 ]);
 
                 // Thêm dữ liệu từ controller
@@ -895,7 +794,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
                 // Lưu file
                 final bytes = excel.encode(); // Sử dụng encode() thay vì save()
-                if (bytes == null) throw Exception('Không thể tạo file Excel');
+                if (bytes == null) throw Exception(tr('Notsavefile'));
 
                 // Tạo tên file
                 final fileName =
@@ -916,7 +815,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                 } else {
                   // Cho mobile/desktop
                   final String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: 'Lưu file Excel',
+                    dialogTitle: tr('savefile'),
                     fileName: fileName,
                     type: FileType.custom,
                     allowedExtensions: ['xlsx'],
@@ -940,14 +839,14 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                       color: Colors.green,
                       size: 50,
                     ),
-                    title: const Text(
-                      'Thành công',
+                    title: Text(
+                      tr('Done'),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Export dữ liệu thành công'),
+                        Text(tr('exportDone')),
                         const SizedBox(height: 10),
                       ],
                     ),
@@ -958,7 +857,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text('Đóng'),
+                        child: Text(tr('Cancel')),
                       ),
                     ],
                   ),
@@ -968,11 +867,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Lỗi Export thất bại: ${e.toString()}'),
+                      title: Text('${tr('exportError')}${e.toString()}'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Đóng'),
+                          child: Text(tr('Cancel')),
                         ),
                       ],
                     ),
@@ -1027,65 +926,6 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         const SizedBox(height: 8),
         Text(label, style: TextStyle(color: Colors.grey[700])),
       ],
-    );
-  }
-
-  void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1296,7 +1136,7 @@ class MyData extends DataTableSource {
               fontSize: Common.sizeColumn,
             ), // Thêm cho TextFormField
             decoration: InputDecoration(
-              labelText: 'Sức khỏe',
+              labelText: tr('health'),
               labelStyle: TextStyle(
                 fontSize: Common.sizeColumn,
               ), // Thêm cho label
@@ -1306,7 +1146,7 @@ class MyData extends DataTableSource {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Vui lòng kết quả khám sức khỏe';
+                return tr('pleaseHealth');
               }
               return null;
             },
@@ -1320,7 +1160,7 @@ class MyData extends DataTableSource {
               fontSize: Common.sizeColumn,
             ), // Thêm cho TextFormField
             decoration: InputDecoration(
-              labelText: 'Lý do',
+              labelText: tr('reason'),
               labelStyle: TextStyle(
                 fontSize: Common.sizeColumn,
               ), // Thêm cho label
@@ -1330,7 +1170,7 @@ class MyData extends DataTableSource {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập lý do';
+                return tr('pleaseReason');
               }
               return null;
             },
@@ -1381,121 +1221,263 @@ class _EditTwoContractDialog extends StatelessWidget {
     RxString errorMessage = ''.obs;
 
     return AlertDialog(
-      title: Text('Chỉnh sửa thông tin ${twoContract.vchREmployeeName}'),
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            '${tr('edit')} ${twoContract.vchREmployeeName}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Form(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
-                initialValue: twoContract.vchRCodeSection,
-                decoration: const InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(),
+              // Tiêu đề phần Information
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('Information'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
                 ),
-                onChanged: (value) => edited.vchRCodeSection = value,
+              ),
+              const SizedBox(height: 10),
+              // Dòng 1: Mã phòng ban + Tên phòng ban
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.vchRCodeSection,
+                      label: tr('department'),
+                      onChanged: (value) => edited.vchRCodeSection = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.chRCostCenterName,
+                      label: tr('group'),
+                      onChanged: (value) => edited.chRCostCenterName = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Dòng 2: Mã NV + Giới tính
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.vchREmployeeId,
+                      label: tr('employeeCode'),
+                      onChanged: (value) => edited.vchREmployeeId = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.vchRTyperId,
+                      label: tr('gender'),
+                      onChanged: (value) => edited.vchRTyperId = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 3: Tên NV + Tuổi
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.vchREmployeeName,
+                      label: tr('fullName'),
+                      onChanged: (value) => edited.vchREmployeeName = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 80,
+                    child: _buildCompactTextField(
+                      initialValue: getAgeFromBirthday(
+                        twoContract.dtMBrithday,
+                      ).toString(),
+                      label: tr('age'),
+                      onChanged: (value) => edited.dtMBrithday = value,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 4: Vị trí + Bậc lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.chRPosition,
+                      label: tr('position'),
+                      onChanged: (value) => edited.chRPosition = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.chRCodeGrade,
+                      label: tr('salaryGrade'),
+                      onChanged: (value) => edited.chRCodeGrade = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateTime.parse(twoContract.dtMJoinDate!)),
+                      label: tr('contractEffective'),
+                      onChanged: (value) => edited.dtMJoinDate = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateTime.parse(twoContract.dtMEndDate!)),
+                      label: tr('contractEndDate'),
+                      onChanged: (value) => edited.dtMEndDate = value,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                initialValue: twoContract.vchREmployeeId,
-                decoration: const InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(),
+
+              // Tiêu đề phần thống kê
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('titleEidt1'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
                 ),
-                onChanged: (value) => edited.vchREmployeeId = value,
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.fLGoLeaveLate?.toString(),
+                      label: tr('earlyLateCount'),
+                      onChanged: (value) =>
+                          edited.fLGoLeaveLate = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.fLPaidLeave?.toString(),
+                      label: tr('paidLeave'),
+                      onChanged: (value) =>
+                          edited.fLPaidLeave = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 7: Nghỉ không lương + Không báo cáo
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.fLNotPaidLeave?.toString(),
+                      label: tr('unpaidLeave'),
+                      onChanged: (value) =>
+                          edited.fLNotPaidLeave = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.fLNotLeaveDay?.toString(),
+                      label: tr('unreportedLeave'),
+                      onChanged: (value) =>
+                          edited.fLNotLeaveDay = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: twoContract.inTViolation?.toString(),
+                      label: tr('violationCount'),
+                      onChanged: (value) =>
+                          edited.inTViolation = int.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  // const SizedBox(width: 10),
+                  // Expanded(
+                  //   child: _buildCompactTextField(
+                  //     initialValue: twoContract.vchRCodeApprover,
+                  //     label: tr('CodeApprover'),
+                  //     onChanged: (value) => edited.vchRCodeApprover = value,
+                  //   ),
+                  // ),
+                ],
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                initialValue: twoContract.vchREmployeeName,
-                decoration: const InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) => edited.vchREmployeeName = value,
+
+              // Lý do vi phạm (chiếm full width)
+              _buildCompactTextField(
+                initialValue: twoContract.nvarchaRViolation,
+                label: tr('reason'),
+                onChanged: (value) => edited.nvarchaRViolation = value,
+                maxLines: 2,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                initialValue: twoContract.chRPosition,
-                decoration: const InputDecoration(
-                  labelText: 'Chức vụ',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) => edited.chRPosition = value,
-              ),
-              // const SizedBox(height: 12),
-              // DropdownButtonFormField<int>(
-              //   value: twoContract.inTLock,
-              //   decoration: const InputDecoration(
-              //     labelText: 'Trạng thái',
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   items: const [
-              //     DropdownMenuItem(value: 0, child: Text('Active')),
-              //     DropdownMenuItem(value: 1, child: Text('Delete')),
-              //   ],
-              //   onChanged: (value) => editedUser.inTLock = value ?? 0,
-              // ),
-              // const SizedBox(height: 12),
-              // DropdownButtonFormField<int>(
-              //   value: twoContract.inTUseridCommon,
-              //   decoration: const InputDecoration(
-              //     labelText: 'Loại User',
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   items: const [
-              //     DropdownMenuItem(value: 0, child: Text('0: Dùng riêng')),
-              //     DropdownMenuItem(value: 1, child: Text('1: Dùng chung')),
-              //   ],
-              //   onChanged: (value) => editedUser.inTUseridCommon = value ?? 0,
-              // ),
-              // const SizedBox(height: 12),
-              // DropdownButtonFormField<String>(
-              //   value:
-              //       [
-              //         'Admin',
-              //         'Per',
-              //         'Chief Per',
-              //         'PTHC',
-              //         'Leader',
-              //         'Chief Section',
-              //         'Manager Section',
-              //         'Director',
-              //       ].contains(twoContract.chRGroup)
-              //       ? twoContract.chRGroup
-              //       : 'Per',
-              //   decoration: const InputDecoration(
-              //     labelText: 'Nhóm quyền',
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   items: const [
-              //     DropdownMenuItem(value: 'Admin', child: Text('Admin')),
-              //     DropdownMenuItem(value: 'Per', child: Text('Per')),
-              //     DropdownMenuItem(
-              //       value: 'Chief Per',
-              //       child: Text('Chief Per'),
-              //     ),
-              //     DropdownMenuItem(value: 'PTHC', child: Text('PTHC')),
-              //     DropdownMenuItem(value: 'Leader', child: Text('Leader')),
-              //     DropdownMenuItem(
-              //       value: 'Chief Section',
-              //       child: Text('Chief Section'),
-              //     ),
-              //     DropdownMenuItem(
-              //       value: 'Manager Section',
-              //       child: Text('Manager Section'),
-              //     ),
-              //     DropdownMenuItem(value: 'Director', child: Text('Director')),
-              //   ],
-              //   validator: (value) =>
-              //       value == null ? 'Vui lòng chọn nhóm quyền' : null,
-              //   onChanged: (value) => editedUser.chRGroup = value,
-              // ),
+
               if (errorMessage.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(top: 10),
                   child: Text(
                     errorMessage.value,
-                    style: TextStyle(color: Colors.red, fontSize: 14),
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
             ],
@@ -1504,16 +1486,30 @@ class _EditTwoContractDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
           onPressed: controller.isLoading.value
               ? null
               : () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
+          child: Text(tr('Cancel')),
         ),
         Obx(
           () => ElevatedButton(
-            onPressed: controller.isLoading.value
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
                 ? null
                 : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
                     try {
                       await controller.updateTwoContract(edited);
                       if (context.mounted) {
@@ -1521,14 +1517,65 @@ class _EditTwoContractDialog extends StatelessWidget {
                       }
                     } catch (e) {
                       errorMessage.value =
-                          'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                          '${tr('ErrorUpdate')}${e.toString()}';
                     }
                   },
-            child: const Text('Lưu'),
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildCompactTextField({
+    required String? initialValue,
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
+  }
+
+  String getAgeFromBirthday(String? birthday) {
+    if (birthday == null || birthday.isEmpty) return '';
+    try {
+      final birthDate = DateTime.parse(birthday);
+      final now = DateTime.now();
+      int age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+      return '$age';
+    } catch (e) {
+      return 'Invalid date';
+    }
   }
 }
 
@@ -1547,20 +1594,18 @@ class _DeleteTwoContractDialog extends StatelessWidget {
       }
 
       return AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: const Text(
-          'Bạn có chắc chắn muốn xóa thông tin đánh già này?',
-        ),
+        title: Text(tr('CommfirmDelete')),
+        content: Text(tr('Areyoudelete')),
         actions: [
           TextButton(
             onPressed: controller.isLoading.value
                 ? null
                 : () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
+            child: Text(tr('Cancel')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: controller.isLoading.value
+            onPressed: (controller.isLoading.value)
                 ? null
                 : () async {
                     try {
@@ -1575,10 +1620,414 @@ class _DeleteTwoContractDialog extends StatelessWidget {
                       }
                     }
                   },
-            child: const Text('Xóa'),
+            child: Text(tr('delete')),
           ),
         ],
       );
     });
+  }
+}
+
+class _showAddDialog extends StatelessWidget {
+  _showAddDialog();
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<DashboardControllerTwo>();
+    var twoContract = TwoContract();
+    RxString errorMessage = ''.obs;
+    String olded = '0';
+    return AlertDialog(
+      titlePadding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            '${tr('addCreateTwo')}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              // Tiêu đề phần Information
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('Information'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Dòng 1: Mã phòng ban + Tên phòng ban
+              SizedBox(
+                width: 500,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildCompactTextField(
+                        label: tr('department'),
+                        onChanged: (value) =>
+                            twoContract.vchRCodeSection = value,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildCompactTextField(
+                        label: tr('group'),
+                        onChanged: (value) =>
+                            twoContract.chRCostCenterName = value,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Dòng 2: Mã NV + Giới tính
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('employeeCode'),
+                      onChanged: (value) => twoContract.vchREmployeeId = value,
+                    ),
+                  ),
+                  // const SizedBox(width: 10),
+                  // SizedBox(
+                  //   width: 100,
+                  //   child: _buildCompactTextField(
+                  //     label: tr('gender'),
+                  //     onChanged: (value) => twoContract.vchRTyperId = value,
+                  //   ),
+                  // ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 3: Tên NV + Tuổi
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _buildCompactTextField(
+                      label: tr('fullName'),
+                      onChanged: (value) =>
+                          twoContract.vchREmployeeName = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 80,
+                    child: _buildCompactTextField(
+                      label: tr('age'),
+                      onChanged: (value) => olded = value,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 4: Vị trí + Bậc lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('position'),
+                      onChanged: (value) => twoContract.chRPosition = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      label: tr('salaryGrade'),
+                      onChanged: (value) => twoContract.chRCodeGrade = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDatePickerField(
+                      context: context,
+                      initialDate: twoContract.dtMJoinDate,
+                      label: tr('contractEffective'),
+                      onDateSelected: (date) {
+                        twoContract.dtMJoinDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(date);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildDatePickerField(
+                      context: context,
+                      initialDate: twoContract.dtMEndDate,
+                      label: tr('contractEndDate'),
+                      onDateSelected: (date) {
+                        twoContract.dtMEndDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(date);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Tiêu đề phần thống kê
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('titleEidt1'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('earlyLateCount'),
+                      onChanged: (value) => twoContract.fLGoLeaveLate =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('paidLeave'),
+                      onChanged: (value) => twoContract.fLPaidLeave =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 7: Nghỉ không lương + Không báo cáo
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('unpaidLeave'),
+                      onChanged: (value) => twoContract.fLNotPaidLeave =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('unreportedLeave'),
+                      onChanged: (value) => twoContract.fLNotLeaveDay =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('violationCount'),
+                      onChanged: (value) =>
+                          twoContract.inTViolation = int.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Lý do vi phạm (chiếm full width)
+              _buildCompactTextField(
+                label: tr('reason'),
+                onChanged: (value) => twoContract.nvarchaRViolation = value,
+                maxLines: 2,
+              ),
+
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      await controller.addTwoContract(twoContract, olded);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactTextField({
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 13),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildDatePickerField({
+    required BuildContext context,
+    required String? initialDate,
+    required String label,
+    required Function(DateTime) onDateSelected,
+  }) {
+    final textController = TextEditingController(
+      text: initialDate != null && initialDate.isNotEmpty
+          ? DateFormat('yyyy-MM-dd').format(DateTime.parse(initialDate))
+          : '',
+    );
+
+    return TextFormField(
+      controller: textController,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        suffixIcon: Icon(Icons.calendar_today, size: 20),
+      ),
+      readOnly: true,
+      onTap: () async {
+        final initial = initialDate != null && initialDate.isNotEmpty
+            ? DateTime.parse(initialDate)
+            : DateTime.now();
+
+        final pickedDate = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: Common.primaryColor,
+                  onPrimary: Colors.white,
+                  surface: Colors.white,
+                  onSurface: Colors.black,
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Common.primaryColor,
+                  ),
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+
+        if (pickedDate != null) {
+          final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+          textController.text = formattedDate;
+          onDateSelected(pickedDate);
+        }
+      },
+    );
   }
 }

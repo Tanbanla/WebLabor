@@ -34,7 +34,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); 
     _currentBody = //TwoContractScreen();
     HomeScreen(
       changeBody: _changeBody,
@@ -243,7 +243,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         child: ListTile(
           leading: FlutterLogo(),
           title: Text(
-            "LABOR CONTRACT EVALUATION",
+            'appTitle'.tr(),
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,

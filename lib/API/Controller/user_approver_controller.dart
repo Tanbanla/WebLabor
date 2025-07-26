@@ -4,12 +4,19 @@ import 'package:get/get.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/User_Approver.dart';
+
 class DashboardControllerUserApprover extends GetxController {
   var dataList = <ApproverUser>[].obs;
   var filterdataList = <ApproverUser>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   var isLoading = false.obs;
-
+  final RxString section;
+  final RxString chucvu;
+  DashboardControllerUserApprover({
+    required String section,
+    required String chucvu,
+  }) : section = section.obs,
+      chucvu = chucvu.obs;
   @override
   void onInit() {
     super.onInit();
@@ -25,20 +32,22 @@ class DashboardControllerUserApprover extends GetxController {
       colorText: Colors.white,
     );
   }
+
   // lay du lieu
   Future<void> fetchDummyData() async {
     try {
       isLoading(true);
-    final Uri uri = Uri.parse('${Common.API}${Common.UserApprover}')
-      .replace(queryParameters: {
-        'section': 'R&D-IT', 
-        'positionGroups': 'Chief'
-      });
+      final Uri uri = Uri.parse('${Common.API}${Common.UserApprover}').replace(
+        queryParameters: {
+          'section': section.value,
+          'positionGroups': chucvu.value,
+        },
+      );
 
-    final response = await http.get(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-    );
+      final response = await http.get(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+      );
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);

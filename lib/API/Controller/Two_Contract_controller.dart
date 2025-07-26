@@ -9,6 +9,8 @@ import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
+
 class DashboardControllerTwo extends GetxController {
   var dataList = <TwoContract>[].obs;
   var filterdataList = <TwoContract>[].obs;
@@ -33,6 +35,16 @@ class DashboardControllerTwo extends GetxController {
       backgroundColor: Colors.red,
       colorText: Colors.white,
     );
+  }
+
+  List<TwoContract> getSelectedItems() {
+    List<TwoContract> selectedItems = [];
+    for (int i = 0; i < selectRows.length; i++) {
+      if (selectRows[i]) {
+        selectedItems.add(filterdataList[i]);
+      }
+    }
+    return selectedItems;
   }
 
   //sap xep du lieu
@@ -119,10 +131,37 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // them danh gia
-  Future<void> addTwoContract(TwoContract twocontract) async {
+  Future<void> addTwoContract(TwoContract twocontract, String olded) async {
     try {
+      // bo sung cac truong con thieu
+      twocontract.id = 0;
+      twocontract.vchRUserCreate = 'khanhmf';
+      twocontract.vchRNameSection = twocontract.vchRCodeSection;
+      twocontract.dtMCreate = formatDateTime(DateTime.now());
+      twocontract.dtMUpdate = formatDateTime(DateTime.now());
+      twocontract.dtMBrithday = () {
+        try {
+          final age = int.tryParse(olded) ?? 0;
+          final birthDate = DateTime(
+            DateTime.now().year - age,
+            DateTime.now().month,
+            DateTime.now().day,
+          );
+          return birthDate.toIso8601String();
+        } catch (e) {
+          return null; // hoặc giá trị mặc định nếu cần
+        }
+      }();
+      twocontract.inTStatusId = 1;
+      if (twocontract.vchREmployeeId != null &&
+          twocontract.vchREmployeeId!.isNotEmpty) {
+        twocontract.vchRTyperId = twocontract.vchREmployeeId!.substring(0, 1);
+      } else {
+        twocontract.vchRTyperId = '';
+      }
+
       isLoading(true);
-      final response = await http.put(
+      final response = await http.post(
         Uri.parse('${Common.API}${Common.AddTwo}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(twocontract.toJson()),
@@ -146,8 +185,11 @@ class DashboardControllerTwo extends GetxController {
   // update thông tin
   Future<void> updateTwoContract(TwoContract twocontract) async {
     try {
+      twocontract.vchRUserUpdate = 'khanhmf';
+      twocontract.dtMUpdate = formatDateTime(DateTime.now());
+
       isLoading(true);
-      final response = await http.post(
+      final response = await http.put(
         Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(twocontract.toJson()),
@@ -158,6 +200,45 @@ class DashboardControllerTwo extends GetxController {
         final error = json.decode(response.body);
         throw Exception(
           'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // udpate to list
+  Future<void> updateListTwoContract(
+    String userApprover,
+  ) async {
+    try {
+         // List<TwoContract> twocontract,
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      for (int i = 0; i < twocontract.length; i++){
+        twocontract[i].vchRUserUpdate = 'khanhmf';
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        twocontract[i].inTStatusId = 2;
+        twocontract[i].useRApproverPer = userApprover;
+      }
+        isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        await fetchDummyData();
+      } else {
+        final error = json.decode(response.body);
+        print(json.encode(twocontract));
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${userApprover}',
         );
       }
     } catch (e) {
@@ -242,8 +323,8 @@ class DashboardControllerTwo extends GetxController {
         // Create and populate twoContract
         final twocontract = TwoContract()
           ..id = 0
-          ..vchRCodeApprover =
-              'HD2N' + formatDateTime(DateTime.now()).toString()
+          ..vchRCodeApprover
+          //'HD2N' + formatDateTime(DateTime.now()).toString()
           ..vchRCodeSection = row[4]?.value?.toString()
           ..vchRNameSection = row[4]?.value?.toString()
           ..vchREmployeeId = row[1]?.value?.toString()
@@ -373,8 +454,8 @@ class DashboardControllerTwo extends GetxController {
         // Create and populate
         final twocontract = TwoContract()
           ..id = 0
-          ..vchRCodeApprover =
-              'HD2N' + formatDateTime(DateTime.now()).toString()
+          ..vchRCodeApprover //=
+          //'HD2N' + formatDateTime(DateTime.now()).toString()
           ..vchRCodeSection = row[4]?.value?.toString()
           ..vchRNameSection = row[4]?.value?.toString()
           ..vchREmployeeId = row[1]?.value?.toString()

@@ -14,7 +14,10 @@ void main() async {
       supportedLocales: [Locale('vi'), Locale('ja')],
       path: 'assets/translations',
       fallbackLocale: Locale('vi'),
-      child: MyApp(),
+      child: ChangeNotifierProvider(
+        create: (context) => AuthState(), // Tạo instance của AuthState
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -22,7 +25,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,14 +32,14 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: MenuScreen()
-      // Consumer<AuthState>(
-      //   builder: (context, authState, child) {
-      //     return authState.isAuthenticated
-      //         ? const MenuScreen()
-      //         : const SignInScreen();
-      //   },
-      // ),
+      home: //MenuScreen()
+      Consumer<AuthState>(
+        builder: (context, authState, child) {
+          return authState.isAuthenticated
+              ? const MenuScreen()
+              : const SignInScreen();
+        },
+      ),
     );
   }
 }
