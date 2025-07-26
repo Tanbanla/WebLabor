@@ -32,14 +32,14 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: //MenuScreen()
-      Consumer<AuthState>(
-        builder: (context, authState, child) {
-          return authState.isAuthenticated
-              ? const MenuScreen()
-              : const SignInScreen();
-        },
-      ),
+      home: MenuScreen()
+      // Consumer<AuthState>(
+      //   builder: (context, authState, child) {
+      //     return authState.isAuthenticated
+      //         ? const MenuScreen()
+      //         : const SignInScreen();
+      //   },
+      // ),
     );
   }
 }

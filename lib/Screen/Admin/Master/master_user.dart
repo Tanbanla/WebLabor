@@ -133,14 +133,14 @@ class _MasterUserState extends State<MasterUser> {
 
         // Action Buttons
         _buildActionButton(
-          icon: Iconsax.import,
+          icon: Iconsax.import5,
           color: Colors.blue,
           tooltip: 'Import dữ liệu',
           onPressed: () => _showImportDialog(),
         ),
         const SizedBox(width: 8),
         _buildActionButton(
-          icon: Iconsax.export,
+          icon: Iconsax.export5,
           color: Colors.green,
           tooltip: 'Export dữ liệu',
           onPressed: () => _showExportDialog(),
