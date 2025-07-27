@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
@@ -12,6 +13,7 @@ import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -61,7 +63,8 @@ class _MenuScreenState extends State<MenuScreen> {
       //     ? HomeScreen(changeBody: _changeBody) // Truyền callback khi là HomeScreen
       //     : body(),
       drawer: ComplexDrawer(
-        changeBody: _changeBody, // Truyền hàm callback xuống drawer
+        changeBody: _changeBody,
+        context: context, // Truyền hàm callback xuống drawer
       ),
       drawerScrimColor: Colors.transparent,
       backgroundColor: Colors.white,
@@ -129,8 +132,9 @@ class _MenuScreenState extends State<MenuScreen> {
 
 class ComplexDrawer extends StatefulWidget {
   final Function(Widget) changeBody; // Callback để thay đổi giao diện
+  final BuildContext context;
 
-  const ComplexDrawer({Key? key, required this.changeBody}) : super(key: key);
+  const ComplexDrawer({Key? key, required this.changeBody, required this.context}) : super(key: key);
 
   @override
   _ComplexDrawerState createState() => _ComplexDrawerState();
@@ -138,7 +142,6 @@ class ComplexDrawer extends StatefulWidget {
 
 class _ComplexDrawerState extends State<ComplexDrawer> {
   int selectedIndex = -1; //dont set it to 0
-
   bool isExpanded = false;
   List<CDM> get cdms {
     return [
@@ -406,7 +409,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             }
           } else if (subMenu == trialContractText) {
             if (title == createEvaluationText) {
-              widget.changeBody(ApprenticeContract());
+              widget.changeBody(ApprenticeContractScreen());
             } else if (title == fillEvaluationText) {
               widget.changeBody(FillApprenticeScreen());
             } else if (title == approvalText) {

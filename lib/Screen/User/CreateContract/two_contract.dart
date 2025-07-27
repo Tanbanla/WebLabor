@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
@@ -1396,7 +1397,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       initialValue: twoContract.fLGoLeaveLate?.toString(),
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
-                          edited.fLGoLeaveLate = double.tryParse(value ?? '0'),
+                          edited.fLGoLeaveLate = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1406,7 +1407,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       initialValue: twoContract.fLPaidLeave?.toString(),
                       label: tr('paidLeave'),
                       onChanged: (value) =>
-                          edited.fLPaidLeave = double.tryParse(value ?? '0'),
+                          edited.fLPaidLeave = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1422,7 +1423,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       initialValue: twoContract.fLNotPaidLeave?.toString(),
                       label: tr('unpaidLeave'),
                       onChanged: (value) =>
-                          edited.fLNotPaidLeave = double.tryParse(value ?? '0'),
+                          edited.fLNotPaidLeave = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1432,7 +1433,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       initialValue: twoContract.fLNotLeaveDay?.toString(),
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
-                          edited.fLNotLeaveDay = double.tryParse(value ?? '0'),
+                          edited.fLNotLeaveDay = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1448,7 +1449,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       initialValue: twoContract.inTViolation?.toString(),
                       label: tr('violationCount'),
                       onChanged: (value) =>
-                          edited.inTViolation = int.tryParse(value ?? '0'),
+                          edited.inTViolation = int.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1812,7 +1813,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('earlyLateCount'),
                       onChanged: (value) => twoContract.fLGoLeaveLate =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1821,7 +1822,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('paidLeave'),
                       onChanged: (value) => twoContract.fLPaidLeave =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1836,7 +1837,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('unpaidLeave'),
                       onChanged: (value) => twoContract.fLNotPaidLeave =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1845,7 +1846,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('unreportedLeave'),
                       onChanged: (value) => twoContract.fLNotLeaveDay =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1860,7 +1861,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('violationCount'),
                       onChanged: (value) =>
-                          twoContract.inTViolation = int.tryParse(value ?? '0'),
+                          twoContract.inTViolation = int.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),

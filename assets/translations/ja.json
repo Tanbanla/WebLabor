@@ -78,5 +78,17 @@
   "pleaseSelectAtLeastOneRecord": "Vui lòng chọn ít nhất một bản ghi",
   "success": "Thành công",
   "sentSuccessfully": "Đã gửi thành công bản ghi",
-  "sendFailed": "Gửi thất bại"
+  "sendFailed": "Gửi thất bại",
+  "hintApprentice":"Lập danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm",
+  "lythuyet":"Đào tạo lý thuyết",
+  "thuchanh":"Đào tạo thực hành",
+  "congviec":"Hoàn thành công việc",
+  "hochoi":"Khả năng học hỏi",
+  "thichnghi":"Khả năng thích nghi",
+  "tinhthan":"Tinh thần hỗ trợ, quan hệ với đồng nghiệp",
+  "baocao":"Báo cáo, liên lạc, thảo thuận",
+  "chaphanh":"Chấp hành nội quy công ty'",
+  "ketqua":"Kết quả cuối cùng",
+  "note":"Ghi chú",
+  "Lydo":"Lý do không tuyển dụng lại"
 }

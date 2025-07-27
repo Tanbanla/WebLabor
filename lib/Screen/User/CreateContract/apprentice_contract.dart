@@ -1,27 +1,31 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, isSkiaWeb;
 import 'package:universal_html/html.dart' as html;
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
+import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
-import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
-import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:easy_localization/easy_localization.dart';
+import 'package:web_labor_contract/class/Apprentice_Contract.dart';
+import 'package:web_labor_contract/class/User_Approver.dart';
+import 'package:excel/excel.dart' hide Border;
 
-class ApprenticeContract extends StatefulWidget {
-  const ApprenticeContract({super.key});
+class ApprenticeContractScreen extends StatefulWidget {
+  const ApprenticeContractScreen({super.key});
 
   @override
-  State<ApprenticeContract> createState() => _ApprenticeContractState();
+  State<ApprenticeContractScreen> createState() => _ApprenticeContractScreenState();
 }
 
-class _ApprenticeContractState extends State<ApprenticeContract> {
+class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
@@ -65,142 +69,155 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
   }
 
   Widget _buildApproverPer() {
-    String? _selectedConfirmer;
+    final controller = Get.put(
+      DashboardControllerUserApprover(
+        section: 'ADM-PER',
+        chucvu: 'Chief,Section Manager',
+      ),
+    );
+    final RxString selectedConfirmerId = RxString('');
+    final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
+    RxString errorMessage = ''.obs;
 
-    // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
-    final List<Map<String, String>> _confirmersList = [
-      {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-      {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-      {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-      {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
-    ];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        // Row(
-        //   crossAxisAlignment: CrossAxisAlignment.center,
-        //   children: [
-        //     Text(
-        //       'Mã đợt phát hành: ',
-        //       style: TextStyle(
-        //         color: Common.primaryColor,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     ),
-        //     const SizedBox(width: 6),
-        //     const CustomField1(
-        //       icon: Icons.apartment,
-        //       obscureText: false,
-        //       hinText: 'Nhập mã đợt',
-        //     ),
-        //   ],
-        // ),
-        const SizedBox(width: 6),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Người xác nhận: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
+    return Obx(() {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(width: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                tr('approver'),
+                style: TextStyle(
+                  color: Common.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(width: 6),
-            DropdownButton<String>(
-              value: _selectedConfirmer,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: 14,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              hint: const Text('Chọn người xác nhận'),
-              items: _confirmersList.map((confirmer) {
-                return DropdownMenuItem<String>(
-                  value: confirmer['id'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Icon(Icons.person, color: Colors.blue, size: 16),
-                      ),
-                      const SizedBox(width: 8),
-                      Center(
-                        child: Column(
+              const SizedBox(width: 6),
+              DropdownButton<ApproverUser>(
+                value: selectedConfirmer.value,
+                underline: Container(),
+                isDense: true,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Common.primaryColor.withOpacity(0.8),
+                ),
+                dropdownColor: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Common.primaryColor.withOpacity(0.8),
+                ),
+                hint: Text(tr('pickapprover')),
+                items: controller.filterdataList.map((confirmer) {
+                  return DropdownMenuItem<ApproverUser>(
+                    value: confirmer,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person, color: Colors.blue, size: 16),
+                        const SizedBox(width: 8),
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              confirmer['name'] ?? '',
+                              confirmer.chREmployeeName ?? '',
                               style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              confirmer['position'] ?? '',
-                              style: TextStyle(
-                                fontSize: Common.sizeColumn,
-                                color: Colors.grey,
-                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedConfirmer = newValue;
-                });
-                // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
-              },
-            ),
-            if (_selectedConfirmer != null) const SizedBox(width: 8),
-            if (_selectedConfirmer != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  setState(() {
-                    _selectedConfirmer = null;
-                  });
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (ApproverUser? newValue) {
+                  selectedConfirmer.value = newValue;
+                  selectedConfirmerId.value = newValue?.chREmployeeAdid ?? '';
                 },
               ),
-          ],
-        ),
-        const SizedBox(width: 30),
-        // Button gửi
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 130,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Common.primaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: const Center(
-              child: Text(
-                'Gửi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              if (selectedConfirmer.value != null) const SizedBox(width: 8),
+              if (selectedConfirmer.value != null)
+                IconButton(
+                  icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                  onPressed: () {
+                    selectedConfirmer.value = null;
+                    selectedConfirmerId.value = '';
+                  },
+                ),
+            ],
+          ),
+          const SizedBox(width: 30),
+          // Send button
+          GestureDetector(
+            onTap: () async {
+              errorMessage.value = '';
+              if (selectedConfirmer.value == null) {
+                errorMessage.value = tr('pleasecomfirm');
+                return;
+              }
+              try {
+                final controllerTwo = Get.find<DashboardControllerApprentice>();
+                await controllerTwo.updateListApprenticeContract(
+                  selectedConfirmerId.value.toString(),
+                );
+              } catch (e) {
+                errorMessage.value =
+                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+              }
+            },
+            child: Obx(
+              () => Container(
+                width: 130,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: controller.isLoading.value
+                      ? Colors.grey
+                      : Common.primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          tr('send'),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+          const SizedBox(width: 8),
+          if (errorMessage.isNotEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 1),
+                child: Text(
+                  errorMessage.value,
+                  style: TextStyle(color: Colors.red, fontSize: 14),
+                ),
+              ),
+            ),
+        ],
+      );
+    });
   }
 
   Widget _buildHeader() {
@@ -208,7 +225,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Lập đánh giá kết thúc hợp đồng học nghề, thử việc',
+          tr('createEvaluation') + ' ' + tr('trialContract'),
           style: TextStyle(
             color: Colors.blue.withOpacity(0.9),
             fontWeight: FontWeight.bold,
@@ -217,7 +234,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Lập danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm',
+          tr('hintApprentice'),
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
       ],
@@ -247,7 +264,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 controller.searchQuery(value);
               },
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm theo mã, tên nhân viên...',
+                hintText: tr('searchhint'),
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 prefixIcon: Icon(
                   Iconsax.search_normal,
@@ -281,22 +298,27 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
         buildActionButton(
           icon: Iconsax.import,
           color: Colors.blue,
-          tooltip: 'Import dữ liệu',
+          tooltip: tr('import'),
           onPressed: () => _showImportDialog(),
         ),
         const SizedBox(width: 8),
         buildActionButton(
           icon: Iconsax.export,
           color: Colors.green,
-          tooltip: 'Export dữ liệu',
+          tooltip: tr('export'),
           onPressed: () => _showExportDialog(),
         ),
         const SizedBox(width: 8),
         buildActionButton(
           icon: Iconsax.add,
           color: Colors.orange,
-          tooltip: 'Thêm mới',
-          onPressed: () => _showAddDialog(),
+          tooltip: tr('add'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => _showAddDialog(),
+            );
+          },
         ),
       ],
     );
@@ -370,158 +392,163 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 },
                 columns: [
                   DataColumnCustom(
-                    title: 'STT',
+                    title: tr('stt'),
                     width: 70,
                     onSort: controller.sortById,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   // DataColumn2
                   DataColumnCustom(
-                    title: 'Hành động',
+                    title: tr('action'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Mã NV',
+                    title: tr('employeeCode'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'M/F',
+                    title: tr('gender'),
                     width: 60,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Họ và tên',
+                    title: tr('fullName'),
                     width: 180,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Phòng ban',
+                    title: tr('department'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nhóm',
+                    title: tr('group'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Tuổi',
+                    title: tr('age'),
                     width: 70,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Vị trí',
+                    title: tr('position'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Bậc lương',
+                    title: tr('salaryGrade'),
                     width: 100,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Hiệu lực HD',
+                    title: tr('contractEffective'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Ngày kết thúc HD',
+                    title: tr('contractEndDate'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Số lần đi mượn, về sớm',
+                    title: tr('earlyLateCount'),
                     width: 110,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ hưởng lương',
+                    title: tr('paidLeave'),
                     width: 100,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ không lương',
+                    title: tr('unpaidLeave'),
                     width: 90,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Nghỉ không báo cáo',
+                    title: tr('unreportedLeave'),
                     width: 90,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Số lần vi phạm nội quy công ty',
+                    title: tr('violationCount'),
                     width: 130,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Đào tạo lý thuyết',
+                    title: tr('reason'),
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Đào tạo thực hành',
+                    title: tr('lythuyet'),
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('thuchanh'),
                     width: 120,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Hoàn thành công việc',
+                    title: tr('congviec'),
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Khả năng học hỏi',
+                    title: tr('hochoi'),
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Khả năng thích nghi',
+                    title: tr('thichnghi'),
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Tinh thần hỗ trợ, quan hệ với đồng nghiệp',
+                    title: tr('tinhthan'),
                     fontSize: Common.sizeColumn,
                     width: 150,
                     maxLines: 3,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Báo cáo, liên lạc, thảo thuận',
+                    title: tr('baocao'),
                     fontSize: Common.sizeColumn,
                     width: 130,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Chấp hành nội quy công ty',
+                    title: tr('chaphanh'),
                     fontSize: Common.sizeColumn,
                     width: 130,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Kết quả cuối cùng',
+                    title: tr('ketqua'),
                     fontSize: Common.sizeColumn,
                     width: 150,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Ghi chú',
+                    title: tr('note'),
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Trường hợp không tuyển dụng lại điền "X"',
+                    title: tr('notRehirable'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do không tuyển dụng lại',
+                    title: tr('Lydo'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
                 ],
-                source: MyData(),
+                source: MyData(context),
               ),
             ),
           ),
@@ -532,159 +559,68 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
 
   void _showImportDialog() {
     final controller = Get.find<DashboardControllerApprentice>();
+    Rx<File?> selectedFile = Rx<File?>(null);
+    Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
+    RxString fileName = ''.obs;
+    RxString errorMessage = ''.obs;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Chọn file Excel để import dữ liệu',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 20),
-              Obx(
-                () => ElevatedButton.icon(
-                  icon: controller.isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Iconsax.document_upload),
-                  label: controller.isLoading.value
-                      ? const Text('Đang xử lý...')
-                      : const Text('Chọn File'),
+      builder: (context) => Obx(
+        () => AlertDialog(
+          title: Text(tr('import')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(tr('pickFile'), style: TextStyle(color: Colors.grey[600])),
+                const SizedBox(height: 20),
+                if (fileName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      '${tr('pickedFile')}${fileName.value}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      errorMessage.value,
+                      style: TextStyle(color: Colors.red, fontSize: 14),
+                    ),
+                  ),
+                ElevatedButton.icon(
+                  icon: const Icon(Iconsax.document_upload),
+                  label: Text(tr('pick')),
                   onPressed: controller.isLoading.value
                       ? null
                       : () async {
+                          errorMessage.value = '';
                           try {
-                            FilePickerResult? result = await FilePicker.platform
-                                .pickFiles(
-                                  type: FileType.custom,
-                                  allowedExtensions: ['xlsx'],
-                                  allowMultiple: false,
-                                );
-
-                            if (result != null && result.files.isNotEmpty) {
-                              controller.isLoading.value = true;
-
-                              // Xử lý file khác nhau giữa web và mobile
-                              Uint8List bytes;
-
-                              if (kIsWeb) {
-                                // Trên web
-                                bytes = result.files.first.bytes!;
-                              } else {
-                                // Trên mobile/desktop
-                                final file = File(result.files.first.path!);
-                                bytes = await file.readAsBytes();
-                              }
-
-                              final excel = Excel.decodeBytes(bytes);
-
-                              if (excel.tables.isEmpty) {
-                                throw Exception('File Excel không có dữ liệu');
-                              }
-
-                              // Lấy sheet đầu tiên
-                              final sheet = excel.tables.values.first;
-
-                              // Chuẩn bị danh sách dữ liệu mới
-                              List<Map<String, String>> newData = [];
-
-                              // Bắt đầu từ hàng thứ 2 (bỏ qua header)
-                              for (var i = 1; i < sheet.rows.length; i++) {
-                                final row = sheet.rows[i];
-                                newData.add({
-                                  'employeeCode':
-                                      row[1]?.value.toString() ?? '',
-                                  'fullName': row[2]?.value.toString() ?? '',
-                                  'department': row[3]?.value.toString() ?? '',
-                                  'group': row[4]?.value.toString() ?? '',
-                                  'age': row[5]?.value.toString() ?? '',
-                                  'position': row[6]?.value.toString() ?? '',
-                                  'salaryGrade': row[7]?.value.toString() ?? '',
-                                  'contractValidity':
-                                      row[8]?.value.toString() ?? '',
-                                  'contractEndDate':
-                                      row[9]?.value.toString() ?? '',
-                                  'earlyLeaveCount':
-                                      row[10]?.value.toString() ?? '',
-                                  'paidLeaveDays':
-                                      row[11]?.value.toString() ?? '',
-                                  'unpaidLeaveDays':
-                                      row[12]?.value.toString() ?? '',
-                                  'unreportedLeaveDays':
-                                      row[13]?.value.toString() ?? '',
-                                  'violationCount':
-                                      row[14]?.value.toString() ?? '',
-                                  'healthStatus':
-                                      row[15]?.value.toString() ?? 'Đạt',
-                                  'evaluationStatus':
-                                      row[16]?.value.toString() ?? 'OK',
-                                  'notRehire':
-                                      row[17]?.value.toString() ?? 'NG',
-                                  'notRehireReason':
-                                      row[18]?.value.toString() ?? '',
-                                  'reason': '',
-                                  'gender': '',
-                                });
-                              }
-
-                              if (newData.isNotEmpty) {
-                                controller.dataList.assignAll(newData);
-                                controller.filterdataList.assignAll(newData);
-                                controller.selectRows.assignAll(
-                                  List.generate(
-                                    newData.length,
-                                    (index) => false,
-                                  ),
-                                );
-
-                                if (context.mounted) {
-                                  Navigator.of(context).pop();
-                                }
-
-                                Get.snackbar(
-                                  'Thành công',
-                                  'Đã import ${newData.length} bản ghi',
-                                  backgroundColor: Colors.green,
-                                  colorText: Colors.white,
-                                  duration: const Duration(seconds: 3),
-                                );
-                              } else {
-                                throw Exception(
-                                  'Không có dữ liệu hợp lệ để import',
-                                );
-                              }
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text(
-                                    'Lỗi Import thất bại: ${e.toString()}',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: const Text('Đóng'),
-                                    ),
-                                  ],
-                                ),
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['xlsx', 'xls'],
+                              allowMultiple: false,
+                            );
+                            if (result != null &&
+                                result.files.single.path != null) {
+                              selectedFile.value = File(
+                                result.files.single.path!,
                               );
+                              fileName.value = result.files.single.name;
+                              if (isSkiaWeb) {
+                                selectedFileData.value =
+                                    result.files.single.bytes;
+                              }
                             }
-                          } finally {
-                            controller.isLoading.value = false;
+                          } on PlatformException catch (e) {
+                            errorMessage.value =
+                                tr('ConnectFile') + '${e.message}';
+                          } catch (e) {
+                            errorMessage.value =
+                                '${tr('ErrorPick')}${e.toString().replaceAll('_Namespace', '')}';
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -699,35 +635,110 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                     ),
                   ),
                 ),
+                if (controller.isLoading.value) ...[
+                  const SizedBox(height: 20),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 10),
+                  Text(tr('Doing')),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: controller.isLoading.value
+                  ? null
+                  : () => Navigator.of(context).pop(),
+              child: Text(tr('Cancel')),
+            ),
+            ElevatedButton(
+              onPressed:
+                  (controller.isLoading.value || selectedFile.value == null)
+                  ? null
+                  : () async {
+                      errorMessage.value = '';
+                      try {
+                        controller.isLoading(true);
+                        if (kIsWeb) {
+                          // Xử lý web
+                          await controller.importFromExcelWeb(
+                            selectedFileData.value!,
+                          );
+                        } else {
+                          // Xử lý mobile/desktop
+                          await controller.importExcelMobileContract(
+                            selectedFile.value!,
+                          );
+                        }
+                        // Close the dialog after successful import
+                        if (mounted) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the import dialog first
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              icon: const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 50,
+                              ),
+                              title: Text(
+                                tr('Done'),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(tr('DoneImport')),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: Text(tr('Cancel')),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      } on PlatformException catch (e) {
+                        errorMessage.value = '${tr('ErrorSys')}${e.message}';
+                      } catch (e) {
+                        errorMessage.value =
+                            '${tr('ErrorImport')}${e.toString().replaceAll('', '')}';
+                      } finally {
+                        controller.isLoading(false);
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
               ),
-            ],
-          ),
+              child: const Text('Import'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: controller.isLoading.value
-                ? null
-                : () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-        ],
       ),
     );
   }
+
   void _showExportDialog() {
     final controller = Get.find<DashboardControllerApprentice>();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Export Dữ Liệu'),
+        title: Text(tr('export')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Chọn định dạng export',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -737,15 +748,13 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
         ),
         actions: [
           TextButton(
-            onPressed: controller.isLoading.value
-                ? null
-                : () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
               try {
-                controller.isLoading.value = true;
+                controller.isLoadingExport.value = true;
 
                 // Tạo file Excel
                 final excel = Excel.createExcel();
@@ -753,25 +762,35 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
 
                 // Thêm tiêu đề các cột
                 sheet.appendRow([
-                  TextCellValue('STT'),
-                  TextCellValue('Mã NV'),
-                  TextCellValue('Họ và tên'),
-                  TextCellValue('Phòng ban'),
-                  TextCellValue('Nhóm'),
-                  TextCellValue('Tuổi'),
-                  TextCellValue('Vị trí'),
-                  TextCellValue('Bậc lương'),
-                  TextCellValue('Hiệu lực HD'),
-                  TextCellValue('Ngày kết thúc HD'),
-                  TextCellValue('Số lần đi mượn, về sớm'),
-                  TextCellValue('Nghỉ hưởng lương'),
-                  TextCellValue('Nghỉ không lương'),
-                  TextCellValue('Nghỉ không báo cáo'),
-                  TextCellValue('Số lần vi phạm'),
-                  TextCellValue('Kết quả khám sức khỏe'),
-                  TextCellValue('Kết quả đánh giá'),
-                  TextCellValue('Tuyển dụng lại'),
-                  TextCellValue('Lý do không tuyển dụng lại'),
+                  TextCellValue(tr('stt')),
+                  TextCellValue(tr('employeeCode')),
+                  TextCellValue(tr('gender')),
+                  TextCellValue(tr('fullName')),
+                  TextCellValue(tr('department')),
+                  TextCellValue(tr('group')),
+                  TextCellValue(tr('age')),
+                  TextCellValue(tr('position')),
+                  TextCellValue(tr('salaryGrade')),
+                  TextCellValue(tr('contractEffective')),
+                  TextCellValue(tr('contractEndDate')),
+                  TextCellValue(tr('earlyLateCount')),
+                  TextCellValue(tr('paidLeave')),
+                  TextCellValue(tr('unpaidLeave')),
+                  TextCellValue(tr('unreportedLeave')),
+                  TextCellValue(tr('violationCount')),
+                  TextCellValue(tr('reason')),
+                  TextCellValue(tr('lythuyet')),
+                  TextCellValue(tr('thuchanh')),
+                  TextCellValue(tr('congviec')),
+                  TextCellValue(tr('hochoi')),
+                  TextCellValue(tr('thichnghi')),
+                  TextCellValue(tr('tinhthan')),
+                  TextCellValue(tr('baocao')),
+                  TextCellValue(tr('chaphanh')),
+                  TextCellValue(tr('ketqua')),
+                  TextCellValue(tr('note')),
+                  TextCellValue(tr('notRehirable')),
+                  TextCellValue(tr('Lydo')),
                 ]);
 
                 // Thêm dữ liệu từ controller
@@ -779,34 +798,55 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                   final item = controller.filterdataList[i];
                   sheet.appendRow([
                     TextCellValue((i + 1).toString()),
-                    TextCellValue(item['employeeCode'] ?? ''),
-                    TextCellValue(item['fullName'] ?? ''),
-                    TextCellValue(item['department'] ?? ''),
-                    TextCellValue(item['group'] ?? ''),
-                    TextCellValue(item['age'] ?? ''),
-                    TextCellValue(item['position'] ?? ''),
-                    TextCellValue(item['salaryGrade'] ?? ''),
-                    TextCellValue(item['contractValidity'] ?? ''),
-                    TextCellValue(item['contractEndDate'] ?? ''),
-                    TextCellValue(item['earlyLeaveCount'] ?? ''),
-                    TextCellValue(item['paidLeaveDays'] ?? ''),
-                    TextCellValue(item['unpaidLeaveDays'] ?? ''),
-                    TextCellValue(item['unreportedLeaveDays'] ?? ''),
-                    TextCellValue(item['violationCount'] ?? ''),
-                    TextCellValue(item['healthStatus'] ?? ''),
-                    TextCellValue(item['evaluationStatus'] ?? ''),
-                    TextCellValue(item['notRehire'] ?? ''),
-                    TextCellValue(item['notRehireReason'] ?? ''),
+                    TextCellValue(item.vchREmployeeId ?? ''),
+                    TextCellValue(item.vchRTyperId ?? ''),
+                    TextCellValue(item.vchREmployeeName ?? ''),
+                    TextCellValue(item.vchRNameSection ?? ''),
+                    TextCellValue(item.chRCostCenterName ?? ''),
+                    TextCellValue(
+                      getAgeFromBirthday(item.dtMBrithday).toString(),
+                    ),
+                    TextCellValue(item.chRPosition ?? ''),
+                    TextCellValue(item.chRCodeGrade ?? ''),
+                    TextCellValue(
+                      item.dtMJoinDate != null
+                          ? DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.parse(item.dtMJoinDate!))
+                          : '',
+                    ),
+                    TextCellValue(
+                      item.dtMEndDate != null
+                          ? DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.parse(item.dtMEndDate!))
+                          : '',
+                    ),
+                    TextCellValue(item.fLGoLeaveLate.toString()),
+                    TextCellValue(item.fLNotLeaveDay.toString()),
+                    TextCellValue(item.inTViolation.toString()),
+                    TextCellValue(item.nvarchaRViolation ?? ''),
+                    TextCellValue(item.vchRLyThuyet.toString()),
+                    TextCellValue(item.vchRThucHanh.toString()), 
+                    TextCellValue(item.vchRCompleteWork.toString()),
+                    TextCellValue(item.vchRLearnWork.toString()),
+                    TextCellValue(item.vchRThichNghi.toString()), 
+                    TextCellValue(item.vchRUseful.toString()),
+                    TextCellValue(item.vchRContact.toString()), 
+                    TextCellValue(item.vcHNeedViolation.toString()), 
+                    TextCellValue(item.vchRReasultsLeader ?? ''),
+                    TextCellValue(item.biTNoReEmployment.toString()),
+                    TextCellValue(item.nvchRNoReEmpoyment ?? ''),
                   ]);
                 }
 
                 // Lưu file
                 final bytes = excel.encode(); // Sử dụng encode() thay vì save()
-                if (bytes == null) throw Exception('Không thể tạo file Excel');
+                if (bytes == null) throw Exception(tr('Notsavefile'));
 
                 // Tạo tên file
                 final fileName =
-                    'DanhSachNhanVienHocNgheThuViec_${DateTime.now().toString().replaceAll(':', '-')}.xlsx';
+                    'DanhSachDanhGiaHopDongHocNgheThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
 
                 // Xử lý tải file xuống
                 if (kIsWeb) {
@@ -823,7 +863,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 } else {
                   // Cho mobile/desktop
                   final String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: 'Lưu file Excel',
+                    dialogTitle: tr('savefile'),
                     fileName: fileName,
                     type: FileType.custom,
                     allowedExtensions: ['xlsx'],
@@ -839,23 +879,54 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
                 if (context.mounted) {
                   Navigator.of(context).pop();
                 }
-
-                Get.snackbar(
-                  'Thành công',
-                  'Đã export ${controller.filterdataList.length} nhân viên ra file Excel',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                  duration: const Duration(seconds: 3),
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    icon: const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 50,
+                    ),
+                    title: Text(
+                      tr('Done'),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(tr('exportDone')),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(tr('Cancel')),
+                      ),
+                    ],
+                  ),
                 );
               } catch (e) {
-                Get.snackbar(
-                  'Lỗi',
-                  'Export thất bại: ${e.toString()}',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('${tr('exportError')}${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               } finally {
-                controller.isLoading.value = false;
+                controller.isLoadingExport.value = false;
               }
             },
             style: ElevatedButton.styleFrom(
@@ -863,7 +934,7 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
               foregroundColor: Colors.white,
             ),
             child: Obx(
-              () => controller.isLoading.value
+              () => controller.isLoadingExport.value
                   ? const SizedBox(
                       width: 20,
                       height: 20,
@@ -880,6 +951,22 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
     );
   }
 
+  String getAgeFromBirthday(String? birthday) {
+    if (birthday == null || birthday.isEmpty) return '';
+    try {
+      final birthDate = DateTime.parse(birthday);
+      final now = DateTime.now();
+      int age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+      return '$age';
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
   Widget _buildExportOption(IconData icon, String label) {
     return Column(
       children: [
@@ -889,70 +976,13 @@ class _ApprenticeContractState extends State<ApprenticeContract> {
       ],
     );
   }
-
-  void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class MyData extends DataTableSource {
   final DashboardControllerApprentice controller = Get.find();
+  final BuildContext context;
 
+  MyData(this.context);
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -965,7 +995,7 @@ class MyData extends DataTableSource {
         }
         return null;
       }),
-      onTap: () => _showDetailDialog(data),
+      onTap: () {},
       selected: controller.selectRows[index],
       onSelectChanged: (value) {
         controller.selectRows[index] = value ?? false;
@@ -990,114 +1020,137 @@ class MyData extends DataTableSource {
               _buildActionButton(
                 icon: Iconsax.edit_2,
                 color: Colors.blue,
-                onPressed: () => _handleEdit(data),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        _EditContractDialog(contract: data),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               _buildActionButton(
                 icon: Iconsax.trash,
                 color: Colors.red,
-                onPressed: () => _handleDelete(data),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        _DeleteContractDialog(id: (data.id ?? 0)),
+                  );
+                },
               ),
               const SizedBox(width: 8),
               _buildActionButton(
                 icon: Iconsax.eye,
                 color: Colors.green,
-                onPressed: () => _showDetailDialog(data),
+                onPressed: () {}, //=> _showDetailDialog(data),
               ),
             ],
           ),
         ),
         DataCell(
           Text(
-            data['employeeCode'] ?? "",
+            data.vchREmployeeId ?? '',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['gender'] ?? "",
+            data.vchRTyperId ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['fullName'] ?? "",
+            data.vchREmployeeName ?? '',
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['department'] ?? "",
+            data.vchRNameSection ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['group'] ?? "",
+            data.chRCostCenterName ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['age']?.toString() ?? "",
+            data.dtMBrithday != null
+                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                  : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['position'] ?? "",
+            data.chRPosition ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['salaryGrade']?.toString() ?? "",
+              data.chRCodeGrade?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['contractValidity'] ?? "",
+              data.dtMJoinDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMJoinDate!))
+                  : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['contractEndDate'] ?? "",
+              data.dtMEndDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMEndDate!))
+                  : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['earlyLeaveCount']?.toString() ?? "",
+              data.fLGoLeaveLate?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['paidLeaveDays']?.toString() ?? "",
+            data.reactive.toString(),
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['unpaidLeaveDays']?.toString() ?? "",
+            data.fLNotLeaveDay?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['unreportedLeaveDays']?.toString() ?? "",
+            data.inTViolation?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-            data['violationCount']?.toString() ?? "",
+            "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         //5 thuộc tính đánh giá
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
@@ -1113,8 +1166,8 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
+            final status = item.vchRLyThuyet ?? 'OK';
+            final id = item.vchREmployeeId ?? '';
 
             return DropdownButton<String>(
               value: status,
@@ -1191,8 +1244,8 @@ class MyData extends DataTableSource {
               ],
               onChanged: (newValue) {
                 if (newValue != null && id.isNotEmpty) {
-                  controller.updateEvaluationStatus(id, newValue);
-                  controller.filterdataList.refresh();
+                  // controller.updateEvaluationStatus(id, newValue);
+                  // controller.filterdataList.refresh();
                 }
               },
             );
@@ -1226,11 +1279,11 @@ class MyData extends DataTableSource {
               child: Text(controller.filterdataList[index].toString()),
             );
             // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = item.vchRThucHanh;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = item.vchREmployeeId ?? '';
 
             return DropdownButton<String>(
               value: status,
@@ -1273,7 +1326,7 @@ class MyData extends DataTableSource {
               ],
               onChanged: (newValue) {
                 if (newValue != null && employeeCode.isNotEmpty) {
-                  controller.updateRehireStatus(employeeCode, newValue);
+                 //controller.updateRehireStatus(employeeCode, newValue);
                   controller.filterdataList.refresh();
                 }
               },
@@ -1337,139 +1390,6 @@ class MyData extends DataTableSource {
       ),
     );
   }
-
-  void _showDetailDialog(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Chi tiết: ${data['Column3']}'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
-              _buildDetailRow('Mã nhân viên:', data['Column2'] ?? ""),
-              _buildDetailRow('Tên nhân viên:', data['Column3'] ?? ""),
-              _buildDetailRow('ADID:', data['Column4'] ?? ""),
-              _buildDetailRow('Nhóm quyền:', data['Column5'] ?? ""),
-              const SizedBox(height: 16),
-              const Text(
-                'Lịch sử hoạt động:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(
-                3,
-                (index) => _buildActivityItem('Hoạt động ${index + 1}'),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Đóng')),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(Icons.circle, size: 8, color: Colors.blue),
-          const SizedBox(width: 8),
-          Text(text),
-        ],
-      ),
-    );
-  }
-
-  void _handleEdit(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Chỉnh sửa thông tin'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Tên nhân viên',
-                border: OutlineInputBorder(),
-              ),
-              controller: TextEditingController(text: data['Column3']),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField(
-              decoration: InputDecoration(
-                labelText: 'Nhóm quyền',
-                border: OutlineInputBorder(),
-              ),
-              value: data['Column5'],
-              items: [
-                'QL',
-                'NV',
-                'Admin',
-                'Guest',
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) {},
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Save logic
-              Get.back();
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleDelete(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn chắc chắn muốn xóa ${data['Column3']}?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[50],
-              foregroundColor: Colors.red,
-            ),
-            onPressed: () {
-              controller.deleteItem(data);
-              Get.back();
-            },
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   bool get isRowCountApproximate => false;
 
@@ -1479,148 +1399,774 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
+class _EditContractDialog extends StatelessWidget {
+  final ApprenticeContract contract;
+  final DashboardControllerApprentice controller = Get.find();
 
-class DashboardControllerApprentice extends GetxController {
-  var dataList = <Map<String, String>>[].obs;
-  var filterdataList = <Map<String, String>>[].obs;
-  RxList<bool> selectRows = <bool>[].obs;
-  RxInt sortCloumnIndex = 0.obs;
-  RxBool sortAscending = true.obs;
-  final searchTextController = TextEditingController();
-  var isLoading = false.obs;
+  _EditContractDialog({required this.contract});
 
   @override
-  void onInit() {
-    super.onInit();
-    fetchDummyData();
-  }
+  Widget build(BuildContext context) {
+    final edited = ApprenticeContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
 
-  void sortById(int sortColumnIndex, bool ascending) {
-    sortAscending.value = ascending;
-    filterdataList.sort((a, b) {
-      final aValue = a['employeeCode']?.toLowerCase() ?? '';
-      final bValue = b['employeeCode']?.toLowerCase() ?? '';
-      return ascending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
-    });
-    this.sortCloumnIndex.value = sortColumnIndex;
-  }
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            '${tr('edit')} ${contract.vchREmployeeName}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Tiêu đề phần Information
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('Information'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Dòng 1: Mã phòng ban + Tên phòng ban
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.vchRCodeSection,
+                      label: tr('department'),
+                      onChanged: (value) => edited.vchRCodeSection = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.chRCostCenterName,
+                      label: tr('group'),
+                      onChanged: (value) => edited.chRCostCenterName = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Dòng 2: Mã NV + Giới tính
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.vchREmployeeId,
+                      label: tr('employeeCode'),
+                      onChanged: (value) => edited.vchREmployeeId = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      initialValue: contract.vchRTyperId,
+                      label: tr('gender'),
+                      onChanged: (value) => edited.vchRTyperId = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
 
-  void searchQuery(String query) {
-    if (query.isEmpty) {
-      filterdataList.assignAll(dataList);
-    } else {
-      filterdataList.assignAll(
-        dataList.where(
-          (item) =>
-              (item['employeeCode']?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item['fullName']?.toLowerCase().contains(query.toLowerCase()) ??
-                  false),
+              // Dòng 3: Tên NV + Tuổi
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _buildCompactTextField(
+                      initialValue: contract.vchREmployeeName,
+                      label: tr('fullName'),
+                      onChanged: (value) => edited.vchREmployeeName = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 80,
+                    child: _buildCompactTextField(
+                      initialValue: getAgeFromBirthday(
+                        contract.dtMBrithday,
+                      ).toString(),
+                      label: tr('age'),
+                      onChanged: (value) => edited.dtMBrithday = value,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 4: Vị trí + Bậc lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.chRPosition,
+                      label: tr('position'),
+                      onChanged: (value) => edited.chRPosition = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      initialValue: contract.chRCodeGrade,
+                      label: tr('salaryGrade'),
+                      onChanged: (value) => edited.chRCodeGrade = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateTime.parse(contract.dtMJoinDate!)),
+                      label: tr('contractEffective'),
+                      onChanged: (value) => edited.dtMJoinDate = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateTime.parse(contract.dtMEndDate!)),
+                      label: tr('contractEndDate'),
+                      onChanged: (value) => edited.dtMEndDate = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Tiêu đề phần thống kê
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('titleEidt1'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.fLGoLeaveLate?.toString(),
+                      label: tr('earlyLateCount'),
+                      onChanged: (value) =>
+                          edited.fLGoLeaveLate = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.fLNotLeaveDay?.toString(),
+                      label: tr('unreportedLeave'),
+                      onChanged: (value) =>
+                          edited.fLNotLeaveDay = double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      initialValue: contract.inTViolation?.toString(),
+                      label: tr('violationCount'),
+                      onChanged: (value) =>
+                          edited.inTViolation = int.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  // const SizedBox(width: 10),
+                  // Expanded(
+                  //   child: _buildCompactTextField(
+                  //     initialValue: twoContract.vchRCodeApprover,
+                  //     label: tr('CodeApprover'),
+                  //     onChanged: (value) => edited.vchRCodeApprover = value,
+                  //   ),
+                  // ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Lý do vi phạm (chiếm full width)
+              _buildCompactTextField(
+                initialValue: contract.nvarchaRViolation,
+                label: tr('reason'),
+                onChanged: (value) => edited.nvarchaRViolation = value,
+                maxLines: 2,
+              ),
+
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
         ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      await controller.updateApprenticeContract(edited);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactTextField({
+    required String? initialValue,
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
+  }
+
+  String getAgeFromBirthday(String? birthday) {
+    if (birthday == null || birthday.isEmpty) return '';
+    try {
+      final birthDate = DateTime.parse(birthday);
+      final now = DateTime.now();
+      int age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+      return '$age';
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+}
+
+class _DeleteContractDialog extends StatelessWidget {
+  final int id;
+  final DashboardControllerApprentice controller = Get.find();
+
+  _DeleteContractDialog({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      // Thêm Obx để theo dõi trạng thái loading
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return AlertDialog(
+        title: Text(tr('CommfirmDelete')),
+        content: Text(tr('Areyoudelete')),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    try {
+                      await controller.deleteApprenticeContract(id);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: Text(tr('delete')),
+          ),
+        ],
       );
-    }
+    });
   }
+}
 
-  void deleteItem(Map<String, String> item) {
-    dataList.remove(item);
-    filterdataList.remove(item);
-    selectRows.removeAt(dataList.indexOf(item));
-  }
+class _showAddDialog extends StatelessWidget {
+  _showAddDialog();
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<DashboardControllerApprentice>();
+    var twoContract = ApprenticeContract();
+    RxString errorMessage = ''.obs;
+    String olded = '0';
+    return AlertDialog(
+      titlePadding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            '${tr('addCreateTwo')}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              // Tiêu đề phần Information
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('Information'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Dòng 1: Mã phòng ban + Tên phòng ban
+              SizedBox(
+                width: 500,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildCompactTextField(
+                        label: tr('department'),
+                        onChanged: (value) =>
+                            twoContract.vchRCodeSection = value,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildCompactTextField(
+                        label: tr('group'),
+                        onChanged: (value) =>
+                            twoContract.chRCostCenterName = value,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Dòng 2: Mã NV + Giới tính
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('employeeCode'),
+                      onChanged: (value) => twoContract.vchREmployeeId = value,
+                    ),
+                  ),
+                  // const SizedBox(width: 10),
+                  // SizedBox(
+                  //   width: 100,
+                  //   child: _buildCompactTextField(
+                  //     label: tr('gender'),
+                  //     onChanged: (value) => twoContract.vchRTyperId = value,
+                  //   ),
+                  // ),
+                ],
+              ),
+              const SizedBox(height: 10),
 
-  // các trường đánh giá
-  void updateReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
+              // Dòng 3: Tên NV + Tuổi
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _buildCompactTextField(
+                      label: tr('fullName'),
+                      onChanged: (value) =>
+                          twoContract.vchREmployeeName = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 80,
+                    child: _buildCompactTextField(
+                      label: tr('age'),
+                      onChanged: (value) => olded = value,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 4: Vị trí + Bậc lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('position'),
+                      onChanged: (value) => twoContract.chRPosition = value,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 100,
+                    child: _buildCompactTextField(
+                      label: tr('salaryGrade'),
+                      onChanged: (value) => twoContract.chRCodeGrade = value,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDatePickerField(
+                      context: context,
+                      initialDate: twoContract.dtMJoinDate,
+                      label: tr('contractEffective'),
+                      onDateSelected: (date) {
+                        twoContract.dtMJoinDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(date);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildDatePickerField(
+                      context: context,
+                      initialDate: twoContract.dtMEndDate,
+                      label: tr('contractEndDate'),
+                      onDateSelected: (date) {
+                        twoContract.dtMEndDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(date);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Tiêu đề phần thống kê
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('titleEidt1'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('earlyLateCount'),
+                      onChanged: (value) => twoContract.fLGoLeaveLate =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('unreportedLeave'),
+                      onChanged: (value) => twoContract.fLNotLeaveDay =
+                          double.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactTextField(
+                      label: tr('violationCount'),
+                      onChanged: (value) =>
+                          twoContract.inTViolation = int.tryParse(value ?? '0'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Lý do vi phạm (chiếm full width)
+              _buildCompactTextField(
+                label: tr('reason'),
+                onChanged: (value) => twoContract.nvarchaRViolation = value,
+                maxLines: 2,
+              ),
+
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      await controller.addApprenticeContract(twoContract, olded);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
     );
-    if (index != -1) {
-      dataList[index]['reason'] = reason;
-      dataList.refresh();
-    }
   }
 
-  void updateHealthStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
+  Widget _buildCompactTextField({
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 13),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
     );
-    if (index != -1) {
-      dataList[index]['healthStatus'] = status;
-      dataList.refresh();
-    }
   }
 
-  void updateEvaluationStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['evaluationStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateRehireStatus(String employeeCode, String value) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['notRehire'] = value;
-      dataList.refresh();
-    }
-  }
-
-  void updateNotRehireReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['notRehireReason'] = reason;
-      dataList.refresh();
-    }
-  }
-
-  //
-  void fetchDummyData() {
-    final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
-    final genders = ['M', 'F'];
-    final groups = ['Nhóm 1', 'Nhóm 2', 'Nhóm 3'];
-    final positions = ['Nhân viên', 'Trưởng nhóm', 'Quản lý', 'Giám đốc'];
-
-    dataList.assignAll(
-      List.generate(50, (index) {
-        final dept = departments[index % departments.length];
-        final gender = genders[index % genders.length];
-        final group = groups[index % groups.length];
-        final position = positions[index % positions.length];
-
-        return {
-          'employeeCode': 'NV${1000 + index}',
-          'gender': gender,
-          'fullName': 'Nguyễn Văn ${String.fromCharCode(65 + index % 26)}',
-          'department': dept,
-          'group': group,
-          'age': (25 + index % 20).toString(),
-          'position': position,
-          'salaryGrade': (index % 10 + 1).toString(),
-          'contractValidity': 'Còn hiệu lực',
-          'contractEndDate':
-              '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
-          'earlyLeaveCount': (index % 5).toString(),
-          'paidLeaveDays': (index % 10).toString(),
-          'unpaidLeaveDays': (index % 3).toString(),
-          'unreportedLeaveDays': (index % 2).toString(),
-          'violationCount': (index % 4).toString(),
-          'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
-          'healthStatus': 'Đạt',
-          'notRehire': 'NG',
-          'notRehireReason': '',
-          'reason': '',
-        };
-      }),
+  Widget _buildDatePickerField({
+    required BuildContext context,
+    required String? initialDate,
+    required String label,
+    required Function(DateTime) onDateSelected,
+  }) {
+    final textController = TextEditingController(
+      text: initialDate != null && initialDate.isNotEmpty
+          ? DateFormat('yyyy-MM-dd').format(DateTime.parse(initialDate))
+          : '',
     );
 
-    filterdataList.assignAll(dataList);
-    selectRows.assignAll(List.generate(dataList.length, (index) => false));
+    return TextFormField(
+      controller: textController,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 12),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        suffixIcon: Icon(Icons.calendar_today, size: 20),
+      ),
+      readOnly: true,
+      onTap: () async {
+        final initial = initialDate != null && initialDate.isNotEmpty
+            ? DateTime.parse(initialDate)
+            : DateTime.now();
+
+        final pickedDate = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: Common.primaryColor,
+                  onPrimary: Colors.white,
+                  surface: Colors.white,
+                  onSurface: Colors.black,
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Common.primaryColor,
+                  ),
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+
+        if (pickedDate != null) {
+          final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+          textController.text = formattedDate;
+          onDateSelected(pickedDate);
+        }
+      },
+    );
   }
 }

@@ -1245,14 +1245,14 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
-
-class DashboardControllerFill extends GetxController {
+class DashboardControllerFill  extends GetxController {
   var dataList = <Map<String, String>>[].obs;
   var filterdataList = <Map<String, String>>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
+  var isLoading = false.obs;
 
   @override
   void onInit() {
@@ -1378,7 +1378,7 @@ class DashboardControllerFill extends GetxController {
           'violationCount': (index % 4).toString(),
           'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
           'healthStatus': 'Đạt',
-          'notRehire': 'OK',
+          'notRehire': 'NG',
           'notRehireReason': '',
           'reason': '',
         };

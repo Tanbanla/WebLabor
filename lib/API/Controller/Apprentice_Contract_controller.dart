@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
-import 'package:web_labor_contract/class/Two_Contract.dart';
+import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class DashboardControllerTwo extends GetxController {
-  var dataList = <TwoContract>[].obs;
-  var filterdataList = <TwoContract>[].obs;
+class DashboardControllerApprentice extends GetxController {
+  var dataList = <ApprenticeContract>[].obs;
+  var filterdataList = <ApprenticeContract>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -21,24 +21,16 @@ class DashboardControllerTwo extends GetxController {
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
 
+
+
   @override
   void onInit() {
     super.onInit();
     fetchDummyData();
   }
 
-  void showError(String message) {
-    Get.snackbar(
-      'Error',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  }
-
-  List<TwoContract> getSelectedItems() {
-    List<TwoContract> selectedItems = [];
+  List<ApprenticeContract> getSelectedItems() {
+    List<ApprenticeContract> selectedItems = [];
     for (int i = 0; i < selectRows.length; i++) {
       if (selectRows[i]) {
         selectedItems.add(filterdataList[i]);
@@ -47,7 +39,6 @@ class DashboardControllerTwo extends GetxController {
     return selectedItems;
   }
 
-  //sap xep du lieu
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     sortCloumnIndex.value = sortColumnIndex;
@@ -72,7 +63,6 @@ class DashboardControllerTwo extends GetxController {
     });
   }
 
-  // so sanh du lieu
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);
@@ -97,12 +87,12 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-  // lay du lieu
+  // lay du lieu data
   Future<void> fetchDummyData() async {
     try {
       isLoading(true);
       final response = await http.get(
-        Uri.parse(Common.API + Common.TwoGetAll),
+        Uri.parse(Common.API + Common.ApprenticeGetAll),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -112,7 +102,7 @@ class DashboardControllerTwo extends GetxController {
           final List<dynamic> data = jsonData['data'];
           dataList.assignAll(
             data
-                .map((twocontract) => TwoContract.fromJson(twocontract))
+                .map((contract) => ApprenticeContract.fromJson(contract))
                 .toList(),
           );
           filterdataList.assignAll(dataList);
@@ -130,16 +120,20 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-  // them danh gia
-  Future<void> addTwoContract(TwoContract twocontract, String olded) async {
+  // api post
+  Future<void> addApprenticeContract(
+    ApprenticeContract contract,
+    String olded,
+  ) async {
     try {
+      isLoading(true);
       // bo sung cac truong con thieu
-      twocontract.id = 0;
-      twocontract.vchRUserCreate = 'khanhmf';
-      twocontract.vchRNameSection = twocontract.vchRCodeSection;
-      twocontract.dtMCreate = formatDateTime(DateTime.now());
-      twocontract.dtMUpdate = formatDateTime(DateTime.now());
-      twocontract.dtMBrithday = () {
+      contract.id = 0;
+      contract.vchRUserCreate = 'khanhmf';
+      contract.vchRNameSection = contract.vchRCodeSection;
+      contract.dtMCreate = formatDateTime(DateTime.now());
+      contract.dtMUpdate = formatDateTime(DateTime.now());
+      contract.dtMBrithday = () {
         try {
           final age = int.tryParse(olded) ?? 0;
           final birthDate = DateTime(
@@ -152,19 +146,17 @@ class DashboardControllerTwo extends GetxController {
           return null; // hoặc giá trị mặc định nếu cần
         }
       }();
-      twocontract.inTStatusId = 1;
-      if (twocontract.vchREmployeeId != null &&
-          twocontract.vchREmployeeId!.isNotEmpty) {
-        twocontract.vchRTyperId = twocontract.vchREmployeeId!.substring(0, 1);
+      contract.inTStatusId = 1;
+      if (contract.vchREmployeeId != null &&
+          contract.vchREmployeeId!.isNotEmpty) {
+        contract.vchRTyperId = contract.vchREmployeeId!.substring(0, 1);
       } else {
-        twocontract.vchRTyperId = '';
+        contract.vchRTyperId = '';
       }
-
-      isLoading(true);
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.AddTwo}'),
+        Uri.parse('${Common.API}${Common.AddApprentice}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract.toJson()),
+        body: json.encode(contract.toJson()),
       );
       if (response.statusCode == 200) {
         await fetchDummyData();
@@ -175,24 +167,23 @@ class DashboardControllerTwo extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to update two contract: $e');
-      rethrow;
+      throw Exception('Failed to update two contract: $e');
     } finally {
       isLoading(false);
     }
   }
 
-  // update thông tin
-  Future<void> updateTwoContract(TwoContract twocontract) async {
+  //  update thong tin
+  Future<void> updateApprenticeContract(ApprenticeContract contract) async {
     try {
-      twocontract.vchRUserUpdate = 'khanhmf';
-      twocontract.dtMUpdate = formatDateTime(DateTime.now());
+      contract.vchRUserUpdate = 'khanhmf';
+      contract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
       final response = await http.put(
-        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
+        Uri.parse('${Common.API}${Common.UpdateApprentice}${contract.id}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract.toJson()),
+        body: json.encode(contract.toJson()),
       );
       if (response.statusCode == 200) {
         await fetchDummyData();
@@ -203,34 +194,31 @@ class DashboardControllerTwo extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to update two contract: $e');
-      rethrow;
+      throw Exception('Failed to update two contract: $e');
     } finally {
       isLoading(false);
     }
   }
 
-  // udpate to list
-  Future<void> updateListTwoContract(
-    String userApprover,
-  ) async {
+  //update thong tin to list
+  Future<void> updateListApprenticeContract(String userApprover) async {
     try {
-         // List<TwoContract> twocontract,
-      final twocontract = getSelectedItems();
-      if (twocontract.isEmpty) {
+      // List<TwoContract> twocontract,
+      final contract = getSelectedItems();
+      if (contract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
-      for (int i = 0; i < twocontract.length; i++){
-        twocontract[i].vchRUserUpdate = 'khanhmf';
-        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-        twocontract[i].inTStatusId = 2;
-        twocontract[i].useRApproverPer = userApprover;
+      for (int i = 0; i < contract.length; i++) {
+        contract[i].vchRUserUpdate = 'khanhmf';
+        contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        contract[i].inTStatusId = 2;
+        contract[i].useRApproverPer = userApprover;
       }
-        isLoading(true);
+      isLoading(true);
       final response = await http.put(
-        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract),
+        body: json.encode(contract),
       );
       if (response.statusCode == 200) {
         await fetchDummyData();
@@ -241,18 +229,17 @@ class DashboardControllerTwo extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to update two contract: $e');
-      rethrow;
+      throw Exception('Failed to update two contract: $e');
     } finally {
       isLoading(false);
     }
   }
 
   // delete
-  Future<void> deleteTwoContract(int id) async {
+  Future<void> deleteApprenticeContract(int id) async {
     try {
       isLoading(true);
-      final endpoint = Common.DeleteTwoID;
+      final endpoint = Common.DeleteApprenticeID;
       final response = await http.delete(
         Uri.parse('${Common.API}$endpoint$id'),
         headers: {'Content-Type': 'application/json'},
@@ -267,39 +254,14 @@ class DashboardControllerTwo extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to delete twoContract: $e');
+      throw Exception('Failed to delete twoContract: $e');
     } finally {
       isLoading(false);
     }
   }
 
-  // xuat file
-  Future<void> exportToExcelTwoContract() async {
-    try {
-      isLoadingExport(true);
-      final response = await http.get(
-        Uri.parse('${Common.API}${Common.TwoGetAll}'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        // Xử lý file Excel
-        Get.snackbar(
-          'Success',
-          'Exported successfully',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } catch (e) {
-      showError('Export failed: $e');
-      rethrow;
-    } finally {
-      isLoadingExport(false);
-    }
-  }
-
   // import file
-  Future<void> importExcelMobileTwoContract(File file) async {
+  Future<void> importExcelMobileContract(File file) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -314,13 +276,13 @@ class DashboardControllerTwo extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
       // 4. Refresh data
-      final List<TwoContract> importedTwoContract = [];
+      final List<ApprenticeContract> importedTwoContract = [];
       int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
-        // Create and populate twoContract
-        final twocontract = TwoContract()
+        // Create
+        final twocontract = ApprenticeContract()
           ..id = 0
           ..vchRCodeApprover
           //'HD2N' + formatDateTime(DateTime.now()).toString()
@@ -350,20 +312,21 @@ class DashboardControllerTwo extends GetxController {
           ..fLGoLeaveLate = row[11]?.value != null
               ? double.tryParse(row[11]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
-          ..fLPaidLeave = row[12]?.value != null
+          ..fLNotLeaveDay = row[12]?.value != null
               ? double.tryParse(row[12]!.value.toString()) ?? 0
               : 0 //double.parse(row[12]!.value.toString())
-          ..fLNotPaidLeave = row[13]?.value != null
-              ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0 //double.parse(row[13]!.value.toString())
-          ..fLNotLeaveDay = row[14]?.value != null
-              ? double.tryParse(row[14]!.value.toString()) ?? 0
-              : 0 //double.parse(row[14]!.value.toString())
-          ..inTViolation = row[15]?.value != null
-              ? int.tryParse(row[15]!.value.toString()) ?? 0
+          ..inTViolation = row[13]?.value != null
+              ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvarchaRHealthResults
+          ..nvarchaRViolation = row[14]!.value.toString()
+          ..vchRLyThuyet
+          ..vchRThucHanh
+          ..vchRCompleteWork
+          ..vchRLearnWork
+          ..vchRThichNghi
+          ..vchRUseful
+          ..vchRContact
+          ..vcHNeedViolation
           ..vchRReasultsLeader
           ..biTNoReEmployment
           ..nvchRNoReEmpoyment
@@ -409,7 +372,7 @@ class DashboardControllerTwo extends GetxController {
       }
 
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(importedTwoContract),
       );
@@ -423,14 +386,12 @@ class DashboardControllerTwo extends GetxController {
       //6 reset data
       await fetchDummyData();
     } catch (e) {
-      showError('Import failed: $e');
-      rethrow;
+      throw Exception('Import failed: $e');
     } finally {
       isLoading(false);
     }
   }
-
-  // nhap file tren web
+    // nhap file tren web
   Future<void> importFromExcelWeb(Uint8List bytes) async {
     try {
       isLoading(true);
@@ -445,13 +406,13 @@ class DashboardControllerTwo extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
       // 4. Refresh data
-      final List<TwoContract> importedTwoContract = [];
+      final List<ApprenticeContract> importedTwoContract = [];
       int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
         // Create and populate
-        final twocontract = TwoContract()
+        final twocontract = ApprenticeContract()
           ..id = 0
           ..vchRCodeApprover //=
           //'HD2N' + formatDateTime(DateTime.now()).toString()
@@ -482,20 +443,21 @@ class DashboardControllerTwo extends GetxController {
           ..fLGoLeaveLate = row[11]?.value != null
               ? double.tryParse(row[11]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
-          ..fLPaidLeave = row[12]?.value != null
+          ..fLNotLeaveDay = row[12]?.value != null
               ? double.tryParse(row[12]!.value.toString()) ?? 0
               : 0 //double.parse(row[12]!.value.toString())
-          ..fLNotPaidLeave = row[13]?.value != null
-              ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0 //double.parse(row[13]!.value.toString())
-          ..fLNotLeaveDay = row[14]?.value != null
-              ? double.tryParse(row[14]!.value.toString()) ?? 0
-              : 0 //double.parse(row[14]!.value.toString())
-          ..inTViolation = row[15]?.value != null
-              ? int.tryParse(row[15]!.value.toString()) ?? 0
+          ..inTViolation = row[13]?.value != null
+              ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvarchaRHealthResults
+          ..nvarchaRViolation = row[14]!.value.toString()
+          ..vchRLyThuyet
+          ..vchRThucHanh
+          ..vchRCompleteWork
+          ..vchRLearnWork
+          ..vchRThichNghi
+          ..vchRUseful
+          ..vchRContact
+          ..vcHNeedViolation
           ..vchRReasultsLeader
           ..biTNoReEmployment
           ..nvchRNoReEmpoyment
@@ -541,7 +503,7 @@ class DashboardControllerTwo extends GetxController {
       }
 
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.AddListTwo}'),
+        Uri.parse('${Common.API}${Common.AddListApprentice}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(importedTwoContract),
       );
@@ -555,13 +517,14 @@ class DashboardControllerTwo extends GetxController {
       //6 reset data
       await fetchDummyData();
     } catch (e) {
-      showError('Import failed: $e');
-      rethrow;
+      throw Exception('Import failed: $e');
     } finally {
       isLoading(false);
     }
   }
 
+
+  // ham format dateTime
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

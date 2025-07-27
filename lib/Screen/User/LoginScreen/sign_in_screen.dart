@@ -24,6 +24,7 @@ class _SignInScreenState extends State<SignInScreen> {
     // Kiểm tra nếu đã đăng nhập thì chuyển thẳng đến MenuScreen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Provider.of<AuthState>(context, listen: false).isAuthenticated) {
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MenuScreen()),
@@ -50,7 +51,10 @@ class _SignInScreenState extends State<SignInScreen> {
     });
     if (response['success'] == true) {
       // Cập nhật trạng thái đăng nhập
-      Provider.of<AuthState>(context, listen: false).login(_adidController.text.trim());
+      Provider.of<AuthState>(
+        context,
+        listen: false,
+      ).login(_adidController.text.trim());
       // Login thành công
       if (!mounted) return;
       Navigator.pushReplacement(

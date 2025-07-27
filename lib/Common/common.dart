@@ -68,6 +68,25 @@ class Common {
   static const String DeleteTwoIDLogic = "ContractTwoYear/delete-logic/";
   static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi/";
   static const String DeleteTwoMultiIDLogic ="ContractTwoYear/delete-logic-multi/";
+  
+  
+  // Contract Apprentice Api
+    static const String ApprenticeGetAll = "ContractApprentice/get-all";
+  static const String GetApprenticeCount = "ContractApprentice/get-count-all";
+  static const String GetByIdApprentice = "ContractApprentice/get/";
+  static const String ApprenticeGetByCount = "ContractApprentice/get-count-by-condition";
+  static const String ApprenticeSreachBy = "ContractApprentice/search-by-condition";
+  // POST
+  static const String AddApprentice = "ContractApprentice/add";
+  static const String AddListApprentice = "ContractApprentice/add-multi";
+  //PUST
+  static const String UpdateApprentice = "ContractApprentice/update/";
+  static const String UpdataListApprentice = "ContractApprentice/update-multi";
+  //DELETE
+  static const String DeleteApprenticeID = "ContractApprentice/delete/";
+  static const String DeleteApprenticeIDLogic = "ContractApprentice/delete-logic/";
+  static const String DeleteApprenticeMultiID = "ContractApprentice/delete-multi/";
+  static const String DeleteApprenticeMultiIDLogic ="ContractApprentice/delete-logic-multi/";
   // font size
   static double sizeColumn = 12;
 }
