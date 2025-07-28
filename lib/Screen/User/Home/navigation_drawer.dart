@@ -13,7 +13,7 @@ import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -23,24 +23,15 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  // Widget _currentBody = HomeScreen(changeBody: (newBody) {},); //TwoContractScreen();
-
-  // // Hàm này sẽ được truyền xuống drawer
-  // void _changeBody(Widget newBody) {
-  //   setState(() {
-  //     _currentBody = newBody;
-  //     Navigator.of(context).pop();
-  //   });
-  // }
   late Widget _currentBody; // Sử dụng late thay vì khởi tạo ngay
 
   @override
   void initState() {
-    super.initState(); 
-    _currentBody = //TwoContractScreen();
-    HomeScreen(
-      changeBody: _changeBody,
-    ); // Khởi tạo trong initState
+    super.initState();
+    _currentBody = FillTwoScreen();
+    // HomeScreen(
+    //   changeBody: _changeBody,
+    // ); // Khởi tạo trong initState
   }
 
   void _changeBody(Widget newBody) {
@@ -75,7 +66,7 @@ class _MenuScreenState extends State<MenuScreen> {
     return AppBar(
       iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
       title: Text(
-        'appTitle'.tr(),
+        tr('appTitle'),
         //"LABOR CONTRACT EVALUATION",
         style: TextStyle(color: Colors.white),
       ),
@@ -134,41 +125,46 @@ class ComplexDrawer extends StatefulWidget {
   final Function(Widget) changeBody; // Callback để thay đổi giao diện
   final BuildContext context;
 
-  const ComplexDrawer({Key? key, required this.changeBody, required this.context}) : super(key: key);
+  const ComplexDrawer({
+    Key? key,
+    required this.changeBody,
+    required this.context,
+  }) : super(key: key);
 
   @override
   _ComplexDrawerState createState() => _ComplexDrawerState();
 }
 
 class _ComplexDrawerState extends State<ComplexDrawer> {
+  final authState = Get.find<AuthState>();
   int selectedIndex = -1; //dont set it to 0
   bool isExpanded = false;
   List<CDM> get cdms {
     return [
-      CDM(Icons.home, 'home'.tr(), ['home'.tr()]),
-      CDM(Icons.grid_view, "master".tr(), [
-        "userManagement".tr(),
-        "pthcInfo".tr(),
-        "screenList".tr(),
+      CDM(Icons.home, tr('home'), [tr('home')]),
+      CDM(Icons.grid_view, tr("master"), [
+        tr("userManagement"),
+        tr("pthcInfo"),
+        tr("screenList"),
       ]),
-      CDM(Icons.subscriptions, 'createEvaluation'.tr(), [
-        "trialContract".tr(),
-        "indefiniteContract".tr(),
-        "preparationApproval".tr(),
+      CDM(Icons.subscriptions, tr('createEvaluation'), [
+        tr("trialContract"),
+        tr("indefiniteContract"),
+        tr("preparationApproval"),
       ]),
-      CDM(Icons.explore, "fillEvaluation".tr(), [
-        "trialContract".tr(),
-        "indefiniteContract".tr(),
+      CDM(Icons.explore, tr("fillEvaluation"), [
+        tr("trialContract"),
+        tr("indefiniteContract"),
       ]),
-      CDM(Icons.markunread_mailbox, "approval".tr(), [
-        "trialContract".tr(),
-        "indefiniteContract".tr(),
+      CDM(Icons.markunread_mailbox, tr("approval"), [
+        tr("trialContract"),
+        tr("indefiniteContract"),
       ]),
-      CDM(Icons.pie_chart, "report".tr(), [
-        "trialContract".tr(),
-        "indefiniteContract".tr(),
+      CDM(Icons.pie_chart, tr("report"), [
+        tr("trialContract"),
+        tr("indefiniteContract"),
       ]),
-      CDM(Icons.settings, "settings".tr(), []),
+      CDM(Icons.settings, tr("settings"), []),
     ];
   }
 
@@ -246,7 +242,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         child: ListTile(
           leading: FlutterLogo(),
           title: Text(
-            'appTitle'.tr(),
+            tr('appTitle'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -465,14 +461,15 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       color: Common.primaryColor,
       child: ListTile(
         leading: accountButton(usePadding: false),
-        title: Text('welcome'.tr(), style: TextStyle(color: Colors.white)),
+        title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
         subtitle: Text(
-          "Nguyễn Duy Khánh",
+          authState.adid ?? 'Chưa đăng nhập',
           style: TextStyle(color: Colors.white70),
         ),
       ),
     );
   }
+
   void expandOrShrinkDrawer() {
     setState(() {
       isExpanded = !isExpanded;

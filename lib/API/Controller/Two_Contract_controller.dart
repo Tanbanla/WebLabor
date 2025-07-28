@@ -21,10 +21,18 @@ class DashboardControllerTwo extends GetxController {
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
 
+  RxString currentStatusId = "".obs;
+
   @override
   void onInit() {
     super.onInit();
-    fetchDummyData();
+    // fetchDummyData();
+    //fetchDataBy(statusId: currentStatusId.value);
+  }
+
+  // Hàm helper để thay đổi status và load lại dữ liệu
+  Future<void> changeStatus(String newStatusId) async {
+    await fetchDataBy(statusId: newStatusId);
   }
 
   void showError(String message) {
@@ -130,6 +138,124 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
+  Future<void> fetchDataBy({String? statusId}) async {
+    try {
+      isLoading(true);
+      if (statusId!.isNotEmpty) {
+        final requestBody = {
+          "pageNumber": -1,
+          "pageSize": 10,
+          "filters": [
+            {
+              "field": "INT_STATUS_ID",
+              "value": statusId,
+              "operator": "=",
+              "logicType": "AND",
+            },
+          ],
+        };
+        final response = await http.post(
+          Uri.parse(Common.API + Common.TwoSreachBy),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(requestBody),
+        );
+
+        if (response.statusCode == 200) {
+          final jsonData = json.decode(response.body);
+          if (jsonData['success'] == true) {
+            // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
+            final List<dynamic> data = jsonData['data']['data'] ?? [];
+
+            dataList.assignAll(
+              data.map((contract) => TwoContract.fromJson(contract)).toList(),
+            );
+
+            filterdataList.assignAll(dataList);
+            selectRows.assignAll(
+              List.generate(dataList.length, (index) => false),
+            );
+          } else {
+            throw Exception(jsonData['message'] ?? 'Failed to load data');
+          }
+        } else {
+          throw Exception('Failed to load Two contract');
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchDataSection({
+    String? statusId,
+    String? section,
+    String? user,
+    String? column,
+  }) async {
+    try {
+      isLoading(true);
+      if (statusId!.isNotEmpty) {
+        final requestBody = 
+        {
+          "pageNumber": -1,
+          "pageSize": 10,
+          "filters": [
+            {
+              "field": "INT_STATUS_ID",
+              "value": statusId,
+              "operator": "=",
+              "logicType": "AND",
+            },
+            {
+              "field": "VCHR_CODE_SECTION",
+              "value": section,
+              "operator": "=",
+              "logicType": "AND",
+            },
+            {
+              "field": column,
+              "value": user,
+              "operator": "=",
+              "logicType": "AND",
+            },
+          ],
+        };
+        final response = await http.post(
+          Uri.parse(Common.API + Common.TwoSreachBy),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(requestBody),
+        );
+
+        if (response.statusCode == 200) {
+          final jsonData = json.decode(response.body);
+          if (jsonData['success'] == true) {
+            // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
+            final List<dynamic> data = jsonData['data']['data'] ?? [];
+
+            dataList.assignAll(
+              data.map((contract) => TwoContract.fromJson(contract)).toList(),
+            );
+
+            filterdataList.assignAll(dataList);
+            selectRows.assignAll(
+              List.generate(dataList.length, (index) => false),
+            );
+          } else {
+            throw Exception(jsonData['message'] ?? 'Failed to load data');
+          }
+        } else {
+          throw Exception('Failed to load Two contract');
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // them danh gia
   Future<void> addTwoContract(TwoContract twocontract, String olded) async {
     try {
@@ -167,7 +293,7 @@ class DashboardControllerTwo extends GetxController {
         body: json.encode(twocontract.toJson()),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -195,7 +321,7 @@ class DashboardControllerTwo extends GetxController {
         body: json.encode(twocontract.toJson()),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -211,29 +337,29 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // udpate to list
-  Future<void> updateListTwoContract(
-    String userApprover,
-  ) async {
+  Future<void> updateListTwoContract(String userApprover) async {
     try {
-         // List<TwoContract> twocontract,
+      // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
-      for (int i = 0; i < twocontract.length; i++){
+      for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = 'khanhmf';
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].inTStatusId = 2;
         twocontract[i].useRApproverPer = userApprover;
+        twocontract[i].vchRCodeApprover =
+            'HD2N' + formatDateTime(DateTime.now()).toString();
       }
-        isLoading(true);
+      isLoading(true);
       final response = await http.put(
         Uri.parse('${Common.API}${Common.UpdataListTwo}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(twocontract),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -259,7 +385,7 @@ class DashboardControllerTwo extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -421,7 +547,7 @@ class DashboardControllerTwo extends GetxController {
         );
       }
       //6 reset data
-      await fetchDummyData();
+      //await fetchDataBy();
     } catch (e) {
       showError('Import failed: $e');
       rethrow;
@@ -553,7 +679,7 @@ class DashboardControllerTwo extends GetxController {
         );
       }
       //6 reset data
-      await fetchDummyData();
+      //await fetchDataBy();
     } catch (e) {
       showError('Import failed: $e');
       rethrow;
@@ -583,5 +709,54 @@ class DashboardControllerTwo extends GetxController {
       }
     }
     return null;
+  }
+
+  // dien danh gia
+  void updateHealthStatus(String employeeCode, String status) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].nvarchaRHealthResults =  status;
+      filterdataList[index].nvarchaRHealthResults =  status;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+  void updateEvaluationStatus(String employeeCode, String status) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRReasultsLeader = status;
+      filterdataList[index].vchRReasultsLeader = status;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+  void updateRehireStatus(String employeeCode, bool value) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].biTNoReEmployment = value;
+      filterdataList[index].biTNoReEmployment = value;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+  void updateNotRehireReason(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].nvchRNoReEmpoyment = reason;
+      filterdataList[index].nvchRNoReEmpoyment = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
   }
 }

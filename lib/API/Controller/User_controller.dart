@@ -9,6 +9,7 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:web_labor_contract/class/User.dart';
+
 class DashboardControllerUser extends GetxController {
   var userList = <User>[].obs;
   var filteredUserList = <User>[].obs;
@@ -53,7 +54,60 @@ class DashboardControllerUser extends GetxController {
     }
   }
 
-  Future<void> sortById(int columnIndex, bool ascending) async{
+  Future<void> fetchDataSection({
+    String? user,
+  }) async {
+    try {
+      isLoading(true);
+      if (user!.isNotEmpty) {
+        final requestBody = 
+        {
+          "pageNumber": -1,
+          "pageSize": 10,
+          "filters": [
+            {
+              "field": "CHR_USERID",
+              "value": user,
+              "operator": "=",
+              "logicType": "AND",
+            }
+          ],
+        };
+        final response = await http.post(
+          Uri.parse(Common.API + Common.UserSreachBy),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(requestBody),
+        );
+
+        if (response.statusCode == 200) {
+          final jsonData = json.decode(response.body);
+          if (jsonData['success'] == true) {
+            // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
+            final List<dynamic> data = jsonData['data']['data'] ?? [];
+
+            userList.assignAll(
+              data.map((contract) => User.fromJson(contract)).toList(),
+            );
+
+            filteredUserList.assignAll(userList);
+            selectRows.assignAll(
+              List.generate(userList.length, (index) => false),
+            );
+          } else {
+            throw Exception(jsonData['message'] ?? 'Failed to load data');
+          }
+        } else {
+          throw Exception('Failed to load Two contract');
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> sortById(int columnIndex, bool ascending) async {
     sortAscending.value = ascending;
     sortColumnIndex.value = columnIndex;
 
@@ -77,7 +131,7 @@ class DashboardControllerUser extends GetxController {
     });
   }
 
-  Future<void> searchQuery(String query) async{
+  Future<void> searchQuery(String query) async {
     if (query.isEmpty) {
       filteredUserList.assignAll(userList);
     } else {
@@ -419,5 +473,41 @@ class DashboardControllerUser extends GetxController {
       }
     }
     return null;
+  }
+
+  // send mail
+  Future<void> SendMail(String code, String to, String cc, String bcc) async {
+    try {
+      isLoading(true);
+      final requestBody = {
+        "master_mail_id": code,
+        "mail_to": to,
+        "mail_cc": cc,
+        "mail_bcc": bcc,
+      };
+      final response = await http.post(
+        Uri.parse(Common.SendMail),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          userList.assignAll(data.map((user) => User.fromJson(user)).toList());
+          filteredUserList.assignAll(userList);
+          selectRows.assignAll(
+            List.generate(userList.length, (index) => false),
+          );
+        }
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
   }
 }

@@ -842,16 +842,17 @@ class MyData extends DataTableSource {
         // thuộc tính approver
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = ""; //item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = "";
+           // item['employeeCode'] as String? ?? '';
 
             return DropdownButton<String>(
               value: status,

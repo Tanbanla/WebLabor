@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
-import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
@@ -33,6 +32,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.changeStatus('1');
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -124,7 +124,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              confirmer.chREmployeeName?? '',
+                              confirmer.chREmployeeName ?? '',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -163,6 +163,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                 await controllerTwo.updateListTwoContract(
                   selectedConfirmerId.value.toString(),
                 );
+                await controllerTwo.changeStatus("1");
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -209,8 +210,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 1),
-                child:
-                Text(
+                child: Text(
                   errorMessage.value,
                   style: TextStyle(color: Colors.red, fontSize: 14),
                 ),
@@ -630,11 +630,13 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                           await controller.importFromExcelWeb(
                             selectedFileData.value!,
                           );
+                          await controller.changeStatus("1");
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileTwoContract(
                             selectedFile.value!,
                           );
+                          await controller.changeStatus("1");
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -993,12 +995,12 @@ class MyData extends DataTableSource {
                   );
                 },
               ),
-              const SizedBox(width: 8),
-              _buildActionButton(
-                icon: Iconsax.eye,
-                color: Colors.green,
-                onPressed: () {}, //=> _showDetailDialog(data),
-              ),
+              // const SizedBox(width: 8),
+              // _buildActionButton(
+              //   icon: Iconsax.eye,
+              //   color: Colors.green,
+              //   onPressed: () {}, //=> _showDetailDialog(data),
+              // ),
             ],
           ),
         ),
@@ -1516,6 +1518,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
@@ -1614,6 +1617,7 @@ class _DeleteTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -1812,8 +1816,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('earlyLateCount'),
-                      onChanged: (value) => twoContract.fLGoLeaveLate =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLGoLeaveLate = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1821,8 +1825,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('paidLeave'),
-                      onChanged: (value) => twoContract.fLPaidLeave =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLPaidLeave = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1836,8 +1840,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('unpaidLeave'),
-                      onChanged: (value) => twoContract.fLNotPaidLeave =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLNotPaidLeave = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1845,8 +1849,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('unreportedLeave'),
-                      onChanged: (value) => twoContract.fLNotLeaveDay =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLNotLeaveDay = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1919,6 +1923,7 @@ class _showAddDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';

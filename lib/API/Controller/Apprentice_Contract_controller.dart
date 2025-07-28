@@ -21,14 +21,18 @@ class DashboardControllerApprentice extends GetxController {
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
 
-
+  RxString currentStatusId = "1".obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchDummyData();
+    //fetchDummyData();
+    //fetchDataBy(statusId: currentStatusId.value);
   }
-
+  // Hàm helper để thay đổi status và load lại dữ liệu
+  Future<void> changeStatus(String newStatusId) async {
+    await fetchDataBy(statusId: newStatusId);
+  }
   List<ApprenticeContract> getSelectedItems() {
     List<ApprenticeContract> selectedItems = [];
     for (int i = 0; i < selectRows.length; i++) {
@@ -120,6 +124,56 @@ class DashboardControllerApprentice extends GetxController {
     }
   }
 
+  Future<void> fetchDataBy({String? statusId}) async {
+    try {
+      isLoading(true);
+      final requestBody = {
+        "pageNumber": -1,
+        "pageSize": 10,
+        "filters": [
+          {
+            "field": "INT_STATUS_ID",
+            "value": statusId,
+            "operator": "=",
+            "logicType": "AND",
+          },
+        ],
+      };
+      final response = await http.post(
+        Uri.parse(Common.API + Common.ApprenticeSreachBy),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
+          final List<dynamic> data = jsonData['data']['data'] ?? [];
+
+          dataList.assignAll(
+            data
+                .map((contract) => ApprenticeContract.fromJson(contract))
+                .toList(),
+          );
+
+          filterdataList.assignAll(dataList);
+          selectRows.assignAll(
+            List.generate(dataList.length, (index) => false),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load Two contract');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // api post
   Future<void> addApprenticeContract(
     ApprenticeContract contract,
@@ -159,7 +213,7 @@ class DashboardControllerApprentice extends GetxController {
         body: json.encode(contract.toJson()),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -186,7 +240,7 @@ class DashboardControllerApprentice extends GetxController {
         body: json.encode(contract.toJson()),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -213,6 +267,7 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].inTStatusId = 2;
         contract[i].useRApproverPer = userApprover;
+        contract[i].vchRCodeApprover = 'HNTV' + formatDateTime(DateTime.now()).toString();
       }
       isLoading(true);
       final response = await http.put(
@@ -221,7 +276,7 @@ class DashboardControllerApprentice extends GetxController {
         body: json.encode(contract),
       );
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -246,7 +301,7 @@ class DashboardControllerApprentice extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        await fetchDummyData();
+        ////await fetchDataBy();
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -307,8 +362,8 @@ class DashboardControllerApprentice extends GetxController {
           ..chRPosition = row[7]?.value?.toString()
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
-          ..dtMJoinDate = row[9]?.value?.toString()
-          ..dtMEndDate = row[10]?.value?.toString()
+          ..dtMJoinDate = formatDateTime(row[9]?.value?.toString())
+          ..dtMEndDate = formatDateTime(row[10]?.value?.toString())
           ..fLGoLeaveLate = row[11]?.value != null
               ? double.tryParse(row[11]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
@@ -318,7 +373,7 @@ class DashboardControllerApprentice extends GetxController {
           ..inTViolation = row[13]?.value != null
               ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[14]!.value.toString()
+          ..nvarchaRViolation // = row[14]!.value.toString()
           ..vchRLyThuyet
           ..vchRThucHanh
           ..vchRCompleteWork
@@ -384,14 +439,15 @@ class DashboardControllerApprentice extends GetxController {
         );
       }
       //6 reset data
-      await fetchDummyData();
+      //await fetchDataBy();
     } catch (e) {
       throw Exception('Import failed: $e');
     } finally {
       isLoading(false);
     }
   }
-    // nhap file tren web
+
+  // nhap file tren web
   Future<void> importFromExcelWeb(Uint8List bytes) async {
     try {
       isLoading(true);
@@ -438,8 +494,8 @@ class DashboardControllerApprentice extends GetxController {
           ..chRPosition = row[7]?.value?.toString()
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
-          ..dtMJoinDate = row[9]?.value?.toString()
-          ..dtMEndDate = row[10]?.value?.toString()
+          ..dtMJoinDate = formatDateTime(row[9]?.value?.toString())
+          ..dtMEndDate = formatDateTime(row[10]?.value?.toString())
           ..fLGoLeaveLate = row[11]?.value != null
               ? double.tryParse(row[11]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
@@ -449,7 +505,7 @@ class DashboardControllerApprentice extends GetxController {
           ..inTViolation = row[13]?.value != null
               ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[14]!.value.toString()
+          ..nvarchaRViolation //= row[14]!.value.toString()
           ..vchRLyThuyet
           ..vchRThucHanh
           ..vchRCompleteWork
@@ -501,7 +557,6 @@ class DashboardControllerApprentice extends GetxController {
       if (importedTwoContract.isEmpty) {
         throw Exception('Không có dữ liệu hợp lệ để import');
       }
-
       final response = await http.post(
         Uri.parse('${Common.API}${Common.AddListApprentice}'),
         headers: {'Content-Type': 'application/json'},
@@ -515,14 +570,13 @@ class DashboardControllerApprentice extends GetxController {
         );
       }
       //6 reset data
-      await fetchDummyData();
+      //await fetchDataBy();
     } catch (e) {
       throw Exception('Import failed: $e');
     } finally {
       isLoading(false);
     }
   }
-
 
   // ham format dateTime
   String? formatDateTime(dynamic value) {

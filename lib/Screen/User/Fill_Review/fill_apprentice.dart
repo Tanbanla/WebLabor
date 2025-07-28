@@ -56,299 +56,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   }
 
   Widget _buildApproverPer() {
-    String? _selectedConfirmer;
-
-    // Danh sách người có thể xác nhận (có thể lấy từ API hoặc local)
-    final List<Map<String, String>> _confirmersList = [
-      {'id': '1', 'name': 'Nguyễn Văn A', 'position': 'Trưởng phòng'},
-      {'id': '2', 'name': 'Trần Thị B', 'position': 'Phó phòng'},
-      {'id': '3', 'name': 'Lê Văn C', 'position': 'Quản lý nhân sự'},
-      {'id': '4', 'name': 'Phạm Thị D', 'position': 'Giám đốc'},
-    ];
-    final List<Map<String, String>> _sectionsList = [
-      {'id': '1', 'name': 'R&D-IT'},
-      {'id': '2', 'name': 'R&D-EE'},
-    ];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Mã đợt phát hành: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            const CustomField1(
-              icon: Icons.apartment,
-              obscureText: false,
-              hinText: 'Nhập mã đợt',
-            ),
-          ],
-        ),
-        // tim kiem theo nhóm
-        const SizedBox(width: 30),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Nhóm: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            DropdownButton<String>(
-              value: _selectedConfirmer,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: 14,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              hint: const Text('Chọn nhóm'),
-              items: _sectionsList.map((confirmer) {
-                return DropdownMenuItem<String>(
-                  value: confirmer['id'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Icon(
-                          Icons.room_preferences,
-                          color: Colors.blue,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              confirmer['name'] ?? '',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedConfirmer = newValue;
-                });
-              },
-            ),
-            if (_selectedConfirmer != null) const SizedBox(width: 8),
-            if (_selectedConfirmer != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  setState(() {
-                    _selectedConfirmer = null;
-                  });
-                },
-              ),
-          ],
-        ),
-        // tim kien theo vi tri
-        const SizedBox(width: 30),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Vị trí: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            DropdownButton<String>(
-              value: _selectedConfirmer,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: 14,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              hint: const Text('Chọn vị trí'),
-              items: _sectionsList.map((confirmer) {
-                return DropdownMenuItem<String>(
-                  value: confirmer['id'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Icon(
-                          Icons.room_preferences,
-                          color: Colors.blue,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              confirmer['name'] ?? '',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedConfirmer = newValue;
-                });
-              },
-            ),
-            if (_selectedConfirmer != null) const SizedBox(width: 8),
-            if (_selectedConfirmer != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  setState(() {
-                    _selectedConfirmer = null;
-                  });
-                },
-              ),
-          ],
-        ),
-        // xac nhan
-        const SizedBox(width: 30),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Người xác nhận: ',
-              style: TextStyle(
-                color: Common.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 6),
-            DropdownButton<String>(
-              value: _selectedConfirmer,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: 14,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Common.primaryColor.withOpacity(0.8),
-              ),
-              hint: const Text('Chọn người xác nhận'),
-              items: _confirmersList.map((confirmer) {
-                return DropdownMenuItem<String>(
-                  value: confirmer['id'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Icon(Icons.person, color: Colors.blue, size: 16),
-                      ),
-                      const SizedBox(width: 8),
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              confirmer['name'] ?? '',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              confirmer['position'] ?? '',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedConfirmer = newValue;
-                });
-                // Có thể thêm logic xử lý khi chọn người xác nhận ở đây
-              },
-            ),
-            if (_selectedConfirmer != null) const SizedBox(width: 8),
-            if (_selectedConfirmer != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  setState(() {
-                    _selectedConfirmer = null;
-                  });
-                },
-              ),
-          ],
-        ),
-        const SizedBox(width: 30),
-        // Button gửi
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 130,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Common.primaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: const Center(
-              child: Text(
-                'Gửi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return Container();
   }
 
   Widget _buildHeader() {
@@ -874,13 +582,15 @@ class MyData extends DataTableSource {
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
+            final status = "";
+            //item?['evaluationStatus'] as String? ?? 'OK';
+            final id = "";
+            //item?['employeeCode'] as String? ?? '';
 
             return DropdownButton<String>(
               value: status,
@@ -986,17 +696,19 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
             // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = "";
+            //item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = "";
+            //item['employeeCode'] as String? ?? '';
 
             return DropdownButton<String>(
               value: status,
@@ -1245,7 +957,8 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
-class DashboardControllerFill  extends GetxController {
+
+class DashboardControllerFill extends GetxController {
   var dataList = <Map<String, String>>[].obs;
   var filterdataList = <Map<String, String>>[].obs;
   RxList<bool> selectRows = <bool>[].obs;

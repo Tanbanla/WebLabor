@@ -25,6 +25,7 @@ class _SignInScreenState extends State<SignInScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Provider.of<AuthState>(context, listen: false).isAuthenticated) {
         if (!mounted) return;
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MenuScreen()),
@@ -32,7 +33,6 @@ class _SignInScreenState extends State<SignInScreen> {
       }
     });
   }
-
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -44,31 +44,21 @@ class _SignInScreenState extends State<SignInScreen> {
     final response = await AuthService.login(
       userADID: _adidController.text.trim(),
       password: _passwordController.text.trim(),
+      context: context, // Thêm context
     );
 
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
+
     if (response['success'] == true) {
-      // Cập nhật trạng thái đăng nhập
-      Provider.of<AuthState>(
-        context,
-        listen: false,
-      ).login(_adidController.text.trim());
-      // Login thành công
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MenuScreen()),
       );
     } else {
-      // Hiển thị lỗi
-      setState(() {
-        _errorMessage = response['message'];
-      });
+      setState(() => _errorMessage = response['message']);
     }
   }
-
   @override
   void dispose() {
     _adidController.dispose();

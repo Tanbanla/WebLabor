@@ -12,7 +12,6 @@ import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:universal_html/html.dart' as html;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:web_labor_contract/class/User_Approver.dart';
@@ -33,6 +32,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.changeStatus('1');
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -163,6 +163,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                 await controllerTwo.updateListApprenticeContract(
                   selectedConfirmerId.value.toString(),
                 );
+                await controllerTwo.changeStatus("1");
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -459,18 +460,18 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('paidLeave'),
-                    width: 100,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('unpaidLeave'),
-                    width: 90,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
+                  // DataColumnCustom(
+                  //   title: tr('paidLeave'),
+                  //   width: 100,
+                  //   maxLines: 2,
+                  //   fontSize: Common.sizeColumn,
+                  // ).toDataColumn2(),
+                  // DataColumnCustom(
+                  //   title: tr('unpaidLeave'),
+                  //   width: 90,
+                  //   maxLines: 2,
+                  //   fontSize: Common.sizeColumn,
+                  // ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('unreportedLeave'),
                     width: 90,
@@ -664,11 +665,13 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                           await controller.importFromExcelWeb(
                             selectedFileData.value!,
                           );
+                          await controller.changeStatus("1");
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileContract(
                             selectedFile.value!,
                           );
+                          await controller.changeStatus("1");
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -774,8 +777,8 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   TextCellValue(tr('contractEffective')),
                   TextCellValue(tr('contractEndDate')),
                   TextCellValue(tr('earlyLateCount')),
-                  TextCellValue(tr('paidLeave')),
-                  TextCellValue(tr('unpaidLeave')),
+                  // TextCellValue(tr('paidLeave')),
+                  // TextCellValue(tr('unpaidLeave')),
                   TextCellValue(tr('unreportedLeave')),
                   TextCellValue(tr('violationCount')),
                   TextCellValue(tr('reason')),
@@ -835,6 +838,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                     TextCellValue(item.vchRContact.toString()), 
                     TextCellValue(item.vcHNeedViolation.toString()), 
                     TextCellValue(item.vchRReasultsLeader ?? ''),
+                    TextCellValue(item.vchRNote.toString()), 
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
                   ]);
@@ -1040,12 +1044,12 @@ class MyData extends DataTableSource {
                   );
                 },
               ),
-              const SizedBox(width: 8),
-              _buildActionButton(
-                icon: Iconsax.eye,
-                color: Colors.green,
-                onPressed: () {}, //=> _showDetailDialog(data),
-              ),
+              // const SizedBox(width: 8),
+              // _buildActionButton(
+              //   icon: Iconsax.eye,
+              //   color: Colors.green,
+              //   onPressed: () {}, //=> _showDetailDialog(data),
+              // ),
             ],
           ),
         ),
@@ -1127,12 +1131,6 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-            data.reactive.toString(),
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
             data.fLNotLeaveDay?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
@@ -1145,11 +1143,10 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-            "",
+            data.nvarchaRViolation?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        //5 thuộc tính đánh giá
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
@@ -1159,98 +1156,6 @@ class MyData extends DataTableSource {
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(
-          Obx(() {
-            final item = controller.filterdataList[index];
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final status = item.vchRLyThuyet ?? 'OK';
-            final id = item.vchREmployeeId ?? '';
-
-            return DropdownButton<String>(
-              value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn,
-                color: _getStatusColor(status),
-              ), // Changed to 12
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.cancel, color: Colors.red, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.pause_circle,
-                        color: Colors.orange,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: (newValue) {
-                if (newValue != null && id.isNotEmpty) {
-                  // controller.updateEvaluationStatus(id, newValue);
-                  // controller.filterdataList.refresh();
-                }
-              },
-            );
-          }),
-        ),
         DataCell(
           TextFormField(
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
@@ -1271,68 +1176,7 @@ class MyData extends DataTableSource {
             },
           ),
         ),
-        DataCell(
-          Obx(() {
-            final item = controller.filterdataList[index];
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
-            final rawStatus = item.vchRThucHanh;
-            final status = (rawStatus == 'OK' || rawStatus == 'NG')
-                ? rawStatus
-                : 'NG';
-            final employeeCode = item.vchREmployeeId ?? '';
-
-            return DropdownButton<String>(
-              value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn,
-                color: _getStatusColor(status),
-              ), // Changed to 12
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(fontSize: Common.sizeColumn),
-                      ), // Added fontSize 12
-                    ],
-                  ),
-                ),
-              ],
-              onChanged: (newValue) {
-                if (newValue != null && employeeCode.isNotEmpty) {
-                 //controller.updateRehireStatus(employeeCode, newValue);
-                  controller.filterdataList.refresh();
-                }
-              },
-            );
-          }),
-        ),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           TextFormField(
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
@@ -1355,21 +1199,6 @@ class MyData extends DataTableSource {
         ),
       ],
     );
-  }
-
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'OK':
-        return Colors.green;
-      case 'NG':
-        return Colors.red;
-      case 'Stop Working':
-        return Colors.orange;
-      case 'Finish L/C':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
   }
 
   Widget _buildActionButton({
@@ -1586,7 +1415,7 @@ class _EditContractDialog extends StatelessWidget {
                       initialValue: contract.fLGoLeaveLate?.toString(),
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
-                          edited.fLGoLeaveLate = double.tryParse(value ?? '0'),
+                          edited.fLGoLeaveLate = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1596,7 +1425,7 @@ class _EditContractDialog extends StatelessWidget {
                       initialValue: contract.fLNotLeaveDay?.toString(),
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
-                          edited.fLNotLeaveDay = double.tryParse(value ?? '0'),
+                          edited.fLNotLeaveDay = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1611,7 +1440,7 @@ class _EditContractDialog extends StatelessWidget {
                       initialValue: contract.inTViolation?.toString(),
                       label: tr('violationCount'),
                       onChanged: (value) =>
-                          edited.inTViolation = int.tryParse(value ?? '0'),
+                          edited.inTViolation = int.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1678,6 +1507,7 @@ class _EditContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
@@ -1776,6 +1606,7 @@ class _DeleteContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -1975,7 +1806,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('earlyLateCount'),
                       onChanged: (value) => twoContract.fLGoLeaveLate =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1984,7 +1815,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('unreportedLeave'),
                       onChanged: (value) => twoContract.fLNotLeaveDay =
-                          double.tryParse(value ?? '0'),
+                          double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1999,7 +1830,7 @@ class _showAddDialog extends StatelessWidget {
                     child: _buildCompactTextField(
                       label: tr('violationCount'),
                       onChanged: (value) =>
-                          twoContract.inTViolation = int.tryParse(value ?? '0'),
+                          twoContract.inTViolation = int.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -2057,6 +1888,7 @@ class _showAddDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
+                      await controller.changeStatus("1");
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';

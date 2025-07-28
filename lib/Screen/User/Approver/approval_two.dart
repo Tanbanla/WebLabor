@@ -634,54 +634,6 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     );
   }
 
-  void _showImportDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Import Dữ Liệu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chọn file Excel để import dữ liệu',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Iconsax.document_upload),
-              label: const Text('Chọn File'),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Import logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Import'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showExportDialog() {
     Get.dialog(
       AlertDialog(
@@ -729,65 +681,6 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         const SizedBox(height: 8),
         Text(label, style: TextStyle(color: Colors.grey[700])),
       ],
-    );
-  }
-
-  void _showAddDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm User Mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Mã nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Tên nhân viên',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                decoration: InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: ['RD', 'HR', 'Finance', 'Marketing']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              // Add logic
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -965,13 +858,13 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
+            final status = 'OK';
+            final id = '';
 
             return DropdownButton<String>(
               value: status,
@@ -1043,16 +936,17 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = ""; //item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = "";
+            //item['employeeCode'] as String? ?? '';
 
             return DropdownButton<String>(
               value: status,

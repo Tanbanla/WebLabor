@@ -87,6 +87,10 @@ class Common {
   static const String DeleteApprenticeIDLogic = "ContractApprentice/delete-logic/";
   static const String DeleteApprenticeMultiID = "ContractApprentice/delete-multi/";
   static const String DeleteApprenticeMultiIDLogic ="ContractApprentice/delete-logic-multi/";
+  
+  // Send mail
+  static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
+  
   // font size
   static double sizeColumn = 12;
 }

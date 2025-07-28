@@ -657,6 +657,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ),
     );
   }
+
   void _showExportDialog() {
     Get.dialog(
       AlertDialog(
@@ -866,13 +867,13 @@ class MyData extends DataTableSource {
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final status = item?['evaluationStatus'] as String? ?? 'OK';
-            final id = item?['employeeCode'] as String? ?? '';
+            final status = 'OK';
+            final id = '';
 
             return DropdownButton<String>(
               value: status,
@@ -978,17 +979,18 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Obx(() {
-            final item = controller.filterdataList[index];
+            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
             // Lấy giá trị notRehire, mặc định là 'NG' nếu null hoặc không hợp lệ
-            final rawStatus = item['notRehire'] as String?;
+            final rawStatus = ""; //item['notRehire'] as String?;
             final status = (rawStatus == 'OK' || rawStatus == 'NG')
                 ? rawStatus
                 : 'NG';
-            final employeeCode = item['employeeCode'] as String? ?? '';
+            final employeeCode = '';
+            //item['employeeCode'] as String? ?? '';
 
             return DropdownButton<String>(
               value: status,
