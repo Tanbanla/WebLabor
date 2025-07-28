@@ -13,7 +13,8 @@ import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -136,7 +137,6 @@ class ComplexDrawer extends StatefulWidget {
 }
 
 class _ComplexDrawerState extends State<ComplexDrawer> {
-  final authState = Get.find<AuthState>();
   int selectedIndex = -1; //dont set it to 0
   bool isExpanded = false;
   List<CDM> get cdms {
@@ -457,6 +457,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   }
 
   Widget accountTile() {
+    final authState = Provider.of<AuthState>(context, listen: true);
     return Container(
       color: Common.primaryColor,
       child: ListTile(

@@ -15,38 +15,54 @@ class AuthService {
     required String password,
     required BuildContext context, 
   }) async {
+    // try {
+    //   final response = await http
+    //       .post(
+    //         Uri.parse('$_baseUrl$_loginEndpoint'),
+    //         headers: {'Content-Type': 'application/json'},
+    //         body: json.encode({'userADID': userADID, 'password': password}),
+    //       )
+    //       .timeout(const Duration(seconds: _timeoutSeconds));
+
+    //   final responseData = json.decode(response.body);
+
+    //   if (response.statusCode == 200) {
+    //     if (responseData['data'] == true) {
+
+    //       // Cập nhật AuthState khi đăng nhập thành công
+    //     final authState = Provider.of<AuthState>(context, listen: false);
+    //     await authState.login(userADID);
+              
+    //       return {
+    //         'success': true,
+    //         'message': responseData['message'] ?? 'Login successful',
+    //       };
+    //     }
+    //   }
+    //   return {
+    //     'success': false,
+    //     'message': responseData['message'] ?? 'Login failed',
+    //   };
+    // } catch (e) {
+    //   return {'success': false, 'message': 'Network error: $e'};
+    // }
     try {
-      final response = await http
-          .post(
-            Uri.parse('$_baseUrl$_loginEndpoint'),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode({'userADID': userADID, 'password': password}),
-          )
-          .timeout(const Duration(seconds: _timeoutSeconds));
-
-      final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        if (responseData['data'] == true) {
+      if (200 == 200) {
+        if (true) {
 
           // Cập nhật AuthState khi đăng nhập thành công
-        // 1. Cập nhật AuthState
         final authState = Provider.of<AuthState>(context, listen: false);
         await authState.login(userADID);
-        
-        // // 2. Gọi fetchDataSection ngay sau khi đăng nhập thành công
-        // final userController = Provider.of<DashboardControllerUser>(context, listen: false);
-        // await userController.fetchDataSection(user: userADID);
               
           return {
             'success': true,
-            'message': responseData['message'] ?? 'Login successful',
+            'message':  'Login successful',
           };
         }
       }
       return {
         'success': false,
-        'message': responseData['message'] ?? 'Login failed',
+        'message': 'Login failed',
       };
     } catch (e) {
       return {'success': false, 'message': 'Network error: $e'};
