@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
@@ -16,6 +17,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:web_labor_contract/class/User_Approver.dart';
 import 'package:excel/excel.dart' hide Border;
+import 'package:provider/provider.dart';
 
 class ApprenticeContractScreen extends StatefulWidget {
   const ApprenticeContractScreen({super.key});
@@ -32,7 +34,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
 
   @override
   Widget build(BuildContext context) {
-    controller.changeStatus('1');
+    controller.changeStatus('1',null,null);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -69,15 +71,12 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   }
 
   Widget _buildApproverPer() {
-    final controller = Get.put(
-      DashboardControllerUserApprover(
-        section: 'ADM-PER',
-        chucvu: 'Chief,Section Manager',
-      ),
-    );
+    final controller = Get.put(DashboardControllerUserApprover(),);
+    controller.changeStatus('ADM-PER', 'Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     return Obx(() {
       return Row(
@@ -161,9 +160,9 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               try {
                 final controllerTwo = Get.find<DashboardControllerApprentice>();
                 await controllerTwo.updateListApprenticeContract(
-                  selectedConfirmerId.value.toString(),
-                );
-                await controllerTwo.changeStatus("1");
+                  selectedConfirmerId.value.toString(), authState.user!.chRUserid.toString()
+                ); 
+                await controllerTwo.changeStatus("1",null,null);
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -460,18 +459,6 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
-                  // DataColumnCustom(
-                  //   title: tr('paidLeave'),
-                  //   width: 100,
-                  //   maxLines: 2,
-                  //   fontSize: Common.sizeColumn,
-                  // ).toDataColumn2(),
-                  // DataColumnCustom(
-                  //   title: tr('unpaidLeave'),
-                  //   width: 90,
-                  //   maxLines: 2,
-                  //   fontSize: Common.sizeColumn,
-                  // ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('unreportedLeave'),
                     width: 90,
@@ -564,6 +551,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     showDialog(
       context: context,
@@ -663,15 +651,15 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                         if (kIsWeb) {
                           // Xử lý web
                           await controller.importFromExcelWeb(
-                            selectedFileData.value!,
+                            selectedFileData.value!, authState.user!.chRUserid.toString()
                           );
-                          await controller.changeStatus("1");
+                          await controller.changeStatus("1",null, null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileContract(
-                            selectedFile.value!,
+                            selectedFile.value!,authState.user!.chRUserid.toString()
                           );
-                          await controller.changeStatus("1");
+                          await controller.changeStatus("1",null,null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -1160,7 +1148,7 @@ class MyData extends DataTableSource {
           TextFormField(
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
-              labelText: 'Ghi chú',
+              labelText: tr('note'),
               labelStyle: TextStyle(
                 fontSize: Common.sizeColumn,
               ), // Added fontSize 12
@@ -1170,7 +1158,7 @@ class MyData extends DataTableSource {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập ghi chú';
+                return tr('pleaseNote');
               }
               return null;
             },
@@ -1181,7 +1169,7 @@ class MyData extends DataTableSource {
           TextFormField(
             style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
             decoration: InputDecoration(
-              labelText: 'Lý do',
+              labelText: tr('reason'),
               labelStyle: TextStyle(
                 fontSize: Common.sizeColumn,
               ), // Added fontSize 12
@@ -1191,7 +1179,7 @@ class MyData extends DataTableSource {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập lý do';
+                return tr('pleaseReason');
               }
               return null;
             },
@@ -1228,6 +1216,7 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
+
 class _EditContractDialog extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
@@ -1238,6 +1227,7 @@ class _EditContractDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = ApprenticeContract.fromJson(contract.toJson());
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -1444,14 +1434,6 @@ class _EditContractDialog extends StatelessWidget {
                       keyboardType: TextInputType.number,
                     ),
                   ),
-                  // const SizedBox(width: 10),
-                  // Expanded(
-                  //   child: _buildCompactTextField(
-                  //     initialValue: twoContract.vchRCodeApprover,
-                  //     label: tr('CodeApprover'),
-                  //     onChanged: (value) => edited.vchRCodeApprover = value,
-                  //   ),
-                  // ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -1503,11 +1485,11 @@ class _EditContractDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      await controller.updateApprenticeContract(edited);
+                      await controller.updateApprenticeContract(edited, authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1",null,null);
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
@@ -1606,7 +1588,7 @@ class _DeleteContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1",null,null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -1627,6 +1609,7 @@ class _showAddDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DashboardControllerApprentice>();
+    final authState = Provider.of<AuthState>(context, listen: true);
     var twoContract = ApprenticeContract();
     RxString errorMessage = ''.obs;
     String olded = '0';
@@ -1698,14 +1681,6 @@ class _showAddDialog extends StatelessWidget {
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
                   ),
-                  // const SizedBox(width: 10),
-                  // SizedBox(
-                  //   width: 100,
-                  //   child: _buildCompactTextField(
-                  //     label: tr('gender'),
-                  //     onChanged: (value) => twoContract.vchRTyperId = value,
-                  //   ),
-                  // ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -1884,11 +1859,11 @@ class _showAddDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      await controller.addApprenticeContract(twoContract, olded);
+                      await controller.addApprenticeContract(twoContract, olded, authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1",null,null);
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';

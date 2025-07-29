@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
@@ -18,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:web_labor_contract/class/User_Approver.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 
 class TwoContractScreen extends StatefulWidget {
   const TwoContractScreen({super.key});
@@ -32,7 +34,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
   @override
   Widget build(BuildContext context) {
-    controller.changeStatus('1');
+    controller.changeStatus('1', null, null);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -69,15 +71,12 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   }
 
   Widget _buildApproverPer() {
-    final controller = Get.put(
-      DashboardControllerUserApprover(
-        section: 'ADM-PER',
-        chucvu: 'Chief,Section Manager',
-      ),
-    );
+    final controller = Get.put(DashboardControllerUserApprover(),);
+    controller.changeStatus('ADM-PER', 'Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     return Obx(() {
       return Row(
@@ -160,10 +159,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
               }
               try {
                 final controllerTwo = Get.find<DashboardControllerTwo>();
-                await controllerTwo.updateListTwoContract(
+                await controllerTwo.updateListTwoContractPer(
                   selectedConfirmerId.value.toString(),
+                  authState.user!.chRUserid.toString(),
                 );
-                await controllerTwo.changeStatus("1");
+                await controllerTwo.changeStatus("1", null, null);
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -529,6 +529,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     showDialog(
       context: context,
@@ -629,14 +630,16 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                           // Xử lý web
                           await controller.importFromExcelWeb(
                             selectedFileData.value!,
+                            authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1");
+                          await controller.changeStatus("1", null, null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileTwoContract(
                             selectedFile.value!,
+                            authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1");
+                          await controller.changeStatus("1", null, null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -1222,7 +1225,7 @@ class _EditTwoContractDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = TwoContract.fromJson(twoContract.toJson());
     RxString errorMessage = ''.obs;
-
+    final authState = Provider.of<AuthState>(context, listen: true);
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1514,11 +1517,14 @@ class _EditTwoContractDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      await controller.updateTwoContract(edited);
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1", null, null);
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
@@ -1617,7 +1623,7 @@ class _DeleteTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1", null, null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -1641,6 +1647,8 @@ class _showAddDialog extends StatelessWidget {
     var twoContract = TwoContract();
     RxString errorMessage = ''.obs;
     String olded = '0';
+    final authState = Provider.of<AuthState>(context, listen: true);
+
     return AlertDialog(
       titlePadding: EdgeInsets.fromLTRB(20, 20, 20, 10),
       contentPadding: EdgeInsets.symmetric(horizontal: 20),
@@ -1919,11 +1927,15 @@ class _showAddDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      await controller.addTwoContract(twoContract, olded);
+                      await controller.addTwoContract(
+                        twoContract,
+                        olded,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
+                      await controller.changeStatus("1", null, null);
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';

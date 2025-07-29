@@ -29,10 +29,10 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    _currentBody = FillTwoScreen();
-    // HomeScreen(
-    //   changeBody: _changeBody,
-    // ); // Khởi tạo trong initState
+    _currentBody = //FillTwoScreen();
+    HomeScreen(
+      changeBody: _changeBody,
+    ); // Khởi tạo trong initState
   }
 
   void _changeBody(Widget newBody) {
@@ -56,7 +56,7 @@ class _MenuScreenState extends State<MenuScreen> {
       //     : body(),
       drawer: ComplexDrawer(
         changeBody: _changeBody,
-        context: context, // Truyền hàm callback xuống drawer
+        context: context, 
       ),
       drawerScrimColor: Colors.transparent,
       backgroundColor: Colors.white,
@@ -464,7 +464,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         leading: accountButton(usePadding: false),
         title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
         subtitle: Text(
-          authState.adid ?? 'Chưa đăng nhập',
+          authState.user?.nvchRNameId.toString() ?? 'Chưa đăng nhập',
           style: TextStyle(color: Colors.white70),
         ),
       ),

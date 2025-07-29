@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
@@ -17,6 +18,7 @@ import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:web_labor_contract/class/User_Approver.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 class FillTwoScreen extends StatefulWidget {
   const FillTwoScreen({super.key});
@@ -31,7 +33,24 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    controller.changeStatus('2');
+    final authState = Provider.of<AuthState>(context, listen: true);
+    String sectionName = authState.user!.chRSecCode
+        .toString()
+        .split(':')[1]
+        .trim();
+    // phan xem ai dang vao man so sanh
+    // if(authState.user!.chRGroup.toString() == "PTHC"){
+    //   // truong hop PTHC phong ban
+    //   controller.changeStatus('3', sectionName, null);
+    // }else{
+    //   // truong hop leader
+    //   controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString());
+    // }
+    controller.changeStatus(
+      '2',
+      sectionName,
+      authState.user!.chRUserid.toString(),
+    );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -68,12 +87,13 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
   }
 
   Widget _buildApproverPer() {
-    final controller = Get.put(
-      DashboardControllerUserApprover(
-        section: 'ADM-PER',
-        chucvu: 'Chief,Section Manager',
-      ),
-    );
+    final authState = Provider.of<AuthState>(context, listen: true);
+    String sectionName = authState.user!.chRSecCode
+        .toString()
+        .split(':')[1]
+        .trim();
+    final controller = Get.put(DashboardControllerUserApprover());
+    controller.changeStatus(sectionName, 'Leader,Supervisor,Staff');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
     RxString errorMessage = ''.obs;
@@ -159,8 +179,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
               }
               try {
                 final controllerTwo = Get.find<DashboardControllerTwo>();
-                await controllerTwo.updateListTwoContract(
+                await controllerTwo.updateListTwoContractFill(
                   selectedConfirmerId.value.toString(),
+                  authState.user!.chRUserid.toString(),
                 );
               } catch (e) {
                 errorMessage.value =
@@ -298,7 +319,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         buildActionButton(
           icon: Iconsax.export,
           color: Colors.green,
-          tooltip: 'Export dữ liệu',
+          tooltip: tr('export'),
           onPressed: () => _showExportDialog(),
         ),
       ],
@@ -1056,7 +1077,13 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('O', style: TextStyle(fontSize: Common.sizeColumn,color: Colors.green)),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1066,7 +1093,13 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('X', style: TextStyle(fontSize: Common.sizeColumn, color: Colors.red)),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1141,150 +1174,6 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class DashboardControllerFillTwo extends GetxController {
-  var dataList = <Map<String, String>>[].obs;
-  var filterdataList = <Map<String, String>>[].obs;
-  RxList<bool> selectRows = <bool>[].obs;
-  RxInt sortCloumnIndex = 0.obs;
-  RxBool sortAscending = true.obs;
-  final searchTextController = TextEditingController();
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchDummyData();
-  }
-
-  void sortById(int sortColumnIndex, bool ascending) {
-    sortAscending.value = ascending;
-    filterdataList.sort((a, b) {
-      final aValue = a['employeeCode']?.toLowerCase() ?? '';
-      final bValue = b['employeeCode']?.toLowerCase() ?? '';
-      return ascending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
-    });
-    this.sortCloumnIndex.value = sortColumnIndex;
-  }
-
-  void searchQuery(String query) {
-    if (query.isEmpty) {
-      filterdataList.assignAll(dataList);
-    } else {
-      filterdataList.assignAll(
-        dataList.where(
-          (item) =>
-              (item['employeeCode']?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item['fullName']?.toLowerCase().contains(query.toLowerCase()) ??
-                  false),
-        ),
-      );
-    }
-  }
-
-  void deleteItem(Map<String, String> item) {
-    dataList.remove(item);
-    filterdataList.remove(item);
-    selectRows.removeAt(dataList.indexOf(item));
-  }
-
-  // các trường đánh giá
-  void updateReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['reason'] = reason;
-      dataList.refresh();
-    }
-  }
-
-  void updateHealthStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['healthStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateEvaluationStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['evaluationStatus'] = status;
-      dataList.refresh();
-    }
-  }
-
-  void updateRehireStatus(String employeeCode, String value) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['notRehire'] = value;
-      dataList.refresh();
-    }
-  }
-
-  void updateNotRehireReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item['employeeCode'] == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index]['notRehireReason'] = reason;
-      dataList.refresh();
-    }
-  }
-
-  //
-  void fetchDummyData() {
-    final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
-    final genders = ['M', 'F'];
-    final groups = ['Nhóm 1', 'Nhóm 2', 'Nhóm 3'];
-    final positions = ['Nhân viên', 'Trưởng nhóm', 'Quản lý', 'Giám đốc'];
-
-    dataList.assignAll(
-      List.generate(50, (index) {
-        final dept = departments[index % departments.length];
-        final gender = genders[index % genders.length];
-        final group = groups[index % groups.length];
-        final position = positions[index % positions.length];
-
-        return {
-          'employeeCode': 'NV${1000 + index}',
-          'gender': gender,
-          'fullName': 'Nguyễn Văn ${String.fromCharCode(65 + index % 26)}',
-          'department': dept,
-          'group': group,
-          'age': (25 + index % 20).toString(),
-          'position': position,
-          'salaryGrade': (index % 10 + 1).toString(),
-          'contractValidity': 'Còn hiệu lực',
-          'contractEndDate':
-              '${DateTime.now().add(Duration(days: 365)).toString().substring(0, 10)}',
-          'earlyLeaveCount': (index % 5).toString(),
-          'paidLeaveDays': (index % 10).toString(),
-          'unpaidLeaveDays': (index % 3).toString(),
-          'unreportedLeaveDays': (index % 2).toString(),
-          'violationCount': (index % 4).toString(),
-          'evaluationStatus': 'OK', // Khởi tạo giá trị mặc định
-          'healthStatus': 'Đạt',
-          'notRehire': 'OK',
-          'notRehireReason': '',
-          'reason': '',
-        };
-      }),
-    );
-
-    filterdataList.assignAll(dataList);
-    selectRows.assignAll(List.generate(dataList.length, (index) => false));
-  }
-}
-
 class _EditTwoContractDialog extends StatelessWidget {
   final TwoContract twoContract;
   final DashboardControllerTwo controller = Get.find();
@@ -1295,6 +1184,7 @@ class _EditTwoContractDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = TwoContract.fromJson(twoContract.toJson());
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -1587,11 +1477,30 @@ class _EditTwoContractDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      await controller.updateTwoContract(edited);
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      String sectionName = authState.user!.chRSecCode
+                          .toString()
+                          .split(':')[1]
+                          .trim();
+                      // phan xem ai dang vao man so sanh
+                      // if(authState.user!.chRGroup.toString() == "PTHC"){
+                      //   // truong hop PTHC phong ban
+                      //   controller.changeStatus('3', sectionName, null);
+                      // }else{
+                      //   // truong hop leader
+                      //   controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString());
+                      // }
+                      await controller.changeStatus(
+                        "2",
+                        sectionName,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1");
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';

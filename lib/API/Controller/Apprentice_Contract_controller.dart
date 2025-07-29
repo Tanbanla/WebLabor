@@ -29,10 +29,16 @@ class DashboardControllerApprentice extends GetxController {
     //fetchDummyData();
     //fetchDataBy(statusId: currentStatusId.value);
   }
+
   // Hàm helper để thay đổi status và load lại dữ liệu
-  Future<void> changeStatus(String newStatusId) async {
-    await fetchDataBy(statusId: newStatusId);
+  Future<void> changeStatus(
+    String newStatusId,
+    String? newSection,
+    String? adid,
+  ) async {
+    await fetchDataBy(statusId: newStatusId, section: newSection, adid: adid);
   }
+
   List<ApprenticeContract> getSelectedItems() {
     List<ApprenticeContract> selectedItems = [];
     for (int i = 0; i < selectRows.length; i++) {
@@ -124,20 +130,61 @@ class DashboardControllerApprentice extends GetxController {
     }
   }
 
-  Future<void> fetchDataBy({String? statusId}) async {
+  Future<void> fetchDataBy({
+    String? statusId,
+    String? section,
+    String? adid,
+  }) async {
     try {
       isLoading(true);
+      if (statusId == null || statusId.isEmpty) {
+        throw Exception('Status ID is required');
+      }
+      isLoading(true);
+      String cloumn = "";
+      switch (statusId) {
+        case "2":
+          cloumn = "USER_APPROVER_PER";
+          break;
+        case "3":
+          cloumn = "VCHR_PTHC_SECTION";
+          break;
+        case "4":
+          cloumn = "VCHR_LEADER_EVALUTION";
+          break;
+        case "5":
+          cloumn = "USER_APPROVER_CHIEF";
+          break;
+        case "6":
+          cloumn = "USER_APPROVER_SECTION_MANAGER";
+          break;
+        case "7":
+          cloumn = "USER_APPROVER_DIRECTOR";
+          break;
+      }
+      // Build request body
+      final filters = [
+        {
+          "field": "INT_STATUS_ID",
+          "value": statusId,
+          "operator": "=",
+          "logicType": "AND",
+        },
+        if (section != null && section.isNotEmpty)
+          {
+            "field": "VCHR_CODE_SECTION",
+            "value": section,
+            "operator": "like",
+            "logicType": "AND",
+          },
+        if (adid != null && adid.isNotEmpty)
+          {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
+      ];
+
       final requestBody = {
         "pageNumber": -1,
         "pageSize": 10,
-        "filters": [
-          {
-            "field": "INT_STATUS_ID",
-            "value": statusId,
-            "operator": "=",
-            "logicType": "AND",
-          },
-        ],
+        "filters": filters,
       };
       final response = await http.post(
         Uri.parse(Common.API + Common.ApprenticeSreachBy),
@@ -178,12 +225,13 @@ class DashboardControllerApprentice extends GetxController {
   Future<void> addApprenticeContract(
     ApprenticeContract contract,
     String olded,
+    String user,
   ) async {
     try {
       isLoading(true);
       // bo sung cac truong con thieu
       contract.id = 0;
-      contract.vchRUserCreate = 'khanhmf';
+      contract.vchRUserCreate = user;
       contract.vchRNameSection = contract.vchRCodeSection;
       contract.dtMCreate = formatDateTime(DateTime.now());
       contract.dtMUpdate = formatDateTime(DateTime.now());
@@ -228,9 +276,12 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   //  update thong tin
-  Future<void> updateApprenticeContract(ApprenticeContract contract) async {
+  Future<void> updateApprenticeContract(
+    ApprenticeContract contract,
+    String userUpdate,
+  ) async {
     try {
-      contract.vchRUserUpdate = 'khanhmf';
+      contract.vchRUserUpdate = userUpdate;
       contract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -255,19 +306,66 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   //update thong tin to list
-  Future<void> updateListApprenticeContract(String userApprover) async {
+  Future<void> updateListApprenticeContract(
+    String userApprover,
+    String userUpdate,
+  ) async {
     try {
-      // List<TwoContract> twocontract,
       final contract = getSelectedItems();
       if (contract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
       for (int i = 0; i < contract.length; i++) {
-        contract[i].vchRUserUpdate = 'khanhmf';
+        contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].inTStatusId = 2;
         contract[i].useRApproverPer = userApprover;
-        contract[i].vchRCodeApprover = 'HNTV' + formatDateTime(DateTime.now()).toString();
+        contract[i].vchRCodeApprover =
+            'HNTV' + formatDateTime(DateTime.now()).toString();
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(contract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to update two contract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // update list cho fill
+  Future<void> updateListApprenticeContractFill(
+    String userApprover,
+    String userUpdate,
+  ) async {
+    try {
+      final contract = getSelectedItems();
+      if (contract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      for (int i = 0; i < contract.length; i++) {
+        contract[i].vchRUserUpdate = userUpdate;
+        contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        if (contract[i].inTStatusId == 3) {
+          contract[i].inTStatusId = 4;
+          contract[i].nvchRPthcSection = userUpdate;
+          contract[i].vchRLeaderEvalution = userApprover;
+        } else if (contract[i].inTStatusId == 4) {
+          contract[i].inTStatusId = 5;
+          contract[i].vchRLeaderEvalution = userUpdate;
+          contract[i].useRApproverChief = userApprover;
+        }
       }
       isLoading(true);
       final response = await http.put(
@@ -316,7 +414,7 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // import file
-  Future<void> importExcelMobileContract(File file) async {
+  Future<void> importExcelMobileContract(File file, String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -400,7 +498,7 @@ class DashboardControllerApprentice extends GetxController {
           ..biTApproverDirector
           ..nvchRApproverDirector
           ..dtMApproverDirector
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
@@ -448,7 +546,7 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // nhap file tren web
-  Future<void> importFromExcelWeb(Uint8List bytes) async {
+  Future<void> importFromExcelWeb(Uint8List bytes, String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -532,7 +630,7 @@ class DashboardControllerApprentice extends GetxController {
           ..biTApproverDirector
           ..nvchRApproverDirector
           ..dtMApproverDirector
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())

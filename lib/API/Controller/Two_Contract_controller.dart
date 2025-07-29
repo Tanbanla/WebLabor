@@ -31,8 +31,12 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // Hàm helper để thay đổi status và load lại dữ liệu
-  Future<void> changeStatus(String newStatusId) async {
-    await fetchDataBy(statusId: newStatusId);
+  Future<void> changeStatus(
+    String newStatusId,
+    String? newSection,
+    String? adid,
+  ) async {
+    await fetchDataBy(statusId: newStatusId, section: newSection, adid: adid);
   }
 
   void showError(String message) {
@@ -138,116 +142,86 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-  Future<void> fetchDataBy({String? statusId}) async {
-    try {
-      isLoading(true);
-      if (statusId!.isNotEmpty) {
-        final requestBody = {
-          "pageNumber": -1,
-          "pageSize": 10,
-          "filters": [
-            {
-              "field": "INT_STATUS_ID",
-              "value": statusId,
-              "operator": "=",
-              "logicType": "AND",
-            },
-          ],
-        };
-        final response = await http.post(
-          Uri.parse(Common.API + Common.TwoSreachBy),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(requestBody),
-        );
-
-        if (response.statusCode == 200) {
-          final jsonData = json.decode(response.body);
-          if (jsonData['success'] == true) {
-            // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
-            final List<dynamic> data = jsonData['data']['data'] ?? [];
-
-            dataList.assignAll(
-              data.map((contract) => TwoContract.fromJson(contract)).toList(),
-            );
-
-            filterdataList.assignAll(dataList);
-            selectRows.assignAll(
-              List.generate(dataList.length, (index) => false),
-            );
-          } else {
-            throw Exception(jsonData['message'] ?? 'Failed to load data');
-          }
-        } else {
-          throw Exception('Failed to load Two contract');
-        }
-      }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch data: $e');
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<void> fetchDataSection({
+  Future<void> fetchDataBy({
     String? statusId,
     String? section,
-    String? user,
-    String? column,
+    String? adid,
   }) async {
     try {
+      if (statusId == null || statusId.isEmpty) {
+        throw Exception('Status ID is required');
+      }
       isLoading(true);
-      if (statusId!.isNotEmpty) {
-        final requestBody = 
+      String cloumn = "";
+      switch (statusId) {
+        case "2":
+          cloumn = "USER_APPROVER_PER";
+          break;
+        case "3":
+          cloumn = "VCHR_PTHC_SECTION";
+          break;
+        case "4":
+          cloumn = "VCHR_LEADER_EVALUTION";
+          break;
+        case "5":
+          cloumn = "USER_APPROVER_CHIEF";
+          break;
+        case "6":
+          cloumn = "USER_APPROVER_SECTION_MANAGER";
+          break;
+        case "7":
+          cloumn = "USER_APPROVER_DIRECTOR";
+          break;
+      }
+      // Build request body
+      final filters = [
         {
-          "pageNumber": -1,
-          "pageSize": 10,
-          "filters": [
-            {
-              "field": "INT_STATUS_ID",
-              "value": statusId,
-              "operator": "=",
-              "logicType": "AND",
-            },
-            {
-              "field": "VCHR_CODE_SECTION",
-              "value": section,
-              "operator": "=",
-              "logicType": "AND",
-            },
-            {
-              "field": column,
-              "value": user,
-              "operator": "=",
-              "logicType": "AND",
-            },
-          ],
-        };
-        final response = await http.post(
-          Uri.parse(Common.API + Common.TwoSreachBy),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(requestBody),
-        );
+          "field": "INT_STATUS_ID",
+          "value": statusId,
+          "operator": "=",
+          "logicType": "AND",
+        },
+        if (section != null && section.isNotEmpty)
+          {
+            "field": "VCHR_CODE_SECTION",
+            "value": section,
+            "operator": "like",
+            "logicType": "AND",
+          },
+        if (adid != null && adid.isNotEmpty)
+          {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
+      ];
 
-        if (response.statusCode == 200) {
-          final jsonData = json.decode(response.body);
-          if (jsonData['success'] == true) {
-            // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
-            final List<dynamic> data = jsonData['data']['data'] ?? [];
+      final requestBody = {
+        "pageNumber": -1,
+        "pageSize": 10,
+        "filters": filters,
+      };
+      final response = await http.post(
+        Uri.parse(Common.API + Common.TwoSreachBy),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
 
-            dataList.assignAll(
-              data.map((contract) => TwoContract.fromJson(contract)).toList(),
-            );
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
+          final List<dynamic> data = jsonData['data']['data'] ?? [];
 
-            filterdataList.assignAll(dataList);
-            selectRows.assignAll(
-              List.generate(dataList.length, (index) => false),
-            );
-          } else {
-            throw Exception(jsonData['message'] ?? 'Failed to load data');
-          }
+          dataList.assignAll(
+            data.map((contract) => TwoContract.fromJson(contract)).toList(),
+          );
+
+          filterdataList.assignAll(dataList);
+          selectRows.assignAll(
+            List.generate(dataList.length, (index) => false),
+          );
         } else {
-          throw Exception('Failed to load Two contract');
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
         }
+      } else {
+        throw Exception('Failed to load Two contract');
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch data: $e');
@@ -255,13 +229,16 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
-
   // them danh gia
-  Future<void> addTwoContract(TwoContract twocontract, String olded) async {
+  Future<void> addTwoContract(
+    TwoContract twocontract,
+    String olded,
+    String userUpdate,
+  ) async {
     try {
       // bo sung cac truong con thieu
       twocontract.id = 0;
-      twocontract.vchRUserCreate = 'khanhmf';
+      twocontract.vchRUserCreate = userUpdate;
       twocontract.vchRNameSection = twocontract.vchRCodeSection;
       twocontract.dtMCreate = formatDateTime(DateTime.now());
       twocontract.dtMUpdate = formatDateTime(DateTime.now());
@@ -309,9 +286,12 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // update thông tin
-  Future<void> updateTwoContract(TwoContract twocontract) async {
+  Future<void> updateTwoContract(
+    TwoContract twocontract,
+    String userUpdate,
+  ) async {
     try {
-      twocontract.vchRUserUpdate = 'khanhmf';
+      twocontract.vchRUserUpdate = userUpdate;
       twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -337,7 +317,10 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // udpate to list
-  Future<void> updateListTwoContract(String userApprover) async {
+  Future<void> updateListTwoContractPer(
+    String userApprover,
+    String userUpdate,
+  ) async {
     try {
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
@@ -345,12 +328,58 @@ class DashboardControllerTwo extends GetxController {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
       for (int i = 0; i < twocontract.length; i++) {
-        twocontract[i].vchRUserUpdate = 'khanhmf';
+        twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].inTStatusId = 2;
         twocontract[i].useRApproverPer = userApprover;
         twocontract[i].vchRCodeApprover =
             'HD2N' + formatDateTime(DateTime.now()).toString();
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  //update list cho PTHC va Leader
+  Future<void> updateListTwoContractFill(
+    String userApprover,
+    String userUpdate,
+  ) async {
+    try {
+      // List<TwoContract> twocontract,
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      for (int i = 0; i < twocontract.length; i++) {
+        twocontract[i].vchRUserUpdate = userUpdate;
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        if (twocontract[i].inTStatusId == 3) {
+          twocontract[i].inTStatusId = 4;
+          twocontract[i].nvchRPthcSection = userUpdate;
+          twocontract[i].vchRLeaderEvalution = userApprover;
+        } else if(twocontract[i].inTStatusId == 4){
+          twocontract[i].inTStatusId = 5;
+          twocontract[i].vchRLeaderEvalution = userUpdate;
+          twocontract[i].useRApproverChief = userApprover;
+        }
       }
       isLoading(true);
       final response = await http.put(
@@ -425,7 +454,10 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // import file
-  Future<void> importExcelMobileTwoContract(File file) async {
+  Future<void> importExcelMobileTwoContract(
+    File file,
+    String userUpdate,
+  ) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -508,7 +540,7 @@ class DashboardControllerTwo extends GetxController {
           ..biTApproverDirector
           ..nvchRApproverDirector
           ..dtMApproverDirector
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
@@ -557,7 +589,7 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // nhap file tren web
-  Future<void> importFromExcelWeb(Uint8List bytes) async {
+  Future<void> importFromExcelWeb(Uint8List bytes, String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -640,7 +672,7 @@ class DashboardControllerTwo extends GetxController {
           ..biTApproverDirector
           ..nvchRApproverDirector
           ..dtMApproverDirector
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
@@ -717,8 +749,8 @@ class DashboardControllerTwo extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
-      dataList[index].nvarchaRHealthResults =  status;
-      filterdataList[index].nvarchaRHealthResults =  status;
+      dataList[index].nvarchaRHealthResults = status;
+      filterdataList[index].nvarchaRHealthResults = status;
       dataList.refresh();
       filterdataList.refresh();
     }

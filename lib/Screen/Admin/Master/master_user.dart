@@ -5,6 +5,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/User_controller.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/class/User.dart';
 import 'package:excel/excel.dart' hide Border;
@@ -13,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:provider/provider.dart';
 
 class MasterUser extends StatefulWidget {
   const MasterUser({super.key});
@@ -289,6 +291,7 @@ class _MasterUserState extends State<MasterUser> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     showDialog(
       context: context,
@@ -391,11 +394,11 @@ class _MasterUserState extends State<MasterUser> {
                         if (kIsWeb) {
                           // Xử lý web
                           await controller.importFromExcelWeb(
-                            selectedFileData.value!,
+                            selectedFileData.value!, authState.user!.chRUserid.toString()
                           );
                         } else {
                           // Xử lý mobile/desktop
-                          await controller.importFromExcel(selectedFile.value!);
+                          await controller.importFromExcel(selectedFile.value!,authState.user!.chRUserid.toString());
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -656,6 +659,7 @@ class _MasterUserState extends State<MasterUser> {
     final controller = Get.find<DashboardControllerUser>();
     var userAdd = User();
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     showDialog(
       context: context,
@@ -748,7 +752,7 @@ class _MasterUserState extends State<MasterUser> {
                       errorMessage.value = '';
                       controller.isLoading(false);
                       try {
-                        await controller.addUser(userAdd);
+                        await controller.addUser(userAdd,authState.user!.chRUserid.toString());
                         if (mounted) {
                           Navigator.of(
                             context,
@@ -952,6 +956,7 @@ class _EditUserDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final editedUser = User.fromJson(user.toJson());
     RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
 
     return AlertDialog(
       title: Text('Chỉnh sửa thông tin ${user.nvchRNameId}'),
@@ -1088,7 +1093,7 @@ class _EditUserDialog extends StatelessWidget {
                 ? null
                 : () async {
                     try {
-                      await controller.updateUser(editedUser);
+                      await controller.updateUser(editedUser,authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

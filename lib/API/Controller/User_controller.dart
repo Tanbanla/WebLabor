@@ -26,42 +26,11 @@ class DashboardControllerUser extends GetxController {
     fetchUserData();
   }
 
-  Future<void> fetchUserData() async {
-    try {
-      isLoading(true);
-      final response = await http.get(
-        Uri.parse(Common.API + Common.UserGetAll),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          final List<dynamic> data = jsonData['data'];
-          userList.assignAll(data.map((user) => User.fromJson(user)).toList());
-          filteredUserList.assignAll(userList);
-          selectRows.assignAll(
-            List.generate(userList.length, (index) => false),
-          );
-        }
-      } else {
-        throw Exception('Failed to load users');
-      }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch data: $e');
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<void> fetchDataSection({
-    String? user,
-  }) async {
+  Future<void> fetchDataSection({String? user}) async {
     try {
       isLoading(true);
       if (user!.isNotEmpty) {
-        final requestBody = 
-        {
+        final requestBody = {
           "pageNumber": -1,
           "pageSize": 10,
           "filters": [
@@ -70,7 +39,7 @@ class DashboardControllerUser extends GetxController {
               "value": user,
               "operator": "=",
               "logicType": "AND",
-            }
+            },
           ],
         };
         final response = await http.post(
@@ -99,6 +68,34 @@ class DashboardControllerUser extends GetxController {
         } else {
           throw Exception('Failed to load Two contract');
         }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.UserGetAll),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          userList.assignAll(data.map((user) => User.fromJson(user)).toList());
+          filteredUserList.assignAll(userList);
+          selectRows.assignAll(
+            List.generate(userList.length, (index) => false),
+          );
+        }
+      } else {
+        throw Exception('Failed to load users');
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch data: $e');
@@ -152,12 +149,12 @@ class DashboardControllerUser extends GetxController {
     }
   }
 
-  Future<void> updateUser(User user) async {
+  Future<void> updateUser(User user, String userUpdate) async {
     try {
       isLoading(true);
-      user.vchRUserUpdate = 'khanhmf';
+      user.vchRUserUpdate = userUpdate;
       if (user.vchRUserCreate.toString().isEmpty) {
-        user.vchRUserCreate = 'khanhmf';
+        user.vchRUserCreate = userUpdate;
       }
       final response = await http.put(
         Uri.parse('${Common.API}${Common.UpdateUser}${user.id}'),
@@ -204,7 +201,7 @@ class DashboardControllerUser extends GetxController {
   }
 
   // thêm người dùng
-  Future<void> addUser(User newUser) async {
+  Future<void> addUser(User newUser, String userUpdate) async {
     try {
       isLoading(true);
       final user = User()
@@ -218,9 +215,9 @@ class DashboardControllerUser extends GetxController {
         ..inTLock = 0
         ..inTLockDay = 90
         ..inTUseridCommon = newUser.inTUseridCommon
-        ..vchRUserCreate = 'khanhmf'
+        ..vchRUserCreate = userUpdate
         ..dtMCreate = formatDateTime(DateTime.now())
-        ..vchRUserUpdate = 'khanhmf'
+        ..vchRUserUpdate = userUpdate
         ..dtMUpdate = formatDateTime(DateTime.now())
         ..dtMLastLogin = formatDateTime(DateTime.now());
       final response = await http.post(
@@ -245,7 +242,7 @@ class DashboardControllerUser extends GetxController {
     }
   }
 
-  Future<void> importFromExcel(File file) async {
+  Future<void> importFromExcel(File file,String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -283,9 +280,9 @@ class DashboardControllerUser extends GetxController {
               (row[6]?.value?.toString() ?? '').toLowerCase() == "dùng chung"
               ? 1
               : 0
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
-          ..vchRUserUpdate = 'khanhmf'
+          ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..dtMLastLogin = formatDateTime(DateTime.now());
 
@@ -329,7 +326,7 @@ class DashboardControllerUser extends GetxController {
   }
 
   // add list user web
-  Future<void> importFromExcelWeb(Uint8List bytes) async {
+  Future<void> importFromExcelWeb(Uint8List bytes, String userUpdate) async {
     try {
       isLoading(true);
 
@@ -368,9 +365,9 @@ class DashboardControllerUser extends GetxController {
               ? 1
               : 0
           ..inTUseridCommon = 0
-          ..vchRUserCreate = 'khanhmf'
+          ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
-          ..vchRUserUpdate = 'khanhmf'
+          ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..dtMLastLogin = formatDateTime(DateTime.now());
 
