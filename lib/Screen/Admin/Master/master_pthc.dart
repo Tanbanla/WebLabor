@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/class/PTHC_Group.dart';
 
 class MasterPTHC extends StatefulWidget {
   const MasterPTHC({super.key});
@@ -21,7 +23,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddDialog,
+        onPressed: (){},
         backgroundColor: Common.primaryColor,
         child: const Icon(Iconsax.add, color: Colors.white),
       ),
@@ -207,7 +209,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
                 DataColumn2(label: const Text('Mail CC'), size: ColumnSize.L),
                 const DataColumn2(label: Text('Hành động'), fixedWidth: 120),
               ],
-              rows: controller.filterdataList
+              rows: controller.filteredpthcList
                   .map((data) => _buildDataRow(data))
                   .toList(),
             ),
@@ -217,21 +219,21 @@ class _MasterPTHCState extends State<MasterPTHC> {
     );
   }
 
-  DataRow2 _buildDataRow(Map<String, String> data) {
+  DataRow2 _buildDataRow(PthcGroup data) {
     return DataRow2(
-      onTap: () => _showDetailDialog(data),
+      onTap: () {},
       cells: [
         DataCell(
           Text(
-            data['Column1'] ?? "",
+            data.section?? "",
             style: TextStyle(
               color: Colors.blue[800],
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        DataCell(Text(data['Column2'] ?? "", overflow: TextOverflow.ellipsis)),
-        DataCell(Text(data['Column3'] ?? "", overflow: TextOverflow.ellipsis)),
+        DataCell(Text(data.mailto ?? "", overflow: TextOverflow.ellipsis)),
+        DataCell(Text(data.mailcc ?? "", overflow: TextOverflow.ellipsis)),
         DataCell(
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -240,21 +242,11 @@ class _MasterPTHCState extends State<MasterPTHC> {
                 icon: Icon(Iconsax.edit_2, size: 20, color: Colors.blue),
                 //onPressed: () => _showEditDialog(data),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => ShowEditDialog(
-                      data: data,
-                      onUpdate: (updatedData) {
-                        // Gọi hàm cập nhật dữ liệu ở đây
-                        controller.updateItem(data, updatedData);
-                      },
-                    ),
-                  );
                 },
               ),
               IconButton(
                 icon: Icon(Iconsax.trash, size: 20, color: Colors.red),
-                onPressed: () => _showDeleteDialog(data),
+                onPressed: () {},
               ),
             ],
           ),
@@ -375,106 +367,14 @@ class _MasterPTHCState extends State<MasterPTHC> {
     );
   }
 
-  void _showAddDialog() {
-    final emailController = TextEditingController();
-    final ccController = TextEditingController();
-    final deptController = TextEditingController();
-
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Thêm PTHC Mới'),
-        content: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: deptController,
-                  decoration: InputDecoration(
-                    labelText: 'Phòng ban',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập phòng ban';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail To (phân cách bằng dấu phẩy)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Email không hợp lệ';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: ccController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail CC (phân cách bằng dấu phẩy)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                controller.addItem({
-                  'Column1': deptController.text,
-                  'Column2': emailController.text,
-                  'Column3': ccController.text,
-                });
-                Get.back();
-                Get.snackbar(
-                  'Thành công',
-                  'Đã thêm PTHC mới',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Thêm'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // void _showEditDialog(Map<String, String> data) {
-  //   final emailController = TextEditingController(text: data['Column2']);
-  //   final ccController = TextEditingController(text: data['Column3']);
-  //   final deptController = TextEditingController(text: data['Column1']);
+  // void _showAddDialog() {
+  //   final emailController = TextEditingController();
+  //   final ccController = TextEditingController();
+  //   final deptController = TextEditingController();
 
   //   Get.dialog(
   //     AlertDialog(
-  //       title: const Text('Chỉnh sửa PTHC'),
+  //       title: const Text('Thêm PTHC Mới'),
   //       content: Form(
   //         key: _formKey,
   //         child: SingleChildScrollView(
@@ -500,7 +400,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
   //               TextFormField(
   //                 controller: emailController,
   //                 decoration: InputDecoration(
-  //                   labelText: 'Mail To',
+  //                   labelText: 'Mail To (phân cách bằng dấu phẩy)',
   //                   border: OutlineInputBorder(
   //                     borderRadius: BorderRadius.circular(8),
   //                   ),
@@ -519,7 +419,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
   //               TextFormField(
   //                 controller: ccController,
   //                 decoration: InputDecoration(
-  //                   labelText: 'Mail CC',
+  //                   labelText: 'Mail CC (phân cách bằng dấu phẩy)',
   //                   border: OutlineInputBorder(
   //                     borderRadius: BorderRadius.circular(8),
   //                   ),
@@ -534,7 +434,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
   //         ElevatedButton(
   //           onPressed: () {
   //             if (_formKey.currentState!.validate()) {
-  //               controller.updateItem(data, {
+  //               controller.addItem({
   //                 'Column1': deptController.text,
   //                 'Column2': emailController.text,
   //                 'Column3': ccController.text,
@@ -542,258 +442,191 @@ class _MasterPTHCState extends State<MasterPTHC> {
   //               Get.back();
   //               Get.snackbar(
   //                 'Thành công',
-  //                 'Đã cập nhật PTHC',
+  //                 'Đã thêm PTHC mới',
   //                 backgroundColor: Colors.green,
   //                 colorText: Colors.white,
   //               );
   //             }
   //           },
-  //           child: const Text('Lưu'),
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.blue,
+  //             foregroundColor: Colors.white,
+  //           ),
+  //           child: const Text('Thêm'),
   //         ),
   //       ],
   //     ),
   //   );
   // }
+  // void _showDetailDialog(Map<String, String> data) {
+  //   Get.dialog(
+  //     AlertDialog(
+  //       title: Text('Chi tiết PTHC: ${data['Column1']}'),
+  //       content: SingleChildScrollView(
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
+  //             _buildDetailRow('Mail To:', data['Column2'] ?? ""),
+  //             _buildDetailRow('Mail CC:', data['Column3'] ?? ""),
+  //           ],
+  //         ),
+  //       ),
+  //       actions: [TextButton(onPressed: Get.back, child: const Text('Đóng'))],
+  //     ),
+  //   );
+  // }
 
-  void _showDetailDialog(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Chi tiết PTHC: ${data['Column1']}'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Phòng ban:', data['Column1'] ?? ""),
-              _buildDetailRow('Mail To:', data['Column2'] ?? ""),
-              _buildDetailRow('Mail CC:', data['Column3'] ?? ""),
-            ],
-          ),
-        ),
-        actions: [TextButton(onPressed: Get.back, child: const Text('Đóng'))],
-      ),
-    );
-  }
+  // Widget _buildDetailRow(String label, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         SizedBox(
+  //           width: 100,
+  //           child: Text(label, style: TextStyle(color: Colors.grey[600])),
+  //         ),
+  //         const SizedBox(width: 8),
+  //         Expanded(child: Text(value)),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteDialog(Map<String, String> data) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn chắc chắn muốn xóa PTHC ${data['Column1']}?'),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Hủy')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[50],
-              foregroundColor: Colors.red,
-            ),
-            onPressed: () {
-              controller.deleteItem(data);
-              Get.back();
-              Get.snackbar(
-                'Thành công',
-                'Đã xóa PTHC',
-                backgroundColor: Colors.green,
-                colorText: Colors.white,
-              );
-            },
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showDeleteDialog(Map<String, String> data) {
+  //   Get.dialog(
+  //     AlertDialog(
+  //       title: const Text('Xác nhận xóa'),
+  //       content: Text('Bạn chắc chắn muốn xóa PTHC ${data['Column1']}?'),
+  //       actions: [
+  //         TextButton(onPressed: Get.back, child: const Text('Hủy')),
+  //         ElevatedButton(
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.red[50],
+  //             foregroundColor: Colors.red,
+  //           ),
+  //           onPressed: () {
+  //             controller.deleteItem(data);
+  //             Get.back();
+  //             Get.snackbar(
+  //               'Thành công',
+  //               'Đã xóa PTHC',
+  //               backgroundColor: Colors.green,
+  //               colorText: Colors.white,
+  //             );
+  //           },
+  //           child: const Text('Xóa'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
-class DashboardControllerPTHC extends GetxController {
-  var dataList = <Map<String, String>>[].obs;
-  var filterdataList = <Map<String, String>>[].obs;
-  final searchTextController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchDummyData();
-  }
+// class ShowEditDialog extends StatelessWidget {
+//   final Map<String, String> data;
+//   final Function(Map<String, String>) onUpdate;
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController deptController = TextEditingController();
+//   final TextEditingController emailController = TextEditingController();
+//   final TextEditingController ccController = TextEditingController();
 
-  void sortById(int sortColumnIndex, bool ascending) {
-    filterdataList.sort((a, b) {
-      final aValue = a['Column1']?.toLowerCase() ?? '';
-      final bValue = b['Column1']?.toLowerCase() ?? '';
-      return ascending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
-    });
-  }
+//   ShowEditDialog({Key? key, required this.data, required this.onUpdate})
+//     : super(key: key) {
+//     // Khởi tạo giá trị ban đầu cho các controller
+//     deptController.text = data['Column1'] ?? '';
+//     emailController.text = data['Column2'] ?? '';
+//     ccController.text = data['Column3'] ?? '';
+//   }
 
-  void searchQuery(String query) {
-    if (query.isEmpty) {
-      filterdataList.assignAll(dataList);
-    } else {
-      filterdataList.assignAll(
-        dataList.where(
-          (item) =>
-              (item['Column1']?.toLowerCase().contains(query.toLowerCase()) ??
-                  false) ||
-              (item['Column2']?.toLowerCase().contains(query.toLowerCase()) ??
-                  false),
-        ),
-      );
-    }
-  }
-
-  void addItem(Map<String, String> newItem) {
-    dataList.add(newItem);
-    filterdataList.add(newItem);
-  }
-
-  void updateItem(Map<String, String> oldItem, Map<String, String> newItem) {
-    final index = dataList.indexOf(oldItem);
-    if (index != -1) {
-      dataList[index] = newItem;
-      filterdataList[index] = newItem;
-    }
-  }
-
-  void deleteItem(Map<String, String> item) {
-    dataList.remove(item);
-    filterdataList.remove(item);
-  }
-
-  void fetchDummyData() {
-    final departments = ['RD', 'HR', 'Finance', 'Marketing', 'IT'];
-
-    dataList.assignAll(
-      List.generate(20, (index) {
-        final dept = departments[index % departments.length];
-        return {
-          'Column1': dept,
-          'Column2': '${dept.toLowerCase()}@company.com,manager@company.com',
-          'Column3': 'hr@company.com,admin@company.com',
-        };
-      }),
-    );
-
-    filterdataList.assignAll(dataList);
-  }
-}
-
-class ShowEditDialog extends StatelessWidget {
-  final Map<String, String> data;
-  final Function(Map<String, String>) onUpdate;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController deptController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController ccController = TextEditingController();
-
-  ShowEditDialog({Key? key, required this.data, required this.onUpdate})
-    : super(key: key) {
-    // Khởi tạo giá trị ban đầu cho các controller
-    deptController.text = data['Column1'] ?? '';
-    emailController.text = data['Column2'] ?? '';
-    ccController.text = data['Column3'] ?? '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: AlertDialog(
-        title: const Text('Chỉnh sửa PTHC'),
-        content: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: deptController,
-                  decoration: InputDecoration(
-                    labelText: 'Phòng ban',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập phòng ban';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail To',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Email không hợp lệ';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: ccController,
-                  decoration: InputDecoration(
-                    labelText: 'Mail CC',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                onUpdate({
-                  'Column1': deptController.text,
-                  'Column2': emailController.text,
-                  'Column3': ccController.text,
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Đã cập nhật PTHC'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Dialog(
+//       child: AlertDialog(
+//         title: const Text('Chỉnh sửa PTHC'),
+//         content: Form(
+//           key: _formKey,
+//           child: SingleChildScrollView(
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 TextFormField(
+//                   controller: deptController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Phòng ban',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Vui lòng nhập phòng ban';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 const SizedBox(height: 12),
+//                 TextFormField(
+//                   controller: emailController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Mail To',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Vui lòng nhập email';
+//                     }
+//                     if (!value.contains('@')) {
+//                       return 'Email không hợp lệ';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 const SizedBox(height: 12),
+//                 TextFormField(
+//                   controller: ccController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Mail CC',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//         actions: [
+//           TextButton(
+//             onPressed: () => Navigator.of(context).pop(),
+//             child: const Text('Hủy'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               if (_formKey.currentState!.validate()) {
+//                 onUpdate({
+//                   'Column1': deptController.text,
+//                   'Column2': emailController.text,
+//                   'Column3': ccController.text,
+//                 });
+//                 Navigator.of(context).pop();
+//                 ScaffoldMessenger.of(context).showSnackBar(
+//                   SnackBar(
+//                     content: const Text('Đã cập nhật PTHC'),
+//                     backgroundColor: Colors.green,
+//                   ),
+//                 );
+//               }
+//             },
+//             child: const Text('Lưu'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

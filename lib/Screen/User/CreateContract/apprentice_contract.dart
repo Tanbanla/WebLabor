@@ -1605,7 +1605,6 @@ class _DeleteContractDialog extends StatelessWidget {
 }
 
 class _showAddDialog extends StatelessWidget {
-  _showAddDialog();
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DashboardControllerApprentice>();
@@ -1653,21 +1652,21 @@ class _showAddDialog extends StatelessWidget {
                 width: 500,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: _buildCompactTextField(
-                        label: tr('department'),
-                        onChanged: (value) =>
-                            twoContract.vchRCodeSection = value,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _buildCompactTextField(
-                        label: tr('group'),
-                        onChanged: (value) =>
-                            twoContract.chRCostCenterName = value,
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: _buildCompactTextField(
+                    //     label: tr('department'),
+                    //     onChanged: (value) =>
+                    //         twoContract.vchRCodeSection = value,
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 10),
+                    // Expanded(
+                    //   child: _buildCompactTextField(
+                    //     label: tr('group'),
+                    //     onChanged: (value) =>
+                    //         twoContract.chRCostCenterName = value,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -1681,54 +1680,62 @@ class _showAddDialog extends StatelessWidget {
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
                   ),
+                  // const SizedBox(width: 10),
+                  // SizedBox(
+                  //   width: 100,
+                  //   child: _buildCompactTextField(
+                  //     label: tr('gender'),
+                  //     onChanged: (value) => twoContract.vchRTyperId = value,
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: 10),
 
               // Dòng 3: Tên NV + Tuổi
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: _buildCompactTextField(
-                      label: tr('fullName'),
-                      onChanged: (value) =>
-                          twoContract.vchREmployeeName = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 80,
-                    child: _buildCompactTextField(
-                      label: tr('age'),
-                      onChanged: (value) => olded = value,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       flex: 3,
+              //       child: _buildCompactTextField(
+              //         label: tr('fullName'),
+              //         onChanged: (value) =>
+              //             twoContract.vchREmployeeName = value,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 10),
+              //     SizedBox(
+              //       width: 80,
+              //       child: _buildCompactTextField(
+              //         label: tr('age'),
+              //         onChanged: (value) => olded = value,
+              //         keyboardType: TextInputType.number,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10),
 
-              // Dòng 4: Vị trí + Bậc lương
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      label: tr('position'),
-                      onChanged: (value) => twoContract.chRPosition = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: _buildCompactTextField(
-                      label: tr('salaryGrade'),
-                      onChanged: (value) => twoContract.chRCodeGrade = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
+              // // Dòng 4: Vị trí + Bậc lương
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: _buildCompactTextField(
+              //         label: tr('position'),
+              //         onChanged: (value) => twoContract.chRPosition = value,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 10),
+              //     SizedBox(
+              //       width: 100,
+              //       child: _buildCompactTextField(
+              //         label: tr('salaryGrade'),
+              //         onChanged: (value) => twoContract.chRCodeGrade = value,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10),
               // Dòng 5: Ngày bắt đầu + Ngày kết thúc
               Row(
                 children: [

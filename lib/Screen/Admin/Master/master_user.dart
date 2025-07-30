@@ -837,13 +837,13 @@ class MyData extends DataTableSource {
         }
         return null;
       }),
-      onTap: () {}, //=> _showDetailDialog(data),
-      selected: controller.selectRows[index],
-      onSelectChanged: (value) {
-        controller.selectRows[index] = value ?? false;
-        controller.selectRows.refresh();
-        notifyListeners();
-      },
+      // onTap: () {}, //=> _showDetailDialog(data),
+      // selected: controller.selectRows[index],
+      // onSelectChanged: (value) {
+      //   controller.selectRows[index] = value ?? false;
+      //   controller.selectRows.refresh();
+      //   notifyListeners();
+      // },
       cells: [
         DataCell(
           Text(
