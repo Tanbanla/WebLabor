@@ -750,6 +750,10 @@ class _MasterUserState extends State<MasterUser> {
                   ? null
                   : () async {
                       errorMessage.value = '';
+                      if(userAdd.chRUserid!.isEmpty || userAdd.chRGroup!.isEmpty ){
+                        errorMessage.value = 'Yêu cầu không để trống thông tin';
+                        return;
+                      }
                       controller.isLoading(false);
                       try {
                         await controller.addUser(userAdd,authState.user!.chRUserid.toString());
@@ -1093,6 +1097,13 @@ class _EditUserDialog extends StatelessWidget {
                 ? null
                 : () async {
                     try {
+                      errorMessage.value ='';
+                      if(editedUser.chREmployeeId!.isEmpty|| editedUser.chRSecCode!.isEmpty|| editedUser.chRUserid!.isEmpty|| editedUser.nvchRNameId!.isEmpty
+                      || editedUser.chRGroup!.isEmpty
+                      ){
+                        errorMessage.value ="Yêu cầu nhập đầy đủ thông tin vào các ô";
+                        return;
+                      }
                       await controller.updateUser(editedUser,authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
