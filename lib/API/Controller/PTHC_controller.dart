@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:web_labor_contract/class/PTHC_Group.dart';
 import 'package:web_labor_contract/class/TM_PTHC.dart';
-import 'package:web_labor_contract/class/User.dart';
 
 class DashboardControllerPTHC extends GetxController {
   var pthcList = <PthcGroup>[].obs;
@@ -109,7 +108,7 @@ class DashboardControllerPTHC extends GetxController {
         user.vchRUserCreate = userUpdate;
       }
       final response = await http.put(
-        Uri.parse('${Common.API}${Common.UpdateUser}${user.id}'),
+        Uri.parse('${Common.API}${Common.UpdatePTHC}${user.id}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(user.toJson()),
       );
@@ -123,36 +122,34 @@ class DashboardControllerPTHC extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to update user: $e');
+      showError('Failed to update PTHC: $e');
     } finally {
       isLoading(false);
     }
   }
 
   // thêm người dùng
-  Future<void> addUser(User newUser, String userUpdate) async {
+  Future<void> addPTHC(Pthc newPthc, String userUpdate) async {
     try {
       isLoading(true);
-      final user = User()
+      final pthc = Pthc()
         ..id = 0
-        ..chRSecCode = null
-        ..chREmployeeId = null
-        ..nvchRNameId = null
-        ..chRUserid = newUser.chRUserid
-        ..chRPass = ''
-        ..chRGroup = newUser.chRGroup
-        ..inTLock = 0
-        ..inTLockDay = 90
-        ..inTUseridCommon = newUser.inTUseridCommon
+        ..vchRCodeSection = newPthc.vchRCodeSection
+        ..vchRNameSection = newPthc.vchRNameSection
+        ..vchREmployeeId = newPthc.vchREmployeeId
+        ..nvchREmployeeName = newPthc.nvchREmployeeName
+        ..vchREmployeeAdid = newPthc.vchREmployeeAdid
+        ..vchRMail = newPthc.vchRMail
         ..vchRUserCreate = userUpdate
         ..dtMCreate = formatDateTime(DateTime.now())
         ..vchRUserUpdate = userUpdate
         ..dtMUpdate = formatDateTime(DateTime.now())
-        ..dtMLastLogin = formatDateTime(DateTime.now());
+        ..inTStatusId = newPthc.inTStatusId
+        ..vchRNote = newPthc.vchRNote;
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.AddUser}'),
+        Uri.parse('${Common.API}${Common.AddPTHC}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(user.toJson()),
+        body: json.encode(pthc.toJson()),
       );
 
       if (response.statusCode == 200) {
@@ -164,7 +161,7 @@ class DashboardControllerPTHC extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to add user: $e');
+      showError('Failed to add PTHC: $e');
       rethrow;
     } finally {
       isLoading(false);
@@ -186,55 +183,47 @@ class DashboardControllerPTHC extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
       // 4. Refresh data
-      final List<User> importedUsers = [];
+      final List<Pthc> importedPTHC = [];
       int _i = 1;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
-        // Create and populate user
-        final user = User()
-          ..id = 0
-          ..chRSecCode = row[1]?.value?.toString()
-          ..chREmployeeId = row[2]?.value?.toString()
-          ..nvchRNameId = row[3]?.value?.toString()
-          ..chRUserid = row[4]?.value?.toString()
-          ..chRPass = ''
-          ..chRGroup = row[5]?.value?.toString()
-          ..inTLock =
-              (row[7]?.value?.toString() ?? '').toLowerCase() == "delete"
-              ? 1
-              : 0
-          ..inTLockDay = 90
-          ..inTUseridCommon =
-              (row[6]?.value?.toString() ?? '').toLowerCase() == "dùng chung"
-              ? 1
-              : 0
-          ..vchRUserCreate = userUpdate
-          ..dtMCreate = formatDateTime(DateTime.now())
-          ..vchRUserUpdate = userUpdate
-          ..dtMUpdate = formatDateTime(DateTime.now())
-          ..dtMLastLogin = formatDateTime(DateTime.now());
+        // Create and populate pthc
+        final pthc = Pthc()
+        ..id = 0
+        ..vchRCodeSection = row[1]?.value?.toString()
+        ..vchRNameSection = row[1]?.value?.toString()
+        ..vchREmployeeId = row[2]?.value?.toString()
+        ..nvchREmployeeName = row[3]?.value?.toString()
+        ..vchREmployeeAdid = row[4]?.value?.toString()
+        ..vchRMail = row[5]?.value?.toString()
+        ..vchRUserCreate = userUpdate
+        ..dtMCreate = formatDateTime(DateTime.now())
+        ..vchRUserUpdate = userUpdate
+        ..dtMUpdate = formatDateTime(DateTime.now())
+        ..inTStatusId = 1
+        ..vchRNote ="Update by file";
 
         // Validate required fields
-        if (user.chRUserid?.isEmpty == true ||
-            user.nvchRNameId?.isEmpty == true ||
-            user.chREmployeeId?.isEmpty == true) {
+        if (pthc.vchREmployeeAdid?.isEmpty == true ||
+            pthc.vchREmployeeId?.isEmpty == true ||
+            pthc.vchRMail?.isEmpty == true) {
           _i++;
           continue; // Skip invalid rows
         }
 
-        importedUsers.add(user);
+        importedPTHC.add(pthc);
         _i++;
       }
       // 5. Send to API
-      if (importedUsers.isEmpty) {
+      if (importedPTHC.isEmpty) {
         throw Exception('Không có dữ liệu hợp lệ để import');
       }
 
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.AddListUser}'),
+        Uri.parse('${Common.API}${Common.AddListPTHC}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(importedUsers),
+        body: json.encode(importedPTHC),
       );
 
       if (response.statusCode != 200) {
@@ -270,56 +259,47 @@ class DashboardControllerPTHC extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
       // 4. Refresh data
-      final List<User> importedUsers = [];
+      final List<Pthc> importedPTHC = [];
       int _i = 1;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
         // Create and populate user
-        final user = User()
-          ..id = 0
-          ..chRSecCode = row[1]?.value?.toString()
-          ..chREmployeeId = row[2]?.value?.toString()
-          ..nvchRNameId = row[3]?.value?.toString()
-          ..chRUserid = row[4]?.value?.toString()
-          ..chRPass = ''
-          ..chRGroup = row[5]?.value?.toString()
-          ..inTLock =
-              (row[7]?.value?.toString() ?? '').toLowerCase() == "delete"
-              ? 1
-              : 0
-          ..inTLockDay = 90
-          ..inTUseridCommon =
-              (row[6]?.value?.toString() ?? '').toLowerCase() == "dùng chung"
-              ? 1
-              : 0
-          ..inTUseridCommon = 0
-          ..vchRUserCreate = userUpdate
-          ..dtMCreate = formatDateTime(DateTime.now())
-          ..vchRUserUpdate = userUpdate
-          ..dtMUpdate = formatDateTime(DateTime.now())
-          ..dtMLastLogin = formatDateTime(DateTime.now());
+        final pthc = Pthc()
+        ..id = 0
+        ..vchRCodeSection = row[1]?.value?.toString()
+        ..vchRNameSection = row[1]?.value?.toString()
+        ..vchREmployeeId = row[2]?.value?.toString()
+        ..nvchREmployeeName = row[3]?.value?.toString()
+        ..vchREmployeeAdid = row[4]?.value?.toString()
+        ..vchRMail = row[5]?.value?.toString()
+        ..vchRUserCreate = userUpdate
+        ..dtMCreate = formatDateTime(DateTime.now())
+        ..vchRUserUpdate = userUpdate
+        ..dtMUpdate = formatDateTime(DateTime.now())
+        ..inTStatusId = 1
+        ..vchRNote ="Update by file";
 
         // Validate required fields
-        if (user.chRUserid?.isEmpty == true ||
-            user.nvchRNameId?.isEmpty == true ||
-            user.chREmployeeId?.isEmpty == true) {
+        if (pthc.vchREmployeeAdid?.isEmpty == true ||
+            pthc.vchREmployeeId?.isEmpty == true ||
+            pthc.vchRMail?.isEmpty == true) {
           _i++;
           continue; // Skip invalid rows
         }
 
-        importedUsers.add(user);
+        importedPTHC.add(pthc);
         _i++;
       }
       // 5. Send to API
-      if (importedUsers.isEmpty) {
+      if (importedPTHC.isEmpty) {
         throw Exception('Không có dữ liệu hợp lệ để import');
       }
 
       final response = await http.post(
-        Uri.parse('${Common.API}${Common.AddListUser}'),
+        Uri.parse('${Common.API}${Common.AddListPTHC}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(importedUsers),
+        body: json.encode(importedPTHC),
       );
 
       if (response.statusCode != 200) {
@@ -351,12 +331,12 @@ class DashboardControllerPTHC extends GetxController {
     );
   }
 
-  Future<void> deleteUser(int id, {bool logical = true}) async {
+  Future<void> deletePTHC(int id, {bool logical = true}) async {
     try {
       isLoading(true);
       final endpoint = logical
-          ? Common.DeleteIDLogic
-          : Common.DeleteID; //logical ? Common.DeleteIDLogic :
+          ? Common.DeletePTHCIDLogic
+          : Common.DeletePTHCID; //logical ? Common.DeleteIDLogic :
       final response = await http.delete(
         // Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
         Uri.parse('${Common.API}$endpoint$id'),
@@ -372,7 +352,7 @@ class DashboardControllerPTHC extends GetxController {
         );
       }
     } catch (e) {
-      showError('Failed to delete user: $e');
+      showError('Failed to delete PTHC: $e');
     } finally {
       isLoading(false);
     }
@@ -400,40 +380,4 @@ class DashboardControllerPTHC extends GetxController {
     }
     return null;
   }
-
-  // send mail
-  // Future<void> SendMail(String code, String to, String cc, String bcc) async {
-  //   try {
-  //     isLoading(true);
-  //     final requestBody = {
-  //       "master_mail_id": code,
-  //       "mail_to": to,
-  //       "mail_cc": cc,
-  //       "mail_bcc": bcc,
-  //     };
-  //     final response = await http.post(
-  //       Uri.parse(Common.SendMail),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: json.encode(requestBody),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final jsonData = json.decode(response.body);
-  //       if (jsonData['success'] == true) {
-  //         final List<dynamic> data = jsonData['data'];
-  //         pthcList.assignAll(data.map((user) => User.fromJson(user)).toList());
-  //         filteredpthcList.assignAll(pthcList);
-  //         selectRows.assignAll(
-  //           List.generate(pthcList.length, (index) => false),
-  //         );
-  //       }
-  //     } else {
-  //       throw Exception('Failed to load users');
-  //     }
-  //   } catch (e) {
-  //     Get.snackbar('Error', 'Failed to fetch data: $e');
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
 }

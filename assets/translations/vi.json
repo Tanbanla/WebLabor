@@ -93,5 +93,8 @@
   "pleaseNote":"Vui lòng nhập ghi chú!",
   "Lydo":"Lý do không tuyển dụng lại",
   "hintTwofill":"Điền đánh giá danh sách các công nhân viên từ hợp đồng 2 năm lên hợp đồng không xác định thời hạn",
-  "hintApprenticefill":"Điền đánh giá cho các công nhân viên kết thúc thực hợp đồng học nghề, thử việc"
+  "hintApprenticefill":"Điền đánh giá cho các công nhân viên kết thúc thực hợp đồng học nghề, thử việc",
+  "titlePTHC":"Quản lý thông tin phê duyệt và thông báo",
+  "Mailto":"Mail To",
+  "MailCC":"Mail CC"
 }
