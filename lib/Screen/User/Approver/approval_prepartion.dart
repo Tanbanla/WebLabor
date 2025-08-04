@@ -157,20 +157,16 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           GestureDetector(
             onTap: () async {
               errorMessage.value = '';
-              // if (selectedConfirmer.value == null) {
-              //   errorMessage.value = tr('pleasecomfirm');
-              //   return;
-              // }
-              // try {
-              //   final controllerTwo = Get.find<DashboardControllerTwo>();
-              //   await controllerTwo.updateListTwoContractFill(
-              //     selectedConfirmerId.value.toString(),
-              //     authState.user!.chRUserid.toString(),
-              //   );
-              // } catch (e) {
-              //   errorMessage.value =
-              //       '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-              // }
+              try {
+                final controller = Get.find<DashboardControllerApporver>();
+                final contractType = selectedContractType == tr('indefiniteContract')
+                      ? 'two'
+                      : 'apprentice';
+                await controller.updateListContractApproval( authState.user!.chRUserid.toString(),  authState.user!.chRUserid.toString(), contractType);
+              } catch (e) {
+                errorMessage.value =
+                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+              }
             },
             child: Obx(
               () => Container(

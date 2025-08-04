@@ -5,6 +5,7 @@ import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
+import 'package:intl/intl.dart';
 
 
 class DashboardControllerApporver extends GetxController {
@@ -22,7 +23,61 @@ class DashboardControllerApporver extends GetxController {
     super.onInit();
     //fetchDummyData();
   }
-
+  List<dynamic> getSelectedItems() {
+    List<dynamic> selectedItems = [];
+    for (int i = 0; i < selectRows.length; i++) {
+      if (selectRows[i]) {
+        selectedItems.add(filterdataList[i]);
+      }
+    }
+    return selectedItems;
+  }
+Future<void> updateListContractApproval(
+    String userApprover,
+    String userUpdate,
+    String? contractType,
+  ) async {
+    try {
+      // List<TwoContract> twocontract,
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      isLoading(true);
+      for (int i = 0; i < twocontract.length; i++) {
+        twocontract[i].vchRUserUpdate = userUpdate;
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        if(twocontract[i].biTApproverPer){
+          twocontract[i].inTStatusId = 3;
+        }else{
+          twocontract[i].inTStatusId = 1;
+        }
+        twocontract[i].dtMApproverPer = formatDateTime(DateTime.now());
+        twocontract[i].useRApproverPer = userApprover;
+      }
+      // Determine API endpoint and column mapping based on contract type
+      final apiEndpoint = contractType == 'two' 
+          ? Common.UpdataListTwo
+          : Common.UpdataListApprentice;
+      final response = await http.put(
+        Uri.parse('${Common.API}$apiEndpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to update two contract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     sortCloumnIndex.value = sortColumnIndex;
@@ -200,5 +255,27 @@ class DashboardControllerApporver extends GetxController {
       dataList.refresh();
       filterdataList.refresh();
     }
+  }
+  String? formatDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value.toIso8601String();
+    if (value is String) {
+      // Try various common datetime formats
+      final formats = [
+        'yyyy-MM-dd HH:mm:ss.SSS',
+        'yyyy-MM-dd HH:mm:ss',
+        'yyyy-MM-dd',
+      ];
+
+      for (var format in formats) {
+        try {
+          final date = DateFormat(format).parse(value.replaceAll(' ', ''));
+          return date.toIso8601String();
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+    return null;
   }
 }
