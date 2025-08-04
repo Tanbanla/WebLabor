@@ -34,7 +34,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
       backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddDialog();
+          showDialog(context: context, builder: (context) => _ShowDialogAdd());
         },
         tooltip: tr('add'),
         backgroundColor: Common.primaryColor,
@@ -54,173 +54,14 @@ class _MasterPTHCState extends State<MasterPTHC> {
             const SizedBox(height: 16),
 
             // Data Table
-            Expanded(child: Obx(() => _buildDataTable())),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showAddDialog() {
-    final controller = Get.find<DashboardControllerPTHC>();
-    var userAdd = Pthc();
-    RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
-
-    showDialog(
-      context: context,
-      builder: (context) => Obx(
-        () => AlertDialog(
-          title: const Text('Thêm PTHC Mới'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Nhập ADID',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onChanged: (value) => userAdd.vchREmployeeAdid = value,
-                ),
-                // const SizedBox(height: 12),
-                // DropdownButtonFormField(
-                //   decoration: InputDecoration(
-                //     labelText: 'Loại User',
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //     ),
-                //   ),
-                //   items: ['0: Dùng riêng', '1: Dùng chung']
-                //       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                //       .toList(),
-                //   onChanged: (value) {
-                //     switch (value) {
-                //       case "0: Dùng riêng":
-                //         userAdd.inTUseridCommon = 0;
-                //       case "1: Dùng chung":
-                //         userAdd.inTUseridCommon = 1;
-                //     }
-                //   },
-                // ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Loại Mail',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  items:
-                      [
-                        'TO',
-                        'CC',
-                        'BCC',
-                      ]
-                      .map(
-                        (e) => DropdownMenuItem(value: e, child: Text(e)),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    userAdd.vchRNote = value;
-                  },
-                ),
-                const SizedBox(height: 12),
-                if (errorMessage.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      errorMessage.value,
-                      style: TextStyle(color: Colors.red, fontSize: 14),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: controller.isLoading.value
-                  ? null
-                  : () => Navigator.of(context).pop(),
-              child: const Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: (controller.isLoading.value)
-                  ? null
-                  : () async {
-                      errorMessage.value = '';
-                      if (userAdd.vchREmployeeAdid!.isEmpty ||
-                          userAdd.vchRNote!.isEmpty) {
-                        errorMessage.value = 'Yêu cầu không để trống thông tin';
-                        return;
-                      }
-                      controller.isLoading(false);
-                      try {
-                        await controller.addPTHC(
-                          userAdd,
-                          authState.user!.chRUserid.toString(),
-                        );
-                        if (mounted) {
-                          Navigator.of(
-                            context,
-                          ).pop(); // Close the import dialog first
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              icon: const Icon(
-                                Icons.check_circle,
-                                color: Colors.green,
-                                size: 50,
-                              ),
-                              title: const Text(
-                                'Thành công',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text('Thêm PHTC thành công'),
-                                  const SizedBox(height: 10),
-                                ],
-                              ),
-                              actions: [
-                                ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Đóng'),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        errorMessage.value =
-                            'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
-                      } finally {
-                        controller.isLoading(false);
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
-              child: Obx(
-                () => controller.isLoadingExport.value
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('Thêm'),
-              ),
+            Expanded(
+              child: Obx(() {
+                Visibility(
+                  visible: false,
+                  child: Text(controller.filteredpthcList.length.toString()),
+                );
+                return _buildDataTable();
+              }),
             ),
           ],
         ),
@@ -315,6 +156,18 @@ class _MasterPTHCState extends State<MasterPTHC> {
           tooltip: tr('export'),
           onPressed: _showExportDialog,
         ),
+        const SizedBox(width: 8),
+        _buildActionButton(
+          icon: Iconsax.trash,
+          color: Colors.red,
+          tooltip: tr('delete'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => _DeletePTHCDialog(),
+            );
+          },
+        ),
       ],
     );
   }
@@ -342,74 +195,95 @@ class _MasterPTHCState extends State<MasterPTHC> {
   }
 
   Widget _buildDataTable() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
+    double width = MediaQuery.of(context).size.width;
+    return Theme(
+      data: Theme.of(context).copyWith(
+        cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
+        dividerTheme: DividerThemeData(
+          color: Colors.grey[200],
+          thickness: 1,
+          space: 0,
+        ),
       ),
-      child: Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        child: SingleChildScrollView(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Scrollbar(
           controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width - 32,
-            child: PaginatedDataTable2(
-              columnSpacing: 12,
-              minWidth: 800,
-              horizontalMargin: 12,
-              dataRowHeight: 56,
-              headingRowHeight: 56,
-              headingTextStyle: TextStyle(
-                color: Colors.blue[800],
-                fontWeight: FontWeight.bold,
-              ),
-              headingRowDecoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: width - 34,
+              child: PaginatedDataTable2(
+                columnSpacing: 12,
+                minWidth: 1000,
+                horizontalMargin: 12,
+                dataRowHeight: 56,
+                headingRowHeight: 56,
+                headingTextStyle: TextStyle(
+                  color: Colors.blue[800],
+                  fontWeight: FontWeight.bold,
                 ),
-                color: Colors.blue[50],
-              ),
-              showCheckboxColumn: true,
-              showFirstLastButtons: true,
-              renderEmptyRowsInTheEnd: false,
-              rowsPerPage: 10,
-              availableRowsPerPage: const [5, 10, 20, 50],
-              onRowsPerPageChanged: (value) {},
-              sortColumnIndex: controller.sortColumnIndex.value,
-              ///
-              sortAscending: controller.sortAscending.value,
-              sortArrowBuilder: (ascending, sorted) {
-                return Icon(
-                  sorted
-                      ? ascending
-                            ? Iconsax.arrow_up_2
-                            : Iconsax.arrow_down_1
-                      : Iconsax.row_horizontal,
-                  size: 16,
-                  color: sorted ? Colors.blue[800] : Colors.grey,
-                );
-              },
-              columns: [
-                DataColumn2(
-                  label: Text(tr('department')),
-                  size: ColumnSize.L,
-                  onSort: controller.sortById,
+                headingRowDecoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                  color: Colors.blue[50],
                 ),
-                DataColumn2(label: Text(tr('Mailto')), size: ColumnSize.L),
-                DataColumn2(label: Text(tr('MailCC')), size: ColumnSize.L),
-                DataColumn2(label: Text(tr('action')), fixedWidth: 120),
-              ],
-              source: MyData(context),
+                showCheckboxColumn: true,
+                showFirstLastButtons: true,
+                renderEmptyRowsInTheEnd: false,
+                rowsPerPage: 10,
+                availableRowsPerPage: const [5, 10, 20, 50],
+                onRowsPerPageChanged: (value) {},
+                sortColumnIndex: controller.sortColumnIndex.value,
+
+                ///
+                sortAscending: controller.sortAscending.value,
+                sortArrowBuilder: (ascending, sorted) {
+                  return Icon(
+                    sorted
+                        ? ascending
+                              ? Iconsax.arrow_up_2
+                              : Iconsax.arrow_down_1
+                        : Iconsax.row_horizontal,
+                    size: 16,
+                    color: sorted ? Colors.blue[800] : Colors.grey,
+                  );
+                },
+                columns: [
+                  DataColumn2(
+                    label: Text(tr('department')),
+                    fixedWidth: 150,
+                    onSort: controller.sortById,
+                  ),
+                  DataColumn2(
+                    label: Text(tr('Mailto')),
+                    // fixedWidth: 150,
+                  ),
+                  DataColumn2(
+                    label: Text(tr('MailCC')),
+                    // fixedWidth: 200,
+                  ),
+                  DataColumn2(
+                    label: Text(tr('MailBCC')),
+                    // fixedWidth: 150,
+                  ),
+                ],
+                source: MyData(context),
+              ),
             ),
           ),
         ),
@@ -795,57 +669,7 @@ class MyData extends DataTableSource {
         DataCell(Text(data.mailto ?? '')),
         DataCell(Text(data.mailcc ?? '')),
         DataCell(Text(data.mailbcc ?? '')),
-        DataCell(
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildActionButton(
-                icon: Iconsax.edit_2,
-                color: Colors.blue,
-                onPressed: () {
-                  // showDialog(
-                  //   context: context,
-                  //   builder: (context) => _EditUserDialog(user: data),
-                  // );
-                },
-              ),
-              const SizedBox(width: 8),
-              _buildActionButton(
-                icon: Iconsax.trash,
-                color: Colors.red,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        _DeletePTHCDialog(id: (0)), // sua loai doan xoa nay
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
       ],
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: IconButton(
-          icon: Icon(icon, size: 20, color: color),
-          onPressed: onPressed,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-        ),
-      ),
     );
   }
 
@@ -859,23 +683,196 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class _DeletePTHCDialog extends StatelessWidget {
-  final int id;
-  final DashboardControllerPTHC controller = Get.find();
+class _DeletePTHCDialog extends StatefulWidget {
+  const _DeletePTHCDialog();
 
-  _DeletePTHCDialog({required this.id});
+  @override
+  State<_DeletePTHCDialog> createState() => _DeletePTHCDialogState();
+}
+
+class _DeletePTHCDialogState extends State<_DeletePTHCDialog> {
+  final DashboardControllerPTHC controller = Get.find();
+  final TextEditingController _inputController = TextEditingController();
+  RxString _errorMessage = ''.obs;
+  RxBool _isADID = true.obs;
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // Thêm Obx để theo dõi trạng thái loading
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
 
       return AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: const Text('Bạn có chắc chắn muốn xóa user này?'),
+        title: const Text('Xóa PTHC', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: const Text('Xóa bằng ADID hoặc Email'),
+                      selected: _isADID.value,
+                      onSelected: (selected) {
+                        _isADID.value = true;
+                        _inputController.clear();
+                        _errorMessage.value = '';
+                      },
+                    ),
+                  ),
+                  // const SizedBox(width: 8),
+                  // Expanded(
+                  //   child: ChoiceChip(
+                  //     label: const Text('Xóa bằng Email'),
+                  //     selected: !_isADID.value,
+                  //     onSelected: (selected) {
+                  //       _isADID.value = false;
+                  //       _inputController.clear();
+                  //       _errorMessage.value = '';
+                  //     },
+                  //   ),
+                  // ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _inputController,
+                decoration: InputDecoration(
+                  labelText: _isADID.value ? 'Nhập ADID cần xóa' : 'Nhập Email cần xóa',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  errorText: _errorMessage.value.isEmpty ? null : _errorMessage.value,
+                ),
+                onChanged: (value) => _errorMessage.value = '',
+              ),
+              const SizedBox(height: 8),
+              if (_errorMessage.value.isNotEmpty)
+                Text(
+                  _errorMessage.value,
+                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value ? null : () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: controller.isLoading.value ? null : () async {
+              if (_inputController.text.isEmpty) {
+                _errorMessage.value = 'Vui lòng nhập ${_isADID.value ? 'ADID' : 'Email'}';
+                return;
+              }
+
+              controller.isLoading(true);
+              try {
+                await controller.deleteAdidOrMail(_inputController.text);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              } catch (e) {
+                  _errorMessage.value = 'Lỗi: ${e.toString()}';
+              } finally {
+                controller.isLoading(false);
+              }
+            },
+            child: const Text('Xóa'),
+          ),
+        ],
+      );
+    });
+  }
+
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+        title: const Text('Thành công', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Đóng'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _ShowDialogAdd extends StatefulWidget {
+  const _ShowDialogAdd();
+  @override
+  State<_ShowDialogAdd> createState() => __ShowDialogAddState();
+}
+
+class __ShowDialogAddState extends State<_ShowDialogAdd> {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<DashboardControllerPTHC>();
+    var userAdd = Pthc();
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+    return Obx(
+      () => AlertDialog(
+        title: const Text('Thêm PTHC Mới'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Nhập ADID',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: (value) => userAdd.vchREmployeeAdid = value,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField(
+                decoration: InputDecoration(
+                  labelText: 'Loại Mail',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                items: ['TO', 'CC', 'BCC']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {
+                  userAdd.vchRNote = value;
+                },
+              ),
+              const SizedBox(height: 12),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: controller.isLoading.value
@@ -884,26 +881,83 @@ class _DeletePTHCDialog extends StatelessWidget {
             child: const Text('Hủy'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: controller.isLoading.value
+            onPressed: (controller.isLoading.value)
                 ? null
                 : () async {
+                    errorMessage.value = '';
+                    if (userAdd.vchREmployeeAdid!.isEmpty ||
+                        userAdd.vchRNote!.isEmpty) {
+                      errorMessage.value = 'Yêu cầu không để trống thông tin';
+                      return;
+                    }
+                    controller.isLoading(false);
                     try {
-                      await controller.deletePTHC(id);
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
+                      await controller.addPTHC(
+                        userAdd,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      if (mounted) {
+                        Navigator.of(
+                          context,
+                        ).pop(); // Close the import dialog first
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            icon: const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                            title: const Text(
+                              'Thành công',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('Thêm PHTC thành công'),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Đóng'),
+                              ),
+                            ],
+                          ),
+                        );
                       }
                     } catch (e) {
-                      // Xử lý lỗi nếu cần
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
+                      errorMessage.value =
+                          'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                    } finally {
+                      controller.isLoading(false);
                     }
                   },
-            child: const Text('Xóa'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Thêm'),
+            ),
           ),
         ],
-      );
-    });
+      ),
+    );
   }
 }

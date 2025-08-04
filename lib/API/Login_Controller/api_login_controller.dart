@@ -29,10 +29,6 @@ class AuthService {
 
       if (response.statusCode == 200) {
         if (responseData['data'] == true) {
-          // Cập nhật AuthState khi đăng nhập thành công
-          // final authState = Provider.of<AuthState>(context, listen: false);
-          // await authState.login(userADID);
-
           final requestBody = {
             "pageNumber": -1,
             "pageSize": 10,

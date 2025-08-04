@@ -21,8 +21,6 @@ class DashboardControllerTwo extends GetxController {
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
 
-  RxString currentStatusId = "".obs;
-
   @override
   void onInit() {
     super.onInit();

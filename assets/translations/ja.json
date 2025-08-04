@@ -96,5 +96,14 @@
   "hintApprenticefill":"Điền đánh giá cho các công nhân viên kết thúc thực hợp đồng học nghề, thử việc",
   "titlePTHC":"Quản lý thông tin phê duyệt và thông báo",
   "Mailto":"Mail To",
-  "MailCC":"Mail CC"
+  "MailCC":"Mail CC",
+  "MailBCC":"Mail BCC",
+  "Approverhint":"Phê duyệt của nhân sự cho danh sách đánh giá các công nhân viên chuyển sang loại hợp đồng mới",
+  "Confirm": "Xác nhận",
+  "LogOut":"Đăng xuất",
+  "LogOut1":"Xác nhận đăng xuất",
+  "LogOut2":"Bạn có chắc chắn muốn đăng xuất?",
+  "NotLogin":"Chưa đăng nhập",
+  "TypeContract":"Loại hợp đồng: ",
+  "DotDanhGia":"Mã đợt đánh giá"
 }

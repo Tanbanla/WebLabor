@@ -39,14 +39,18 @@ class DashboardControllerPTHC extends GetxController {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           final List<dynamic> data = jsonData['data'];
-          pthcList.assignAll(data.map((user) => PthcGroup.fromJson(user)).toList());
+          pthcList.assignAll(
+            data.map((user) => PthcGroup.fromJson(user)).toList(),
+          );
           filteredpthcList.assignAll(pthcList);
           selectRows.assignAll(
             List.generate(pthcList.length, (index) => false),
           );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
         }
       } else {
-        throw Exception('Failed to load users');
+        throw Exception('Failed to load dats');
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch data: $e');
@@ -86,15 +90,11 @@ class DashboardControllerPTHC extends GetxController {
       filteredpthcList.assignAll(
         pthcList.where(
           (pthc) =>
-              (pthc.section?? '').toLowerCase().contains(
+              (pthc.section ?? '').toLowerCase().contains(
                 query.toLowerCase(),
               ) ||
-              (pthc.mailto ?? '').toLowerCase().contains(
-                query.toLowerCase(),
-              ) ||
-              (pthc.mailcc?? '').toLowerCase().contains(
-                query.toLowerCase(),
-              ),
+              (pthc.mailto ?? '').toLowerCase().contains(query.toLowerCase()) ||
+              (pthc.mailcc ?? '').toLowerCase().contains(query.toLowerCase()),
         ),
       );
     }
@@ -144,7 +144,7 @@ class DashboardControllerPTHC extends GetxController {
         ..dtMCreate = formatDateTime(DateTime.now())
         ..vchRUserUpdate = userUpdate
         ..dtMUpdate = formatDateTime(DateTime.now())
-        ..inTStatusId = newPthc.inTStatusId
+        ..inTStatusId = 0
         ..vchRNote = newPthc.vchRNote;
       final response = await http.post(
         Uri.parse('${Common.API}${Common.AddPTHC}'),
@@ -168,7 +168,7 @@ class DashboardControllerPTHC extends GetxController {
     }
   }
 
-  Future<void> importFromExcel(File file,String userUpdate) async {
+  Future<void> importFromExcel(File file, String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -190,19 +190,19 @@ class DashboardControllerPTHC extends GetxController {
         final row = rows[_i];
         // Create and populate pthc
         final pthc = Pthc()
-        ..id = 0
-        ..vchRCodeSection = row[1]?.value?.toString()
-        ..vchRNameSection = row[1]?.value?.toString()
-        ..vchREmployeeId = row[2]?.value?.toString()
-        ..nvchREmployeeName = row[3]?.value?.toString()
-        ..vchREmployeeAdid = row[4]?.value?.toString()
-        ..vchRMail = row[5]?.value?.toString()
-        ..vchRUserCreate = userUpdate
-        ..dtMCreate = formatDateTime(DateTime.now())
-        ..vchRUserUpdate = userUpdate
-        ..dtMUpdate = formatDateTime(DateTime.now())
-        ..inTStatusId = 1
-        ..vchRNote ="Update by file";
+          ..id = 0
+          ..vchRCodeSection = row[1]?.value?.toString()
+          ..vchRNameSection = row[1]?.value?.toString()
+          ..vchREmployeeId = row[2]?.value?.toString()
+          ..nvchREmployeeName = row[3]?.value?.toString()
+          ..vchREmployeeAdid = row[4]?.value?.toString()
+          ..vchRMail = row[5]?.value?.toString()
+          ..vchRUserCreate = userUpdate
+          ..dtMCreate = formatDateTime(DateTime.now())
+          ..vchRUserUpdate = userUpdate
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..inTStatusId = 0
+          ..vchRNote = row[6]?.value?.toString();
 
         // Validate required fields
         if (pthc.vchREmployeeAdid?.isEmpty == true ||
@@ -266,19 +266,19 @@ class DashboardControllerPTHC extends GetxController {
         final row = rows[_i];
         // Create and populate user
         final pthc = Pthc()
-        ..id = 0
-        ..vchRCodeSection = row[1]?.value?.toString()
-        ..vchRNameSection = row[1]?.value?.toString()
-        ..vchREmployeeId = row[2]?.value?.toString()
-        ..nvchREmployeeName = row[3]?.value?.toString()
-        ..vchREmployeeAdid = row[4]?.value?.toString()
-        ..vchRMail = row[5]?.value?.toString()
-        ..vchRUserCreate = userUpdate
-        ..dtMCreate = formatDateTime(DateTime.now())
-        ..vchRUserUpdate = userUpdate
-        ..dtMUpdate = formatDateTime(DateTime.now())
-        ..inTStatusId = 1
-        ..vchRNote ="Update by file";
+          ..id = 0
+          ..vchRCodeSection = row[1]?.value?.toString()
+          ..vchRNameSection = row[1]?.value?.toString()
+          ..vchREmployeeId = row[2]?.value?.toString()
+          ..nvchREmployeeName = row[3]?.value?.toString()
+          ..vchREmployeeAdid = row[4]?.value?.toString()
+          ..vchRMail = row[5]?.value?.toString()
+          ..vchRUserCreate = userUpdate
+          ..dtMCreate = formatDateTime(DateTime.now())
+          ..vchRUserUpdate = userUpdate
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..inTStatusId = 0
+          ..vchRNote = row[6]?.value?.toString();
 
         // Validate required fields
         if (pthc.vchREmployeeAdid?.isEmpty == true ||
@@ -338,13 +338,42 @@ class DashboardControllerPTHC extends GetxController {
           ? Common.DeletePTHCIDLogic
           : Common.DeletePTHCID; //logical ? Common.DeleteIDLogic :
       final response = await http.delete(
-        // Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
         Uri.parse('${Common.API}$endpoint$id'),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         await fetchPTHCData();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to delete PTHC: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteAdidOrMail(String adid) async {
+    try {
+      isLoading(true);
+      final response = await http.delete(
+        Uri.parse('${Common.API}${Common.DeleteByADIDPthc}$adid'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          await fetchPTHCData();
+        }else{
+          throw Exception(
+          'Data does not exist',
+        );
+        }
       } else {
         final error = json.decode(response.body);
         throw Exception(

@@ -15,7 +15,6 @@ import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
-
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
@@ -54,10 +53,7 @@ class _MenuScreenState extends State<MenuScreen> {
       // is HomeScreen
       //     ? HomeScreen(changeBody: _changeBody) // Truyền callback khi là HomeScreen
       //     : body(),
-      drawer: ComplexDrawer(
-        changeBody: _changeBody,
-        context: context, 
-      ),
+      drawer: ComplexDrawer(changeBody: _changeBody, context: context),
       drawerScrimColor: Colors.transparent,
       backgroundColor: Colors.white,
     );
@@ -182,8 +178,13 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   Widget row() {
     return Row(
       children: [
-        isExpanded ? blackIconTiles() : blackIconMenu(),
-        invisibleSubMenus(),
+        // isExpanded ? blackIconTiles()  : blackIconMenu(),
+        // invisibleSubMenus(),
+        if (isExpanded) ...[
+          blackIconMenu(),
+          invisibleSubMenus(),
+        ] else
+          blackIconTiles(),
       ],
     );
   }
@@ -292,7 +293,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   Widget invisibleSubMenus() {
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
-      width: isExpanded ? 0 : 200,
+      width: !isExpanded ? 0 : 200,
       color: Color.fromARGB(255, 119, 201, 146).withOpacity(0.4),
       child: Column(
         children: [
@@ -447,7 +448,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           color: Colors.white70,
           image: DecorationImage(
             //ảnh
-            image: AssetImage('assets/img/profile.jpg'),
+            image: AssetImage('assets/img/plant-one.png'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(6),
@@ -457,19 +458,58 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   }
 
   Widget accountTile() {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    return Container(
-      color: Common.primaryColor,
-      child: ListTile(
-        leading: accountButton(usePadding: false),
-        title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
-        subtitle: Text(
-          authState.user?.nvchRNameId.toString() ?? 'Chưa đăng nhập',
-          style: TextStyle(color: Colors.white70),
+  final authState = Provider.of<AuthState>(context, listen: true);
+  return Container(
+    color: Common.primaryColor,
+    child: Row(
+      children: [
+        Expanded(
+          child: ListTile(
+            leading: accountButton(usePadding: false),
+            title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
+            subtitle: Text(
+              authState.user?.nvchRNameId.toString() ?? tr('NotLogin'),
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
         ),
-      ),
-    );
-  }
+        IconButton(
+          icon: Icon(Icons.logout, color: Colors.white),
+          tooltip: tr('LogOut'),
+          onPressed: () async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(tr('LogOut1')),
+                content: Text(tr('LogOut2')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(tr('Cancel')),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(tr('LogOut'), style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            );
+            
+            if (confirmed == true) {
+              try {
+                await authState.logout();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('LogOut faile: ${e.toString()}')),
+                );
+              }
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
 
   void expandOrShrinkDrawer() {
     setState(() {

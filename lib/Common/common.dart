@@ -43,7 +43,8 @@ class Common {
   // POST
   static const String AddPTHC = "PthcSection/add";
   static const String AddListPTHC = "PthcSection/add-multi";
-  static const String GetGroupPTHC ="PthcSection/get-list-mail-groupby-section";
+  static const String GetGroupPTHC =
+      "PthcSection/get-list-mail-groupby-section";
   //PUST
   static const String UpdatePTHC = "PthcSection/update/";
   static const String UpdataListPTHC = "PthcSection/update-multi";
@@ -51,7 +52,9 @@ class Common {
   static const String DeletePTHCID = "PthcSection/delete/";
   static const String DeletePTHCIDLogic = "PthcSection/delete-logic/";
   static const String DeletePTHCMultiID = "PthcSection/delete-multi/";
-  static const String DeletePTHCMultiIDLogic ="PthcSection/delete-logic-multi/";
+  static const String DeletePTHCMultiIDLogic =
+      "PthcSection/delete-logic-multi/";
+  static const String DeleteByADIDPthc = "PthcSection/delete-logic-by-adid-or-email?input=";
 
   // Contract Two year
   static const String TwoGetAll = "ContractTwoYear/get-all";
@@ -69,14 +72,17 @@ class Common {
   static const String DeleteTwoID = "ContractTwoYear/delete/";
   static const String DeleteTwoIDLogic = "ContractTwoYear/delete-logic/";
   static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi/";
-  static const String DeleteTwoMultiIDLogic ="ContractTwoYear/delete-logic-multi/";
+  static const String DeleteTwoMultiIDLogic =
+      "ContractTwoYear/delete-logic-multi/";
 
   // Contract Apprentice Api
   static const String ApprenticeGetAll = "ContractApprentice/get-all";
   static const String GetApprenticeCount = "ContractApprentice/get-count-all";
   static const String GetByIdApprentice = "ContractApprentice/get/";
-  static const String ApprenticeGetByCount ="ContractApprentice/get-count-by-condition";
-  static const String ApprenticeSreachBy ="ContractApprentice/search-by-condition";
+  static const String ApprenticeGetByCount =
+      "ContractApprentice/get-count-by-condition";
+  static const String ApprenticeSreachBy =
+      "ContractApprentice/search-by-condition";
   // POST
   static const String AddApprentice = "ContractApprentice/add";
   static const String AddListApprentice = "ContractApprentice/add-multi";

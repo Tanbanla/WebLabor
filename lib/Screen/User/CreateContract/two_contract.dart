@@ -71,7 +71,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   }
 
   Widget _buildApproverPer() {
-    final controller = Get.put(DashboardControllerUserApprover(),);
+    final controller = Get.put(DashboardControllerUserApprover());
     controller.changeStatus('ADM-PER', 'Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
