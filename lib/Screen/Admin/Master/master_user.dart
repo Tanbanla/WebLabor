@@ -295,8 +295,9 @@ class _MasterUserState extends State<MasterUser> {
 
     showDialog(
       context: context,
-      builder: (context) => Obx(
-        () => AlertDialog(
+      builder: (context) => 
+      Obx(() => 
+      AlertDialog(
           title: const Text('Import Dữ Liệu'),
           content: SingleChildScrollView(
             child: Column(
@@ -663,8 +664,9 @@ class _MasterUserState extends State<MasterUser> {
 
     showDialog(
       context: context,
-      builder: (context) => Obx(
-        () => AlertDialog(
+      builder: (context) => 
+      Obx(() => 
+        AlertDialog(
           title: const Text('Thêm User Mới'),
           content: SingleChildScrollView(
             child: Column(

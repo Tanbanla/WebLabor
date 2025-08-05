@@ -1333,7 +1333,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 10, width: 500,),
 
               // Dòng 4: Vị trí + Bậc lương
               Row(

@@ -699,4 +699,139 @@ class DashboardControllerApprentice extends GetxController {
     }
     return null;
   }
+
+  // cac thuoc tinh update
+  void updateVchrLythuyet(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRLyThuyet= diem;
+      filterdataList[index].vchRLyThuyet = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateThucHanh(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRThucHanh= diem;
+      filterdataList[index].vchRThucHanh = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateCompleteWork(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRCompleteWork= diem;
+      filterdataList[index].vchRCompleteWork = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateStudyWork(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRLearnWork= diem;
+      filterdataList[index].vchRLearnWork = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateThichNghi(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRThichNghi= diem;
+      filterdataList[index].vchRThichNghi = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateUseful(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRUseful= diem;
+      filterdataList[index].vchRUseful = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateContact(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRContact= diem;
+      filterdataList[index].vchRContact = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateNoiQuy(String employeeCode, String diem){
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vcHNeedViolation= diem;
+      filterdataList[index].vcHNeedViolation = diem;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateCuoicung(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRReasultsLeader = reason;
+      filterdataList[index].vchRReasultsLeader = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateRehireStatus(String employeeCode, bool value) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].biTNoReEmployment = value;
+      filterdataList[index].biTNoReEmployment = value;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+  void updateNotRehireReason(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].nvchRNoReEmpoyment = reason;
+      filterdataList[index].nvchRNoReEmpoyment = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateNote(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRNote = reason;
+      filterdataList[index].vchRNote = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
 }

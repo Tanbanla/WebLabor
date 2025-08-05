@@ -105,5 +105,8 @@
   "LogOut2":"Bạn có chắc chắn muốn đăng xuất?",
   "NotLogin":"Chưa đăng nhập",
   "TypeContract":"Loại hợp đồng: ",
-  "DotDanhGia":"Mã đợt đánh giá"
+  "DotDanhGia":"Mã đợt đánh giá",
+  "LoiGui":"Lỗi danh sách gửi đi không có dữ liệu!",
+  "InputError":"Yêu cầu nhập lý do không tuyển dụng cho ",
+    "PheDuyetHint":"Phê duyệt sách đánh giá các công nhân viên từ hợp đồng 2 năm lên hợp đồng không xác định thời hạn"
 }

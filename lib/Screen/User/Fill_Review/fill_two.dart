@@ -39,18 +39,22 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    // if(authState.user!.chRGroup.toString() == "PTHC"){
-    //   // truong hop PTHC phong ban
-    //   controller.changeStatus('3', sectionName, null);
-    // }else{
-    //   // truong hop leader
-    //   controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString());
-    // }
-    controller.changeStatus(
-      '2',
-      sectionName,
-      authState.user!.chRUserid.toString(),
-    );
+    if (authState.user!.chRGroup.toString() == "PTHC") {
+      // truong hop PTHC phong ban
+      controller.changeStatus('3', sectionName, null);
+    } else {
+      // truong hop leader
+      controller.changeStatus(
+        '4',
+        sectionName,
+        authState.user!.chRUserid.toString(),
+      );
+    }
+    // controller.changeStatus(
+    //   '2',
+    //   sectionName,
+    //   authState.user!.chRUserid.toString(),
+    // );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -245,7 +249,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          tr('fillEvaluation') + ' ' + tr('indefiniteContract'),
+          '${tr('fillEvaluation')} ${tr('indefiniteContract')}',
           style: TextStyle(
             color: Common.primaryColor.withOpacity(0.8),
             fontWeight: FontWeight.bold,
@@ -946,22 +950,27 @@ class MyData extends DataTableSource {
         ),
         //4 thuộc tính đánh giá
         DataCell(
-          TextFormField(
-            controller: healthController,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            decoration: InputDecoration(
-              labelText: tr('health'),
-              labelStyle: TextStyle(fontSize: Common.sizeColumn),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateHealthStatus(
+                  data.vchREmployeeId.toString(),
+                  healthController.text,
+                );
+              }
+            },
+            child: TextFormField(
+              controller: healthController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('health'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
-            onChanged: (value) {
-              controller.updateHealthStatus(
-                data.vchREmployeeId.toString(),
-                value,
-              );
-            },
           ),
         ),
         DataCell(
@@ -1058,7 +1067,7 @@ class MyData extends DataTableSource {
               child: Text(controller.filterdataList[index].toString()),
             );
             final rawStatus =
-                controller.filterdataList[index].biTNoReEmployment ?? false;
+                controller.filterdataList[index].biTNoReEmployment ?? true;
             final status = rawStatus ? 'OK' : 'NG';
             return DropdownButton<String>(
               value: status,
@@ -1108,22 +1117,27 @@ class MyData extends DataTableSource {
           }),
         ),
         DataCell(
-          TextFormField(
-            controller: reasonController,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            decoration: InputDecoration(
-              labelText: tr('reason'),
-              labelStyle: TextStyle(fontSize: Common.sizeColumn),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateNotRehireReason(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                );
+              }
+            },
+            child: TextFormField(
+              controller: reasonController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
-            onChanged: (value) {
-              controller.updateNotRehireReason(
-                data.vchREmployeeId.toString(),
-                value,
-              );
-            },
           ),
         ),
       ],
@@ -1241,7 +1255,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 10, width: 500,),
               // Dòng 2: Mã NV + Giới tính
               Row(
                 children: [
@@ -1418,14 +1432,6 @@ class _EditTwoContractDialog extends StatelessWidget {
                       keyboardType: TextInputType.number,
                     ),
                   ),
-                  // const SizedBox(width: 10),
-                  // Expanded(
-                  //   child: _buildCompactTextField(
-                  //     initialValue: twoContract.vchRCodeApprover,
-                  //     label: tr('CodeApprover'),
-                  //     onChanged: (value) => edited.vchRCodeApprover = value,
-                  //   ),
-                  // ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -1486,18 +1492,22 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      // if(authState.user!.chRGroup.toString() == "PTHC"){
-                      //   // truong hop PTHC phong ban
-                      //   controller.changeStatus('3', sectionName, null);
-                      // }else{
-                      //   // truong hop leader
-                      //   controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString());
-                      // }
-                      await controller.changeStatus(
-                        "2",
-                        sectionName,
-                        authState.user!.chRUserid.toString(),
-                      );
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        // truong hop PTHC phong ban
+                        await controller.changeStatus('3', sectionName, null);
+                      } else {
+                        // truong hop leader
+                        await controller.changeStatus(
+                          '4',
+                          sectionName,
+                          authState.user!.chRUserid.toString(),
+                        );
+                      }
+                      // await controller.changeStatus(
+                      //   "2",
+                      //   sectionName,
+                      //   authState.user!.chRUserid.toString(),
+                      // );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

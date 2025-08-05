@@ -22,7 +22,9 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
     DashboardControllerApporver(),
   );
   final ScrollController _scrollController = ScrollController();
-  String? selectedContractType = tr('indefiniteContract');
+  //RxString selectedContractType  = RxString('');
+  String get _indefiniteContractText => tr('indefiniteContract');
+  String get _trialContractText => tr('trialContract');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,104 +67,109 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
     final controller = Get.find<DashboardControllerApporver>();
 
     // Extract section name safely
-    String sectionName =
-        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-    RxString errorMessage = ''.obs;
+    // String sectionName =
+    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const SizedBox(width: 20),
-        Text(
-          tr('TypeContract'),
-          style: TextStyle(
-            color: Common.primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: Common.sizeColumn,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.withOpacity(0.3)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: selectedContractType,
-              hint: Text(tr('selectContractType')),
-              icon: Icon(Icons.arrow_drop_down, color: Common.primaryColor),
-              style: TextStyle(
-                fontSize: Common.sizeColumn,
-                color: Colors.black87,
-              ),
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    selectedContractType = newValue ;
-                  });
-                  // Map the translated value to controller contract type
-                  final contractType = newValue == tr('indefiniteContract')
-                      ? 'two'
-                      : 'apprentice';
-                  controller.fetchData(
-                    contractType: contractType,
-                    statusId: '2',
-                    section: sectionName,
-                    adid: authState.user?.chRUserid ?? '',
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: tr('indefiniteContract'),
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      const SizedBox(width: 8),
-                      Text(
-                        tr('indefiniteContract'),
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Common.greenColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: tr('trialContract'),
-                  child: Row(
-                    children: [
-                      Icon(Icons.work_outline, color: Colors.blue, size: 16),
-                      const SizedBox(width: 8),
-                      Text(
-                        tr('trialContract'),
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    RxString errorMessage = ''.obs;
+    return Obx(() {
+      final currentValue = controller.currentContractType.value == 'two'
+          ? _indefiniteContractText
+          : controller.currentContractType.value == 'apprentice'
+          ? _trialContractText
+          : _indefiniteContractText; // Giá trị mặc định
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(width: 20),
+          Text(
+            tr('TypeContract'),
+            style: TextStyle(
+              color: Common.primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: Common.sizeColumn,
             ),
           ),
-        ),
-        const SizedBox(width: 30),
-         // Send button
+          const SizedBox(width: 10),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: currentValue,
+                hint: Text(tr('indefiniteContract')),
+                icon: Icon(Icons.arrow_drop_down, color: Common.primaryColor),
+                style: TextStyle(
+                  fontSize: Common.sizeColumn,
+                  color: Colors.black87,
+                ),
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    //selectedContractType.value = newValue;
+                    // Map the translated value to controller contract type
+                    final contractType = newValue == tr('indefiniteContract')
+                        ? 'two'
+                        : 'apprentice';
+                    controller.setContractType(contractType);
+                    controller.fetchData(
+                      contractType: contractType,
+                      statusId: '2',
+                      section: null,
+                      adid: authState.user?.chRUserid ?? '',
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: tr('indefiniteContract'),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          tr('indefiniteContract'),
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Common.greenColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: tr('trialContract'),
+                    child: Row(
+                      children: [
+                        Icon(Icons.work_outline, color: Colors.blue, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          tr('trialContract'),
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 30),
+          // Send button
           GestureDetector(
             onTap: () async {
               errorMessage.value = '';
               try {
-                final controller = Get.find<DashboardControllerApporver>();
-                final contractType = selectedContractType == tr('indefiniteContract')
-                      ? 'two'
-                      : 'apprentice';
-                await controller.updateListContractApproval( authState.user!.chRUserid.toString(),  authState.user!.chRUserid.toString(), contractType);
+                await controller.updateListContractApproval(
+                  authState.user!.chRUserid.toString(),
+                  authState.user!.chRUserid.toString(),
+                  controller.currentContractType.toString(),
+                );
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -193,7 +200,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                           ),
                         )
                       : Text(
-                          tr('send'),
+                          tr('Confirm'),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -215,8 +222,9 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                 ),
               ),
             ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   Widget _buildHeader() {
@@ -484,10 +492,12 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
 
 class MyData extends DataTableSource {
   final DashboardControllerApporver controller = Get.find();
-
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
+    final reasonController = TextEditingController(
+      text: data.nvchRApproverPer ?? '',
+    );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -570,14 +580,14 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        // DataCell(
-        //   Center(
-        //     child: Text(
-        //       data.chRCodeGrade?.toString() ?? "",
-        //       style: TextStyle(fontSize: Common.sizeColumn),
-        //     ),
-        //   ),
-        // ),
+        DataCell(
+          Center(
+            child: Text(
+              data.chRCodeGrade?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
         DataCell(
           Center(
             child: Text(
@@ -610,30 +620,6 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        // DataCell(
-        //   Center(
-        //     child: Text(
-        //       data.fLPaidLeave?.toString() ?? "",
-        //       style: TextStyle(fontSize: Common.sizeColumn),
-        //     ),
-        //   ),
-        // ),
-        // DataCell(
-        //   Center(
-        //     child: Text(
-        //       data.fLNotPaidLeave?.toString() ?? "",
-        //       style: TextStyle(fontSize: Common.sizeColumn),
-        //     ),
-        //   ),
-        // ),
-        // DataCell(
-        //   Center(
-        //     child: Text(
-        //       data.fLNotLeaveDay?.toString() ?? "",
-        //       style: TextStyle(fontSize: Common.sizeColumn),
-        //     ),
-        //   ),
-        // ),
         DataCell(
           Center(
             child: Text(
@@ -642,40 +628,32 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        //5 thuộc tính đánh giá
         DataCell(
           Text(
             data.nvarchaRViolation?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         // thuộc tính approver
         DataCell(
           Obx(() {
-            //final item = controller.filterdataList[index];
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus = ""; //item['notRehire'] as String?;
-            final status = (rawStatus == 'OK' || rawStatus == 'NG')
-                ? rawStatus
-                : 'NG';
-            final employeeCode = "";
-            // item['employeeCode'] as String? ?? '';
-
+            final rawStatus =
+                controller.filterdataList[index].biTApproverPer ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
             return DropdownButton<String>(
               value: status,
-              underline: Container(),
-              isDense: true,
-              style: TextStyle(
-                fontSize: Common.sizeColumn, // Cập nhật font size
-                color: _getStatusColor(status),
-              ),
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              icon: Icon(Icons.arrow_drop_down, color: _getStatusColor(status)),
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateApproval(
+                    data.vchREmployeeId.toString(),
+                    newValue == 'OK',
+                  );
+                }
+              },
               items: [
                 DropdownMenuItem(
                   value: 'OK',
@@ -683,7 +661,13 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 4),
-                      Text('O', style: TextStyle(fontSize: Common.sizeColumn)),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -693,58 +677,52 @@ class MyData extends DataTableSource {
                     children: [
                       Icon(Icons.cancel, color: Colors.red, size: 16),
                       SizedBox(width: 4),
-                      Text('X', style: TextStyle(fontSize: Common.sizeColumn)),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
-              onChanged: (newValue) {
-                if (newValue != null && employeeCode.isNotEmpty) {
-                  controller.filterdataList.refresh();
-                }
-              },
             );
           }),
         ),
         DataCell(
-          TextFormField(
-            style: TextStyle(
-              fontSize: Common.sizeColumn,
-            ), // Thêm cho TextFormField
-            decoration: InputDecoration(
-              labelText: 'Lý do',
-              labelStyle: TextStyle(
-                fontSize: Common.sizeColumn,
-              ), // Thêm cho label
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập lý do';
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateNoteApprovel(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                );
               }
-              return null;
             },
+            child: TextFormField(
+              controller: reasonController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              // onChanged: (value) {
+              //   controller.updateNoteApprovel(
+              //     data.vchREmployeeId.toString(),
+              //     value,
+              //   );
+              // },
+            ),
           ),
         ),
       ],
     );
-  }
-
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'OK':
-        return Colors.green;
-      case 'NG':
-        return Colors.red;
-      case 'Stop Working':
-        return Colors.orange;
-      case 'Finish L/C':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
   }
 
   @override

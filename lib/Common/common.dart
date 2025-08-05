@@ -54,7 +54,8 @@ class Common {
   static const String DeletePTHCMultiID = "PthcSection/delete-multi/";
   static const String DeletePTHCMultiIDLogic =
       "PthcSection/delete-logic-multi/";
-  static const String DeleteByADIDPthc = "PthcSection/delete-logic-by-adid-or-email?input=";
+  static const String DeleteByADIDPthc =
+      "PthcSection/delete-logic-by-adid-or-email?input=";
 
   // Contract Two year
   static const String TwoGetAll = "ContractTwoYear/get-all";
@@ -100,6 +101,7 @@ class Common {
 
   // Send mail
   static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
+  static const String SendMailCustom = "http://172.26.248.62:8501/send-email-notify-custom";
 
   // font size
   static double sizeColumn = 12;

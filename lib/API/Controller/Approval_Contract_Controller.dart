@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:intl/intl.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 
 class DashboardControllerApporver extends GetxController {
   final RxList<dynamic> dataList = <dynamic>[].obs;
@@ -16,13 +16,14 @@ class DashboardControllerApporver extends GetxController {
   RxBool sortAscending = true.obs;
   final searchTextController = TextEditingController();
   var isLoading = false.obs;
-  final RxString currentContractType = ''.obs;
+  final RxString currentContractType = 'two'.obs;
 
   @override
   void onInit() {
     super.onInit();
     //fetchDummyData();
   }
+
   List<dynamic> getSelectedItems() {
     List<dynamic> selectedItems = [];
     for (int i = 0; i < selectRows.length; i++) {
@@ -32,7 +33,12 @@ class DashboardControllerApporver extends GetxController {
     }
     return selectedItems;
   }
-Future<void> updateListContractApproval(
+
+  void setContractType(String type) {
+    currentContractType.value = type;
+  }
+
+  Future<void> updateListContractApproval(
     String userApprover,
     String userUpdate,
     String? contractType,
@@ -41,22 +47,32 @@ Future<void> updateListContractApproval(
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
-        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+        throw Exception(tr('LoiGui'));
       }
       isLoading(true);
       for (int i = 0; i < twocontract.length; i++) {
+        if (twocontract[i].biTApproverPer == null) {
+          twocontract[i].biTApproverPer = true;
+        }
+        if (twocontract[i].biTApproverPer == false &&
+            (twocontract[i].nvchRApproverPer == '' ||
+                twocontract[i].nvchRApproverPer == null)) {
+          throw Exception(
+            '${tr('InputError')} ${twocontract[i].vchREmployeeName}',
+          );
+        }
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-        if(twocontract[i].biTApproverPer){
+        if (twocontract[i].biTApproverPer) {
           twocontract[i].inTStatusId = 3;
-        }else{
+        } else {
           twocontract[i].inTStatusId = 1;
         }
         twocontract[i].dtMApproverPer = formatDateTime(DateTime.now());
         twocontract[i].useRApproverPer = userApprover;
       }
       // Determine API endpoint and column mapping based on contract type
-      final apiEndpoint = contractType == 'two' 
+      final apiEndpoint = contractType == 'two'
           ? Common.UpdataListTwo
           : Common.UpdataListApprentice;
       final response = await http.put(
@@ -65,19 +81,20 @@ Future<void> updateListContractApproval(
         body: json.encode(twocontract),
       );
       if (response.statusCode == 200) {
-        //await fetchDataBy();
+        await fetchData(adid: userUpdate, statusId: '2', section: null,contractType:  contractType);
       } else {
         final error = json.decode(response.body);
         throw Exception(
-          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+          'Error sending data to server  ${error['message'] ?? response.body}',
         );
       }
     } catch (e) {
-      throw Exception('Failed to update two contract: $e');
+      throw Exception('Failed to update contract: $e');
     } finally {
       isLoading(false);
     }
   }
+
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     sortCloumnIndex.value = sortColumnIndex;
@@ -102,7 +119,6 @@ Future<void> updateListContractApproval(
     });
   }
 
-
   // so sanh du lieu
   void searchQuery(String query) {
     if (query.isEmpty) {
@@ -122,13 +138,17 @@ Future<void> updateListContractApproval(
               (item.vchRNameSection?.toLowerCase().contains(
                     query.toLowerCase(),
                   ) ??
-                  false) || (item.vchRCodeApprover?.toLowerCase().contains(query.toLowerCase(),) ?? false),
+                  false) ||
+              (item.vchRCodeApprover?.toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ??
+                  false),
         ),
       );
     }
   }
 
-    Future<void> fetchData({
+  Future<void> fetchData({
     String? contractType,
     String? statusId,
     String? section,
@@ -143,7 +163,7 @@ Future<void> updateListContractApproval(
       currentContractType.value = contractType.toString();
 
       // Determine API endpoint and column mapping based on contract type
-      final apiEndpoint = contractType == 'two' 
+      final apiEndpoint = contractType == 'two'
           ? Common.TwoSreachBy
           : Common.ApprenticeSreachBy;
 
@@ -169,7 +189,7 @@ Future<void> updateListContractApproval(
             "field": columnMapping,
             "value": adid,
             "operator": "=",
-            "logicType": "AND"
+            "logicType": "AND",
           },
       ];
 
@@ -191,12 +211,18 @@ Future<void> updateListContractApproval(
           final List<dynamic> data = jsonData['data']['data'] ?? [];
 
           // Use the appropriate model based on contract type
-          dataList.assignAll(data.map((contract) => contractType == 'two'
-              ? TwoContract.fromJson(contract)
-              : ApprenticeContract.fromJson(contract)));
+          dataList.assignAll(
+            data.map(
+              (contract) => contractType == 'two'
+                  ? TwoContract.fromJson(contract)
+                  : ApprenticeContract.fromJson(contract),
+            ),
+          );
 
           filterdataList.assignAll(dataList);
-          selectRows.assignAll(List.generate(dataList.length, (index) => false));
+          selectRows.assignAll(
+            List.generate(dataList.length, (index) => false),
+          );
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to load data');
         }
@@ -239,7 +265,7 @@ Future<void> updateListContractApproval(
     );
     if (index != -1) {
       dataList[index].biTApproverPer = status;
-      filterdataList[index].biTApproverPer= status;
+      filterdataList[index].biTApproverPer = status;
       dataList.refresh();
       filterdataList.refresh();
     }
@@ -256,6 +282,7 @@ Future<void> updateListContractApproval(
       filterdataList.refresh();
     }
   }
+
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

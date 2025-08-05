@@ -264,6 +264,10 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
               onChanged: (value) {
                 controller.searchQuery(value);
               },
+              // onEditingComplete: () {
+              //   // Khi nhấn nút Done/Enter trên bàn phím
+              //   controller.searchQuery(controller.searchTextController.text);
+              // },
               decoration: InputDecoration(
                 hintText: tr('searchhint'),
                 hintStyle: TextStyle(color: Colors.grey[400]),
@@ -1260,7 +1264,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 10, width: 500),
               // Dòng 1: Mã phòng ban + Tên phòng ban
               Row(
                 children: [
