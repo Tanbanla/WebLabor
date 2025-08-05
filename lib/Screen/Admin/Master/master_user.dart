@@ -152,7 +152,7 @@ class _MasterUserState extends State<MasterUser> {
           icon: Iconsax.add,
           color: Colors.orange,
           tooltip: 'Thêm mới',
-          onPressed: () => _showAddDialog(),
+          onPressed: () => _showAddDialog(),//showDialog(context: context, builder: (context) => _showAddDialog(),)
         ),
       ],
     );
@@ -403,9 +403,8 @@ class _MasterUserState extends State<MasterUser> {
                         }
                         // Close the dialog after successful import
                         if (mounted) {
-                          Navigator.of(
-                            context,
-                          ).pop(); // Close the import dialog first
+                          Navigator.of(context,).pop(); 
+                        }// Close the import dialog first
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -437,7 +436,6 @@ class _MasterUserState extends State<MasterUser> {
                               ],
                             ),
                           );
-                        }
                       } on PlatformException catch (e) {
                         errorMessage.value = 'Lỗi hệ thống: ${e.message}';
                       } catch (e) {
@@ -665,7 +663,7 @@ class _MasterUserState extends State<MasterUser> {
     showDialog(
       context: context,
       builder: (context) => 
-      Obx(() => 
+      // Obx(() => 
         AlertDialog(
           title: const Text('Thêm User Mới'),
           content: SingleChildScrollView(
@@ -762,7 +760,9 @@ class _MasterUserState extends State<MasterUser> {
                         if (mounted) {
                           Navigator.of(
                             context,
-                          ).pop(); // Close the import dialog first
+                          ).pop(); 
+                        // Close the import dialog first
+                        }
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -794,7 +794,6 @@ class _MasterUserState extends State<MasterUser> {
                               ],
                             ),
                           );
-                        }
                       } catch (e) {
                         errorMessage.value =
                             'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
@@ -821,9 +820,10 @@ class _MasterUserState extends State<MasterUser> {
             ),
           ],
         ),
-      ),
+      // ),
     );
   }
+
 }
 
 class MyData extends DataTableSource {
@@ -1171,3 +1171,174 @@ class _DeleteUserDialog extends StatelessWidget {
     });
   }
 }
+// class _showAddDialog extends StatefulWidget {
+//   const _showAddDialog();
+
+//   @override
+//   State<_showAddDialog> createState() => __showAddDialogState();
+// }
+
+// class __showAddDialogState extends State<_showAddDialog> {
+//   @override
+//   Widget build(BuildContext context) {
+//     final controller = Get.find<DashboardControllerUser>();
+//     var userAdd = User();
+//     RxString errorMessage = ''.obs;
+//     final authState = Provider.of<AuthState>(context, listen: true);
+//     return  AlertDialog(
+//           title: const Text('Thêm User Mới'),
+//           content: SingleChildScrollView(
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 TextField(
+//                   decoration: InputDecoration(
+//                     labelText: 'Nhập ADID',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                   onChanged: (value) => userAdd.chRUserid = value,
+//                 ),
+//                 const SizedBox(height: 12),
+//                 DropdownButtonFormField(
+//                   decoration: InputDecoration(
+//                     labelText: 'Loại User',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                   items: ['0: Dùng riêng', '1: Dùng chung']
+//                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+//                       .toList(),
+//                   onChanged: (value) {
+//                     switch (value) {
+//                       case "0: Dùng riêng":
+//                         userAdd.inTUseridCommon = 0;
+//                       case "1: Dùng chung":
+//                         userAdd.inTUseridCommon = 1;
+//                     }
+//                   },
+//                 ),
+//                 const SizedBox(height: 12),
+//                 DropdownButtonFormField(
+//                   decoration: InputDecoration(
+//                     labelText: 'Nhóm quyền',
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                   ),
+//                   items:
+//                       [
+//                             'Admin',
+//                             'Per',
+//                             'Chief Per',
+//                             'PTHC',
+//                             'Leader',
+//                             'Chief Section',
+//                             'Manager Section',
+//                             'Director',
+//                           ]
+//                           .map(
+//                             (e) => DropdownMenuItem(value: e, child: Text(e)),
+//                           )
+//                           .toList(),
+//                   onChanged: (value) {
+//                     userAdd.chRGroup = value;
+//                   },
+//                 ),
+//                 const SizedBox(height: 12),
+//                 if (errorMessage.isNotEmpty)
+//                   Padding(
+//                     padding: const EdgeInsets.only(bottom: 10),
+//                     child: Text(
+//                       errorMessage.value,
+//                       style: TextStyle(color: Colors.red, fontSize: 14),
+//                     ),
+//                   ),
+//               ],
+//             ),
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: controller.isLoading.value
+//                   ? null
+//                   : () => Navigator.of(context).pop(),
+//               child: const Text('Hủy'),
+//             ),
+//             ElevatedButton(
+//               onPressed: (controller.isLoading.value)
+//                   ? null
+//                   : () async {
+//                       errorMessage.value = '';
+//                       if(userAdd.chRUserid!.isEmpty || userAdd.chRGroup!.isEmpty ){
+//                         errorMessage.value = 'Yêu cầu không để trống thông tin';
+//                         return;
+//                       }
+//                       controller.isLoading(false);
+//                       try {
+//                         await controller.addUser(userAdd,authState.user!.chRUserid.toString());
+//                         if (mounted) {
+//                           Navigator.of(
+//                             context,
+//                           ).pop(); // Close the import dialog first
+//                           showDialog(
+//                             context: context,
+//                             builder: (context) => AlertDialog(
+//                               icon: const Icon(
+//                                 Icons.check_circle,
+//                                 color: Colors.green,
+//                                 size: 50,
+//                               ),
+//                               title: const Text(
+//                                 'Thành công',
+//                                 style: TextStyle(fontWeight: FontWeight.bold),
+//                               ),
+//                               content: Column(
+//                                 mainAxisSize: MainAxisSize.min,
+//                                 children: [
+//                                   const Text('Thêm user thành công'),
+//                                   const SizedBox(height: 10),
+//                                 ],
+//                               ),
+//                               actions: [
+//                                 ElevatedButton(
+//                                   onPressed: () => Navigator.of(context).pop(),
+//                                   style: ElevatedButton.styleFrom(
+//                                     backgroundColor: Colors.green,
+//                                     foregroundColor: Colors.white,
+//                                   ),
+//                                   child: const Text('Đóng'),
+//                                 ),
+//                               ],
+//                             ),
+//                           );
+//                         }
+//                       } catch (e) {
+//                         errorMessage.value =
+//                             'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+//                       } finally {
+//                         controller.isLoading(false);
+//                       }
+//                     },
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: Colors.blue,
+//                 foregroundColor: Colors.white,
+//               ),
+//               child: Obx(
+//                 () => controller.isLoadingExport.value
+//                     ? const SizedBox(
+//                         width: 20,
+//                         height: 20,
+//                         child: CircularProgressIndicator(
+//                           strokeWidth: 2,
+//                           color: Colors.white,
+//                         ),
+//                       )
+//                     : const Text('Thêm'),
+//               ),
+//             ),
+//           ],
+//         );
+//   }
+// }

@@ -415,6 +415,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
                           Navigator.of(
                             context,
                           ).pop(); // Close the import dialog first
+                        }
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -446,7 +447,6 @@ class _MasterPTHCState extends State<MasterPTHC> {
                               ],
                             ),
                           );
-                        }
                       } on PlatformException catch (e) {
                         errorMessage.value = 'Lỗi hệ thống: ${e.message}';
                       } catch (e) {

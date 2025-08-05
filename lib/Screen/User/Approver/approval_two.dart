@@ -38,19 +38,22 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    // 'Chief Section',
-    // 'Manager Section',
-    // 'Director',
-    if (authState.user!.chRGroup.toString() == "PTHC") {
-      // truong hop PTHC phong ban
-      controller.changeStatus('3', sectionName, null);
-    } else {
-      // truong hop leader
+    if (authState.user!.chRGroup.toString() == "Chief Section") {
+      // truong hop quan ly
       controller.changeStatus(
-        '4',
+        '6',
         sectionName,
         authState.user!.chRUserid.toString(),
       );
+    } else if (authState.user!.chRGroup.toString() == "Manager Section") {
+      // truong hop truong phong
+      controller.changeStatus(
+        '7',
+        sectionName,
+        authState.user!.chRUserid.toString(),
+      );
+    } else if (authState.user!.chRGroup.toString() == "Director") {
+      controller.changeStatus('8', null, authState.user!.chRUserid.toString());
     }
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -1526,14 +1529,27 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                      if (authState.user!.chRGroup.toString() ==
+                          "Chief Section") {
                         // truong hop PTHC phong ban
-                        await controller.changeStatus('3', sectionName, null);
-                      } else {
-                        // truong hop leader
-                        await controller.changeStatus(
-                          '4',
+                        controller.changeStatus(
+                          '6',
                           sectionName,
+                          authState.user!.chRUserid.toString(),
+                        );
+                      } else if (authState.user!.chRGroup.toString() ==
+                          "Manager Section") {
+                        // truong hop leader
+                        controller.changeStatus(
+                          '7',
+                          sectionName,
+                          authState.user!.chRUserid.toString(),
+                        );
+                      } else if (authState.user!.chRGroup.toString() ==
+                          "Director") {
+                        controller.changeStatus(
+                          '8',
+                          null,
                           authState.user!.chRUserid.toString(),
                         );
                       }
