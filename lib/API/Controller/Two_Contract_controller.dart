@@ -400,7 +400,54 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
-
+  //update thong tin Phe duyet
+    Future<void> updateListTwoContractApproval(
+    String userApprover
+  ) async {
+    try {
+      // List<TwoContract> twocontract,
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      for (int i = 0; i < twocontract.length; i++) {
+        twocontract[i].vchRUserUpdate = userApprover;
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        if (twocontract[i].inTStatusId == 5) {
+          twocontract[i].inTStatusId = 6;
+          twocontract[i].nvchRPthcSection = userApprover;
+          twocontract[i].vchRLeaderEvalution = userApprover;
+        } else if(twocontract[i].inTStatusId == 6){
+          twocontract[i].inTStatusId = 7;
+          twocontract[i].vchRLeaderEvalution = userApprover;
+          twocontract[i].useRApproverChief = userApprover;
+        }else if(twocontract[i].inTStatusId == 7){
+          twocontract[i].inTStatusId = 8;
+          twocontract[i].vchRLeaderEvalution = userApprover;
+          twocontract[i].useRApproverChief = userApprover;
+        }  
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
   // delete
   Future<void> deleteTwoContract(int id) async {
     try {

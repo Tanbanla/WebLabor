@@ -89,91 +89,6 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       ),
     );
   }
-
-  // Widget _buildApproverPer() {
-  //   final authState = Provider.of<AuthState>(context, listen: true);
-  //   final DashboardControllerApporver controller = Get.put(
-  //     DashboardControllerApporver(),
-  //   );
-
-  //   // Extract section name safely
-  //   // String sectionName =
-  //   //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-
-  //   RxString errorMessage = ''.obs;
-  //   return Obx(() {
-  //     return Row(
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       mainAxisAlignment: MainAxisAlignment.start,
-  //       children: [
-  //         const SizedBox(width: 20),
-  //         // Send button
-  //         GestureDetector(
-  //           onTap: () async {
-  //             errorMessage.value = '';
-  //             try {
-  //               await controller.updateListContractApproval(
-  //                 authState.user!.chRUserid.toString(),
-  //                 authState.user!.chRUserid.toString(),
-  //                 controller.currentContractType.toString(),
-  //               );
-  //             } catch (e) {
-  //               errorMessage.value =
-  //                   '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-  //             }
-  //           },
-  //           child: Obx(
-  //             () => Container(
-  //               width: 130,
-  //               height: 36,
-  //               decoration: BoxDecoration(
-  //                 color: controller.isLoading.value
-  //                     ? Colors.grey
-  //                     : Common.primaryColor,
-  //                 borderRadius: BorderRadius.circular(10),
-  //               ),
-  //               padding: const EdgeInsets.symmetric(
-  //                 horizontal: 10,
-  //                 vertical: 8,
-  //               ),
-  //               child: Center(
-  //                 child: controller.isLoading.value
-  //                     ? const SizedBox(
-  //                         width: 20,
-  //                         height: 20,
-  //                         child: CircularProgressIndicator(
-  //                           color: Colors.white,
-  //                           strokeWidth: 2,
-  //                         ),
-  //                       )
-  //                     : Text(
-  //                         tr('Confirm'),
-  //                         style: TextStyle(
-  //                           color: Colors.white,
-  //                           fontSize: 16,
-  //                           fontWeight: FontWeight.bold,
-  //                         ),
-  //                       ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //         const SizedBox(width: 8),
-  //         if (errorMessage.isNotEmpty)
-  //           Center(
-  //             child: Padding(
-  //               padding: const EdgeInsets.only(bottom: 1),
-  //               child: Text(
-  //                 errorMessage.value,
-  //                 style: TextStyle(color: Colors.red, fontSize: 14),
-  //               ),
-  //             ),
-  //           ),
-  //       ],
-  //     );
-  //   });
-  // }
-
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,8 +113,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
 
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
-    final DashboardControllerApporver controller = Get.put(
-      DashboardControllerApporver(),
+    final DashboardControllerTwo controller = Get.put(
+      DashboardControllerTwo(),
     );
 
     // Extract section name safely
@@ -276,10 +191,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                 onTap: () async {
                   errorMessage.value = '';
                   try {
-                    await controller.updateListContractApproval(
-                      authState.user!.chRUserid.toString(),
-                      authState.user!.chRUserid.toString(),
-                      controller.currentContractType.toString(),
+                    await controller.updateListTwoContractApproval(
+                      authState.user!.chRUserid.toString()
                     );
                   } catch (e) {
                     errorMessage.value =
