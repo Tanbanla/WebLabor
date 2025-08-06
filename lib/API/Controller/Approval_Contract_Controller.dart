@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:web_labor_contract/API/Controller/User_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
+import 'package:web_labor_contract/class/PTHC_Group.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,10 +19,12 @@ class DashboardControllerApporver extends GetxController {
   final searchTextController = TextEditingController();
   var isLoading = false.obs;
   final RxString currentContractType = 'two'.obs;
+  var pthcList = <PthcGroup>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    //fetchPTHCData();
     //fetchDummyData();
   }
 
@@ -38,63 +42,239 @@ class DashboardControllerApporver extends GetxController {
     currentContractType.value = type;
   }
 
-  Future<void> updateListContractApproval(
-    String userApprover,
-    String userUpdate,
-    String? contractType,
-  ) async {
-    try {
-      // List<TwoContract> twocontract,
-      final twocontract = getSelectedItems();
-      if (twocontract.isEmpty) {
-        throw Exception(tr('LoiGui'));
+  // Future<void> updateListContractApproval(
+  //   String userApprover,
+  //   String userUpdate,
+  //   String? contractType,
+  // ) async {
+  //   try {
+  //     fetchPTHCData();
+  //     // List<TwoContract> twocontract,
+  //     final twocontract = getSelectedItems();
+  //     List<String> phongban = [];
+  //     List<dynamic> NotApproval = <dynamic>[];
+  //     if (twocontract.isEmpty) {
+  //       throw Exception(tr('LoiGui'));
+  //     }
+  //     isLoading(true);
+  //     for (int i = 0; i < twocontract.length; i++) {
+  //       if (twocontract[i].biTApproverPer == null) {
+  //         twocontract[i].biTApproverPer = true;
+  //       }
+  //       if (twocontract[i].biTApproverPer == false &&
+  //           (twocontract[i].nvchRApproverPer == '' ||
+  //               twocontract[i].nvchRApproverPer == null)) {
+  //         throw Exception(
+  //           '${tr('InputError')} ${twocontract[i].vchREmployeeName}',
+  //         );
+  //       }
+  //       twocontract[i].vchRUserUpdate = userUpdate;
+  //       twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+  //       if (twocontract[i].biTApproverPer) {
+  //         twocontract[i].inTStatusId = 3;
+  //         if (phongban.length > 0 && phongban.isNotEmpty) {
+  //           int dem = 0;
+  //           for (int k = 0; k < phongban.length; k++) {
+  //             if (phongban[k] == twocontract[i].vchRCodeSection) {
+  //               dem++;
+  //             }
+  //           }
+  //           if (dem <= 1) {
+  //             phongban.add(twocontract[i].vchRCodeSection);
+  //           }
+  //         } else {
+  //           phongban.add(twocontract[i].vchRCodeSection);
+  //         }
+  //       } else {
+  //         twocontract[i].inTStatusId = 1;
+  //         NotApproval.add(twocontract[i]);
+  //       }
+  //       twocontract[i].dtMApproverPer = formatDateTime(DateTime.now());
+  //       twocontract[i].useRApproverPer = userApprover;
+  //     }
+  //     // Determine API endpoint and column mapping based on contract type
+  //     final apiEndpoint = contractType == 'two'
+  //         ? Common.UpdataListTwo
+  //         : Common.UpdataListApprentice;
+  //     final response = await http.put(
+  //       Uri.parse('${Common.API}$apiEndpoint'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: json.encode(twocontract),
+  //     );
+  //     if (response.statusCode == 200) {
+  //       await fetchData(
+  //         adid: userUpdate,
+  //         statusId: '2',
+  //         section: null,
+  //         contractType: contractType,
+  //       );
+  //       DashboardControllerUser controlleruser = Get.put(
+  //         DashboardControllerUser(),
+  //       );
+  //       for (int i = 0; i < phongban.length; i++) {
+  //         for (int j = 0; j < pthcList.length; j++) {
+  //           if (phongban[i] == pthcList[j].section) {
+  //             controlleruser.SendMail(
+  //               '2',
+  //               pthcList[j].mailto.toString(),
+  //               pthcList[j].mailcc.toString(),
+  //               pthcList[j].mailbcc.toString(),
+  //             );
+  //           }
+  //         }
+  //       }
+  //       for (int j = 0; j < pthcList.length; j++) {
+  //         if (pthcList[j].section == "1120-1 : ADM-PER") {
+  //           controlleruser.SendMailCustom(
+  //             pthcList[j].mailto.toString(),
+  //             pthcList[j].mailcc.toString(),
+  //             pthcList[j].mailbcc.toString(),
+  //             NotApproval,
+  //           );
+  //         }
+  //       }
+  //     } else {
+  //       final error = json.decode(response.body);
+  //       throw Exception(
+  //         'Error sending data to server  ${error['message'] ?? response.body}',
+  //       );
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Failed to update contract: $e');
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+Future<void> updateListContractApproval(
+  String userApprover,
+  String userUpdate,
+  String? contractType,
+) async {
+  try {
+    fetchPTHCData();
+    final twocontract = getSelectedItems();
+    if (twocontract.isEmpty) {
+      throw Exception(tr('LoiGui'));
+    }
+
+    isLoading(true);
+    List<String> phongban = [];
+    List<dynamic> notApproval = [];
+
+    for (var contract in twocontract) {
+      contract.biTApproverPer ??= true; // Set default value
+
+      if (!contract.biTApproverPer && (contract.nvchRApproverPer?.isEmpty ?? true)) {
+        throw Exception('${tr('InputError')} ${contract.vchREmployeeName}');
       }
-      isLoading(true);
-      for (int i = 0; i < twocontract.length; i++) {
-        if (twocontract[i].biTApproverPer == null) {
-          twocontract[i].biTApproverPer = true;
+
+      contract
+        ..vchRUserUpdate = userUpdate
+        ..dtMUpdate = formatDateTime(DateTime.now())
+        ..dtMApproverPer = formatDateTime(DateTime.now())
+        ..useRApproverPer = userApprover;
+
+      if (contract.biTApproverPer) {
+        contract.inTStatusId = 3;
+        if (!phongban.contains(contract.vchRCodeSection)) {
+          phongban.add(contract.vchRCodeSection);
         }
-        if (twocontract[i].biTApproverPer == false &&
-            (twocontract[i].nvchRApproverPer == '' ||
-                twocontract[i].nvchRApproverPer == null)) {
-          throw Exception(
-            '${tr('InputError')} ${twocontract[i].vchREmployeeName}',
+      } else {
+        contract.inTStatusId = 1;
+        notApproval.add(contract);
+      }
+    }
+
+    // Determine API endpoint
+    final apiEndpoint = contractType == 'two'
+        ? Common.UpdataListTwo
+        : Common.UpdataListApprentice;
+
+    // Send data to server
+    final response = await http.put(
+      Uri.parse('${Common.API}$apiEndpoint'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(twocontract),
+    );
+
+    if (response.statusCode == 200) {
+      await fetchData(
+        adid: userUpdate,
+        statusId: '2',
+        section: null,
+        contractType: contractType,
+      );
+
+      final controlleruser = Get.put(DashboardControllerUser());
+      controlleruser.SendMail(
+            '2',
+            "khanhmf@brotherGroup.net",
+            "khanhmf@brotherGroup.net",
+            "khanhmf@brotherGroup.net",
+          );
+      for (var section in phongban) {
+        final matchingPthc = pthcList.where((item) => item.section == section);
+        for (var item in matchingPthc) {
+          controlleruser.SendMail(
+            '2',
+            item.mailto.toString(),
+            item.mailcc.toString(),
+            item.mailbcc.toString(),
           );
         }
-        twocontract[i].vchRUserUpdate = userUpdate;
-        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-        if (twocontract[i].biTApproverPer) {
-          twocontract[i].inTStatusId = 3;
-        } else {
-          twocontract[i].inTStatusId = 1;
-        }
-        twocontract[i].dtMApproverPer = formatDateTime(DateTime.now());
-        twocontract[i].useRApproverPer = userApprover;
       }
-      // Determine API endpoint and column mapping based on contract type
-      final apiEndpoint = contractType == 'two'
-          ? Common.UpdataListTwo
-          : Common.UpdataListApprentice;
-      final response = await http.put(
-        Uri.parse('${Common.API}$apiEndpoint'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(twocontract),
+
+      //Special case for section "1120-1 : ADM-PER"
+      final specialSection = pthcList.firstWhere(
+        (item) => item.section == "1120-1 : ADM-PER",
       );
-      if (response.statusCode == 200) {
-        await fetchData(adid: userUpdate, statusId: '2', section: null,contractType:  contractType);
-      } else {
-        final error = json.decode(response.body);
-        throw Exception(
-          'Error sending data to server  ${error['message'] ?? response.body}',
+
+        controlleruser.SendMailCustom(
+          specialSection.mailto.toString(),
+          specialSection.mailcc.toString(),
+          specialSection.mailbcc.toString(),
+          notApproval,
         );
+    } else {
+      final error = json.decode(response.body);
+      throw Exception('Error sending data to server: ${error['message'] ?? response.body}');
+    }
+  } catch (e) {
+    throw Exception('Failed to update contract: $e');
+  } finally {
+    isLoading(false);
+  }
+}
+  /// Lay thông tin gửi mail
+  Future<void> fetchPTHCData() async {
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse(Common.API + Common.GetGroupPTHC),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          pthcList.assignAll(
+            data.map((user) => PthcGroup.fromJson(user)).toList(),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load dats');
       }
     } catch (e) {
-      throw Exception('Failed to update contract: $e');
+      Get.snackbar('Error', 'Failed to fetch data: $e');
     } finally {
       isLoading(false);
     }
   }
 
+  ///
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     sortCloumnIndex.value = sortColumnIndex;

@@ -477,13 +477,53 @@ class DashboardControllerUser extends GetxController {
     try {
       isLoading(true);
       final requestBody = {
-        "master_mail_id": code,
+        "code_master_mail": code,
         "mail_to": to,
         "mail_cc": cc,
         "mail_bcc": bcc,
       };
       final response = await http.post(
         Uri.parse(Common.SendMail),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          userList.assignAll(data.map((user) => User.fromJson(user)).toList());
+          filteredUserList.assignAll(userList);
+          selectRows.assignAll(
+            List.generate(userList.length, (index) => false),
+          );
+        }
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+  // send mail Custom
+  Future<void> SendMailCustom(String to, String cc, String bcc, List<dynamic> rejectedRequests ) async {
+    try {
+      isLoading(true);
+      final requestBody = {
+        "title": "THÔNG BÁO: YÊU CẦU ĐÁNH GIÁ HỢP ĐỒNG BỊ TỪ CHỐI",
+        "mail_from": "LaborContractEvaluationSystem@brothergroup.net",
+        "mail_to": to,
+        "mail_cc": cc,
+        "mail_bcc": bcc,
+        "body": Common.getRejectionEmailBody(
+        confirmLink: "http://172.26.248.62:8055/",
+        rejectedRequests: rejectedRequests
+      )
+      };
+      final response = await http.post(
+        Uri.parse(Common.SendMailCustom),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestBody),
       );

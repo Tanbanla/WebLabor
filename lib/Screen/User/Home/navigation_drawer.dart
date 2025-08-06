@@ -11,6 +11,7 @@ import 'package:web_labor_contract/Screen/Admin/Master/master_user.dart';
 import 'package:web_labor_contract/Screen/User/Fill_Review/fill_apprentice.dart';
 import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
+import 'package:web_labor_contract/Screen/User/LoginScreen/sign_in_screen.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
@@ -458,58 +459,66 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   }
 
   Widget accountTile() {
-  final authState = Provider.of<AuthState>(context, listen: true);
-  return Container(
-    color: Common.primaryColor,
-    child: Row(
-      children: [
-        Expanded(
-          child: ListTile(
-            leading: accountButton(usePadding: false),
-            title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
-            subtitle: Text(
-              authState.user?.nvchRNameId.toString() ?? tr('NotLogin'),
-              style: TextStyle(color: Colors.white70),
+    final authState = Provider.of<AuthState>(context, listen: true);
+    return Container(
+      color: Common.primaryColor,
+      child: Row(
+        children: [
+          Expanded(
+            child: ListTile(
+              leading: accountButton(usePadding: false),
+              title: Text(tr('welcome'), style: TextStyle(color: Colors.white)),
+              subtitle: Text(
+                authState.user?.nvchRNameId.toString() ?? tr('NotLogin'),
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
           ),
-        ),
-        IconButton(
-          icon: Icon(Icons.logout, color: Colors.white),
-          tooltip: tr('LogOut'),
-          onPressed: () async {
-            final confirmed = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(tr('LogOut1')),
-                content: Text(tr('LogOut2')),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text(tr('Cancel')),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: Text(tr('LogOut'), style: TextStyle(color: Colors.red)),
-                  ),
-                ],
-              ),
-            );
-            
-            if (confirmed == true) {
-              try {
-                await authState.logout();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('LogOut faile: ${e.toString()}')),
-                );
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white),
+            tooltip: tr('LogOut'),
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(tr('LogOut1')),
+                  content: Text(tr('LogOut2')),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(tr('Cancel')),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text(
+                        tr('LogOut'),
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true) {
+                try {
+                  await authState.logout();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignInScreen()), // Thay SignInScreen() bằng widget màn hình login của bạn
+                    (Route<dynamic> route) => false, // Xóa toàn bộ stack navigation
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('LogOut faile: ${e.toString()}')),
+                  );
+                }
               }
-            }
-          },
-        ),
-      ],
-    ),
-  );
-}
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   void expandOrShrinkDrawer() {
     setState(() {
