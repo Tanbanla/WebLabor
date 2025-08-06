@@ -206,12 +206,6 @@ Future<void> updateListContractApproval(
       );
 
       final controlleruser = Get.put(DashboardControllerUser());
-      controlleruser.SendMail(
-            '2',
-            "khanhmf@brotherGroup.net",
-            "khanhmf@brotherGroup.net",
-            "khanhmf@brotherGroup.net",
-          );
       for (var section in phongban) {
         final matchingPthc = pthcList.where((item) => item.section == section);
         for (var item in matchingPthc) {
@@ -225,16 +219,30 @@ Future<void> updateListContractApproval(
       }
 
       //Special case for section "1120-1 : ADM-PER"
-      final specialSection = pthcList.firstWhere(
-        (item) => item.section == "1120-1 : ADM-PER",
-      );
+      // final specialSection = pthcList.firstWhere(
+      //   (item) => item.section == "1120-1 : ADM-PER",
+      // );
 
-        controlleruser.SendMailCustom(
-          specialSection.mailto.toString(),
-          specialSection.mailcc.toString(),
-          specialSection.mailbcc.toString(),
-          notApproval,
-        );
+      //   controlleruser.SendMailCustom(
+      //     specialSection.mailto.toString(),
+      //     specialSection.mailcc.toString(),
+      //     specialSection.mailbcc.toString(),
+      //     notApproval,
+      //   );
+        // Gửi mail đặc biệt cho phòng "ADM-PER"
+    final specialSection = pthcList.firstWhere(
+      (item) => item.section == "1120-1 : ADM-PER",
+      orElse: () => null as PthcGroup,
+    );
+
+    if (specialSection != null) {
+      controlleruser.SendMailCustom(
+        specialSection.mailto!,
+        specialSection.mailcc!,
+        specialSection.mailbcc!,
+        notApproval,
+      );
+    }
     } else {
       final error = json.decode(response.body);
       throw Exception('Error sending data to server: ${error['message'] ?? response.body}');

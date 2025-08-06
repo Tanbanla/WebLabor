@@ -129,7 +129,7 @@ class Common {
   //   <table border="1" cellpadding="5" cellspacing="0">
   //     <tr>
   //       <th>Loại đánh giá</th>
-  //       <th>Mã đợt Phát hành</th> 
+  //       <th>Mã đợt Phát hành</th>
   //       <th>Mã Nhân viên</th>
   //       <th>Lý do từ chối</th>
   //     </tr>
@@ -178,22 +178,27 @@ class Common {
   //   ''';
   // }
   static String getRejectionEmailBody({
-  required String confirmLink,
-  required List<dynamic> rejectedRequests,
-}) {
-  // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
-  String buildTableRows() {
-    return rejectedRequests.map((request) => '''
+    required String confirmLink,
+    required List<dynamic> rejectedRequests,
+  }) {
+    // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
+    String buildTableRows() {
+      return rejectedRequests
+          .map(
+            (request) =>
+                '''
       <tr>
         <td>${request['vchRCodeApprover'] ?? 'N/A'}</td>
         <td>${request['vchRCodeApprover'] ?? 'N/A'}</td>
         <td>${request['vchREmployeeId'] ?? 'N/A'}</td>
         <td>${request['nvchRApproverPer'] ?? 'Không có lý do'}</td>
       </tr>
-    ''').join();
-  }
+    ''',
+          )
+          .join();
+    }
 
-  return '''
+    return '''
     ---------------------------<br/>
     Kính gửi: Quản lý phòng ban<br/><br/>
 
@@ -248,5 +253,5 @@ class Common {
     ※This is an automated email from the LCES system. Please do not reply to this email.<br/>
     Please contact the responsible person to confirm the current status.
     ''';
-    }
+  }
 }

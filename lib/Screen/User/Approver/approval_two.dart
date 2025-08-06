@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:web_labor_contract/API/Controller/Approval_Contract_Controller.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';

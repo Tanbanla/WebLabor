@@ -796,26 +796,26 @@ class _DeletePTHCDialogState extends State<_DeletePTHCDialog> {
     });
   }
 
-  void _showSuccessDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-        title: const Text('Thành công', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(message),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Đóng'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showSuccessDialog(BuildContext context, String message) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+  //       title: const Text('Thành công', style: TextStyle(fontWeight: FontWeight.bold)),
+  //       content: Text(message),
+  //       actions: [
+  //         ElevatedButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.green,
+  //             foregroundColor: Colors.white,
+  //           ),
+  //           child: const Text('Đóng'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 class _ShowDialogAdd extends StatefulWidget {
   const _ShowDialogAdd();
@@ -899,7 +899,9 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                       if (mounted) {
                         Navigator.of(
                           context,
-                        ).pop(); // Close the import dialog first
+                        ).pop(); 
+                      // Close the import dialog first
+                      }
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -931,7 +933,6 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                             ],
                           ),
                         );
-                      }
                     } catch (e) {
                       errorMessage.value =
                           'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
