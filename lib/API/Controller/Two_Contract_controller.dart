@@ -417,12 +417,21 @@ class DashboardControllerTwo extends GetxController {
           twocontract[i].inTStatusId = 6;
           twocontract[i].nvchRPthcSection = userApprover;
           twocontract[i].vchRLeaderEvalution = userApprover;
-        } else if(twocontract[i].inTStatusId == 6){
+        } 
+        if(twocontract[i].inTStatusId == 6 && twocontract[i].biTApproverChief == true){
           twocontract[i].inTStatusId = 7;
           twocontract[i].vchRLeaderEvalution = userApprover;
           twocontract[i].useRApproverChief = userApprover;
-        }else if(twocontract[i].inTStatusId == 7){
+        }else {
+
+        }
+        if(twocontract[i].inTStatusId == 7 && twocontract[i].biTApproverSectionManager == true ){
           twocontract[i].inTStatusId = 8;
+          twocontract[i].vchRLeaderEvalution = userApprover;
+          twocontract[i].useRApproverChief = userApprover;
+        }  
+        if(twocontract[i].inTStatusId == 8 && twocontract[i].biTApproverDirector == true){
+          twocontract[i].inTStatusId = 9;
           twocontract[i].vchRLeaderEvalution = userApprover;
           twocontract[i].useRApproverChief = userApprover;
         }  
