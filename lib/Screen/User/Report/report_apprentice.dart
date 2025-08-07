@@ -18,14 +18,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 
-class ApprovalTrialScreen extends StatefulWidget {
-  const ApprovalTrialScreen({super.key});
+class ReportApprentice extends StatefulWidget {
+  const ReportApprentice({super.key});
 
   @override
-  State<ApprovalTrialScreen> createState() => _ApprovalTrialScreenState();
+  State<ReportApprentice> createState() => _ReportApprenticeState();
 }
 
-class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
+class _ReportApprenticeState extends State<ReportApprentice> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
@@ -33,27 +33,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
-    // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "Chief Section") {
-      // truong hop QUAN LY
-      controller.changeStatus(
-        '6',
-        sectionName,
-        null,
-      );
-    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
-      // truong hop truong phong
-      controller.changeStatus(
-        '7',
-        sectionName,
-        null,
-      );
-    }
+    controller.fetchDummyData();
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -111,13 +91,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   }
 
   Widget _buildSearchAndActions() {
-    final authState = Provider.of<AuthState>(context, listen: true);
     final DashboardControllerApprentice controller = Get.put(
       DashboardControllerApprentice(),
     );
     // Extract section name safely
-    String sectionName =
-        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
     RxString errorMessage = ''.obs;
     return Obx(() {
       return Column(
@@ -184,72 +161,72 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 onPressed: () => _showExportDialog(),
               ),
               const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () async {
-                  errorMessage.value = '';
-                  try {
-                    await controller.updateListApprenticeContractApproval(
-                      authState.user!.chRUserid.toString(),
-                    );
-                    // phan xem ai dang vao man so sanh
-                    if (authState.user!.chRGroup.toString() ==
-                        "Chief Section") {
-                      // truong hop QUAN LY
-                      controller.changeStatus(
-                        '6',
-                        sectionName,
-                        null,
-                      );
-                    } else if (authState.user!.chRGroup.toString() ==
-                        "Section Manager") {
-                      // truong hop truong phong
-                      controller.changeStatus(
-                        '7',
-                        sectionName,
-                        null,
-                      );
-                    }
-                  } catch (e) {
-                    errorMessage.value =
-                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-                  }
-                },
-                child: Obx(
-                  () => Container(
-                    width: 130,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: controller.isLoading.value
-                          ? Colors.grey
-                          : Common.primaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    child: Center(
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              tr('Confirm'),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () async {
+              //     errorMessage.value = '';
+              //     try {
+              //       await controller.updateListApprenticeContractApproval(
+              //         authState.user!.chRUserid.toString(),
+              //       );
+              //       // phan xem ai dang vao man so sanh
+              //       if (authState.user!.chRGroup.toString() ==
+              //           "Chief Section") {
+              //         // truong hop QUAN LY
+              //         controller.changeStatus(
+              //           '6',
+              //           sectionName,
+              //           null,
+              //         );
+              //       } else if (authState.user!.chRGroup.toString() ==
+              //           "Section Manager") {
+              //         // truong hop truong phong
+              //         controller.changeStatus(
+              //           '7',
+              //           sectionName,
+              //           null,
+              //         );
+              //       }
+              //     } catch (e) {
+              //       errorMessage.value =
+              //           '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+              //     }
+              //   },
+              //   child: Obx(
+              //     () => Container(
+              //       width: 130,
+              //       height: 36,
+              //       decoration: BoxDecoration(
+              //         color: controller.isLoading.value
+              //             ? Colors.grey
+              //             : Common.primaryColor,
+              //         borderRadius: BorderRadius.circular(10),
+              //       ),
+              //       padding: const EdgeInsets.symmetric(
+              //         horizontal: 10,
+              //         vertical: 8,
+              //       ),
+              //       child: Center(
+              //         child: controller.isLoading.value
+              //             ? const SizedBox(
+              //                 width: 20,
+              //                 height: 20,
+              //                 child: CircularProgressIndicator(
+              //                   color: Colors.white,
+              //                   strokeWidth: 2,
+              //                 ),
+              //               )
+              //             : Text(
+              //                 tr('Confirm'),
+              //                 style: TextStyle(
+              //                   color: Colors.white,
+              //                   fontSize: 16,
+              //                   fontWeight: FontWeight.bold,
+              //                 ),
+              //               ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 10),
@@ -298,7 +275,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3420,
+              width: 4100,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -479,6 +456,30 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('Lydo'),
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Phê duyệt của Chief',
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do từ chối của Chief',
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Phê duyệt của trưởng phòng',
+                    width: 170,
+                    fontSize: Common.sizeColumn,
+                    maxLines: 2,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: 'Lý do từ chối của trưởng phòng',
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
@@ -1743,6 +1744,169 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Focus(
+            // onFocusChange: (hasFocus) {
+            //   if (!hasFocus) {
+            //     // Chỉ update khi mất focus
+            //     controller.updateNotRehireReasonApprovel(
+            //       data.vchREmployeeId.toString(),
+            //       reasonController.text,
+            //       data.inTStatusId,
+            //     );
+            //   }
+            // },
+            child: TextFormField(
+              controller: reasonController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Thông tin phê duyệt
+        DataCell(
+          Obx(() {
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            final rawStatus =controller.filterdataList[index].biTApproverChief ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateRehireStatusApprovel(
+                    data.vchREmployeeId.toString(),
+                    newValue == 'OK',
+                    data.inTStatusId,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        DataCell(
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateNotRehireReasonApprovel(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                  data.inTStatusId,
+                );
+              }
+            },
+            child: TextFormField(
+              controller: reasonController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          Obx(() {
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            final rawStatus =controller.filterdataList[index].biTApproverSectionManager ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateRehireStatusApprovel(
+                    data.vchREmployeeId.toString(),
+                    newValue == 'OK',
+                    data.inTStatusId,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        DataCell(
+          Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
@@ -2086,33 +2250,7 @@ class _EditContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
-                      // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() ==
-                          "Chief Section") {
-                        // truong hop quan ly
-                        controller.changeStatus(
-                          '6',
-                          sectionName,
-                          null,
-                        );
-                      } else if (authState.user!.chRGroup.toString() ==
-                          "Manager Section") {
-                        // truong hop truong phong
-                        controller.changeStatus(
-                          '7',
-                          sectionName,
-                          null,
-                        );
-                      }
-                      // await controller.changeStatus(
-                      //   "2",
-                      //   sectionName,
-                      //   authState.user!.chRUserid.toString(),
-                      // );
+                      controller.fetchDummyData();
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

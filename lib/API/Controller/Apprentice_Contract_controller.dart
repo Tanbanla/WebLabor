@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_labor_contract/API/Controller/User_controller.dart';
+import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
@@ -11,6 +12,8 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:web_labor_contract/class/PTHC_Group.dart';
+import 'package:web_labor_contract/class/User_Approver.dart';
 
 class DashboardControllerApprentice extends GetxController {
   var dataList = <ApprenticeContract>[].obs;
@@ -21,6 +24,7 @@ class DashboardControllerApprentice extends GetxController {
   final searchTextController = TextEditingController();
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
+  var pthcList = <PthcGroup>[].obs;
 
   RxString currentStatusId = "1".obs;
 
@@ -358,7 +362,7 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
-        switch (contract[i].inTStatusId){
+        switch (contract[i].inTStatusId) {
           case 3:
             contract[i].inTStatusId = 4;
             contract[i].nvchRPthcSection = userUpdate;
@@ -369,16 +373,6 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].useRApproverChief = userApprover;
             contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
         }
-        // if (contract[i].inTStatusId == 3) {
-        //   contract[i].inTStatusId = 4;
-        //   contract[i].nvchRPthcSection = userUpdate;
-        //   contract[i].vchRLeaderEvalution = userApprover;
-        // } else if (contract[i].inTStatusId == 4) {
-        //   contract[i].inTStatusId = 6;
-        //   contract[i].vchRLeaderEvalution = userUpdate;
-        //   contract[i].useRApproverChief = userApprover;
-        //   contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-        // }
       }
       isLoading(true);
       final response = await http.put(
@@ -389,11 +383,86 @@ class DashboardControllerApprentice extends GetxController {
       if (response.statusCode == 200) {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMail('2', userApprover, userApprover, userApprover);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to update two contract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // update thong tin phe duyet
+  Future<void> updateListApprenticeContractApproval(String userApprover) async {
+    try {
+      final contract = getSelectedItems();
+      List<dynamic> notApproval = [];
+      String mailSend = "";
+      String sectionAp = "";
+      if (contract.isEmpty) {
+        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+      }
+      for (int i = 0; i < contract.length; i++) {
+        contract[i].vchRUserUpdate = userApprover;
+        contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // lay thong tin phong
+        sectionAp = contract[i].vchRCodeSection.toString();
+        switch (contract[i].inTStatusId) {
+          case 6:
+            contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            contract[i].useRApproverChief = userApprover;
+            if (contract[i].biTApproverChief == true) {
+              contract[i].inTStatusId = 7;
+              mailSend = NextApprovel(section: contract[i].vchRCodeSection, chucVu:  "Section Manager") as String;
+            } else {
+              contract[i].inTStatusId = 4;
+              notApproval.add(contract[i]);
+            }
+          case 7:
+            contract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            contract[i].useRApproverSectionManager = userApprover;
+            if (contract[i].biTApproverSectionManager == true) {
+              contract[i].inTStatusId = 9;
+            } else {
+              contract[i].inTStatusId = 4;
+              notApproval.add(contract[i]);
+            }
+        }
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(contract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        //mail phe duyet
         controlleruser.SendMail(
-          '2',
-          userApprover,
-          userApprover,
-          userApprover,
+            '2',
+            mailSend,
+            mailSend,
+            mailSend,
+          );
+
+        // mail canh bao
+        //Special case for section "1120-1 : ADM-PER"
+        final specialSection = pthcList.firstWhere(
+          (item) => item.section == "1120-1 : ADM-PER",
+        );
+        final ccSection = pthcList.map((item) => item.mailcc)
+              .where((section) => section == sectionAp);
+        controlleruser.SendMailCustom(
+          specialSection.mailto.toString(),
+          ccSection.toString(),
+          specialSection.mailbcc.toString(),
+          notApproval,
         );
       } else {
         final error = json.decode(response.body);
@@ -862,6 +931,94 @@ class DashboardControllerApprentice extends GetxController {
       filterdataList[index].vchRNote = reason;
       dataList.refresh();
       filterdataList.refresh();
+    }
+  }
+
+  // update thong tin phe duyet
+  void updateNotRehireReasonApprovel(
+    String employeeCode,
+    String reason,
+    int? statusId,
+  ) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      switch (statusId) {
+        case 6:
+          dataList[index].nvchRApproverChief = reason;
+          filterdataList[index].nvchRApproverChief = reason;
+        case 7:
+          dataList[index].nvchRApproverManager = reason;
+          filterdataList[index].nvchRApproverManager = reason;
+      }
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+  void updateRehireStatusApprovel(
+    String employeeCode,
+    bool value,
+    int? statusId,
+  ) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      switch (statusId) {
+        case 6:
+          dataList[index].biTApproverChief = value;
+          filterdataList[index].biTApproverChief = value;
+        case 7:
+          dataList[index].biTApproverSectionManager = value;
+          filterdataList[index].biTApproverSectionManager = value;
+      }
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  // lấy mail trưởng phòng, giám đốc, quản lý
+  Future<String> NextApprovel({String? section, String? chucVu}) async {
+    try {
+      isLoading(true);
+
+      // Build URI with optional parameters
+      final uri = Uri.parse('${Common.API}${Common.UserApprover}').replace(
+        queryParameters: {
+          if (section != null) 'section': section,
+          if (chucVu != null) 'positionGroups': chucVu,
+        },
+      );
+
+      // Make HTTP request
+      final response = await http.get(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      // Handle response
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          // Process and join emails in one efficient operation
+          return (jsonData['data'] as List)
+              .map((item) => ApproverUser.fromJson(item).chREmployeeMail)
+              .where((email) => email != null && email.isNotEmpty)
+              .join(';');
+        }
+        throw Exception(
+          'API request failed: ${jsonData['message'] ?? 'Unknown error'}',
+        );
+      }
+      throw Exception(
+        'HTTP request failed with status: ${response.statusCode}',
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch approvers: ${e.toString()}');
+      return "";
+    } finally {
+      isLoading(false);
     }
   }
 }

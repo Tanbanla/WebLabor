@@ -12,6 +12,8 @@ import 'package:web_labor_contract/Screen/User/Fill_Review/fill_apprentice.dart'
 import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
 import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
 import 'package:web_labor_contract/Screen/User/LoginScreen/sign_in_screen.dart';
+import 'package:web_labor_contract/Screen/User/Report/report_apprentice.dart';
+import 'package:web_labor_contract/Screen/User/Report/report_two.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
@@ -391,6 +393,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           final fillEvaluationText = currentLang == 'vi'
               ? 'Điền đánh giá'
               : '評価記入';
+          final ReportText = currentLang == 'vi'
+              ? 'Báo cáo'
+              : 'レポート';
           final approvalText = currentLang == 'vi' ? 'Phê duyệt' : '承認';
 
           if (subMenu == userManagementText) {
@@ -404,6 +409,8 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               widget.changeBody(FillTwoScreen());
             } else if (title == approvalText) {
               widget.changeBody(ApprovalTwoScreen());
+            }else if (title == ReportText){
+              widget.changeBody(ReportTwoScreen());
             }
           } else if (subMenu == trialContractText) {
             if (title == createEvaluationText) {
@@ -412,12 +419,14 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               widget.changeBody(FillApprenticeScreen());
             } else if (title == approvalText) {
               widget.changeBody(ApprovalTrialScreen());
+            }else if (title == ReportText){
+              widget.changeBody(ReportApprentice());
             }
           } else if (subMenu == preparationApprovalText) {
             widget.changeBody(ApprovalPrepartionScreen());
           } else if (subMenu == homeText) {
             widget.changeBody(HomeScreen(changeBody: (newPage) {}));
-          } else {
+          }else {
             widget.changeBody(HomeScreen(changeBody: (newPage) {}));
           }
         }

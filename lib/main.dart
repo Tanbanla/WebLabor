@@ -43,10 +43,10 @@ class MyApp extends StatelessWidget {
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          return //MenuScreen();
-          authState.isAuthenticated
-              ? const MenuScreen()
-              : const SignInScreen();
+          return MenuScreen();
+          // authState.isAuthenticated
+          //     ? const MenuScreen()
+          //     : const SignInScreen();
         },
       ),
     );

@@ -471,19 +471,6 @@ class DashboardControllerUser extends GetxController {
     }
     return null;
   }
-
-  // Section chief, manager and Directory
-  Future<void> SectionMail() async {
-    try {
-      isLoading(true);
-      
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch data: $e');
-    } finally {
-      isLoading(false);
-    }
-  }
-
   // send mail
   Future<void> SendMail(String code, String to, String cc, String bcc) async {
     try {

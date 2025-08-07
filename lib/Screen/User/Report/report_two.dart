@@ -18,42 +18,21 @@ import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 
-class ApprovalTwoScreen extends StatefulWidget {
-  const ApprovalTwoScreen({super.key});
+class ReportTwoScreen extends StatefulWidget {
+  const ReportTwoScreen({super.key});
 
   @override
-  State<ApprovalTwoScreen> createState() => _ApprovalTwoScreenState();
+  State<ReportTwoScreen> createState() => _ReportTwoScreenState();
 }
 
-class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
+class _ReportTwoScreenState extends State<ReportTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
   final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "Chief Section") {
-      // truong hop quan ly
-      controller.changeStatus(
-        '6',
-        sectionName,
-        null,
-      );
-    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
-      // truong hop truong phong
-      controller.changeStatus(
-        '7',
-        sectionName,
-        null,
-      );
-    } else if (authState.user!.chRGroup.toString() == "Director") {
-      controller.changeStatus('8', null, null);
-    }
+    controller.fetchDummyData();
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -112,13 +91,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   }
 
   Widget _buildSearchAndActions() {
-    final authState = Provider.of<AuthState>(context, listen: true);
     final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
-
-    // Extract section name safely
-    String sectionName =
-        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-
     RxString errorMessage = ''.obs;
     return Obx(() {
       return Column(
@@ -185,72 +158,72 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
               // action send
               const SizedBox(width: 20),
               // Send button
-              GestureDetector(
-                onTap: () async {
-                  errorMessage.value = '';
-                  try {
-                    await controller.updateListTwoContractApproval(
-                      authState.user!.chRUserid.toString(),
-                    );
-                    // phan xem ai dang vao man so sanh
-                    if (authState.user!.chRGroup.toString() == "Chief Section") {
-                      // truong hop quan ly
-                      controller.changeStatus(
-                        '6',
-                        sectionName,
-                        null,
-                      );
-                    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
-                      // truong hop truong phong
-                      controller.changeStatus(
-                        '7',
-                        sectionName,
-                        null,
-                      );
-                    } else if (authState.user!.chRGroup.toString() == "Director") {
-                      controller.changeStatus('8', null, null);
-                    }
-                  } catch (e) {
-                    errorMessage.value =
-                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-                  }
-                },
-                child: Obx(
-                  () => Container(
-                    width: 130,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: controller.isLoading.value
-                          ? Colors.grey
-                          : Common.primaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    child: Center(
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              tr('Confirm'),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () async {
+              //     errorMessage.value = '';
+              //     try {
+              //       await controller.updateListTwoContractApproval(
+              //         authState.user!.chRUserid.toString(),
+              //       );
+              //       // phan xem ai dang vao man so sanh
+              //       if (authState.user!.chRGroup.toString() == "Chief Section") {
+              //         // truong hop quan ly
+              //         controller.changeStatus(
+              //           '6',
+              //           sectionName,
+              //           null,
+              //         );
+              //       } else if (authState.user!.chRGroup.toString() == "Section Manager") {
+              //         // truong hop truong phong
+              //         controller.changeStatus(
+              //           '7',
+              //           sectionName,
+              //           null,
+              //         );
+              //       } else if (authState.user!.chRGroup.toString() == "Director") {
+              //         controller.changeStatus('8', null, null);
+              //       }
+              //     } catch (e) {
+              //       errorMessage.value =
+              //           '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+              //     }
+              //   },
+              //   child: Obx(
+              //     () => Container(
+              //       width: 130,
+              //       height: 36,
+              //       decoration: BoxDecoration(
+              //         color: controller.isLoading.value
+              //             ? Colors.grey
+              //             : Common.primaryColor,
+              //         borderRadius: BorderRadius.circular(10),
+              //       ),
+              //       padding: const EdgeInsets.symmetric(
+              //         horizontal: 10,
+              //         vertical: 8,
+              //       ),
+              //       child: Center(
+              //         child: controller.isLoading.value
+              //             ? const SizedBox(
+              //                 width: 20,
+              //                 height: 20,
+              //                 child: CircularProgressIndicator(
+              //                   color: Colors.white,
+              //                   strokeWidth: 2,
+              //                 ),
+              //               )
+              //             : Text(
+              //                 tr('Confirm'),
+              //                 style: TextStyle(
+              //                   color: Colors.white,
+              //                   fontSize: 16,
+              //                   fontWeight: FontWeight.bold,
+              //                 ),
+              //               ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 10),
@@ -1442,40 +1415,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
-                      // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() ==
-                          "Chief Section") {
-                        // truong hop PTHC phong ban
-                        controller.changeStatus(
-                          '6',
-                          sectionName,
-                          null,
-                        );
-                      } else if (authState.user!.chRGroup.toString() ==
-                          "Manager Section") {
-                        // truong hop leader
-                        controller.changeStatus(
-                          '7',
-                          sectionName,
-                          null,
-                        );
-                      } else if (authState.user!.chRGroup.toString() ==
-                          "Director") {
-                        controller.changeStatus(
-                          '8',
-                          null,
-                          null,
-                        );
-                      }
-                      // await controller.changeStatus(
-                      //   "2",
-                      //   sectionName,
-                      //   authState.user!.chRUserid.toString(),
-                      // );
+                      controller.fetchDummyData();
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

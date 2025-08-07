@@ -12,14 +12,12 @@ class Common {
   static const String loginEndpoint = "Account/validate-credentials";
 
   //Master User
-  //http://172.26.248.62:8501/api/User/get-employee-section-manager-by-section?section=3500%20%3A%20R%26D-IT&positionGroups=Chief
   //GET
   static const String UserGetAll = "User/get-all";
   static const String GetUserCount = "User/get-count-all";
   static const String GetByIdUser = "User/get/";
   static const String UserGetByCount = "User/get-count-by-condition";
   static const String UserSreachBy = "User/search-by-condition";
-  static const String GetSectionManager = "get-employee-section-manager-by-section?";
   // POST
   static const String AddUser = "User/add";
   static const String AddListUser = "User/add-multi";
