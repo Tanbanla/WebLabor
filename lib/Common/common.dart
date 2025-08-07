@@ -12,12 +12,14 @@ class Common {
   static const String loginEndpoint = "Account/validate-credentials";
 
   //Master User
+  //http://172.26.248.62:8501/api/User/get-employee-section-manager-by-section?section=3500%20%3A%20R%26D-IT&positionGroups=Chief
   //GET
   static const String UserGetAll = "User/get-all";
   static const String GetUserCount = "User/get-count-all";
   static const String GetByIdUser = "User/get/";
   static const String UserGetByCount = "User/get-count-by-condition";
   static const String UserSreachBy = "User/search-by-condition";
+  static const String GetSectionManager = "get-employee-section-manager-by-section?";
   // POST
   static const String AddUser = "User/add";
   static const String AddListUser = "User/add-multi";
@@ -110,73 +112,6 @@ class Common {
   // <div style='font-weight: bold;'>
   // THÔNG BÁO YÊU CẦU ĐÁNH GIÁ BỊ TỪ CHỐI<br/>
   // </div>
-
-  // Mấu mail
-  // static getRejectionEmailBody({
-  //   required String confirmLink,
-  //   required String evaluationType,
-  //   required String releaseCode,
-  //   required String employeeCode,
-  //   required String rejectionReason,
-  // }) {
-  //   return '''
-  //   ---------------------------<br/>
-  //   Kính gửi: Quản lý phòng ban<br/><br/>
-
-  //   Hệ thống thông tin tới bạn Yêu cầu đánh giá <span style="color: red; font-weight: bold;">BỊ TỪ CHỐI</span>.<br/><br/>
-
-  //   <div style="margin-left: 20px;">
-  //   <table border="1" cellpadding="5" cellspacing="0">
-  //     <tr>
-  //       <th>Loại đánh giá</th>
-  //       <th>Mã đợt Phát hành</th>
-  //       <th>Mã Nhân viên</th>
-  //       <th>Lý do từ chối</th>
-  //     </tr>
-  //     <tr>
-  //       <td>$evaluationType</td>
-  //       <td>$releaseCode</td>
-  //       <td>$employeeCode</td>
-  //       <td>$rejectionReason</td>
-  //     </tr>
-  //   </table>
-  //   </div><br/>
-
-  //   Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/>
-  //   <a href="$confirmLink">Link xác nhận</a><br/><br/>
-
-  //   ※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>
-  //   Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>
-  //   --------------------------------------<br/>
-
-  //   Hello,<br/><br/>
-
-  //   The system informs you that the Evaluation Request has been <span style="color: red; font-weight: bold;">REJECTED</span>.<br/><br/>
-
-  //   <div style="margin-left: 20px;">
-  //   <table border="1" cellpadding="5" cellspacing="0">
-  //     <tr>
-  //       <th>Evaluation Type</th>
-  //       <th>Release Code</th>
-  //       <th>Employee Code</th>
-  //       <th>Rejection Reason</th>
-  //     </tr>
-  //     <tr>
-  //       <td>$evaluationType</td>
-  //       <td>$releaseCode</td>
-  //       <td>$employeeCode</td>
-  //       <td>$rejectionReason</td>
-  //     </tr>
-  //   </table>
-  //   </div><br/>
-
-  //   Please click the link below to reconfirm:<br/>
-  //   <a href="$confirmLink">Confirmation Link</a><br/><br/>
-
-  //   ※This is an automated email from the LCES system. Please do not reply to this email.<br/>
-  //   Please contact the responsible person to confirm the current status.
-  //   ''';
-  // }
   static String getRejectionEmailBody({
     required String confirmLink,
     required List<dynamic> rejectedRequests,
@@ -186,72 +121,11 @@ class Common {
       return rejectedRequests
           .map(
             (request) =>
-                '''
-      <tr>
-        <td>${request['vchRCodeApprover'] ?? 'N/A'}</td>
-        <td>${request['vchRCodeApprover'] ?? 'N/A'}</td>
-        <td>${request['vchREmployeeId'] ?? 'N/A'}</td>
-        <td>${request['nvchRApproverPer'] ?? 'Không có lý do'}</td>
-      </tr>
-    ''',
+                "<tr><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchREmployeeId ?? 'N/A'}</td><td>${request.nvchRApproverPer ?? 'Không có lý do'}</td></tr>",
           )
           .join();
     }
 
-    return '''
-    ---------------------------<br/>
-    Kính gửi: Quản lý phòng ban<br/><br/>
-
-    Hệ thống thông báo có <span style="color: red; font-weight: bold;">${rejectedRequests.length} yêu cầu đánh giá BỊ TỪ CHỐI</span>.<br/><br/>
-
-    <div style="margin-left: 20px;">
-    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%;">
-      <thead>
-        <tr style="background-color: #f2f2f2;">
-          <th>Loại đánh giá</th>
-          <th>Mã đợt Phát hành</th> 
-          <th>Mã Nhân viên</th>
-          <th>Lý do từ chối</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${buildTableRows()}
-      </tbody>
-    </table>
-    </div><br/>
-
-    Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/>
-    <a href="$confirmLink">Link xác nhận</a><br/><br/>
-
-    ※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>
-    Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>
-    --------------------------------------<br/>
-
-    Hello,<br/><br/>
-
-    The system informs you that <span style="color: red; font-weight: bold;">${rejectedRequests.length} evaluation requests have been REJECTED</span>.<br/><br/>
-
-    <div style="margin-left: 20px;">
-    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%;">
-      <thead>
-        <tr style="background-color: #f2f2f2;">
-          <th>Evaluation Type</th>
-          <th>Release Code</th>
-          <th>Employee Code</th>
-          <th>Rejection Reason</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${buildTableRows()}
-      </tbody>
-    </table>
-    </div><br/>
-
-    Please click the link below to reconfirm:<br/>
-    <a href="$confirmLink">Confirmation Link</a><br/><br/>
-
-    ※This is an automated email from the LCES system. Please do not reply to this email.<br/>
-    Please contact the responsible person to confirm the current status.
-    ''';
+    return """---------------------------<br/>Kính gửi: Quản lý phòng ban<br/><br/>Hệ thống thông báo có <span style='color: red; font-weight: bold;'>${rejectedRequests.length} yêu cầu đánh giá BỊ TỪ CHỐI</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Lý do từ chối</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>--------------------------------------<br/><br/>Hello,<br/><br/>The system informs you that <span style='color: red; font-weight: bold;'>${rejectedRequests.length} evaluation requests have been REJECTED</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Evaluation Type</th><th>Release Code</th><th>Employee Code</th><th>Rejection Reason</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Please click the link below to reconfirm:<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※This is an automated email from the LCES system. Please do not reply to this email.<br/>Please contact the responsible person to confirm the current status.""";
   }
 }

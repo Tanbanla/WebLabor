@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:web_labor_contract/API/Controller/User_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
@@ -152,13 +153,13 @@ class DashboardControllerApprentice extends GetxController {
         case "4":
           cloumn = "VCHR_LEADER_EVALUTION";
           break;
-        case "5":
+        case "6":
           cloumn = "USER_APPROVER_CHIEF";
           break;
-        case "6":
+        case "7":
           cloumn = "USER_APPROVER_SECTION_MANAGER";
           break;
-        case "7":
+        case "8":
           cloumn = "USER_APPROVER_DIRECTOR";
           break;
       }
@@ -357,15 +358,27 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
-        if (contract[i].inTStatusId == 3) {
-          contract[i].inTStatusId = 4;
-          contract[i].nvchRPthcSection = userUpdate;
-          contract[i].vchRLeaderEvalution = userApprover;
-        } else if (contract[i].inTStatusId == 4) {
-          contract[i].inTStatusId = 5;
-          contract[i].vchRLeaderEvalution = userUpdate;
-          contract[i].useRApproverChief = userApprover;
+        switch (contract[i].inTStatusId){
+          case 3:
+            contract[i].inTStatusId = 4;
+            contract[i].nvchRPthcSection = userUpdate;
+            contract[i].vchRLeaderEvalution = userApprover;
+          case 4:
+            contract[i].inTStatusId = 6;
+            contract[i].vchRLeaderEvalution = userUpdate;
+            contract[i].useRApproverChief = userApprover;
+            contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
         }
+        // if (contract[i].inTStatusId == 3) {
+        //   contract[i].inTStatusId = 4;
+        //   contract[i].nvchRPthcSection = userUpdate;
+        //   contract[i].vchRLeaderEvalution = userApprover;
+        // } else if (contract[i].inTStatusId == 4) {
+        //   contract[i].inTStatusId = 6;
+        //   contract[i].vchRLeaderEvalution = userUpdate;
+        //   contract[i].useRApproverChief = userApprover;
+        //   contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+        // }
       }
       isLoading(true);
       final response = await http.put(
@@ -375,6 +388,13 @@ class DashboardControllerApprentice extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMail(
+          '2',
+          userApprover,
+          userApprover,
+          userApprover,
+        );
       } else {
         final error = json.decode(response.body);
         throw Exception(

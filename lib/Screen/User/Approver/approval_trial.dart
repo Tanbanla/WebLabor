@@ -47,7 +47,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         sectionName,
         authState.user!.chRUserid.toString(),
       );
-    } else if (authState.user!.chRGroup.toString() == "Manager Section") {
+    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
       // truong hop truong phong
       controller.changeStatus(
         '7',

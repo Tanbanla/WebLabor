@@ -44,7 +44,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         sectionName,
         authState.user!.chRUserid.toString(),
       );
-    } else if (authState.user!.chRGroup.toString() == "Manager Section") {
+    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
       // truong hop truong phong
       controller.changeStatus(
         '7',
@@ -88,6 +88,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       ),
     );
   }
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,13 +113,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
 
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
-    final DashboardControllerTwo controller = Get.put(
-      DashboardControllerTwo(),
-    );
+    final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
 
     // Extract section name safely
-    // String sectionName =
-    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
+    String sectionName =
+        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
 
     RxString errorMessage = ''.obs;
     return Obx(() {
@@ -191,8 +190,26 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   errorMessage.value = '';
                   try {
                     await controller.updateListTwoContractApproval(
-                      authState.user!.chRUserid.toString()
+                      authState.user!.chRUserid.toString(),
                     );
+                        // phan xem ai dang vao man so sanh
+                    if (authState.user!.chRGroup.toString() == "Chief Section") {
+                      // truong hop quan ly
+                      controller.changeStatus(
+                        '6',
+                        sectionName,
+                        authState.user!.chRUserid.toString(),
+                      );
+                    } else if (authState.user!.chRGroup.toString() == "Section Manager") {
+                      // truong hop truong phong
+                      controller.changeStatus(
+                        '7',
+                        sectionName,
+                        authState.user!.chRUserid.toString(),
+                      );
+                    } else if (authState.user!.chRGroup.toString() == "Director") {
+                      controller.changeStatus('8', null, authState.user!.chRUserid.toString());
+                    }
                   } catch (e) {
                     errorMessage.value =
                         '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -282,7 +299,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3420,
+              width: 2670, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -388,6 +405,18 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
+                    title: tr('paidLeave'),
+                    width: 100,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('unpaidLeave'),
+                    width: 90,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
                     title: tr('unreportedLeave'),
                     width: 90,
                     maxLines: 2,
@@ -405,67 +434,28 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('lythuyet'),
-                    width: 130,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('thuchanh'),
-                    width: 130,
-                    fontSize: Common.sizeColumn,
+                    title: tr('healthCheckResult'),
+                    width: 170,
                     maxLines: 2,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('congviec'),
-                    width: 130,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('hochoi'),
-                    width: 130,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('thichnghi'),
-                    width: 130,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('tinhthan'),
-                    fontSize: Common.sizeColumn,
+                    title: tr('evaluationResult'),
                     width: 150,
-                    maxLines: 3,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('baocao'),
-                    fontSize: Common.sizeColumn,
-                    width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('chaphanh'),
-                    fontSize: Common.sizeColumn,
-                    width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('ketqua'),
-                    fontSize: Common.sizeColumn,
-                    width: 150,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('note'),
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('notRehirable'),
                     width: 170,
-                    fontSize: Common.sizeColumn,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('Lydo'),
+                    title: tr('notRehirableReason'),
                     width: 170,
-                    fontSize: Common.sizeColumn,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                 ],
                 source: MyData(context),
@@ -725,7 +715,12 @@ class MyData extends DataTableSource {
       text: data.nvarchaRHealthResults ?? '',
     );
     final reasonController = TextEditingController(
-      text: data.nvchRNoReEmpoyment ?? '',
+      text: switch (data.inTStatusId) {
+        6 => data.nvchRApproverChief ?? '',
+        7 => data.nvchRApproverManager ?? '',
+        8 => data.nvchRApproverDirector ?? '',
+        _ => '', // Giá trị mặc định cho các trường hợp khác
+      },
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -1015,16 +1010,26 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =
-                controller.filterdataList[index].biTNoReEmployment ?? true;
+            final rawStatus =() {
+              if (controller.filterdataList.length > index) {
+                return switch (data.inTStatusId) {
+                  6 => controller.filterdataList[index].biTApproverChief ?? true,
+                  7 => controller.filterdataList[index].biTApproverSectionManager ?? true,
+                  8 => controller.filterdataList[index].biTApproverDirector ?? true,
+                  _ => true,
+                };
+              }
+              return true;
+            }();
             final status = rawStatus ? 'OK' : 'NG';
             return DropdownButton<String>(
               value: status,
               onChanged: (newValue) {
                 if (newValue != null) {
-                  controller.updateRehireStatus(
+                  controller.updateRehireStatusApprovel(
                     data.vchREmployeeId.toString(),
                     newValue == 'OK',
+                    data.inTStatusId,
                   );
                 }
               },
@@ -1070,9 +1075,10 @@ class MyData extends DataTableSource {
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
-                controller.updateNotRehireReason(
+                controller.updateNotRehireReasonApprovel(
                   data.vchREmployeeId.toString(),
                   reasonController.text,
+                  data.inTStatusId,
                 );
               }
             },

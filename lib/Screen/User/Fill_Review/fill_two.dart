@@ -97,7 +97,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus(sectionName, 'Leader,Supervisor,Staff');
+    controller.changeStatus(sectionName, 'Leader,Supervisor,Staff,Chief');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
     RxString errorMessage = ''.obs;
@@ -187,6 +187,17 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
+                if (authState.user!.chRGroup.toString() == "PTHC") {
+                  // truong hop PTHC phong ban
+                  await controllerTwo.changeStatus('3', sectionName, null);
+                } else {
+                  // truong hop leader
+                  await controllerTwo.changeStatus(
+                    '4',
+                    sectionName,
+                    authState.user!.chRUserid.toString(),
+                  );
+                }
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -1255,7 +1266,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10, width: 500,),
+              const SizedBox(height: 10, width: 500),
               // Dòng 2: Mã NV + Giới tính
               Row(
                 children: [

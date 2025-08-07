@@ -948,6 +948,9 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
+    final reasonController = TextEditingController(
+      text: data.nvchRApproverPer ?? '',
+    );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -1163,27 +1166,84 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
-          TextFormField(
-            style: TextStyle(
-              fontSize: Common.sizeColumn,
-            ), // Thêm cho TextFormField
-            decoration: InputDecoration(
-              labelText: tr('reason'),
-              labelStyle: TextStyle(
-                fontSize: Common.sizeColumn,
-              ), // Thêm cho label
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+          Obx(() {
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            final rawStatus =
+                controller.filterdataList[index].biTApproverPer ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateRehireStatus(
+                    data.vchREmployeeId.toString(),
+                    newValue == 'OK',
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        DataCell(
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateNotRehireReason(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                );
+              }
+            },
+            child: TextFormField(
+              controller: reasonController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return tr('pleaseReason');
-              }
-              return null;
-            },
           ),
         ),
       ],

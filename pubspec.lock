@@ -165,10 +165,10 @@ packages:
     dependency: "direct dev"
     description:
       name: file_picker
-      sha256: ef9908739bdd9c476353d6adff72e88fd00c625f5b959ae23f7567bd5137db0a
+      sha256: "13ba4e627ef24503a465d1d61b32596ce10eb6b8903678d362a528f9939b4aa8"
       url: "https://pub.dev"
     source: hosted
-    version: "10.2.0"
+    version: "10.2.1"
   fl_chart:
     dependency: "direct dev"
     description:
@@ -510,18 +510,18 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "27cbeb650b780d1f3ab254b26ac64e2b06e92e2d64349537b0db3f714ff1e962"
+      sha256: f999f11af9c54bd46ceb478273e06774d28723ffa2c622d2d6e7e84a358c23e0
       url: "https://pub.dev"
     source: hosted
-    version: "30.1.40"
+    version: "30.1.42"
   syncfusion_flutter_datagrid:
     dependency: "direct dev"
     description:
       name: syncfusion_flutter_datagrid
-      sha256: "42c1b5c869581926d0fc200b8fb769b0e23eff177147b845ae2e29e5d38c158e"
+      sha256: d205f758e7bca4aa82a844813dfe65f7981825fedbc8fd8678423ec7ce9647c4
       url: "https://pub.dev"
     source: hosted
-    version: "30.1.40"
+    version: "30.1.42"
   term_glyph:
     dependency: transitive
     description:
@@ -612,4 +612,4 @@ packages:
     version: "6.5.0"
 sdks:
   dart: ">=3.8.1 <4.0.0"
-  flutter: ">=3.27.4"
+  flutter: ">=3.29.0"

@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:web_labor_contract/API/Controller/User_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_labor_contract/class/PTHC_Group.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/services.dart';
@@ -20,7 +22,7 @@ class DashboardControllerTwo extends GetxController {
   final searchTextController = TextEditingController();
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
-
+  var pthcList = <PthcGroup>[].obs;
   @override
   void onInit() {
     super.onInit();
@@ -161,13 +163,13 @@ class DashboardControllerTwo extends GetxController {
         case "4":
           cloumn = "VCHR_LEADER_EVALUTION";
           break;
-        case "5":
+        case "6":
           cloumn = "USER_APPROVER_CHIEF";
           break;
-        case "6":
+        case "7":
           cloumn = "USER_APPROVER_SECTION_MANAGER";
           break;
-        case "7":
+        case "8":
           cloumn = "USER_APPROVER_DIRECTOR";
           break;
       }
@@ -227,6 +229,7 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   // them danh gia
   Future<void> addTwoContract(
     TwoContract twocontract,
@@ -363,20 +366,23 @@ class DashboardControllerTwo extends GetxController {
     try {
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
+      //List<String> phongban = [];
       if (twocontract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-        if (twocontract[i].inTStatusId == 3) {
-          twocontract[i].inTStatusId = 4;
-          twocontract[i].nvchRPthcSection = userUpdate;
-          twocontract[i].vchRLeaderEvalution = userApprover;
-        } else if(twocontract[i].inTStatusId == 4){
-          twocontract[i].inTStatusId = 5;
-          twocontract[i].vchRLeaderEvalution = userUpdate;
-          twocontract[i].useRApproverChief = userApprover;
+        switch (twocontract[i].inTStatusId){
+          case 3:
+            twocontract[i].inTStatusId = 4;
+            twocontract[i].nvchRPthcSection = userUpdate;
+            twocontract[i].vchRLeaderEvalution = userApprover;
+          case 4:
+            twocontract[i].inTStatusId = 6;
+            twocontract[i].vchRLeaderEvalution = userUpdate;
+            twocontract[i].useRApproverChief = userApprover;
+            twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
         }
       }
       isLoading(true);
@@ -387,6 +393,8 @@ class DashboardControllerTwo extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMail('2', userApprover, userApprover, userApprover);
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -400,41 +408,48 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   //update thong tin Phe duyet
-    Future<void> updateListTwoContractApproval(
-    String userApprover
-  ) async {
+  Future<void> updateListTwoContractApproval(String userApprover) async {
     try {
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
+      List<dynamic> notApproval = [];
       if (twocontract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userApprover;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-        if (twocontract[i].inTStatusId == 5) {
-          twocontract[i].inTStatusId = 6;
-          twocontract[i].nvchRPthcSection = userApprover;
-          twocontract[i].vchRLeaderEvalution = userApprover;
-        } 
-        if(twocontract[i].inTStatusId == 6 && twocontract[i].biTApproverChief == true){
-          twocontract[i].inTStatusId = 7;
-          twocontract[i].vchRLeaderEvalution = userApprover;
-          twocontract[i].useRApproverChief = userApprover;
-        }else {
-
+        switch(twocontract[i].inTStatusId){
+          case 6:
+            twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverChief = userApprover;
+            if (twocontract[i].biTApproverChief == true) {
+              twocontract[i].inTStatusId = 7;
+            } else {
+              twocontract[i].inTStatusId = 4;
+              notApproval.add(twocontract[i]);
+            }
+          case 7:
+            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverSectionManager = userApprover;
+            if(twocontract[i].biTApproverSectionManager == true){
+              twocontract[i].inTStatusId = 8;
+            }else{
+              twocontract[i].inTStatusId = 4;
+              notApproval.add(twocontract[i]);
+            }
+          case 8:
+            twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverDirector = userApprover;
+            if(twocontract[i].biTApproverDirector == true){
+              twocontract[i].inTStatusId = 9;
+            }else{
+              twocontract[i].inTStatusId = 4;
+              notApproval.add(twocontract[i]);
+            }
         }
-        if(twocontract[i].inTStatusId == 7 && twocontract[i].biTApproverSectionManager == true ){
-          twocontract[i].inTStatusId = 8;
-          twocontract[i].vchRLeaderEvalution = userApprover;
-          twocontract[i].useRApproverChief = userApprover;
-        }  
-        if(twocontract[i].inTStatusId == 8 && twocontract[i].biTApproverDirector == true){
-          twocontract[i].inTStatusId = 9;
-          twocontract[i].vchRLeaderEvalution = userApprover;
-          twocontract[i].useRApproverChief = userApprover;
-        }  
       }
       isLoading(true);
       final response = await http.put(
@@ -457,6 +472,36 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
+  /// Lay thông tin gửi mail
+  Future<void> fetchPTHCData() async {
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse(Common.API + Common.GetGroupPTHC),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          pthcList.assignAll(
+            data.map((user) => PthcGroup.fromJson(user)).toList(),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load dats');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // delete
   Future<void> deleteTwoContract(int id) async {
     try {
@@ -841,6 +886,47 @@ class DashboardControllerTwo extends GetxController {
     if (index != -1) {
       dataList[index].nvchRNoReEmpoyment = reason;
       filterdataList[index].nvchRNoReEmpoyment = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  // Các thông tin lưu ở Phê duyệt
+  void updateNotRehireReasonApprovel(String employeeCode, String reason, int? statusId) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      switch (statusId){
+        case 6:
+          dataList[index].nvchRApproverChief = reason;
+          filterdataList[index].nvchRApproverChief = reason;
+        case 7:
+          dataList[index].nvchRApproverManager = reason;
+          filterdataList[index].nvchRApproverManager = reason;
+        case 8:
+          dataList[index].nvchRApproverDirector = reason;
+          filterdataList[index].nvchRApproverDirector= reason;
+      }
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+  void updateRehireStatusApprovel(String employeeCode, bool value, int? statusId) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      switch (statusId){
+        case 6:
+          dataList[index].biTApproverChief = value;
+          filterdataList[index].biTApproverChief = value;
+        case 7:
+          dataList[index].biTApproverSectionManager = value;
+          filterdataList[index].biTApproverSectionManager = value;
+        case 8:
+          dataList[index].biTApproverDirector = value;
+          filterdataList[index].biTApproverDirector = value;
+      }
       dataList.refresh();
       filterdataList.refresh();
     }

@@ -242,7 +242,7 @@ class DashboardControllerUser extends GetxController {
     }
   }
 
-  Future<void> importFromExcel(File file,String userUpdate) async {
+  Future<void> importFromExcel(File file, String userUpdate) async {
     try {
       isLoading(true);
       // Implement your Excel parsing and data import logic here
@@ -472,6 +472,18 @@ class DashboardControllerUser extends GetxController {
     return null;
   }
 
+  // Section chief, manager and Directory
+  Future<void> SectionMail() async {
+    try {
+      isLoading(true);
+      
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // send mail
   Future<void> SendMail(String code, String to, String cc, String bcc) async {
     try {
@@ -507,20 +519,26 @@ class DashboardControllerUser extends GetxController {
       isLoading(false);
     }
   }
+
   // send mail Custom
-  Future<void> SendMailCustom(String to, String cc, String bcc, List<dynamic> rejectedRequests ) async {
+  Future<void> SendMailCustom(
+    String to,
+    String cc,
+    String bcc,
+    List<dynamic> rejectedRequests,
+  ) async {
     try {
       isLoading(true);
       final requestBody = {
         "title": "THÔNG BÁO: YÊU CẦU ĐÁNH GIÁ HỢP ĐỒNG BỊ TỪ CHỐI",
         "mail_from": "LaborContractEvaluationSystem@brothergroup.net",
-        "mail_to": to,
-        "mail_cc": cc,
-        "mail_bcc": bcc,
+        "mail_to": to == "null" ? "" : to,
+        "mail_cc": cc == "null" ? "" : cc,
+        "mail_bcc": bcc == "null" ? "" : bcc,
         "body": Common.getRejectionEmailBody(
-        confirmLink: "http://172.26.248.62:8055/",
-        rejectedRequests: rejectedRequests
-      )
+          confirmLink: "http://172.26.248.62:8055/",
+          rejectedRequests: rejectedRequests,
+        ),
       };
       final response = await http.post(
         Uri.parse(Common.SendMailCustom),

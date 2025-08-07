@@ -147,6 +147,8 @@ class _SignInScreenState extends State<SignInScreen> {
                           }
                           return null;
                         },
+                        textInputAction: TextInputAction.done, // Đặt action là "done" cho trường cuối
+                        onFieldSubmitted: (_) => _handleLogin(), // Xử lý login khi nhấn Enter
                       ),
                       const SizedBox(height: 10),
                       Align(

@@ -189,6 +189,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
+                if (authState.user!.chRGroup.toString() == "PTHC") {
+                  // truong hop PTHC phong ban
+                  await controllerTwo.changeStatus('3', sectionName, null);
+                } else {
+                  // truong hop leader
+                  await controllerTwo.changeStatus(
+                    '4',
+                    sectionName,
+                    authState.user!.chRUserid.toString(),
+                  );
+                }
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';

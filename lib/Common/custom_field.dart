@@ -12,6 +12,8 @@ class CustomField extends StatelessWidget {
   final Color? cursorColor;
   final Radius? cursorRadius;
   final InputDecoration? decoration;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
 
   const CustomField({
     super.key,
@@ -24,6 +26,8 @@ class CustomField extends StatelessWidget {
     this.cursorColor,
     this.cursorRadius,
     this.decoration,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -38,6 +42,8 @@ class CustomField extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         validator: validator,
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
         style: textStyle ?? TextStyle(color: Common.blackColor),
         cursorRadius: cursorRadius ?? const Radius.circular(20),
         cursorColor: cursorColor ?? Common.blackColor.withOpacity(.5),

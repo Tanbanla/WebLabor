@@ -41,110 +41,6 @@ class DashboardControllerApporver extends GetxController {
   void setContractType(String type) {
     currentContractType.value = type;
   }
-
-  // Future<void> updateListContractApproval(
-  //   String userApprover,
-  //   String userUpdate,
-  //   String? contractType,
-  // ) async {
-  //   try {
-  //     fetchPTHCData();
-  //     // List<TwoContract> twocontract,
-  //     final twocontract = getSelectedItems();
-  //     List<String> phongban = [];
-  //     List<dynamic> NotApproval = <dynamic>[];
-  //     if (twocontract.isEmpty) {
-  //       throw Exception(tr('LoiGui'));
-  //     }
-  //     isLoading(true);
-  //     for (int i = 0; i < twocontract.length; i++) {
-  //       if (twocontract[i].biTApproverPer == null) {
-  //         twocontract[i].biTApproverPer = true;
-  //       }
-  //       if (twocontract[i].biTApproverPer == false &&
-  //           (twocontract[i].nvchRApproverPer == '' ||
-  //               twocontract[i].nvchRApproverPer == null)) {
-  //         throw Exception(
-  //           '${tr('InputError')} ${twocontract[i].vchREmployeeName}',
-  //         );
-  //       }
-  //       twocontract[i].vchRUserUpdate = userUpdate;
-  //       twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
-  //       if (twocontract[i].biTApproverPer) {
-  //         twocontract[i].inTStatusId = 3;
-  //         if (phongban.length > 0 && phongban.isNotEmpty) {
-  //           int dem = 0;
-  //           for (int k = 0; k < phongban.length; k++) {
-  //             if (phongban[k] == twocontract[i].vchRCodeSection) {
-  //               dem++;
-  //             }
-  //           }
-  //           if (dem <= 1) {
-  //             phongban.add(twocontract[i].vchRCodeSection);
-  //           }
-  //         } else {
-  //           phongban.add(twocontract[i].vchRCodeSection);
-  //         }
-  //       } else {
-  //         twocontract[i].inTStatusId = 1;
-  //         NotApproval.add(twocontract[i]);
-  //       }
-  //       twocontract[i].dtMApproverPer = formatDateTime(DateTime.now());
-  //       twocontract[i].useRApproverPer = userApprover;
-  //     }
-  //     // Determine API endpoint and column mapping based on contract type
-  //     final apiEndpoint = contractType == 'two'
-  //         ? Common.UpdataListTwo
-  //         : Common.UpdataListApprentice;
-  //     final response = await http.put(
-  //       Uri.parse('${Common.API}$apiEndpoint'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: json.encode(twocontract),
-  //     );
-  //     if (response.statusCode == 200) {
-  //       await fetchData(
-  //         adid: userUpdate,
-  //         statusId: '2',
-  //         section: null,
-  //         contractType: contractType,
-  //       );
-  //       DashboardControllerUser controlleruser = Get.put(
-  //         DashboardControllerUser(),
-  //       );
-  //       for (int i = 0; i < phongban.length; i++) {
-  //         for (int j = 0; j < pthcList.length; j++) {
-  //           if (phongban[i] == pthcList[j].section) {
-  //             controlleruser.SendMail(
-  //               '2',
-  //               pthcList[j].mailto.toString(),
-  //               pthcList[j].mailcc.toString(),
-  //               pthcList[j].mailbcc.toString(),
-  //             );
-  //           }
-  //         }
-  //       }
-  //       for (int j = 0; j < pthcList.length; j++) {
-  //         if (pthcList[j].section == "1120-1 : ADM-PER") {
-  //           controlleruser.SendMailCustom(
-  //             pthcList[j].mailto.toString(),
-  //             pthcList[j].mailcc.toString(),
-  //             pthcList[j].mailbcc.toString(),
-  //             NotApproval,
-  //           );
-  //         }
-  //       }
-  //     } else {
-  //       final error = json.decode(response.body);
-  //       throw Exception(
-  //         'Error sending data to server  ${error['message'] ?? response.body}',
-  //       );
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Failed to update contract: $e');
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
 Future<void> updateListContractApproval(
   String userApprover,
   String userUpdate,
@@ -219,30 +115,16 @@ Future<void> updateListContractApproval(
       }
 
       //Special case for section "1120-1 : ADM-PER"
-      // final specialSection = pthcList.firstWhere(
-      //   (item) => item.section == "1120-1 : ADM-PER",
-      // );
-
-      //   controlleruser.SendMailCustom(
-      //     specialSection.mailto.toString(),
-      //     specialSection.mailcc.toString(),
-      //     specialSection.mailbcc.toString(),
-      //     notApproval,
-      //   );
-        // Gửi mail đặc biệt cho phòng "ADM-PER"
-    final specialSection = pthcList.firstWhere(
-      (item) => item.section == "1120-1 : ADM-PER",
-      orElse: () => null as PthcGroup,
-    );
-
-    if (specialSection != null) {
-      controlleruser.SendMailCustom(
-        specialSection.mailto!,
-        specialSection.mailcc!,
-        specialSection.mailbcc!,
-        notApproval,
+      final specialSection = pthcList.firstWhere(
+        (item) => item.section == "1120-1 : ADM-PER",
       );
-    }
+
+        controlleruser.SendMailCustom(
+          specialSection.mailto.toString(),
+          specialSection.mailcc.toString(),
+          specialSection.mailbcc.toString(),
+          notApproval,
+        );
     } else {
       final error = json.decode(response.body);
       throw Exception('Error sending data to server: ${error['message'] ?? response.body}');
