@@ -98,6 +98,12 @@ class Common {
       "ContractApprentice/delete-multi/";
   static const String DeleteApprenticeMultiIDLogic =
       "ContractApprentice/delete-logic-multi/";
+  // Api Chart Home Contract Apprentice
+
+
+
+  // Api Chart Home Contract Two
+
 
   // Send mail
   static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
@@ -116,12 +122,36 @@ class Common {
   }) {
     // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
     String buildTableRows() {
-      return rejectedRequests
-          .map(
-            (request) =>
-                "<tr><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchREmployeeId ?? 'N/A'}</td><td>${request.nvchRApproverPer ?? 'Không có lý do'}</td></tr>",
-          )
-          .join();
+      // return rejectedRequests
+      //     .map(
+      //       (request) =>
+      //           "<tr><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchREmployeeId ?? 'N/A'}</td><td>${request.nvchRApproverPer ?? 'Không có lý do'}</td></tr>",
+      //     )
+      //     .join();
+      return rejectedRequests.map((request) {
+        // Xác định lý do từ chối dựa trên statusId
+        String rejectionReason;
+        switch (request.inTStatusId) {
+          case 2:
+            rejectionReason = request.nvchRApproverPer ?? 'Không có lý do';
+            break;
+          case 4:
+            if(!request.biTApproverChief){
+              rejectionReason = request.nvchRApproverChief ?? '';
+            }else if (!request.biTApproverSectionManager){
+              rejectionReason = request.nvchRApproverManager ?? '';
+            }else if (!request.biTApproverDirector){
+              rejectionReason = request.nvchRApproverDirector ?? '';
+            }else{
+              rejectionReason ='Không có lý do';
+            }
+            break;
+          default:
+            rejectionReason = 'Không có lý do';
+        }
+
+        return "<tr>""<td>${request.vchRCodeApprover ?? 'N/A'}</td>""<td>${request.vchRCodeApprover ?? 'N/A'}</td>""<td>${request.vchREmployeeId ?? 'N/A'}</td>""<td>$rejectionReason</td>""</tr>";
+      }).join();
     }
 
     return """---------------------------<br/>Kính gửi: Quản lý phòng ban<br/><br/>Hệ thống thông báo có <span style='color: red; font-weight: bold;'>${rejectedRequests.length} yêu cầu đánh giá BỊ TỪ CHỐI</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Lý do từ chối</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>--------------------------------------<br/><br/>Hello,<br/><br/>The system informs you that <span style='color: red; font-weight: bold;'>${rejectedRequests.length} evaluation requests have been REJECTED</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Evaluation Type</th><th>Release Code</th><th>Employee Code</th><th>Rejection Reason</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Please click the link below to reconfirm:<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※This is an automated email from the LCES system. Please do not reply to this email.<br/>Please contact the responsible person to confirm the current status.""";

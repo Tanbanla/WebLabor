@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_labor_contract/API/Controller/User_controller.dart';
-import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
@@ -418,17 +417,30 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].useRApproverChief = userApprover;
             if (contract[i].biTApproverChief == true) {
               contract[i].inTStatusId = 7;
-              mailSend = NextApprovel(section: contract[i].vchRCodeSection, chucVu:  "Section Manager") as String;
+              mailSend = await
+                  NextApprovel(
+                        section: contract[i].vchRCodeSection,
+                        chucVu: "Section Manager",
+                      );
             } else {
+              if ((contract[i].nvchRApproverChief?.isEmpty ?? true)) {
+                throw Exception('${tr('InputError')} ${contract[i].vchREmployeeName}');
+              }
               contract[i].inTStatusId = 4;
               notApproval.add(contract[i]);
             }
           case 7:
+            //xu ly khi xong
+            mailSend = "k";
+            //
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
             if (contract[i].biTApproverSectionManager == true) {
               contract[i].inTStatusId = 9;
             } else {
+              if ((contract[i].nvchRApproverManager?.isEmpty ?? true)) {
+                throw Exception('${tr('InputError')} ${contract[i].vchREmployeeName}');
+              }
               contract[i].inTStatusId = 4;
               notApproval.add(contract[i]);
             }
@@ -444,26 +456,41 @@ class DashboardControllerApprentice extends GetxController {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
-        controlleruser.SendMail(
+        if (mailSend != '') {
+          //controlleruser.SendMail('2', mailSend, mailSend, mailSend);
+          controlleruser.SendMail(
             '2',
-            mailSend,
-            mailSend,
-            mailSend,
+            "vietdo@brothergroup.net",
+            "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
+            "vuduc.hai@brother-bivn.com.vn",
           );
-
+        }else{ /// de test mail, xu dung xong xoa
+          /// de test mail, xu dung xong xoa
+          if(mailSend !="k"){
+            controlleruser.SendMail(
+              '2',
+              "vietdo@brothergroup.net",
+              "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
+              "vuduc.hai@brother-bivn.com.vn",
+            );
+          }
+        }
         // mail canh bao
         //Special case for section "1120-1 : ADM-PER"
-        final specialSection = pthcList.firstWhere(
-          (item) => item.section == "1120-1 : ADM-PER",
-        );
-        final ccSection = pthcList.map((item) => item.mailcc)
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+          final ccSection = pthcList
+              .map((item) => item.mailcc)
               .where((section) => section == sectionAp);
-        controlleruser.SendMailCustom(
-          specialSection.mailto.toString(),
-          ccSection.toString(),
-          specialSection.mailbcc.toString(),
-          notApproval,
-        );
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            ccSection.toString(),
+            specialSection.mailbcc.toString(),
+            notApproval,
+          );
+        }
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -978,6 +1005,7 @@ class DashboardControllerApprentice extends GetxController {
       filterdataList.refresh();
     }
   }
+
   // lấy mail trưởng phòng, giám đốc, quản lý
   Future<String> NextApprovel({String? section, String? chucVu}) async {
     try {

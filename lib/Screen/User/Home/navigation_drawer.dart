@@ -138,7 +138,19 @@ class ComplexDrawer extends StatefulWidget {
 class _ComplexDrawerState extends State<ComplexDrawer> {
   int selectedIndex = -1; //dont set it to 0
   bool isExpanded = false;
-  List<CDM> get cdms {
+  late AuthState authState; //= Provider.of<AuthState>(context, listen: true);
+  @override
+  void initState() {
+    super.initState();
+    // Không thể truy cập context ở đây vì widget chưa được build
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    authState = Provider.of<AuthState>(context, listen: true); // Khởi tạo ở đây
+  }
+  List<CDM> get allCdms {
     return [
       CDM(Icons.home, tr('home'), [tr('home')]),
       CDM(Icons.grid_view, tr("master"), [
@@ -167,15 +179,33 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     ];
   }
 
+  // Lấy danh sách menu theo quyền
+  List<CDM> get cdms {
+    final userGroup = authState.user?.chRGroup?.toString() ?? '';
+
+    switch (userGroup) {
+      case 'Admin':
+        return allCdms; // Admin có tất cả quyền
+      case 'Per':
+      case 'Chief Per':
+        return allCdms.where((cdm) => cdm.title != tr("master")).toList();
+      case 'PTHC':
+      case 'Leader':
+        return allCdms
+            .where((cdm) => cdm.title == tr("fillEvaluation") || cdm.title == tr('home'))
+            .toList();
+      case 'Chief Section':
+      case 'Section Manager':
+      case 'Director':
+        return allCdms.where((cdm) => cdm.title == tr("approval") || cdm.title == tr('home')).toList();
+      default:
+        return [allCdms.first]; // Chỉ hiển thị trang chủ nếu không có quyền
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // do dai menu
-      //width: width/2,
-      child: row(),
-      // color:
-      // Color.fromARGB(255, 119, 201, 146).withOpacity(0.2),
-    );
+    return Container(child: row());
   }
 
   Widget row() {
@@ -393,9 +423,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           final fillEvaluationText = currentLang == 'vi'
               ? 'Điền đánh giá'
               : '評価記入';
-          final ReportText = currentLang == 'vi'
-              ? 'Báo cáo'
-              : 'レポート';
+          final reportText = currentLang == 'vi' ? 'Báo cáo' : 'レポート';
           final approvalText = currentLang == 'vi' ? 'Phê duyệt' : '承認';
 
           if (subMenu == userManagementText) {
@@ -409,7 +437,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               widget.changeBody(FillTwoScreen());
             } else if (title == approvalText) {
               widget.changeBody(ApprovalTwoScreen());
-            }else if (title == ReportText){
+            } else if (title == reportText) {
               widget.changeBody(ReportTwoScreen());
             }
           } else if (subMenu == trialContractText) {
@@ -419,14 +447,14 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               widget.changeBody(FillApprenticeScreen());
             } else if (title == approvalText) {
               widget.changeBody(ApprovalTrialScreen());
-            }else if (title == ReportText){
+            } else if (title == reportText) {
               widget.changeBody(ReportApprentice());
             }
           } else if (subMenu == preparationApprovalText) {
             widget.changeBody(ApprovalPrepartionScreen());
           } else if (subMenu == homeText) {
             widget.changeBody(HomeScreen(changeBody: (newPage) {}));
-          }else {
+          } else {
             widget.changeBody(HomeScreen(changeBody: (newPage) {}));
           }
         }
@@ -513,8 +541,11 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
                   await authState.logout();
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => SignInScreen()), // Thay SignInScreen() bằng widget màn hình login của bạn
-                    (Route<dynamic> route) => false, // Xóa toàn bộ stack navigation
+                    MaterialPageRoute(
+                      builder: (context) => SignInScreen(),
+                    ), // Thay SignInScreen() bằng widget màn hình login của bạn
+                    (Route<dynamic> route) =>
+                        false, // Xóa toàn bộ stack navigation
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(

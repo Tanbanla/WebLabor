@@ -74,7 +74,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${tr('approval')} ${tr('trialContract')}',
+          '${tr('report')} ${tr('trialContract')}',
           style: TextStyle(
             color: Colors.blue.withOpacity(0.9),
             fontWeight: FontWeight.bold,
@@ -161,72 +161,6 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                 onPressed: () => _showExportDialog(),
               ),
               const SizedBox(width: 8),
-              // GestureDetector(
-              //   onTap: () async {
-              //     errorMessage.value = '';
-              //     try {
-              //       await controller.updateListApprenticeContractApproval(
-              //         authState.user!.chRUserid.toString(),
-              //       );
-              //       // phan xem ai dang vao man so sanh
-              //       if (authState.user!.chRGroup.toString() ==
-              //           "Chief Section") {
-              //         // truong hop QUAN LY
-              //         controller.changeStatus(
-              //           '6',
-              //           sectionName,
-              //           null,
-              //         );
-              //       } else if (authState.user!.chRGroup.toString() ==
-              //           "Section Manager") {
-              //         // truong hop truong phong
-              //         controller.changeStatus(
-              //           '7',
-              //           sectionName,
-              //           null,
-              //         );
-              //       }
-              //     } catch (e) {
-              //       errorMessage.value =
-              //           '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-              //     }
-              //   },
-              //   child: Obx(
-              //     () => Container(
-              //       width: 130,
-              //       height: 36,
-              //       decoration: BoxDecoration(
-              //         color: controller.isLoading.value
-              //             ? Colors.grey
-              //             : Common.primaryColor,
-              //         borderRadius: BorderRadius.circular(10),
-              //       ),
-              //       padding: const EdgeInsets.symmetric(
-              //         horizontal: 10,
-              //         vertical: 8,
-              //       ),
-              //       child: Center(
-              //         child: controller.isLoading.value
-              //             ? const SizedBox(
-              //                 width: 20,
-              //                 height: 20,
-              //                 child: CircularProgressIndicator(
-              //                   color: Colors.white,
-              //                   strokeWidth: 2,
-              //                 ),
-              //               )
-              //             : Text(
-              //                 tr('Confirm'),
-              //                 style: TextStyle(
-              //                   color: Colors.white,
-              //                   fontSize: 16,
-              //                   fontWeight: FontWeight.bold,
-              //                 ),
-              //               ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           const SizedBox(height: 10),
@@ -275,7 +209,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 4100,
+              width: 4500,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -460,29 +394,42 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
+                   // các trường thông tin phê duyệt
                   DataColumnCustom(
-                    title: 'Phê duyệt của Chief',
-                    width: 170,
-                    fontSize: Common.sizeColumn,
+                    title: tr('Nguoilap'),
+                    width: 100,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do từ chối của Chief',
-                    width: 170,
-                    fontSize: Common.sizeColumn,
+                    title: tr('Nhansu'),
+                    width: 150,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Phê duyệt của trưởng phòng',
-                    width: 170,
-                    fontSize: Common.sizeColumn,
+                    title: tr('NguoiDanhgia'),
+                    width: 150,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: 'Lý do từ chối của trưởng phòng',
-                    width: 170,
-                    fontSize: Common.sizeColumn,
+                    title: tr('NguoiXacNhan'),
+                    width: 150,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('TruongPhong'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                 ],
                 source: MyData(context),
@@ -557,6 +504,13 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   TextCellValue(tr('note')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('Lydo')),
+                  // cac thuoc tinh danh gia
+                  TextCellValue(tr('Nguoilap')),
+                  TextCellValue(tr('Nhansu')),
+                  TextCellValue(tr('NguoiDanhgia')),
+                  TextCellValue(tr('NguoiXacNhan')),
+                  TextCellValue(tr('TruongPhong')),
+                  TextCellValue(tr('Hientrang')),
                 ]);
 
                 // Thêm dữ liệu từ controller
@@ -604,6 +558,13 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     TextCellValue(item.vchRNote.toString()),
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
+                    // các thuộc tính phê duyệt
+                    TextCellValue(item.vchRUserCreate.toString()),
+                    TextCellValue(item.useRApproverPer.toString()),
+                    TextCellValue(item.vchRLeaderEvalution ?? ''),
+                    TextCellValue(item.useRApproverChief?? ''),
+                    TextCellValue(item.useRApproverSectionManager ?? ''),
+                    TextCellValue(item.inTStatusId.toString()),
                   ]);
                 }
 
@@ -1678,6 +1639,12 @@ class MyData extends DataTableSource {
           }),
         ),
         DataCell(
+          Text(
+            data.vchRNote?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
           Obx(() {
             Visibility(
               visible: false,
@@ -1744,88 +1711,6 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Focus(
-            // onFocusChange: (hasFocus) {
-            //   if (!hasFocus) {
-            //     // Chỉ update khi mất focus
-            //     controller.updateNotRehireReasonApprovel(
-            //       data.vchREmployeeId.toString(),
-            //       reasonController.text,
-            //       data.inTStatusId,
-            //     );
-            //   }
-            // },
-            child: TextFormField(
-              controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Thông tin phê duyệt
-        DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus =controller.filterdataList[index].biTApproverChief ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatusApprovel(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                    data.inTStatusId,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
-        ),
-        DataCell(
-          Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
@@ -1849,87 +1734,38 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        // các thuộc tính phê duyệt
         DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus =controller.filterdataList[index].biTApproverSectionManager ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatusApprovel(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                    data.inTStatusId,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
-        ),
-        DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNotRehireReasonApprovel(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
-                  data.inTStatusId,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+          Text(
+            data.vchRUserCreate?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
+        DataCell(
+          Text(
+            data.useRApproverPer?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.vchRLeaderEvalution?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),       
+        DataCell(
+          Text(
+            data.useRApproverChief?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.useRApproverSectionManager?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
       ],
     );
   }
@@ -1949,6 +1785,100 @@ class MyData extends DataTableSource {
     }
   }
 
+  Widget _getHienTrangColor(int? IntStatus) {
+    switch (IntStatus) {
+      case 1:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blueGrey[100]!),
+          ),
+          child: Text('New', style: TextStyle(color: Colors.grey[800])),
+        );
+      case 2:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.purple[100]!),
+          ),
+          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+        );
+      case 3:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange[100]!),
+          ),
+          child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
+        );
+      case 4:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue[100]!),
+          ),
+          child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+        );
+      case 6:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.yellow[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.yellow[100]!),
+          ),
+          child: Text('Chief', style: TextStyle(color: Colors.yellow[800])),
+        );
+      case 7:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal[100]!),
+          ),
+          child: Text('Manager', style: TextStyle(color: Colors.teal[800])),
+        );
+      case 8:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.brown[100]!),
+          ),
+          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+        );
+      case 9:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green[100]!),
+          ),
+          child: Text('Done', style: TextStyle(color: Colors.green[800])),
+        );
+      default:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red[100]!),
+          ),
+          child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
+        );
+    }
+  }
   Widget _buildActionButton({
     required IconData icon,
     required Color color,

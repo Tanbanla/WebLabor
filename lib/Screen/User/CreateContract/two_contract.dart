@@ -1752,21 +1752,6 @@ class _showAddDialog extends StatelessWidget {
                 width: 500,
                 child: Row(
                   children: [
-                    // Expanded(
-                    //   child: _buildCompactTextField(
-                    //     label: tr('department'),
-                    //     onChanged: (value) =>
-                    //         twoContract.vchRCodeSection = value,
-                    //   ),
-                    // ),
-                    // const SizedBox(width: 10),
-                    // Expanded(
-                    //   child: _buildCompactTextField(
-                    //     label: tr('group'),
-                    //     onChanged: (value) =>
-                    //         twoContract.chRCostCenterName = value,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -1780,62 +1765,9 @@ class _showAddDialog extends StatelessWidget {
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
                   ),
-                  // const SizedBox(width: 10),
-                  // SizedBox(
-                  //   width: 100,
-                  //   child: _buildCompactTextField(
-                  //     label: tr('gender'),
-                  //     onChanged: (value) => twoContract.vchRTyperId = value,
-                  //   ),
-                  // ),
-                ],
+                ]
               ),
               const SizedBox(height: 10),
-
-              // Dòng 3: Tên NV + Tuổi
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       flex: 3,
-              //       child: _buildCompactTextField(
-              //         label: tr('fullName'),
-              //         onChanged: (value) =>
-              //             twoContract.vchREmployeeName = value,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 10),
-              //     SizedBox(
-              //       width: 80,
-              //       child: _buildCompactTextField(
-              //         label: tr('age'),
-              //         onChanged: (value) => olded = value,
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 10),
-
-              // Dòng 4: Vị trí + Bậc lương
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: _buildCompactTextField(
-              //         label: tr('position'),
-              //         onChanged: (value) => twoContract.chRPosition = value,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 10),
-              //     SizedBox(
-              //       width: 100,
-              //       child: _buildCompactTextField(
-              //         label: tr('salaryGrade'),
-              //         onChanged: (value) => twoContract.chRCodeGrade = value,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              //const SizedBox(height: 10),
               // Dòng 5: Ngày bắt đầu + Ngày kết thúc
               Row(
                 children: [
@@ -1954,10 +1886,11 @@ class _showAddDialog extends StatelessWidget {
               if (errorMessage.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    errorMessage.value,
-                    style: const TextStyle(color: Colors.red, fontSize: 14),
-                  ),
+                  child: 
+                    Text(
+                      errorMessage.value,
+                      style: const TextStyle(color: Colors.red, fontSize: 14),
+                    ),
                 ),
             ],
           ),
@@ -1975,7 +1908,8 @@ class _showAddDialog extends StatelessWidget {
           child: Text(tr('Cancel')),
         ),
         Obx(
-          () => ElevatedButton(
+          () => 
+          ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Common.primaryColor,
               foregroundColor: Colors.white,
@@ -1988,7 +1922,22 @@ class _showAddDialog extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    controller.isLoading(false);
+                    controller.isLoading(true);
+                    if (twoContract.vchREmployeeId?.isEmpty ?? true) {
+                      errorMessage.value = tr('ErrorEmployeeID');
+                      controller.isLoading(false);
+                      return;
+                    }
+                    if(twoContract.dtMJoinDate?.isEmpty ?? true){
+                      errorMessage.value = tr('ErrorNotFill');
+                      controller.isLoading(false);
+                      return;
+                    }
+                    if(twoContract.dtMEndDate?.isEmpty ?? true){
+                      errorMessage.value = tr('ErrorNotFill');
+                      controller.isLoading(false);
+                      return;
+                    }
                     try {
                       await controller.addTwoContract(
                         twoContract,

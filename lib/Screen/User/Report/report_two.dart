@@ -32,6 +32,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   @override
   Widget build(BuildContext context) {
     // phan xem ai dang vao man so sanh
+    // controller.changeStatus(
+    //   '9',
+    //   null,
+    //   null,
+    // )
     controller.fetchDummyData();
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -74,7 +79,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       children: [
         Text(
           //'Phê duyệt đánh giá hợp đồng không xác định thời hạn',
-          '${tr('approval')} ${tr('indefiniteContract')}',
+          '${tr('report')} ${tr('indefiniteContract')}',
           style: TextStyle(
             color: Common.primaryColor.withOpacity(0.8),
             fontWeight: FontWeight.bold,
@@ -157,73 +162,6 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               ),
               // action send
               const SizedBox(width: 20),
-              // Send button
-              // GestureDetector(
-              //   onTap: () async {
-              //     errorMessage.value = '';
-              //     try {
-              //       await controller.updateListTwoContractApproval(
-              //         authState.user!.chRUserid.toString(),
-              //       );
-              //       // phan xem ai dang vao man so sanh
-              //       if (authState.user!.chRGroup.toString() == "Chief Section") {
-              //         // truong hop quan ly
-              //         controller.changeStatus(
-              //           '6',
-              //           sectionName,
-              //           null,
-              //         );
-              //       } else if (authState.user!.chRGroup.toString() == "Section Manager") {
-              //         // truong hop truong phong
-              //         controller.changeStatus(
-              //           '7',
-              //           sectionName,
-              //           null,
-              //         );
-              //       } else if (authState.user!.chRGroup.toString() == "Director") {
-              //         controller.changeStatus('8', null, null);
-              //       }
-              //     } catch (e) {
-              //       errorMessage.value =
-              //           '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
-              //     }
-              //   },
-              //   child: Obx(
-              //     () => Container(
-              //       width: 130,
-              //       height: 36,
-              //       decoration: BoxDecoration(
-              //         color: controller.isLoading.value
-              //             ? Colors.grey
-              //             : Common.primaryColor,
-              //         borderRadius: BorderRadius.circular(10),
-              //       ),
-              //       padding: const EdgeInsets.symmetric(
-              //         horizontal: 10,
-              //         vertical: 8,
-              //       ),
-              //       child: Center(
-              //         child: controller.isLoading.value
-              //             ? const SizedBox(
-              //                 width: 20,
-              //                 height: 20,
-              //                 child: CircularProgressIndicator(
-              //                   color: Colors.white,
-              //                   strokeWidth: 2,
-              //                 ),
-              //               )
-              //             : Text(
-              //                 tr('Confirm'),
-              //                 style: TextStyle(
-              //                   color: Colors.white,
-              //                   fontSize: 16,
-              //                   fontWeight: FontWeight.bold,
-              //                 ),
-              //               ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           const SizedBox(height: 10),
@@ -272,7 +210,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2670, //2570,
+              width: 3670, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -430,6 +368,49 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  // các trường thông tin phê duyệt
+                  DataColumnCustom(
+                    title: tr('Nguoilap'),
+                    width: 100,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Nhansu'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('NguoiDanhgia'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('NguoiXacNhan'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('TruongPhong'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('GiamDoc'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
                 ],
                 source: MyData(context),
               ),
@@ -495,6 +476,14 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   TextCellValue(tr('evaluationResult')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('notRehirableReason')),
+                  // cac thuoc tinh danh gia
+                  TextCellValue(tr('Nguoilap')),
+                  TextCellValue(tr('Nhansu')),
+                  TextCellValue(tr('NguoiDanhgia')),
+                  TextCellValue(tr('NguoiXacNhan')),
+                  TextCellValue(tr('TruongPhong')),
+                  TextCellValue(tr('GiamDoc')),
+                  TextCellValue(tr('Hientrang')),
                 ]);
 
                 // Thêm dữ liệu từ controller
@@ -536,6 +525,14 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     TextCellValue(item.vchRReasultsLeader ?? ''),
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
+                    // các thuộc tính phê duyệt
+                    TextCellValue(item.vchRUserCreate.toString()),
+                    TextCellValue(item.useRApproverPer.toString()),
+                    TextCellValue(item.vchRLeaderEvalution ?? ''),
+                    TextCellValue(item.useRApproverChief?? ''),
+                    TextCellValue(item.useRApproverSectionManager ?? ''),
+                    TextCellValue(item.useRApproverDirector??''),
+                    TextCellValue(item.inTStatusId.toString()),
                   ]);
                 }
 
@@ -983,12 +980,19 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =() {
+            final rawStatus = () {
               if (controller.filterdataList.length > index) {
                 return switch (data.inTStatusId) {
-                  6 => controller.filterdataList[index].biTApproverChief ?? true,
-                  7 => controller.filterdataList[index].biTApproverSectionManager ?? true,
-                  8 => controller.filterdataList[index].biTApproverDirector ?? true,
+                  6 =>
+                    controller.filterdataList[index].biTApproverChief ?? true,
+                  7 =>
+                    controller
+                            .filterdataList[index]
+                            .biTApproverSectionManager ??
+                        true,
+                  8 =>
+                    controller.filterdataList[index].biTApproverDirector ??
+                        true,
                   _ => true,
                 };
               }
@@ -1068,6 +1072,44 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        // thong tin phe duyet
+        DataCell(
+          Text(
+            data.vchRUserCreate?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.useRApproverPer?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.vchRLeaderEvalution?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.useRApproverChief?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.useRApproverSectionManager?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.useRApproverDirector?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
       ],
     );
   }
@@ -1084,6 +1126,155 @@ class MyData extends DataTableSource {
         return Colors.blue;
       default:
         return Colors.grey;
+    }
+  }
+
+  Widget _getHienTrangColor(int? IntStatus) {
+    switch (IntStatus) {
+      case 1:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.blueGrey[100]!,
+            ),
+          ),
+          child: Text( 'New',
+            style: TextStyle(
+              color: Colors.grey[800]
+            ),
+          ),
+        );
+      case 2:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.purple[100]!
+            ),
+          ),
+          child: Text( 'Per',
+            style: TextStyle(
+              color: Colors.purple[800]
+            ),
+          ),
+        );
+      case 3:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.orange[100]!
+            ),
+          ),
+          child: Text( 'PTHC',
+            style: TextStyle(
+              color: Colors.orange[800]
+            ),
+          ),
+        );
+      case 4:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.blue[100]!
+            ),
+          ),
+          child: Text( 'Leader',
+            style: TextStyle(
+              color: Colors.blue[800]
+            ),
+          ),
+        );
+      case 6:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.yellow[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.yellow[100]!
+            ),
+          ),
+          child: Text( 'Chief',
+            style: TextStyle(
+              color: Colors.yellow[800]
+            ),
+          ),
+        );
+      case 7:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.teal[100]!
+            ),
+          ),
+          child: Text( 'Manager',
+            style: TextStyle(
+              color: Colors.teal[800]
+            ),
+          ),
+        );
+      case 8:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.brown[100]!
+            ),
+          ),
+          child: Text( 'Director',
+            style: TextStyle(
+              color: Colors.brown[800]
+            ),
+          ),
+        );
+      case 9:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.green[100]!
+            ),
+          ),
+          child: Text( 'Done',
+            style: TextStyle(
+              color: Colors.green[800]
+            ),
+          ),
+        );
+      default:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.red[100]!
+            ),
+          ),
+          child: Text( 'Not Error',
+            style: TextStyle(
+              color: Colors.red[800]
+            ),
+          ),
+        );
     }
   }
 

@@ -1545,7 +1545,22 @@ class _EditContractDialog extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    controller.isLoading(false);
+                    controller.isLoading(true);
+                    if (contract.vchREmployeeId?.isEmpty ?? true) {
+                      errorMessage.value = tr('ErrorEmployeeID');
+                      controller.isLoading(false);
+                      return;
+                    }
+                    if(contract.dtMJoinDate?.isEmpty ?? true){
+                      errorMessage.value = tr('ErrorNotFill');
+                      //controller.isLoading(false);
+                      return;
+                    }
+                    if(contract.dtMEndDate?.isEmpty ?? true){
+                      errorMessage.value = tr('ErrorNotFill');
+                      //controller.isLoading(false);
+                      return;
+                    }
                     try {
                       await controller.updateApprenticeContract(edited, authState.user!.chRUserid.toString());
                       if (context.mounted) {
