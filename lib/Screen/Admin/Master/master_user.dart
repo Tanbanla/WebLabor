@@ -7,6 +7,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/User_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/class/User.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
@@ -1116,52 +1117,28 @@ class __showAddDialogState extends State<_showAddDialog> {
               ? null
               : () async {
                   errorMessage.value = '';
-                  if (userAdd.chRUserid!.isEmpty || userAdd.chRGroup!.isEmpty) {
-                    errorMessage.value = 'Yêu cầu không để trống thông tin';
+                  if (userAdd.chRUserid?.isEmpty ?? true) {// || userAdd.chRGroup!.isEmpty) {
+                    showDialog(context: context, 
+                      builder: (context) => 
+                      DialogNotification(message: 'Yêu cầu không để trống thông tin', title: 'Lỗi', color: Colors.red,
+                      icon:  Icons.error,)
+                    );
+                    controller.isLoading(false);
                     return;
                   }
-                  controller.isLoading(false);
+                  controller.isLoading(true);
                   try {
                     await controller.addUser(
                       userAdd,
                       authState.user!.chRUserid.toString(),
                     );
                     if (mounted) {
-                      Navigator.of(
-                        context,
-                      ).pop(); // Close the import dialog first
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          icon: const Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 50,
-                          ),
-                          title: const Text(
-                            'Thành công',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('Thêm user thành công'),
-                              const SizedBox(height: 10),
-                            ],
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Đóng'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
+                      Navigator.of(context).pop();
+                    } // Close the import dialog first
+                    showDialog(
+                      context: context,
+                      builder: (context) => DialogNotification(message: "Thêm thành công", icon: Icons.check_circle, color: Colors.green, title: "Thành công")
+                    );
                   } catch (e) {
                     errorMessage.value =
                         'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';

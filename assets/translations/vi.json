@@ -118,5 +118,16 @@
   "GiamDoc":"Giám đốc phê duyệt",
   "Hientrang":"Hiện trạng",
   "ErrorEmployeeID":"Yêu cầu nhập thông tin! Mã nhân viên không được để trống",
-  "ErrorNotFill": "Yêu cầu không để trống thông tin"
+  "ErrorNotFill": "Yêu cầu không để trống thông tin",
+  "MessageSuss":"Thêm thành công",
+  "tilteSuss":"Thành công",
+  "titleFail":"Thất bại",
+  "titleChart":"Biểu đồ hợp đồng năm",
+  "ChoDuyet":"Chờ duyệt",
+  "DaDuyet":"Đã duyệt",
+  "Notification":"Thông báo",
+  "HD2N":"Hợp đồng 2 năm cần duyệt",
+  "HDHN":"Hợp đồng học nghề cần duyệt",
+  "ThongBaoDaDuyet":"Số lượng hợp đồng đã duyệt tháng này",
+  "TyLeHoanThanh":"Tỉ lệ hợp đồng đã hoàn thành"
 }

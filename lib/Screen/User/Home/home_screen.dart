@@ -1,8 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Chart_Controller/chart_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:web_labor_contract/class/ChartMonth.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Widget) changeBody;
@@ -12,18 +19,64 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
-  // Dữ liệu mẫu - bạn có thể thay thế bằng dữ liệu thực từ API
-  final int contractsToApprove = 26;
-  final int contractsToApprove2Years = 32;
-  final int approvedThisMonth = 29;
-  final int signedContracts = 22; // Hợp đồng đã ký
-  final int unsignedContracts = 7; // Hợp đồng chưa ký
+  // Biến lưu trữ dữ liệu từ API
+  late ChartMonth contractStats;
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchContractStatistics();
+  }
+
+  Future<void> _fetchContractStatistics() async {
+    final authState = Provider.of<AuthState>(context, listen: false);
+    String linkApi = '';
+    if (authState.user!.chRGroup.toString() == 'Per' ||
+        authState.user!.chRGroup == 'Admin') {
+      linkApi =
+          '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}';
+    }else{
+      linkApi =
+          '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}/${authState.user!.chRSecCode}';
+    }
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      final response = await http.get(Uri.parse(linkApi));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          setState(() {
+            final jsonData = data['data'] as Map<String, dynamic>;
+            contractStats = ChartMonth.fromJson(jsonData);
+            isLoading = false;
+          });
+        } else {
+          throw Exception(data['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = e.toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authState = Provider.of<AuthState>(context, listen: true);
     Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Common.grayColor.shade100,
       body: SingleChildScrollView(
@@ -32,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Thông báo',
+              tr('Notification'),
               style: TextStyle(
                 color: Common.primaryColor,
                 fontSize: 28,
@@ -40,106 +93,136 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Hàng thứ nhất: Thống kê hợp đồng
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildContractCard(
-                    icon: Iconsax.document1,
-                    color: Colors.red,
-                    title: 'Số hợp đồng học nghề, thử việc cần duyệt',
-                    value: contractsToApprove.toString(),
-                    width: size.width > 600 ? 500 : size.width * 0.75,
-                  ),
-                  const SizedBox(width: 20),
-                  _buildContractCard(
-                    icon: Iconsax.document_copy,
-                    color: Colors.orange,
-                    title: 'Số hợp đồng 2 năm cần duyệt',
-                    value: contractsToApprove2Years.toString(),
-                    width: size.width > 600 ? 500 : size.width * 0.75,
-                  ),
-                  const SizedBox(width: 20),
-                  _buildContractCard(
-                    icon: Iconsax.document4,
-                    color: Colors.green,
-                    title: 'Số hợp đồng đã duyệt tháng này',
-                    value: approvedThisMonth.toString(),
-                    width: size.width > 600 ? 500 : size.width * 0.75,
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 30),
-            ContractStatsScreen(),
-            
-            // Biểu đồ tròn
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
+
+            if (isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (errorMessage.isNotEmpty)
+              Center(
+                child: Text(
+                  'Error: $errorMessage',
+                  style: TextStyle(color: Colors.red),
+                ),
+              )
+            else ...[
+              // Hàng thứ nhất: Thống kê hợp đồng
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
                   children: [
-                    Text(
-                      'Tỉ lệ hợp đồng đã ký',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
-                      ),
+                    _buildContractCard(
+                      icon: Iconsax.document1,
+                      color: Colors.red,
+                      title: tr('HDHN'),
+                      value: contractStats.totalApprenticeWaitingApprove
+                          .toString(),
+                      width: size.width > 600 ? 500 : size.width * 0.75,
                     ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 250,
-                      child: PieChart(
-                        PieChartData(
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 60,
-                          sections: [
-                            PieChartSectionData(
-                              color: Colors.green,
-                              value: signedContracts.toDouble(),
-                              title: '${(signedContracts/(signedContracts+unsignedContracts)*100).toStringAsFixed(1)}%',
-                              radius: 60,
-                              titleStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            PieChartSectionData(
-                              color: Colors.orange,
-                              value: unsignedContracts.toDouble(),
-                              title: '${(unsignedContracts/(signedContracts+unsignedContracts)*100).toStringAsFixed(1)}%',
-                              radius: 60,
-                              titleStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    const SizedBox(width: 20),
+                    _buildContractCard(
+                      icon: Iconsax.document_copy,
+                      color: Colors.orange,
+                      title: tr('HD2N'),
+                      value: contractStats.totalTwoYearWaitingApprove
+                          .toString(),
+                      width: size.width > 600 ? 500 : size.width * 0.75,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildLegend(color: Colors.green, text: 'Đã ký'),
-                        const SizedBox(width: 20),
-                        _buildLegend(color: Colors.orange, text: 'Chưa ký'),
-                      ],
+                    const SizedBox(width: 20),
+                    _buildContractCard(
+                      icon: Iconsax.document4,
+                      color: Colors.green,
+                      title: tr('ThongBaoDaDuyet'),
+                      value: contractStats.totalBothApproved.toString(),
+                      width: size.width > 600 ? 500 : size.width * 0.75,
                     ),
                   ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 30),
+              ContractStatsScreen(
+                vaitro: authState.user!.chRGroup,
+                section: authState.user!.chRSecCode,
+              ),
+
+              // Biểu đồ tròn
+              Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        tr('TyLeHoanThanh'),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 250,
+                        child: PieChart(
+                          PieChartData(
+                            sectionsSpace: 2,
+                            centerSpaceRadius: 60,
+                            sections: [
+                              PieChartSectionData(
+                                color: Colors.green,
+                                value: (contractStats.totalBothApproved)
+                                    .toDouble(),
+                                title:
+                                    '${((contractStats.totalBothApproved) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
+                                radius: 60,
+                                titleStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              PieChartSectionData(
+                                color: Colors.orange,
+                                value:
+                                    (contractStats
+                                                .totalApprenticeWaitingApprove +
+                                            contractStats
+                                                .totalTwoYearWaitingApprove)
+                                        .toDouble(),
+                                title:
+                                    '${((contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
+                                radius: 60,
+                                titleStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildLegend(
+                            color: Colors.green,
+                            text: tr('DaDuyet'),
+                          ),
+                          const SizedBox(width: 20),
+                          _buildLegend(
+                            color: Colors.orange,
+                            text: tr('ChoDuyet'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -155,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return Container(
       width: width,
-      padding: const EdgeInsets.all(40),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -176,7 +259,13 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildActionButton(icon: icon, color: color, onPressed: () {}),
               const SizedBox(width: 12),
-              Text(title, style: TextStyle(color: color, fontSize: 16)),
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(color: color, fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -222,10 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           width: 16,
           height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
         Text(text),

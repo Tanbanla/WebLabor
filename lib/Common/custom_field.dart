@@ -162,3 +162,48 @@ class CustomField1 extends StatelessWidget {
     );
   }
 }
+
+// dialog thông báo common
+class DialogNotification extends StatefulWidget {
+  final String message;
+  final String title;
+  final IconData icon;
+  final Color color;
+  const DialogNotification({
+    required this.message,
+    required this.icon,
+    required this.color,
+    required this.title,
+    super.key,
+  });
+
+  @override
+  State<DialogNotification> createState() => _DialogNotificationState();
+}
+
+class _DialogNotificationState extends State<DialogNotification> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      icon: Icon(widget.icon, color: widget.color, size: 50),
+      title: Text(
+        widget.title,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [Text(widget.message), const SizedBox(height: 10)],
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.color,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Đóng'),
+        ),
+      ],
+    );
+  }
+}

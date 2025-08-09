@@ -10,6 +10,7 @@ import 'package:web_labor_contract/API/Controller/user_approver_controller.dart'
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -1547,18 +1548,30 @@ class _EditContractDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(true);
                     if (contract.vchREmployeeId?.isEmpty ?? true) {
-                      errorMessage.value = tr('ErrorEmployeeID');
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorEmployeeID'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
                       controller.isLoading(false);
                       return;
                     }
                     if(contract.dtMJoinDate?.isEmpty ?? true){
-                      errorMessage.value = tr('ErrorNotFill');
-                      //controller.isLoading(false);
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
                       return;
                     }
                     if(contract.dtMEndDate?.isEmpty ?? true){
-                      errorMessage.value = tr('ErrorNotFill');
-                      //controller.isLoading(false);
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
                       return;
                     }
                     try {
@@ -1567,9 +1580,16 @@ class _EditContractDialog extends StatelessWidget {
                         Navigator.of(context).pop();
                       }
                       await controller.changeStatus("1",null,null);
+                      showDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        builder: (context) => DialogNotification(message: tr('MessageSuss'), icon: Icons.check_circle, color: Colors.green, title: tr('tilteSuss'))
+                      );
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
                     }
                   },
             child: controller.isLoading.value

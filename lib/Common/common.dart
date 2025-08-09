@@ -98,11 +98,10 @@ class Common {
       "ContractApprentice/delete-multi/";
   static const String DeleteApprenticeMultiIDLogic =
       "ContractApprentice/delete-logic-multi/";
-  // Api Chart Home Contract Apprentice
 
-
-
-  // Api Chart Home Contract Two
+  // Api Chart Home
+  static const String ContractTotalByYear = "Report/get-quantity-total-contract-statistic-by-year/";
+  static const String ContractTotalByMonth = "Report/get-quantity-total-contract-statistic/";
 
 
   // Send mail
@@ -136,21 +135,26 @@ class Common {
             rejectionReason = request.nvchRApproverPer ?? 'Không có lý do';
             break;
           case 4:
-            if(!request.biTApproverChief){
+            if (!request.biTApproverChief) {
               rejectionReason = request.nvchRApproverChief ?? '';
-            }else if (!request.biTApproverSectionManager){
+            } else if (!request.biTApproverSectionManager) {
               rejectionReason = request.nvchRApproverManager ?? '';
-            }else if (!request.biTApproverDirector){
+            } else if (!request.biTApproverDirector) {
               rejectionReason = request.nvchRApproverDirector ?? '';
-            }else{
-              rejectionReason ='Không có lý do';
+            } else {
+              rejectionReason = 'Không có lý do';
             }
             break;
           default:
             rejectionReason = 'Không có lý do';
         }
 
-        return "<tr>""<td>${request.vchRCodeApprover ?? 'N/A'}</td>""<td>${request.vchRCodeApprover ?? 'N/A'}</td>""<td>${request.vchREmployeeId ?? 'N/A'}</td>""<td>$rejectionReason</td>""</tr>";
+        return "<tr>"
+            "<td>${request.vchRCodeApprover ?? 'N/A'}</td>"
+            "<td>${request.vchRCodeApprover ?? 'N/A'}</td>"
+            "<td>${request.vchREmployeeId ?? 'N/A'}</td>"
+            "<td>$rejectionReason</td>"
+            "</tr>";
       }).join();
     }
 
