@@ -231,7 +231,7 @@ class DashboardControllerUser extends GetxController {
       } else {
         final errorResponse = json.decode(response.body);
         throw Exception(
-          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
+          '${errorResponse['message'] ?? response.body}',
         );
       }
     } catch (e) {
@@ -422,12 +422,16 @@ class DashboardControllerUser extends GetxController {
     );
   }
 
-  Future<void> deleteUser(int id, {bool logical = true}) async {
+  Future<void> deleteUser(int id) async {
     try {
       isLoading(true);
-      final endpoint = logical
-          ? Common.DeleteIDLogic
-          : Common.DeleteID; //logical ? Common.DeleteIDLogic :
+      var endpoint = Common.DeleteIDLogic; 
+      final index = userList.indexWhere(
+        (item) => item.id == id && item.inTLock == 2,
+      );
+      if (index != -1) {
+        endpoint = Common.DeleteID;
+      }
       final response = await http.delete(
         // Uri.parse('${Common.API}${Common.DeleteIDLogic}$id'),
         Uri.parse('${Common.API}$endpoint$id'),

@@ -1117,7 +1117,7 @@ class __showAddDialogState extends State<_showAddDialog> {
               ? null
               : () async {
                   errorMessage.value = '';
-                  if (userAdd.chRUserid?.isEmpty ?? true) {// || userAdd.chRGroup!.isEmpty) {
+                  if ((userAdd.chRUserid?.isEmpty ?? true) || (userAdd.chRGroup?.isEmpty ?? true)) {// || userAdd.chRGroup!.isEmpty) {
                     showDialog(context: context, 
                       builder: (context) => 
                       DialogNotification(message: 'Yêu cầu không để trống thông tin', title: 'Lỗi', color: Colors.red,
@@ -1140,8 +1140,13 @@ class __showAddDialogState extends State<_showAddDialog> {
                       builder: (context) => DialogNotification(message: "Thêm thành công", icon: Icons.check_circle, color: Colors.green, title: "Thành công")
                     );
                   } catch (e) {
-                    errorMessage.value =
-                        'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                    // errorMessage.value =
+                    //     'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: 'Lỗi khi thêm: ${e.toString().replaceAll('', '')}', title: 'Lỗi', color: Colors.red,
+                        icon:  Icons.error,)
+                      );
                   } finally {
                     controller.isLoading(false);
                   }

@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/class/TM_PTHC.dart';
 
 class MasterPTHC extends StatefulWidget {
@@ -885,9 +886,14 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    if (userAdd.vchREmployeeAdid!.isEmpty ||
-                        userAdd.vchRNote!.isEmpty) {
-                      errorMessage.value = 'Yêu cầu không để trống thông tin';
+                    if ((userAdd.vchREmployeeAdid?.isEmpty ?? true)||
+                        (userAdd.vchRNote?.isEmpty ?? true)){ 
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: 'Yêu cầu không để trống thông tin', title: 'Lỗi', color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
                       return;
                     }
                     controller.isLoading(false);
@@ -934,8 +940,13 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                           ),
                         );
                     } catch (e) {
-                      errorMessage.value =
-                          'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                      // errorMessage.value =
+                      //     'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: 'Lỗi khi thêm: ${e.toString().replaceAll('', '')}', title: 'Lỗi', color: Colors.red,
+                        icon:  Icons.error,)
+                      );
                     } finally {
                       controller.isLoading(false);
                     }

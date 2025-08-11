@@ -157,7 +157,7 @@ class DashboardControllerPTHC extends GetxController {
       } else {
         final errorResponse = json.decode(response.body);
         throw Exception(
-          'Lỗi khi gửi dữ liệu lên server  ${errorResponse['message'] ?? response.body}',
+          '${errorResponse['message'] ?? response.body}',
         );
       }
     } catch (e) {

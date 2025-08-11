@@ -1961,7 +1961,34 @@ class _showAddDialog extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    controller.isLoading(false);
+                    controller.isLoading(true);
+                    if (twoContract.vchREmployeeId?.isEmpty ?? true) {
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorEmployeeID'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
+                      return;
+                    }
+                    if(twoContract.dtMJoinDate?.isEmpty ?? true){
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
+                      return;
+                    }
+                    if(twoContract.dtMEndDate?.isEmpty ?? true){
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                      controller.isLoading(false);
+                      return;
+                    }
                     try {
                       await controller.addApprenticeContract(twoContract, olded, authState.user!.chRUserid.toString());
                       if (context.mounted) {
@@ -1969,8 +1996,13 @@ class _showAddDialog extends StatelessWidget {
                       }
                       await controller.changeStatus("1",null,null);
                     } catch (e) {
-                      errorMessage.value =
-                          '${tr('ErrorUpdate')}${e.toString()}';
+                      // errorMessage.value =
+                      //     '${tr('ErrorUpdate')}${e.toString()}';
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: '${tr('ErrorUpdate')}${e.toString()}', title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
                     } finally {
                       controller.isLoading(false);
                     }

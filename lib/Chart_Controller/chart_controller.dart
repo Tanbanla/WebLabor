@@ -77,7 +77,7 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Container(
+    return SizedBox(
       width: size.width,
       height: 500,
       child: Padding(

@@ -1967,8 +1967,13 @@ class _showAddDialog extends StatelessWidget {
                         builder: (context) => DialogNotification(message: tr('MessageSuss'), icon: Icons.check_circle, color: Colors.green, title: tr('tilteSuss'))
                       );
                     } catch (e) {
-                      errorMessage.value =
-                          '${tr('ErrorUpdate')}${e.toString()}';
+                      // errorMessage.value =
+                      //     '${tr('ErrorUpdate')}${e.toString()}';
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: '${tr('ErrorUpdate')}${e.toString()}', title: tr('titleFail'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
                     } finally {
                       controller.isLoading(false);
                     }

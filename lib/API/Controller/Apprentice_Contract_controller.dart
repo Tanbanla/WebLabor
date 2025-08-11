@@ -269,7 +269,7 @@ class DashboardControllerApprentice extends GetxController {
       } else {
         final error = json.decode(response.body);
         throw Exception(
-          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+          '${error['message'] ?? response.body}',
         );
       }
     } catch (e) {
