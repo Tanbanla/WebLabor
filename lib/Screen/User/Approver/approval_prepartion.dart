@@ -468,13 +468,13 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('notRehirable'),
+                    title: tr('Apporval'),//tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('notRehirableReason'),
+                    title: tr('LydoTuChoi'),//tr('notRehirableReason'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,

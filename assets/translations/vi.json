@@ -129,5 +129,7 @@
   "HD2N":"Hợp đồng 2 năm cần duyệt",
   "HDHN":"Hợp đồng học nghề cần duyệt",
   "ThongBaoDaDuyet":"Số lượng hợp đồng đã duyệt tháng này",
-  "TyLeHoanThanh":"Tỉ lệ hợp đồng đã hoàn thành"
+  "TyLeHoanThanh":"Tỉ lệ hợp đồng đã hoàn thành",
+  "Apporval":"Phê duyệt",
+  "LydoTuChoi":"Lý do từ chối"
 }

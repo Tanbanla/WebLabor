@@ -472,13 +472,13 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('notRehirable'),
+                    title: tr('Apporval'),//tr('notRehirable'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('Lydo'),
+                    title: tr('LydoTuChoi'),//tr('Lydo'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,

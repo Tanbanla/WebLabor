@@ -446,7 +446,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('notRehirable'),
+                    title: tr('Apporval'),//tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
