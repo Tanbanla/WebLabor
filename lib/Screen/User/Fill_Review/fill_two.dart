@@ -39,7 +39,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC") {
+    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus('3', sectionName, null);
     } else {
@@ -187,7 +187,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC") {
+                if (authState.user!.chRGroup.toString() == "PTHC"|| authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   await controllerTwo.changeStatus('3', sectionName, null);
                 } else {
@@ -371,7 +371,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2670, //2570,
+              width: 3140, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -505,12 +505,32 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  // DataColumnCustom(
+                  //   title: tr('healthCheckResult'),
+                  //   width: 170,
+                  //   maxLines: 2,
+                  //   fontSize: Common.sizeColumn,
+                  // ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('healthCheckResult'),
+                    title: tr('congviec'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('tinhthan'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('khac'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+
+                  ///
                   DataColumnCustom(
                     title: tr('evaluationResult'),
                     width: 150,
@@ -590,7 +610,10 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   TextCellValue(tr('unreportedLeave')),
                   TextCellValue(tr('violationCount')),
                   TextCellValue(tr('reason')),
-                  TextCellValue(tr('healthCheckResult')),
+                  //TextCellValue(tr('healthCheckResult')),
+                  TextCellValue(tr('congviec')),
+                  TextCellValue(tr('tinhthan')),
+                  TextCellValue(tr('khac')),
                   TextCellValue(tr('evaluationResult')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('notRehirableReason')),
@@ -631,9 +654,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     TextCellValue(item.fLNotLeaveDay.toString()),
                     TextCellValue(item.inTViolation.toString()),
                     TextCellValue(item.nvarchaRViolation ?? ''),
-                    TextCellValue(item.nvarchaRHealthResults ?? ''),
+                    TextCellValue(item.nvchRCompleteWork ?? ''),
+                    TextCellValue(item.nvchRUseful ?? ''),
+                    TextCellValue(item.nvchROther?? ''),
+        //            TextCellValue(item.nvarchaRHealthResults ?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
-                    TextCellValue(item.biTNoReEmployment.toString()),
+                    TextCellValue(item.biTNoReEmployment?? true),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
                   ]);
                 }
@@ -784,7 +810,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final healthController = TextEditingController(
-      text: data.nvarchaRHealthResults ?? '',
+      text:  '',/////
     );
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
@@ -960,30 +986,120 @@ class MyData extends DataTableSource {
           ),
         ),
         //4 thuộc tính đánh giá
-        DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateHealthStatus(
-                  data.vchREmployeeId.toString(),
-                  healthController.text,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: healthController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('health'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+        // DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+                DataCell(
+          Obx(() {
+            final status =
+                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateEvaluationStatus(
+                    data.vchREmployeeId.toString(),
+                    newValue,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
         ),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        // DataCell(
+        //   Focus(
+        //     onFocusChange: (hasFocus) {
+        //       if (!hasFocus) {
+        //         // Chỉ update khi mất focus
+        //         controller.updateHealthStatus(
+        //           data.vchREmployeeId.toString(),
+        //           healthController.text,
+        //         );
+        //       }
+        //     },
+        //     child: TextFormField(
+        //       controller: healthController,
+        //       style: TextStyle(fontSize: Common.sizeColumn),
+        //       decoration: InputDecoration(
+        //         labelText: tr('health'),
+        //         labelStyle: TextStyle(fontSize: Common.sizeColumn),
+        //         border: OutlineInputBorder(
+        //           borderRadius: BorderRadius.circular(8),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
         DataCell(
           Obx(() {
             final status =
@@ -1503,7 +1619,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus('3', sectionName, null);
                       } else {

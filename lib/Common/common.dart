@@ -131,10 +131,10 @@ class Common {
         // Xác định lý do từ chối dựa trên statusId
         String rejectionReason;
         switch (request.inTStatusId) {
-          case 2:
+          case 1:
             rejectionReason = request.nvchRApproverPer ?? 'Không có lý do';
             break;
-          case 4:
+          case 3:
             if (!request.biTApproverChief) {
               rejectionReason = request.nvchRApproverChief ?? '';
             } else if (!request.biTApproverSectionManager) {

@@ -41,100 +41,109 @@ class DashboardControllerApporver extends GetxController {
   void setContractType(String type) {
     currentContractType.value = type;
   }
-Future<void> updateListContractApproval(
-  String userApprover,
-  String userUpdate,
-  String? contractType,
-) async {
-  try {
-    fetchPTHCData();
-    final twocontract = getSelectedItems();
-    if (twocontract.isEmpty) {
-      throw Exception(tr('LoiGui'));
-    }
 
-    isLoading(true);
-    List<String> phongban = [];
-    List<dynamic> notApproval = [];
-
-    for (var contract in twocontract) {
-      contract.biTApproverPer ??= true; // Set default value
-
-      if (!contract.biTApproverPer && (contract.nvchRApproverPer?.isEmpty ?? true)) {
-        throw Exception('${tr('InputError')} ${contract.vchREmployeeName}');
+  Future<void> updateListContractApproval(
+    String userApprover,
+    String userUpdate,
+    String? contractType,
+  ) async {
+    try {
+      fetchPTHCData();
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception(tr('LoiGui'));
       }
 
-      contract
-        ..vchRUserUpdate = userUpdate
-        ..dtMUpdate = formatDateTime(DateTime.now())
-        ..dtMApproverPer = formatDateTime(DateTime.now())
-        ..useRApproverPer = userApprover;
+      isLoading(true);
+      List<String> phongban = [];
+      List<dynamic> notApproval = [];
 
-      if (contract.biTApproverPer) {
-        contract.inTStatusId = 3;
-        if (!phongban.contains(contract.vchRCodeSection)) {
-          phongban.add(contract.vchRCodeSection);
+      for (var contract in twocontract) {
+        contract.biTApproverPer ??= true; // Set default value
+
+        if (!contract.biTApproverPer &&
+            (contract.nvchRApproverPer?.isEmpty ?? true)) {
+          throw Exception('${tr('InputError')} ${contract.vchREmployeeName}');
         }
-      } else {
-        contract.inTStatusId = 1;
-        notApproval.add(contract);
+
+        contract
+          ..vchRUserUpdate = userUpdate
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..dtMApproverPer = formatDateTime(DateTime.now())
+          ..useRApproverPer = userApprover;
+
+        if (contract.biTApproverPer) {
+          contract.inTStatusId = 3;
+          if (!phongban.contains(contract.vchRCodeSection)) {
+            phongban.add(contract.vchRCodeSection);
+          }
+        } else {
+          contract.inTStatusId = 1;
+          notApproval.add(contract);
+        }
       }
-    }
 
-    // Determine API endpoint
-    final apiEndpoint = contractType == 'two'
-        ? Common.UpdataListTwo
-        : Common.UpdataListApprentice;
+      // Determine API endpoint
+      final apiEndpoint = contractType == 'two'
+          ? Common.UpdataListTwo
+          : Common.UpdataListApprentice;
 
-    // Send data to server
-    final response = await http.put(
-      Uri.parse('${Common.API}$apiEndpoint'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(twocontract),
-    );
-
-    if (response.statusCode == 200) {
-      await fetchData(
-        adid: userUpdate,
-        statusId: '2',
-        section: null,
-        contractType: contractType,
+      // Send data to server
+      final response = await http.put(
+        Uri.parse('${Common.API}$apiEndpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
       );
 
-      final controlleruser = Get.put(DashboardControllerUser());
-      for (var section in phongban) {
-        final matchingPthc = pthcList.where((item) => item.section == section);
-        for (var item in matchingPthc) {
-          controlleruser.SendMail(
-            '2',
-            item.mailto.toString(),
-            item.mailcc.toString(),
-            item.mailbcc.toString(),
+      if (response.statusCode == 200) {
+        await fetchData(
+          adid: userUpdate,
+          statusId: '2',
+          section: null,
+          contractType: contractType,
+        );
+
+        final controlleruser = Get.put(DashboardControllerUser());
+        for (var section in phongban) {
+          final matchingPthc = pthcList.where(
+            (item) => item.section == section,
+          );
+          for (var item in matchingPthc) {
+            controlleruser.SendMail(
+              '2',
+              item.mailto.toString(),
+              item.mailcc.toString(),
+              item.mailbcc.toString(),
+            );
+          }
+        }
+
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty){
+          final specialSection = pthcList.firstWhere(
+          (item) => item.section == "1120-1 : ADM-PER",
+          );
+
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            specialSection.mailcc.toString(),
+            specialSection.mailbcc.toString(),
+            notApproval,
           );
         }
-      }
-
-      //Special case for section "1120-1 : ADM-PER"
-      final specialSection = pthcList.firstWhere(
-        (item) => item.section == "1120-1 : ADM-PER",
-      );
-
-        controlleruser.SendMailCustom(
-          specialSection.mailto.toString(),
-          specialSection.mailcc.toString(),
-          specialSection.mailbcc.toString(),
-          notApproval,
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Error sending data to server: ${error['message'] ?? response.body}',
         );
-    } else {
-      final error = json.decode(response.body);
-      throw Exception('Error sending data to server: ${error['message'] ?? response.body}');
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
     }
-  } catch (e) {
-    throw Exception('Failed to update contract: $e');
-  } finally {
-    isLoading(false);
   }
-}
+
   /// Lay thông tin gửi mail
   Future<void> fetchPTHCData() async {
     try {
@@ -212,6 +221,8 @@ Future<void> updateListContractApproval(
               (item.vchRCodeApprover?.toLowerCase().contains(
                     query.toLowerCase(),
                   ) ??
+                  false) ||
+              (item.chRPosition?.toLowerCase().contains(query.toLowerCase()) ??
                   false),
         ),
       );

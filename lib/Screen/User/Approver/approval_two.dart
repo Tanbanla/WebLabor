@@ -559,7 +559,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     TextCellValue(item.fLNotLeaveDay.toString()),
                     TextCellValue(item.inTViolation.toString()),
                     TextCellValue(item.nvarchaRViolation ?? ''),
-                    TextCellValue(item.nvarchaRHealthResults ?? ''),
+    ///                TextCellValue(item.nvarchaRHealthResults ?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
@@ -712,7 +712,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final healthController = TextEditingController(
-      text: data.nvarchaRHealthResults ?? '',
+      text: data.chRCodeGrade ?? '',///////////
     );
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {

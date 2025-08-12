@@ -41,7 +41,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC") {
+    if (authState.user!.chRGroup.toString() == "PTHC"||authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus('3', sectionName, null);
     } else {
@@ -189,7 +189,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC") {
+                if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   await controllerTwo.changeStatus('3', sectionName, null);
                 } else {
@@ -2177,7 +2177,7 @@ class _EditContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus('3', sectionName, null);
                       } else {

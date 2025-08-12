@@ -360,7 +360,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2620,
+              width: 2910,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -495,7 +495,19 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('healthCheckResult'),
+                    title: tr('congviec'),
+                    width: 120,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('tinhthan'),
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('khac'),
                     width: 120,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -755,7 +767,9 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   TextCellValue(tr('unreportedLeave')),
                   TextCellValue(tr('violationCount')),
                   TextCellValue(tr('reason')),
-                  TextCellValue(tr('healthCheckResult')),
+                  TextCellValue(tr('congviec')),
+                  TextCellValue(tr('tinhthan')),
+                  TextCellValue(tr('khac')),
                   TextCellValue(tr('evaluationResult')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('notRehirableReason')),
@@ -796,9 +810,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     TextCellValue(item.fLNotLeaveDay.toString()),
                     TextCellValue(item.inTViolation.toString()),
                     TextCellValue(item.nvarchaRViolation ?? ''),
-                    TextCellValue(item.nvarchaRHealthResults ?? ''),
+                    TextCellValue(item.nvchRCompleteWork ?? ''),
+                    TextCellValue(item.nvchRUseful ?? ''),
+                    TextCellValue(item.nvchROther?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
-                    TextCellValue(item.biTNoReEmployment.toString()),
+                    TextCellValue(item.biTNoReEmployment ?? 'true'),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
                   ]);
                 }
@@ -1144,28 +1160,9 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(
-          TextFormField(
-            style: TextStyle(
-              fontSize: Common.sizeColumn,
-            ), // Thêm cho TextFormField
-            decoration: InputDecoration(
-              labelText: tr('health'),
-              labelStyle: TextStyle(
-                fontSize: Common.sizeColumn,
-              ), // Thêm cho label
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return tr('pleaseHealth');
-              }
-              return null;
-            },
-          ),
-        ),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
+        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           Obx(() {

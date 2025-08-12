@@ -104,6 +104,8 @@ class DashboardControllerTwo extends GetxController {
               (item.vchRNameSection?.toLowerCase().contains(
                     query.toLowerCase(),
                   ) ??
+                  false) ||
+              (item.chRPosition?.toLowerCase().contains(query.toLowerCase()) ??
                   false),
         ),
       );
@@ -275,9 +277,7 @@ class DashboardControllerTwo extends GetxController {
         //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
-        throw Exception(
-          '${error['message'] ?? response.body}',
-        );
+        throw Exception('${error['message'] ?? response.body}');
       }
     } catch (e) {
       showError('Failed to update two contract: $e');
@@ -333,6 +333,8 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].inTStatusId = 2;
+        twocontract[i].biTApproverPer = true;
+        twocontract[i].nvchRApproverPer = '';
         twocontract[i].useRApproverPer = userApprover;
         twocontract[i].vchRCodeApprover =
             'HD2N' + formatDateTime(DateTime.now()).toString();
@@ -510,7 +512,7 @@ class DashboardControllerTwo extends GetxController {
           );
         } else {
           /// de test mail, xu dung xong xoa
-          if(mailSend !="k"){
+          if (mailSend != "k") {
             controlleruser.SendMail(
               '2',
               "vietdo@brothergroup.net",
@@ -697,7 +699,9 @@ class DashboardControllerTwo extends GetxController {
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
           ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvarchaRHealthResults
+          ..nvchRCompleteWork
+          ..nvchRUseful
+          ..nvchROther
           ..vchRReasultsLeader
           ..biTNoReEmployment
           ..nvchRNoReEmpoyment
@@ -829,7 +833,9 @@ class DashboardControllerTwo extends GetxController {
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
           ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvarchaRHealthResults
+          ..nvchRCompleteWork
+          ..nvchRUseful
+          ..nvchROther
           ..vchRReasultsLeader
           ..biTNoReEmployment
           ..nvchRNoReEmpoyment
@@ -925,8 +931,8 @@ class DashboardControllerTwo extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
-      dataList[index].nvarchaRHealthResults = status;
-      filterdataList[index].nvarchaRHealthResults = status;
+      dataList[index].nvarchaRViolation = status;
+      filterdataList[index].nvarchaRViolation = status; ///// can sua
       dataList.refresh();
       filterdataList.refresh();
     }
