@@ -210,7 +210,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3670, //2570,
+              width: 4120, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -344,12 +344,38 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  // DataColumnCustom(
+                  //   title: tr('healthCheckResult'),
+                  //   width: 170,
+                  //   maxLines: 2,
+                  //   fontSize: Common.sizeColumn,
+                  // ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('healthCheckResult'),
+                    title: tr('congviec'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('tinhthan'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('khac'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('note'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+
+                  ///
                   DataColumnCustom(
                     title: tr('evaluationResult'),
                     width: 150,
@@ -521,7 +547,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     TextCellValue(item.fLNotLeaveDay.toString()),
                     TextCellValue(item.inTViolation.toString()),
                     TextCellValue(item.nvarchaRViolation ?? ''),
-      ///              TextCellValue(item.nvarchaRHealthResults ?? ''),
+
+                    ///              TextCellValue(item.nvarchaRHealthResults ?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
@@ -529,9 +556,9 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     TextCellValue(item.vchRUserCreate.toString()),
                     TextCellValue(item.useRApproverPer.toString()),
                     TextCellValue(item.vchRLeaderEvalution ?? ''),
-                    TextCellValue(item.useRApproverChief?? ''),
+                    TextCellValue(item.useRApproverChief ?? ''),
                     TextCellValue(item.useRApproverSectionManager ?? ''),
-                    TextCellValue(item.useRApproverDirector??''),
+                    TextCellValue(item.useRApproverDirector ?? ''),
                     TextCellValue(item.inTStatusId.toString()),
                   ]);
                 }
@@ -681,9 +708,7 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
-    final healthController = TextEditingController(
-      text: '', /////////////////
-    );
+    final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
         6 => data.nvchRApproverChief ?? '',
@@ -864,21 +889,31 @@ class MyData extends DataTableSource {
         ),
         //4 thuộc tính đánh giá
         DataCell(
+          _getDanhGiaView(controller.filterdataList[index].nvchRCompleteWork ?? 'OK')
+        ),
+        DataCell(
+          _getDanhGiaView(controller.filterdataList[index].nvchRUseful ?? 'OK')
+        ),
+        DataCell(
+          _getDanhGiaView(controller.filterdataList[index].nvchROther ?? 'OK')
+        ),
+        // ghi chu
+        DataCell(
           Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
-                // controller.updateHealthStatus(
-                //   data.vchREmployeeId.toString(),
-                //   healthController.text,
-                // );
+                controller.updateNote(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                );
               }
             },
             child: TextFormField(
-              controller: healthController,
+              controller: noteController,
               style: TextStyle(fontSize: Common.sizeColumn),
               decoration: InputDecoration(
-                labelText: tr('health'),
+                labelText: tr('note'),
                 labelStyle: TextStyle(fontSize: Common.sizeColumn),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -887,92 +922,10 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+
+        ///ket qua cuoi cung
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateEvaluationStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+          _getDanhGiaView(controller.filterdataList[index].vchRReasultsLeader ?? 'OK')
         ),
         DataCell(
           Obx(() {
@@ -1113,19 +1066,60 @@ class MyData extends DataTableSource {
       ],
     );
   }
-
-  Color _getStatusColor(String? status) {
+  Widget _getDanhGiaView(String? status) {
     switch (status) {
       case 'OK':
-        return Colors.green;
+        return Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'OK',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        );
       case 'NG':
-        return Colors.red;
+        return Row(
+          children: [
+            Icon(Icons.cancel, color: Colors.red, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'NG',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.red),
+            ),
+          ],
+        );
       case 'Stop Working':
-        return Colors.orange;
+        return Row(
+          children: [
+            Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Stop Working',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.orange,
+              ),
+            ),
+          ],
+        );
       case 'Finish L/C':
-        return Colors.blue;
+        return Row(
+          children: [
+            Icon(Icons.done_all, color: Colors.blue, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Finish L/C',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.blue),
+            ),
+          ],
+        );
       default:
-        return Colors.grey;
+        return Row();
     }
   }
 
@@ -1137,15 +1131,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.blueGrey[100]!,
-            ),
+            border: Border.all(color: Colors.blueGrey[100]!),
           ),
-          child: Text( 'New',
-            style: TextStyle(
-              color: Colors.grey[800]
-            ),
-          ),
+          child: Text('New', style: TextStyle(color: Colors.grey[800])),
         );
       case 2:
         return Container(
@@ -1153,15 +1141,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.purple[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.purple[100]!
-            ),
+            border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text( 'Per',
-            style: TextStyle(
-              color: Colors.purple[800]
-            ),
-          ),
+          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
         );
       case 3:
         return Container(
@@ -1169,15 +1151,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.orange[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.orange[100]!
-            ),
+            border: Border.all(color: Colors.orange[100]!),
           ),
-          child: Text( 'PTHC',
-            style: TextStyle(
-              color: Colors.orange[800]
-            ),
-          ),
+          child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
         );
       case 4:
         return Container(
@@ -1185,15 +1161,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.blue[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.blue[100]!
-            ),
+            border: Border.all(color: Colors.blue[100]!),
           ),
-          child: Text( 'Leader',
-            style: TextStyle(
-              color: Colors.blue[800]
-            ),
-          ),
+          child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
         );
       case 6:
         return Container(
@@ -1201,15 +1171,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.yellow[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.yellow[100]!
-            ),
+            border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text( 'Chief',
-            style: TextStyle(
-              color: Colors.yellow[800]
-            ),
-          ),
+          child: Text('Chief', style: TextStyle(color: Colors.yellow[800])),
         );
       case 7:
         return Container(
@@ -1217,15 +1181,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.teal[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.teal[100]!
-            ),
+            border: Border.all(color: Colors.teal[100]!),
           ),
-          child: Text( 'Manager',
-            style: TextStyle(
-              color: Colors.teal[800]
-            ),
-          ),
+          child: Text('Manager', style: TextStyle(color: Colors.teal[800])),
         );
       case 8:
         return Container(
@@ -1233,15 +1191,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.brown[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.brown[100]!
-            ),
+            border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text( 'Director',
-            style: TextStyle(
-              color: Colors.brown[800]
-            ),
-          ),
+          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
         );
       case 9:
         return Container(
@@ -1249,15 +1201,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.green[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.green[100]!
-            ),
+            border: Border.all(color: Colors.green[100]!),
           ),
-          child: Text( 'Done',
-            style: TextStyle(
-              color: Colors.green[800]
-            ),
-          ),
+          child: Text('Done', style: TextStyle(color: Colors.green[800])),
         );
       default:
         return Container(
@@ -1265,15 +1211,9 @@ class MyData extends DataTableSource {
           decoration: BoxDecoration(
             color: Colors.red[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.red[100]!
-            ),
+            border: Border.all(color: Colors.red[100]!),
           ),
-          child: Text( 'Not Error',
-            style: TextStyle(
-              color: Colors.red[800]
-            ),
-          ),
+          child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
         );
     }
   }

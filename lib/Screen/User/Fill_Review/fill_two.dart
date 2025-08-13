@@ -50,11 +50,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         authState.user!.chRUserid.toString(),
       );
     }
-    // controller.changeStatus(
-    //   '2',
-    //   sectionName,
-    //   authState.user!.chRUserid.toString(),
-    // );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -371,7 +366,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3140, //2570,
+              width: 3290, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -529,7 +524,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
-
+                  DataColumnCustom(
+                    title: tr('note'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
                   ///
                   DataColumnCustom(
                     title: tr('evaluationResult'),
@@ -559,6 +559,223 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     );
   }
 
+  // void _showExportDialog() {
+  //   final controller = Get.find<DashboardControllerTwo>();
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text(tr('export')),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
+  //           const SizedBox(height: 16),
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //             children: [_buildExportOption(Iconsax.document_text, 'Excel')],
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.of(context).pop(),
+  //           child: Text(tr('Cancel')),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () async {
+  //             try {
+  //               controller.isLoadingExport.value = true;
+
+  //               // Tạo file Excel
+  //               final excel = Excel.createExcel();
+  //               final sheet = excel['Sheet1'];
+
+  //               // Thêm tiêu đề các cột
+  //               sheet.appendRow([
+  //                 TextCellValue(tr('stt')),
+  //                 TextCellValue(tr('employeeCode')),
+  //                 TextCellValue(tr('gender')),
+  //                 TextCellValue(tr('fullName')),
+  //                 TextCellValue(tr('department')),
+  //                 TextCellValue(tr('group')),
+  //                 TextCellValue(tr('age')),
+  //                 TextCellValue(tr('position')),
+  //                 TextCellValue(tr('salaryGrade')),
+  //                 TextCellValue(tr('contractEffective')),
+  //                 TextCellValue(tr('contractEndDate')),
+  //                 TextCellValue(tr('earlyLateCount')),
+  //                 TextCellValue(tr('paidLeave')),
+  //                 TextCellValue(tr('unpaidLeave')),
+  //                 TextCellValue(tr('unreportedLeave')),
+  //                 TextCellValue(tr('violationCount')),
+  //                 TextCellValue(tr('reason')),
+  //                 //TextCellValue(tr('healthCheckResult')),
+  //                 TextCellValue(tr('congviec')),
+  //                 TextCellValue(tr('tinhthan')),
+  //                 TextCellValue(tr('khac')),
+  //                 TextCellValue(tr('note')),
+  //                 TextCellValue(tr('evaluationResult')),
+  //                 TextCellValue(tr('notRehirable')),
+  //                 TextCellValue(tr('notRehirableReason')),
+  //               ]);
+
+  //               // Thêm dữ liệu từ controller
+  //               for (int i = 0; i < controller.filterdataList.length; i++) {
+  //                 final item = controller.filterdataList[i];
+  //                 sheet.appendRow([
+  //                   TextCellValue((i + 1).toString()),
+  //                   TextCellValue(item.vchREmployeeId ?? ''),
+  //                   TextCellValue(item.vchRTyperId ?? ''),
+  //                   TextCellValue(item.vchREmployeeName ?? ''),
+  //                   TextCellValue(item.vchRNameSection ?? ''),
+  //                   TextCellValue(item.chRCostCenterName ?? ''),
+  //                   TextCellValue(
+  //                     getAgeFromBirthday(item.dtMBrithday).toString(),
+  //                   ),
+  //                   TextCellValue(item.chRPosition ?? ''),
+  //                   TextCellValue(item.chRCodeGrade ?? ''),
+  //                   TextCellValue(
+  //                     item.dtMJoinDate != null
+  //                         ? DateFormat(
+  //                             'yyyy-MM-dd',
+  //                           ).format(DateTime.parse(item.dtMJoinDate!))
+  //                         : '',
+  //                   ),
+  //                   TextCellValue(
+  //                     item.dtMEndDate != null
+  //                         ? DateFormat(
+  //                             'yyyy-MM-dd',
+  //                           ).format(DateTime.parse(item.dtMEndDate!))
+  //                         : '',
+  //                   ),
+  //                   TextCellValue(item.fLGoLeaveLate.toString()),
+  //                   TextCellValue(item.fLPaidLeave.toString()),
+  //                   TextCellValue(item.fLNotPaidLeave.toString()),
+  //                   TextCellValue(item.fLNotLeaveDay.toString()),
+  //                   TextCellValue(item.inTViolation.toString()),
+  //                   TextCellValue(item.nvarchaRViolation ?? ''),
+  //                   TextCellValue(item.nvchRCompleteWork ?? ''),
+  //                   TextCellValue(item.nvchRUseful ?? ''),
+  //                   TextCellValue(item.nvchROther?? ''),
+  //                   TextCellValue(item.vchRNote ?? ''),
+  //       //            TextCellValue(item.nvarchaRHealthResults ?? ''),
+  //                   TextCellValue(item.vchRReasultsLeader ?? ''),
+  //                   TextCellValue(item.biTNoReEmployment?? true),
+  //                   TextCellValue(item.nvchRNoReEmpoyment ?? ''),
+  //                 ]);
+  //               }
+
+  //               // Lưu file
+  //               final bytes = excel.encode(); // Sử dụng encode() thay vì save()
+  //               if (bytes == null) throw Exception(tr('Notsavefile'));
+
+  //               // Tạo tên file
+  //               final fileName =
+  //                   'DanhSachDanhGiaHopDongKhongXD_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+  //               // Xử lý tải file xuống
+  //               if (kIsWeb) {
+  //                 // Cho trình duyệt web
+  //                 final blob = html.Blob(
+  //                   [bytes],
+  //                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  //                 );
+  //                 final url = html.Url.createObjectUrlFromBlob(blob);
+  //                 final anchor = html.AnchorElement(href: url)
+  //                   ..setAttribute('download', fileName)
+  //                   ..click();
+  //                 html.Url.revokeObjectUrl(url);
+  //               } else {
+  //                 // Cho mobile/desktop
+  //                 final String? outputFile = await FilePicker.platform.saveFile(
+  //                   dialogTitle: tr('savefile'),
+  //                   fileName: fileName,
+  //                   type: FileType.custom,
+  //                   allowedExtensions: ['xlsx'],
+  //                 );
+
+  //                 if (outputFile != null) {
+  //                   final file = File(outputFile);
+  //                   await file.writeAsBytes(bytes, flush: true);
+  //                 }
+  //               }
+
+  //               // Đóng dialog sau khi export thành công
+  //               if (context.mounted) {
+  //                 Navigator.of(context).pop();
+  //               }
+  //               showDialog(
+  //                 context: context,
+  //                 builder: (context) => AlertDialog(
+  //                   icon: const Icon(
+  //                     Icons.check_circle,
+  //                     color: Colors.green,
+  //                     size: 50,
+  //                   ),
+  //                   title: Text(
+  //                     tr('Done'),
+  //                     style: TextStyle(fontWeight: FontWeight.bold),
+  //                   ),
+  //                   content: Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       Text(tr('exportDone')),
+  //                       const SizedBox(height: 10),
+  //                     ],
+  //                   ),
+  //                   actions: [
+  //                     ElevatedButton(
+  //                       onPressed: () => Navigator.of(context).pop(),
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: Colors.green,
+  //                         foregroundColor: Colors.white,
+  //                       ),
+  //                       child: Text(tr('Cancel')),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             } catch (e) {
+  //               if (context.mounted) {
+  //                 showDialog(
+  //                   context: context,
+  //                   builder: (context) => AlertDialog(
+  //                     title: Text('${tr('exportError')}${e.toString()}'),
+  //                     actions: [
+  //                       TextButton(
+  //                         onPressed: () => Navigator.of(context).pop(),
+  //                         child: Text(tr('Cancel')),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 );
+  //               }
+  //             } finally {
+  //               controller.isLoadingExport.value = false;
+  //             }
+  //           },
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.green,
+  //             foregroundColor: Colors.white,
+  //           ),
+  //           child: Obx(
+  //             () => controller.isLoadingExport.value
+  //                 ? const SizedBox(
+  //                     width: 20,
+  //                     height: 20,
+  //                     child: CircularProgressIndicator(
+  //                       strokeWidth: 2,
+  //                       color: Colors.white,
+  //                     ),
+  //                   )
+  //                 : const Text('Export'),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   void _showExportDialog() {
     final controller = Get.find<DashboardControllerTwo>();
 
@@ -587,94 +804,49 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
               try {
                 controller.isLoadingExport.value = true;
 
-                // Tạo file Excel
-                final excel = Excel.createExcel();
+                // 1. Đọc file mẫu từ assets
+                final ByteData templateData = await rootBundle.load('assets/templates/mau_danh_gia.xlsx');
+                final Uint8List templateBytes = templateData.buffer.asUint8List();
+                
+                // 2. Mở file mẫu bằng excel package
+                final excel = Excel.decodeBytes(templateBytes);
+                
+                // 3. Lấy sheet cần làm việc (giả sử tên sheet là 'Sheet1')
                 final sheet = excel['Sheet1'];
 
-                // Thêm tiêu đề các cột
-                sheet.appendRow([
-                  TextCellValue(tr('stt')),
-                  TextCellValue(tr('employeeCode')),
-                  TextCellValue(tr('gender')),
-                  TextCellValue(tr('fullName')),
-                  TextCellValue(tr('department')),
-                  TextCellValue(tr('group')),
-                  TextCellValue(tr('age')),
-                  TextCellValue(tr('position')),
-                  TextCellValue(tr('salaryGrade')),
-                  TextCellValue(tr('contractEffective')),
-                  TextCellValue(tr('contractEndDate')),
-                  TextCellValue(tr('earlyLateCount')),
-                  TextCellValue(tr('paidLeave')),
-                  TextCellValue(tr('unpaidLeave')),
-                  TextCellValue(tr('unreportedLeave')),
-                  TextCellValue(tr('violationCount')),
-                  TextCellValue(tr('reason')),
-                  //TextCellValue(tr('healthCheckResult')),
-                  TextCellValue(tr('congviec')),
-                  TextCellValue(tr('tinhthan')),
-                  TextCellValue(tr('khac')),
-                  TextCellValue(tr('evaluationResult')),
-                  TextCellValue(tr('notRehirable')),
-                  TextCellValue(tr('notRehirableReason')),
-                ]);
-
-                // Thêm dữ liệu từ controller
+                // 4. Điền dữ liệu vào các ô cụ thể theo mẫu
+                // Giả sử dữ liệu bắt đầu từ dòng 2 (dòng 1 là tiêu đề)
+                int startRow = 2;
+                
                 for (int i = 0; i < controller.filterdataList.length; i++) {
                   final item = controller.filterdataList[i];
-                  sheet.appendRow([
-                    TextCellValue((i + 1).toString()),
-                    TextCellValue(item.vchREmployeeId ?? ''),
-                    TextCellValue(item.vchRTyperId ?? ''),
-                    TextCellValue(item.vchREmployeeName ?? ''),
-                    TextCellValue(item.vchRNameSection ?? ''),
-                    TextCellValue(item.chRCostCenterName ?? ''),
-                    TextCellValue(
-                      getAgeFromBirthday(item.dtMBrithday).toString(),
-                    ),
-                    TextCellValue(item.chRPosition ?? ''),
-                    TextCellValue(item.chRCodeGrade ?? ''),
-                    TextCellValue(
-                      item.dtMJoinDate != null
-                          ? DateFormat(
-                              'yyyy-MM-dd',
-                            ).format(DateTime.parse(item.dtMJoinDate!))
-                          : '',
-                    ),
-                    TextCellValue(
-                      item.dtMEndDate != null
-                          ? DateFormat(
-                              'yyyy-MM-dd',
-                            ).format(DateTime.parse(item.dtMEndDate!))
-                          : '',
-                    ),
-                    TextCellValue(item.fLGoLeaveLate.toString()),
-                    TextCellValue(item.fLPaidLeave.toString()),
-                    TextCellValue(item.fLNotPaidLeave.toString()),
-                    TextCellValue(item.fLNotLeaveDay.toString()),
-                    TextCellValue(item.inTViolation.toString()),
-                    TextCellValue(item.nvarchaRViolation ?? ''),
-                    TextCellValue(item.nvchRCompleteWork ?? ''),
-                    TextCellValue(item.nvchRUseful ?? ''),
-                    TextCellValue(item.nvchROther?? ''),
-        //            TextCellValue(item.nvarchaRHealthResults ?? ''),
-                    TextCellValue(item.vchRReasultsLeader ?? ''),
-                    TextCellValue(item.biTNoReEmployment?? true),
-                    TextCellValue(item.nvchRNoReEmpoyment ?? ''),
-                  ]);
+                  
+                  // Điền dữ liệu vào từng ô theo cột
+                  sheet.cell(CellIndex.indexByString('A${startRow + i}')).value = (i + 1).toString() as CellValue?;
+                  sheet.cell(CellIndex.indexByString('B${startRow + i}')).value = (item.vchREmployeeId ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('C${startRow + i}')).value = (item.vchRTyperId ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('D${startRow + i}')).value = (item.vchREmployeeName ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('E${startRow + i}')).value = (item.vchRNameSection ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('F${startRow + i}')).value = (item.chRCostCenterName ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('G${startRow + i}')).value = getAgeFromBirthday(item.dtMBrithday).toString() as CellValue?;
+                  sheet.cell(CellIndex.indexByString('H${startRow + i}')).value = (item.chRPosition ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('I${startRow + i}')).value = (item.chRCodeGrade ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('J${startRow + i}')).value = (item.dtMJoinDate != null 
+                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) : '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('K${startRow + i}')).value = (item.dtMEndDate != null 
+                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) : '') as CellValue?;
+                  // Tiếp tục cho các cột khác...
                 }
 
-                // Lưu file
-                final bytes = excel.encode(); // Sử dụng encode() thay vì save()
+                // 5. Lưu file
+                final bytes = excel.encode();
                 if (bytes == null) throw Exception(tr('Notsavefile'));
 
-                // Tạo tên file
-                final fileName =
-                    'DanhSachDanhGiaHopDongKhongXD_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+                // 6. Tạo tên file
+                final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
 
-                // Xử lý tải file xuống
+                // 7. Xử lý tải file xuống
                 if (kIsWeb) {
-                  // Cho trình duyệt web
                   final blob = html.Blob(
                     [bytes],
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -685,7 +857,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     ..click();
                   html.Url.revokeObjectUrl(url);
                 } else {
-                  // Cho mobile/desktop
                   final String? outputFile = await FilePicker.platform.saveFile(
                     dialogTitle: tr('savefile'),
                     fileName: fileName,
@@ -694,46 +865,14 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   );
 
                   if (outputFile != null) {
-                    final file = File(outputFile);
-                    await file.writeAsBytes(bytes, flush: true);
+                    await File(outputFile).writeAsBytes(bytes, flush: true);
                   }
                 }
 
-                // Đóng dialog sau khi export thành công
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    icon: const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                      size: 50,
-                    ),
-                    title: Text(
-                      tr('Done'),
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(tr('exportDone')),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(tr('Cancel')),
-                      ),
-                    ],
-                  ),
-                );
+                // Đóng dialog và hiển thị thông báo thành công
+                if (context.mounted) Navigator.of(context).pop();
+                _showSuccessDialog(context);
+                
               } catch (e) {
                 if (context.mounted) {
                   showDialog(
@@ -767,7 +906,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Export'),
+                  : Text(tr('Export')),
             ),
           ),
         ],
@@ -775,6 +914,32 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     );
   }
 
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+        title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(tr('exportDone')),
+            const SizedBox(height: 10),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(tr('Cancel')),
+          ),
+        ],
+      ),
+    );
+  }
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -809,8 +974,8 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
-    final OtherController = TextEditingController(
-      text:  data.nvchROther ?? '',
+    final noteController = TextEditingController(
+      text:  data.vchRNote ?? '',
     );
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
@@ -1162,24 +1327,111 @@ class MyData extends DataTableSource {
             );
           }),
         ),
-
         // khac
+        DataCell(
+          Obx(() {
+            final status =
+                controller.filterdataList[index].nvchROther ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {  
+                  controller.updateOther(
+                    data.vchREmployeeId.toString(),
+                    newValue,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        // ghi chu
         DataCell(
           Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
-                controller.updateOther(
+                controller.updateNote(
                   data.vchREmployeeId.toString(),
                   reasonController.text,
                 );
               }
             },
             child: TextFormField(
-              controller: OtherController,
+              controller: noteController,
               style: TextStyle(fontSize: Common.sizeColumn),
               decoration: InputDecoration(
-                labelText: tr('khac'),
+                labelText: tr('note'),
                 labelStyle: TextStyle(fontSize: Common.sizeColumn),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),

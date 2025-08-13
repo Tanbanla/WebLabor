@@ -108,6 +108,7 @@
   "DotDanhGia":"Mã đợt đánh giá",
   "LoiGui":"Lỗi danh sách gửi đi không có dữ liệu!",
   "InputError":"Yêu cầu nhập lý do không tuyển dụng cho ",
+  "InputError1":"Yêu cầu nhập lý do đánh giá NG cho nhân viên",
   "PheDuyetHint":"Phê duyệt sách đánh giá các công nhân viên từ hợp đồng 2 năm lên hợp đồng không xác định thời hạn",
   "PheDuyetApHint":"Phê duyệt danh sách đánh giá các công nhân viên kết thực hợp đồng thử việc lên hợp đồng có thời hạn 2 năm",
   "Nguoilap":"Người lập",

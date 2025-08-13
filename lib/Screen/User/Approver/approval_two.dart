@@ -299,7 +299,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3140, 
+              width: 3290, 
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -457,7 +457,12 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
-                  
+                  DataColumnCustom(
+                    title: tr('note'),
+                    width: 150,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
                   //
                   DataColumnCustom(
                     title: tr('evaluationResult'),
@@ -549,6 +554,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   TextCellValue(tr('congviec')),
                   TextCellValue(tr('tinhthan')),
                   TextCellValue(tr('khac')),
+                  TextCellValue(tr('note')),
                   TextCellValue(tr('evaluationResult')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('notRehirableReason')),
@@ -592,6 +598,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     TextCellValue(item.nvchRCompleteWork ?? ''),
                     TextCellValue(item.nvchRUseful ?? ''),
                     TextCellValue(item.nvchROther?? ''),
+                    TextCellValue(item.vchRNote ?? ''),
     ///                TextCellValue(item.nvarchaRHealthResults ?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
                     TextCellValue(item.biTNoReEmployment.toString()),
@@ -744,8 +751,8 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
-    final OtherController = TextEditingController(
-      text:  data.nvchROther ?? '',
+    final noteController = TextEditingController(
+      text:  data.vchRNote ?? '',
     );
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
@@ -1104,21 +1111,110 @@ class MyData extends DataTableSource {
 
         // khac
         DataCell(
+          Obx(() {
+            final status =
+                controller.filterdataList[index].nvchROther ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateOther(
+                    data.vchREmployeeId.toString(),
+                    newValue,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+
+        // note
+        DataCell(
           Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
-                controller.updateOther(
+                controller.updateNote(
                   data.vchREmployeeId.toString(),
                   reasonController.text,
                 );
               }
             },
             child: TextFormField(
-              controller: OtherController,
+              controller: noteController,
               style: TextStyle(fontSize: Common.sizeColumn),
               decoration: InputDecoration(
-                labelText: tr('khac'),
+                labelText: tr('note'),
                 labelStyle: TextStyle(fontSize: Common.sizeColumn),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -1127,8 +1223,6 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-
-
         // ket qua danh gia
         DataCell(
           Obx(() {

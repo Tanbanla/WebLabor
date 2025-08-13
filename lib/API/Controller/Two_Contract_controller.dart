@@ -337,7 +337,7 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].nvchRApproverPer = '';
         twocontract[i].useRApproverPer = userApprover;
         twocontract[i].vchRCodeApprover =
-            'HD2N' + formatDateTime(DateTime.now()).toString();
+            'HD2N${DateFormat('yyyy-MM-dd').format(DateTime.now())}';//formatDateTime(DateTime.now()).toString();
       }
       isLoading(true);
       final response = await http.put(
@@ -367,9 +367,7 @@ class DashboardControllerTwo extends GetxController {
     String userUpdate,
   ) async {
     try {
-      // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
-      //List<String> phongban = [];
       if (twocontract.isEmpty) {
         throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
       }
@@ -382,10 +380,14 @@ class DashboardControllerTwo extends GetxController {
             twocontract[i].nvchRPthcSection = userUpdate;
             twocontract[i].vchRLeaderEvalution = userApprover;
           case 4:
+            if(twocontract[i].vchRReasultsLeader == 'NG' && twocontract[i].vchRNote.isEmpty){
+              throw Exception('${tr('InputError1')} ${twocontract[i].vchREmployeeId}');
+            }
             twocontract[i].inTStatusId = 6;
             twocontract[i].vchRLeaderEvalution = userUpdate;
             twocontract[i].useRApproverChief = userApprover;
             twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+
         }
       }
       isLoading(true);
@@ -931,12 +933,29 @@ class DashboardControllerTwo extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!status.contains('OK')){
+        dataList[index].vchRReasultsLeader  = 'NG';
+        filterdataList[index].vchRReasultsLeader  = 'NG';
+      }
       dataList[index].nvchROther = status;
-      filterdataList[index].nvchROther = status; ///// can sua
+      filterdataList[index].nvchROther = status;
       dataList.refresh();
       filterdataList.refresh();
     }
   }
+  // ghi chu
+  void updateNote(String employeeCode, String status) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].vchRNote = status;
+      filterdataList[index].vchRNote = status;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
 
   void updateEvaluationStatus(String employeeCode, String status) {
     final index = dataList.indexWhere(
@@ -979,6 +998,10 @@ class DashboardControllerTwo extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!reason.contains('OK')){
+        dataList[index].vchRReasultsLeader  = 'NG';
+        filterdataList[index].vchRReasultsLeader  = 'NG';
+      }
       dataList[index].nvchRCompleteWork = reason;
       filterdataList[index].nvchRCompleteWork = reason;
       dataList.refresh();
@@ -986,11 +1009,15 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-    void updateUserFull(String employeeCode, String reason) {
+  void updateUserFull(String employeeCode, String reason) {
     final index = dataList.indexWhere(
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!reason.contains('OK')){
+        dataList[index].vchRReasultsLeader  = 'NG';
+        filterdataList[index].vchRReasultsLeader  = 'NG';
+      }
       dataList[index].nvchRCompleteWork = reason;
       filterdataList[index].nvchRCompleteWork = reason;
       dataList.refresh();

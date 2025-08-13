@@ -325,7 +325,7 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].inTStatusId = 2;
         contract[i].useRApproverPer = userApprover;
         contract[i].vchRCodeApprover =
-            'HDHN' + formatDateTime(DateTime.now()).toString();
+            'HDHN${DateFormat('yyyy-MM-dd').format(DateTime.now())}';
       }
       isLoading(true);
       final response = await http.put(
