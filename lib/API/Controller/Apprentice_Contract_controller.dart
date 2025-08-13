@@ -382,7 +382,7 @@ class DashboardControllerApprentice extends GetxController {
       if (response.statusCode == 200) {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
-        controlleruser.SendMail('2', userApprover, userApprover, userApprover);
+        controlleruser.SendMail('2', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net');
       } else {
         final error = json.decode(response.body);
         throw Exception(

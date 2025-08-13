@@ -397,7 +397,7 @@ class DashboardControllerTwo extends GetxController {
       if (response.statusCode == 200) {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
-        controlleruser.SendMail('2', userApprover, userApprover, userApprover);
+        controlleruser.SendMail('2', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net');
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -433,7 +433,7 @@ class DashboardControllerTwo extends GetxController {
           case 6:
             twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
             twocontract[i].useRApproverChief = userApprover;
-            if (twocontract[i].biTApproverChief == true) {
+            if (twocontract[i].biTApproverChief == true || twocontract[i].biTApproverChief) {
               twocontract[i].inTStatusId = 7;
               mailSend = await NextApprovel(
                 section: twocontract[i].vchRCodeSection,
@@ -926,13 +926,13 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // dien danh gia
-  void updateHealthStatus(String employeeCode, String status) {
+  void updateOther(String employeeCode, String status) {
     final index = dataList.indexWhere(
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
-      dataList[index].nvarchaRViolation = status;
-      filterdataList[index].nvarchaRViolation = status; ///// can sua
+      dataList[index].nvchROther = status;
+      filterdataList[index].nvchROther = status; ///// can sua
       dataList.refresh();
       filterdataList.refresh();
     }
@@ -974,6 +974,29 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
+  void updateCongViec(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].nvchRCompleteWork = reason;
+      filterdataList[index].nvchRCompleteWork = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
+
+    void updateUserFull(String employeeCode, String reason) {
+    final index = dataList.indexWhere(
+      (item) => item.vchREmployeeId == employeeCode,
+    );
+    if (index != -1) {
+      dataList[index].nvchRCompleteWork = reason;
+      filterdataList[index].nvchRCompleteWork = reason;
+      dataList.refresh();
+      filterdataList.refresh();
+    }
+  }
   // Các thông tin lưu ở Phê duyệt
   void updateNotRehireReasonApprovel(
     String employeeCode,

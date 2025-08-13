@@ -809,8 +809,8 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
-    final healthController = TextEditingController(
-      text:  '',/////
+    final OtherController = TextEditingController(
+      text:  data.nvchROther ?? '',
     );
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
@@ -987,10 +987,10 @@ class MyData extends DataTableSource {
         ),
         //4 thuộc tính đánh giá
         // DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-                DataCell(
+        DataCell(
           Obx(() {
             final status =
-                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
+                controller.filterdataList[index].nvchRCompleteWork ?? 'OK';
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -999,7 +999,7 @@ class MyData extends DataTableSource {
               value: status,
               onChanged: (newValue) {
                 if (newValue != null) {
-                  controller.updateEvaluationStatus(
+                  controller.updateCongViec(
                     data.vchREmployeeId.toString(),
                     newValue,
                   );
@@ -1074,32 +1074,121 @@ class MyData extends DataTableSource {
             );
           }),
         ),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        // DataCell(
-        //   Focus(
-        //     onFocusChange: (hasFocus) {
-        //       if (!hasFocus) {
-        //         // Chỉ update khi mất focus
-        //         controller.updateHealthStatus(
-        //           data.vchREmployeeId.toString(),
-        //           healthController.text,
-        //         );
-        //       }
-        //     },
-        //     child: TextFormField(
-        //       controller: healthController,
-        //       style: TextStyle(fontSize: Common.sizeColumn),
-        //       decoration: InputDecoration(
-        //         labelText: tr('health'),
-        //         labelStyle: TextStyle(fontSize: Common.sizeColumn),
-        //         border: OutlineInputBorder(
-        //           borderRadius: BorderRadius.circular(8),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
+        // tinh than
+        DataCell(
+          Obx(() {
+            final status =
+                controller.filterdataList[index].nvchRUseful ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateUserFull(
+                    data.vchREmployeeId.toString(),
+                    newValue,
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+
+        // khac
+        DataCell(
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // Chỉ update khi mất focus
+                controller.updateOther(
+                  data.vchREmployeeId.toString(),
+                  reasonController.text,
+                );
+              }
+            },
+            child: TextFormField(
+              controller: OtherController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('khac'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // các trường kết quả 
         DataCell(
           Obx(() {
             final status =

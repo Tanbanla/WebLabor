@@ -868,10 +868,10 @@ class MyData extends DataTableSource {
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
-                controller.updateHealthStatus(
-                  data.vchREmployeeId.toString(),
-                  healthController.text,
-                );
+                // controller.updateHealthStatus(
+                //   data.vchREmployeeId.toString(),
+                //   healthController.text,
+                // );
               }
             },
             child: TextFormField(
