@@ -716,9 +716,8 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  //   void _showExportDialog() {
+  // void _showExportDialog1() {
   //   final controller = Get.find<DashboardControllerTwo>();
-
   //   showDialog(
   //     context: context,
   //     builder: (context) => AlertDialog(
@@ -730,7 +729,9 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   //           const SizedBox(height: 16),
   //           Row(
   //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [_buildExportOption(Iconsax.document_text, 'Excel')],
+  //             children: [                  Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+  //                 const SizedBox(height: 8),
+  //                 const Text('Excel', style: TextStyle(fontSize: 16)),]
   //           ),
   //         ],
   //       ),
@@ -893,6 +894,194 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   // }
 
 
+// void _showExportDialog() {
+//   final controller = Get.find<DashboardControllerTwo>();
+
+//   showDialog(
+//     context: context,
+//     builder: (context) => AlertDialog(
+//       title: Text(tr('export')),
+//       content: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
+//           const SizedBox(height: 16),
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//             children: [
+//               Column(
+//                 children: [
+//                   Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+//                   const SizedBox(height: 8),
+//                   const Text('Excel', style: TextStyle(fontSize: 16)),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.of(context).pop(),
+//           child: Text(tr('Cancel')),
+//         ),
+//         ElevatedButton(
+//           onPressed: () async {
+//             try {
+//               controller.isLoadingExport.value = true;
+              
+//               // 1. Đọc và mở file template
+//               final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
+//               final excel = Excel.decodeBytes(templateData.buffer.asUint8List());
+//               final sheet = excel['Sheet1'] ;//?? excel[excel.tables.keys.first];
+//               const startRow = 7;
+
+//               // 2. Điền dữ liệu
+//               for (int i = 0; i < controller.filterdataList.length; i++) {
+//                 final item = controller.filterdataList[i];
+//                 final row = startRow + i;
+                
+//                 // Danh sách các cột và giá trị tương ứng
+//                 final cells = {
+//                   'A': (i + 1).toString(),
+//                   'B': item.vchREmployeeId ?? '',
+//                   'C': item.vchRTyperId ?? '',
+//                   'D': item.vchREmployeeName ?? '',
+//                   'E': item.vchRNameSection ?? '',
+//                   'F': item.chRCostCenterName ?? '',
+//                   'G': getAgeFromBirthday(item.dtMBrithday).toString(),
+//                   'H': item.chRPosition ?? '',
+//                   'I': item.chRCodeGrade ?? '',
+//                   'J': item.dtMJoinDate != null 
+//                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) 
+//                       : '',
+//                   'K': item.dtMEndDate != null 
+//                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) 
+//                       : '',
+//                   'L': item.fLGoLeaveLate.toString(),
+//                   'M': item.fLPaidLeave.toString(),
+//                   'N': item.fLNotPaidLeave.toString(),
+//                   'O': item.fLNotLeaveDay.toString(),
+//                   'P': item.inTViolation.toString(),
+//                   'Q': item.nvarchaRViolation ?? '',
+//                   'R': item.nvchRCompleteWork ?? '',
+//                   'S': item.nvchRUseful ?? '',
+//                   'T': item.nvchROther ?? '',
+//                   'U': item.vchRReasultsLeader ?? '',
+//                   'V': item.vchRNote ?? '',
+//                   'W': item.biTNoReEmployment.toString(),
+//                   'X': item.nvchRNoReEmpoyment ?? '',
+//                 };
+
+//                 // Điền giá trị vào từng ô
+//                 cells.forEach((col, val) {
+//                   final cell = sheet.cell(CellIndex.indexByString('$col$row'));
+//                   cell.value = TextCellValue(val);
+//                   // Giữ nguyên định dạng từ template
+//                   var templateCell = sheet.cell(CellIndex.indexByString('$col${startRow-1}'));
+//                   cell.cellStyle = templateCell.cellStyle;
+//                 });
+//               }
+
+//               // 3. Xuất file
+//               final bytes = excel.encode();
+//               if (bytes == null) throw Exception(tr('Notsavefile'));
+
+//               final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+//               if (kIsWeb) {
+//                 final blob = html.Blob(
+//                   [bytes],
+//                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//                 );
+//                 final url = html.Url.createObjectUrlFromBlob(blob);
+//                 final anchor = html.AnchorElement(href: url)
+//                   ..setAttribute('download', fileName)
+//                   ..click();
+//                 html.Url.revokeObjectUrl(url);
+//               } else {
+//                 final String? outputFile = await FilePicker.platform.saveFile(
+//                   dialogTitle: tr('savefile'),
+//                   fileName: fileName,
+//                   type: FileType.custom,
+//                   allowedExtensions: ['xlsx'],
+//                 );
+//                 if (outputFile != null) {
+//                   await File(outputFile).writeAsBytes(bytes, flush: true);
+//                 }
+//               }
+
+//               // 4. Hiển thị thông báo thành công
+//               if (context.mounted) {
+//                 Navigator.of(context).pop();
+//                 showDialog(
+//                   context: context,
+//                   builder: (context) => AlertDialog(
+//                     icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+//                     title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
+//                     content: Column(
+//                       mainAxisSize: MainAxisSize.min,
+//                       children: [
+//                         Text(tr('exportDone')),
+//                         const SizedBox(height: 10),
+//                       ],
+//                     ),
+//                     actions: [
+//                       ElevatedButton(
+//                         onPressed: () => Navigator.of(context).pop(),
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: Colors.green,
+//                           foregroundColor: Colors.white,
+//                         ),
+//                         child: Text(tr('Cancel')),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               }
+//             } catch (e) {
+//               if (context.mounted) {
+//                 showDialog(
+//                   context: context,
+//                   builder: (context) => AlertDialog(
+//                     title: Text('${tr('exportError')}${e.toString()}'),
+//                     actions: [
+//                       TextButton(
+//                         onPressed: () => Navigator.of(context).pop(),
+//                         child: Text(tr('Cancel')),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               }
+//             } finally {
+//               controller.isLoadingExport.value = false;
+//             }
+//           },
+//           style: ElevatedButton.styleFrom(
+//             backgroundColor: Colors.green,
+//             foregroundColor: Colors.white,
+//           ),
+//           child: Obx(
+//             () => controller.isLoadingExport.value
+//                 ? const SizedBox(
+//                     width: 20,
+//                     height: 20,
+//                     child: CircularProgressIndicator(
+//                       strokeWidth: 2,
+//                       color: Colors.white,
+//                     ),
+//                   )
+//                 : Text(tr('Export')),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+
+
 void _showExportDialog() {
   final controller = Get.find<DashboardControllerTwo>();
 
@@ -928,65 +1117,69 @@ void _showExportDialog() {
           onPressed: () async {
             try {
               controller.isLoadingExport.value = true;
-              
-              // 1. Đọc và mở file template
+
+              // 1. Đọc file template
               final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
               final excel = Excel.decodeBytes(templateData.buffer.asUint8List());
-              final sheet = excel['Sheet1'] ?? excel[excel.tables.keys.first];
-              const startRow = 7;
+              final sheet = excel['Sheet1'] ;//?? excel[excel.tables.keys.first];
+              const startRow = 7; // Dòng bắt đầu điền dữ liệu
 
-              // 2. Điền dữ liệu
+              // 2. Điền dữ liệu vào các ô
               for (int i = 0; i < controller.filterdataList.length; i++) {
                 final item = controller.filterdataList[i];
                 final row = startRow + i;
-                
-                // Danh sách các cột và giá trị tương ứng
-                final cells = {
-                  'A': (i + 1).toString(),
-                  'B': item.vchREmployeeId ?? '',
-                  'C': item.vchRTyperId ?? '',
-                  'D': item.vchREmployeeName ?? '',
-                  'E': item.vchRNameSection ?? '',
-                  'F': item.chRCostCenterName ?? '',
-                  'G': getAgeFromBirthday(item.dtMBrithday).toString(),
-                  'H': item.chRPosition ?? '',
-                  'I': item.chRCodeGrade ?? '',
-                  'J': item.dtMJoinDate != null 
-                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) 
-                      : '',
-                  'K': item.dtMEndDate != null 
-                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) 
-                      : '',
-                  'L': item.fLGoLeaveLate.toString(),
-                  'M': item.fLPaidLeave.toString(),
-                  'N': item.fLNotPaidLeave.toString(),
-                  'O': item.fLNotLeaveDay.toString(),
-                  'P': item.inTViolation.toString(),
-                  'Q': item.nvarchaRViolation ?? '',
-                  'R': item.nvchRCompleteWork ?? '',
-                  'S': item.nvchRUseful ?? '',
-                  'T': item.nvchROther ?? '',
-                  'U': item.vchRReasultsLeader ?? '',
-                  'V': item.vchRNote ?? '',
-                  'W': item.biTNoReEmployment.toString(),
-                  'X': item.nvchRNoReEmpoyment ?? '',
-                };
 
-                // Điền giá trị vào từng ô
-                cells.forEach((col, val) {
-                  final cell = sheet.cell(CellIndex.indexByString('$col$row'));
-                  cell.value = TextCellValue(val);
-                  // Giữ nguyên định dạng từ template
-                  var templateCell = sheet.cell(CellIndex.indexByString('$col${startRow-1}'));
-                  cell.cellStyle = templateCell.cellStyle;
-                });
+                // Lấy style từ dòng mẫu (dòng 6)
+                final templateRow = startRow - 1;
+                final getStyle = (String column) => sheet
+                    .cell(CellIndex.indexByString('$column$templateRow'))
+                    .cellStyle;
+
+                // Điền dữ liệu với style được copy từ template
+                void setCellValue(String column, dynamic value) {
+                  final cell = sheet.cell(CellIndex.indexByString('$column$row'));
+                  cell.value = value is DateTime 
+                      ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                      : TextCellValue(value.toString());
+                  cell.cellStyle = getStyle(column);
+                }
+
+                // Điền từng giá trị vào các cột
+                setCellValue('A', i + 1);
+                setCellValue('B', item.vchREmployeeId ?? '');
+                setCellValue('C', item.vchRTyperId ?? '');
+                setCellValue('D', item.vchREmployeeName ?? '');
+                setCellValue('E', item.vchRNameSection ?? '');
+                setCellValue('F', item.chRCostCenterName ?? '');
+                setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
+                setCellValue('H', item.chRPosition ?? '');
+                setCellValue('I', item.chRCodeGrade ?? '');
+                if (item.dtMJoinDate != null) {
+                  setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                }
+                if (item.dtMEndDate != null) {
+                  setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                }
+                setCellValue('L', item.fLGoLeaveLate);
+                setCellValue('M', item.fLPaidLeave);
+                setCellValue('N', item.fLNotPaidLeave);
+                setCellValue('O', item.fLNotLeaveDay);
+                setCellValue('P', item.inTViolation);
+                setCellValue('Q', item.nvarchaRViolation ?? '');
+                setCellValue('R', item.nvchRCompleteWork ?? '');
+                setCellValue('S', item.nvchRUseful ?? '');
+                setCellValue('T', item.nvchROther ?? '');
+                setCellValue('U', item.vchRReasultsLeader ?? '');
+                setCellValue('V', item.vchRNote ?? '');
+                setCellValue('W', item.biTNoReEmployment);
+                setCellValue('X', item.nvchRNoReEmpoyment ?? '');
               }
 
               // 3. Xuất file
               final bytes = excel.encode();
               if (bytes == null) throw Exception(tr('Notsavefile'));
 
-              final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+              final fileName = 'DanhSachDanhGiaHopDong2nam_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
 
               if (kIsWeb) {
                 final blob = html.Blob(
@@ -1005,38 +1198,39 @@ void _showExportDialog() {
                   type: FileType.custom,
                   allowedExtensions: ['xlsx'],
                 );
+
                 if (outputFile != null) {
                   await File(outputFile).writeAsBytes(bytes, flush: true);
                 }
               }
 
-              // 4. Hiển thị thông báo thành công
+              // 4. Hiển thị thông báo
               if (context.mounted) {
                 Navigator.of(context).pop();
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                    title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(tr('exportDone')),
-                        const SizedBox(height: 10),
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+                      title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(tr('exportDone')),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(tr('Cancel')),
+                        ),
                       ],
                     ),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(tr('Cancel')),
-                      ),
-                    ],
-                  ),
-                );
+                  );
               }
             } catch (e) {
               if (context.mounted) {
@@ -1078,223 +1272,6 @@ void _showExportDialog() {
     ),
   );
 }
-
-
-
-  // void _showExportDialog() {
-  //   final controller = Get.find<DashboardControllerTwo>();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(tr('export')),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-  //           const SizedBox(height: 16),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [_buildExportOption(Iconsax.document_text, 'Excel')],
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: Text(tr('Cancel')),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             try {
-  //               controller.isLoadingExport.value = true;
-
-  //               // Tạo file Excel
-  //               final excel = Excel.createExcel();
-  //               final sheet = excel['Sheet1'];
-
-  //               // Thêm tiêu đề các cột
-  //               sheet.appendRow([
-  //                 TextCellValue(tr('stt')),
-  //                 TextCellValue(tr('employeeCode')),
-  //                 TextCellValue(tr('gender')),
-  //                 TextCellValue(tr('fullName')),
-  //                 TextCellValue(tr('department')),
-  //                 TextCellValue(tr('group')),
-  //                 TextCellValue(tr('age')),
-  //                 TextCellValue(tr('position')),
-  //                 TextCellValue(tr('salaryGrade')),
-  //                 TextCellValue(tr('contractEffective')),
-  //                 TextCellValue(tr('contractEndDate')),
-  //                 TextCellValue(tr('earlyLateCount')),
-  //                 TextCellValue(tr('paidLeave')),
-  //                 TextCellValue(tr('unpaidLeave')),
-  //                 TextCellValue(tr('unreportedLeave')),
-  //                 TextCellValue(tr('violationCount')),
-  //                 TextCellValue(tr('reason')),
-  //                 TextCellValue(tr('congviec')),
-  //                 TextCellValue(tr('tinhthan')),
-  //                 TextCellValue(tr('khac')),
-  //                 TextCellValue(tr('evaluationResult')),
-  //                 TextCellValue(tr('notRehirable')),
-  //                 TextCellValue(tr('notRehirableReason')),
-  //               ]);
-
-  //               // Thêm dữ liệu từ controller
-  //               for (int i = 0; i < controller.filterdataList.length; i++) {
-  //                 final item = controller.filterdataList[i];
-  //                 sheet.appendRow([
-  //                   TextCellValue((i + 1).toString()),
-  //                   TextCellValue(item.vchREmployeeId ?? ''),
-  //                   TextCellValue(item.vchRTyperId ?? ''),
-  //                   TextCellValue(item.vchREmployeeName ?? ''),
-  //                   TextCellValue(item.vchRNameSection ?? ''),
-  //                   TextCellValue(item.chRCostCenterName ?? ''),
-  //                   TextCellValue(
-  //                     getAgeFromBirthday(item.dtMBrithday).toString(),
-  //                   ),
-  //                   TextCellValue(item.chRPosition ?? ''),
-  //                   TextCellValue(item.chRCodeGrade ?? ''),
-  //                   TextCellValue(
-  //                     item.dtMJoinDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMJoinDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(
-  //                     item.dtMEndDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMEndDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(item.fLGoLeaveLate.toString()),
-  //                   TextCellValue(item.fLPaidLeave.toString()),
-  //                   TextCellValue(item.fLNotPaidLeave.toString()),
-  //                   TextCellValue(item.fLNotLeaveDay.toString()),
-  //                   TextCellValue(item.inTViolation.toString()),
-  //                   TextCellValue(item.nvarchaRViolation ?? ''),
-  //                   TextCellValue(item.nvchRCompleteWork ?? ''),
-  //                   TextCellValue(item.nvchRUseful ?? ''),
-  //                   TextCellValue(item.nvchROther?? ''),
-  //                   TextCellValue(item.vchRReasultsLeader ?? ''),
-  //                   TextCellValue(item.biTNoReEmployment ?? 'true'),
-  //                   TextCellValue(item.nvchRNoReEmpoyment ?? ''),
-  //                 ]);
-  //               }
-
-  //               // Lưu file
-  //               final bytes = excel.encode(); // Sử dụng encode() thay vì save()
-  //               if (bytes == null) throw Exception(tr('Notsavefile'));
-
-  //               // Tạo tên file
-  //               final fileName =
-  //                   'DanhSachDanhGiaHopDongKhongXD_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-  //               // Xử lý tải file xuống
-  //               if (kIsWeb) {
-  //                 // Cho trình duyệt web
-  //                 final blob = html.Blob(
-  //                   [bytes],
-  //                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  //                 );
-  //                 final url = html.Url.createObjectUrlFromBlob(blob);
-  //                 final anchor = html.AnchorElement(href: url)
-  //                   ..setAttribute('download', fileName)
-  //                   ..click();
-  //                 html.Url.revokeObjectUrl(url);
-  //               } else {
-  //                 // Cho mobile/desktop
-  //                 final String? outputFile = await FilePicker.platform.saveFile(
-  //                   dialogTitle: tr('savefile'),
-  //                   fileName: fileName,
-  //                   type: FileType.custom,
-  //                   allowedExtensions: ['xlsx'],
-  //                 );
-
-  //                 if (outputFile != null) {
-  //                   final file = File(outputFile);
-  //                   await file.writeAsBytes(bytes, flush: true);
-  //                 }
-  //               }
-
-  //               // Đóng dialog sau khi export thành công
-  //               if (context.mounted) {
-  //                 Navigator.of(context).pop();
-  //               }
-  //               showDialog(
-  //                 context: context,
-  //                 builder: (context) => AlertDialog(
-  //                   icon: const Icon(
-  //                     Icons.check_circle,
-  //                     color: Colors.green,
-  //                     size: 50,
-  //                   ),
-  //                   title: Text(
-  //                     tr('Done'),
-  //                     style: TextStyle(fontWeight: FontWeight.bold),
-  //                   ),
-  //                   content: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     children: [
-  //                       Text(tr('exportDone')),
-  //                       const SizedBox(height: 10),
-  //                     ],
-  //                   ),
-  //                   actions: [
-  //                     ElevatedButton(
-  //                       onPressed: () => Navigator.of(context).pop(),
-  //                       style: ElevatedButton.styleFrom(
-  //                         backgroundColor: Colors.green,
-  //                         foregroundColor: Colors.white,
-  //                       ),
-  //                       child: Text(tr('Cancel')),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             } catch (e) {
-  //               if (context.mounted) {
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (context) => AlertDialog(
-  //                     title: Text('${tr('exportError')}${e.toString()}'),
-  //                     actions: [
-  //                       TextButton(
-  //                         onPressed: () => Navigator.of(context).pop(),
-  //                         child: Text(tr('Cancel')),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 );
-  //               }
-  //             } finally {
-  //               controller.isLoadingExport.value = false;
-  //             }
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: Obx(
-  //             () => controller.isLoadingExport.value
-  //                 ? const SizedBox(
-  //                     width: 20,
-  //                     height: 20,
-  //                     child: CircularProgressIndicator(
-  //                       strokeWidth: 2,
-  //                       color: Colors.white,
-  //                     ),
-  //                   )
-  //                 : const Text('Export'),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1309,16 +1286,6 @@ void _showExportDialog() {
     } catch (e) {
       return 'Invalid date';
     }
-  }
-
-  Widget _buildExportOption(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
-      ],
-    );
   }
 }
 
