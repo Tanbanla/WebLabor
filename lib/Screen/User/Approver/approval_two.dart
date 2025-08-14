@@ -37,21 +37,16 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "Chief Section"||authState.user!.chRGroup.toString() == "Admin") {
+    if (authState.user!.chRGroup.toString() == "Chief Section" ||
+        authState.user!.chRGroup.toString() == "Admin") {
       // truong hop quan ly
-      controller.changeStatus(
-        '6',
-        sectionName,
-        null,
-      );
-    } else if (authState.user!.chRGroup.toString() == "Section Manager"||authState.user!.chRGroup.toString() == "Admin") {
+      controller.changeStatus('6', sectionName, null);
+    } else if (authState.user!.chRGroup.toString() == "Section Manager" ||
+        authState.user!.chRGroup.toString() == "Admin") {
       // truong hop truong phong
-      controller.changeStatus(
-        '7',
-        sectionName,
-        null,
-      );
-    } else if (authState.user!.chRGroup.toString() == "Director"||authState.user!.chRGroup.toString() == "Admin") {
+      controller.changeStatus('7', sectionName, null);
+    } else if (authState.user!.chRGroup.toString() == "Director" ||
+        authState.user!.chRGroup.toString() == "Admin") {
       controller.changeStatus('8', null, null);
     }
     return Scaffold(
@@ -193,26 +188,24 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                       authState.user!.chRUserid.toString(),
                     );
                     // phan xem ai dang vao man so sanh
-                    if (authState.user!.chRGroup.toString() == "Chief Section" ||authState.user!.chRGroup.toString() == "Admin") {
+                    if (authState.user!.chRGroup.toString() ==
+                            "Chief Section" ||
+                        authState.user!.chRGroup.toString() == "Admin") {
                       // truong hop quan ly
-                      controller.changeStatus(
-                        '6',
-                        sectionName,
-                        null,
-                      );
-                    } else if (authState.user!.chRGroup.toString() == "Section Manager"||authState.user!.chRGroup.toString() == "Admin") {
+                      controller.changeStatus('6', sectionName, null);
+                    } else if (authState.user!.chRGroup.toString() ==
+                            "Section Manager" ||
+                        authState.user!.chRGroup.toString() == "Admin") {
                       // truong hop truong phong
-                      controller.changeStatus(
-                        '7',
-                        sectionName,
-                        null,
-                      );
-                    } else if (authState.user!.chRGroup.toString() == "Director" ||authState.user!.chRGroup.toString() == "Admin") {
+                      controller.changeStatus('7', sectionName, null);
+                    } else if (authState.user!.chRGroup.toString() ==
+                            "Director" ||
+                        authState.user!.chRGroup.toString() == "Admin") {
                       controller.changeStatus('8', null, null);
                     }
                   } catch (e) {
                     errorMessage.value =
-                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+                        e.toString().replaceAll('', '');
                   }
                 },
                 child: Obx(
@@ -299,7 +292,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3290, 
+              width: 3610,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -470,12 +463,14 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  // đề xuất của phòng ban
                   DataColumnCustom(
-                    title: tr('Apporval'),//tr('notRehirable'),
+                    title: tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
+                  //
                   DataColumnCustom(
                     title: tr('notRehirableReason'),
                     width: 170,
@@ -485,6 +480,18 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   // nguoi de xuat cua phong ban
                   DataColumnCustom(
                     title: tr('DeXuat'),
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Apporval'), //tr('notRehirable'),
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('LydoTuChoi'), //tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -550,7 +557,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   TextCellValue(tr('unreportedLeave')),
                   TextCellValue(tr('violationCount')),
                   TextCellValue(tr('reason')),
-                 /// TextCellValue(tr('healthCheckResult')),
+
+                  /// TextCellValue(tr('healthCheckResult')),
                   TextCellValue(tr('congviec')),
                   TextCellValue(tr('tinhthan')),
                   TextCellValue(tr('khac')),
@@ -597,9 +605,10 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     TextCellValue(item.nvarchaRViolation ?? ''),
                     TextCellValue(item.nvchRCompleteWork ?? ''),
                     TextCellValue(item.nvchRUseful ?? ''),
-                    TextCellValue(item.nvchROther?? ''),
+                    TextCellValue(item.nvchROther ?? ''),
                     TextCellValue(item.vchRNote ?? ''),
-    ///                TextCellValue(item.nvarchaRHealthResults ?? ''),
+
+                    ///                TextCellValue(item.nvarchaRHealthResults ?? ''),
                     TextCellValue(item.vchRReasultsLeader ?? ''),
                     TextCellValue(item.biTNoReEmployment.toString()),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
@@ -751,16 +760,15 @@ class MyData extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
-    final noteController = TextEditingController(
-      text:  data.vchRNote ?? '',
-    );
+    final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
-      text: switch (data.inTStatusId) {
-        6 => data.nvchRApproverChief ?? '',
-        7 => data.nvchRApproverManager ?? '',
-        8 => data.nvchRApproverDirector ?? '',
-        _ => '', // Giá trị mặc định cho các trường hợp khác
-      },
+      // text: switch (data.inTStatusId) {
+      //   6 => data.nvchRApproverChief ?? '',
+      //   7 => data.nvchRApproverManager ?? '',
+      //   8 => data.nvchRApproverDirector ?? '',
+      //   _ => '', // Giá trị mặc định cho các trường hợp khác
+      //},
+      text: ('')
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -934,270 +942,23 @@ class MyData extends DataTableSource {
         ),
         //4 thuộc tính đánh giá
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].nvchRCompleteWork ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateCongViec(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+          _getDanhGiaView(
+            controller.filterdataList[index].nvchRCompleteWork ?? 'OK',
+          ),
         ),
         // tinh than
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].nvchRUseful ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateUserFull(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+          _getDanhGiaView(
+            controller.filterdataList[index].nvchRUseful ?? 'OK',
+          ),
         ),
 
         // khac
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].nvchROther ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateOther(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+          _getDanhGiaView(
+            controller.filterdataList[index].nvchROther ?? 'OK',
+          ),
         ),
-
         // note
         DataCell(
           Focus(
@@ -1311,18 +1072,99 @@ class MyData extends DataTableSource {
             );
           }),
         ),
+        // tuyển dụng lại
         DataCell(
           Obx(() {
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =() {
+            final rawStatus =
+                controller.filterdataList[index].biTNoReEmployment ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  controller.updateRehireStatus(
+                    data.vchREmployeeId.toString(),
+                    newValue == 'OK',
+                  );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        // ly do k tuyen dung lai
+        DataCell(
+          Center(
+            child: Text(
+              data.nvchRNoReEmpoyment ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
+        // nguoi de xuat cua phong ban
+        DataCell(
+          Text(
+            data.vchRLeaderEvalution ?? '',
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        // phe duyet
+        DataCell(
+          Obx(() {
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            final rawStatus = () {
               if (controller.filterdataList.length > index) {
                 return switch (data.inTStatusId) {
-                  6 => controller.filterdataList[index].biTApproverChief ?? true,
-                  7 => controller.filterdataList[index].biTApproverSectionManager ?? true,
-                  8 => controller.filterdataList[index].biTApproverDirector ?? true,
+                  6 =>
+                    controller.filterdataList[index].biTApproverChief ?? true,
+                  7 =>
+                    controller
+                            .filterdataList[index]
+                            .biTApproverSectionManager ??
+                        true,
+                  8 =>
+                    controller.filterdataList[index].biTApproverDirector ??
+                        true,
                   _ => true,
                 };
               }
@@ -1377,6 +1219,8 @@ class MyData extends DataTableSource {
             );
           }),
         ),
+
+        // ly do tu choi phe duyet
         DataCell(
           Focus(
             onFocusChange: (hasFocus) {
@@ -1402,13 +1246,6 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        // de xuat cua phong ban 
-        DataCell(
-          Text(
-            data.vchRLeaderEvalution ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
       ],
     );
   }
@@ -1427,7 +1264,62 @@ class MyData extends DataTableSource {
         return Colors.grey;
     }
   }
-
+  Widget _getDanhGiaView(String? status) {
+    switch (status) {
+      case 'OK':
+        return Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'OK',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        );
+      case 'NG':
+        return Row(
+          children: [
+            Icon(Icons.cancel, color: Colors.red, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'NG',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.red),
+            ),
+          ],
+        );
+      case 'Stop Working':
+        return Row(
+          children: [
+            Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Stop Working',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.orange,
+              ),
+            ),
+          ],
+        );
+      case 'Finish L/C':
+        return Row(
+          children: [
+            Icon(Icons.done_all, color: Colors.blue, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Finish L/C',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.blue),
+            ),
+          ],
+        );
+      default:
+        return Row();
+    }
+  }
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -1762,28 +1654,19 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .trim();
                       // phan xem ai dang vao man so sanh
                       if (authState.user!.chRGroup.toString() ==
-                          "Chief Section"||authState.user!.chRGroup.toString() == "Admin") {
+                              "Chief Section" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
-                        controller.changeStatus(
-                          '6',
-                          sectionName,
-                          null,
-                        );
+                        controller.changeStatus('6', sectionName, null);
                       } else if (authState.user!.chRGroup.toString() ==
-                          "Manager Section"||authState.user!.chRGroup.toString() == "Admin") {
+                              "Manager Section" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop leader
-                        controller.changeStatus(
-                          '7',
-                          sectionName,
-                          null,
-                        );
+                        controller.changeStatus('7', sectionName, null);
                       } else if (authState.user!.chRGroup.toString() ==
-                          "Director"||authState.user!.chRGroup.toString() == "Admin") {
-                        controller.changeStatus(
-                          '8',
-                          null,
-                          null,
-                        );
+                              "Director" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
+                        controller.changeStatus('8', null, null);
                       }
                       // await controller.changeStatus(
                       //   "2",

@@ -202,7 +202,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 }
               } catch (e) {
                 errorMessage.value =
-                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+                    e.toString().replaceAll('', '');
               }
             },
             child: Obx(

@@ -70,7 +70,16 @@ class DashboardControllerApporver extends GetxController {
           ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..dtMApproverPer = formatDateTime(DateTime.now())
-          ..useRApproverPer = userApprover;
+          ..useRApproverPer = userApprover
+          ..vchRLyThuyet = 'OK'
+          ..vchRThucHanh = 'OK'
+          ..vchRCompleteWork = 'OK'
+          ..vchRLearnWork = 'OK'
+          ..vchRThichNghi = 'OK'
+          ..vchRUseful = 'OK'
+          ..vchRContact = 'OK'
+          ..vcHNeedViolation = 'OK'
+          ;
 
         if (contract.biTApproverPer) {
           contract.inTStatusId = 3;
@@ -119,9 +128,9 @@ class DashboardControllerApporver extends GetxController {
         }
 
         //Special case for section "1120-1 : ADM-PER"
-        if (notApproval.isNotEmpty){
+        if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
-          (item) => item.section == "1120-1 : ADM-PER",
+            (item) => item.section == "1120-1 : ADM-PER",
           );
 
           controlleruser.SendMailCustom(

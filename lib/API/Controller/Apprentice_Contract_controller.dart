@@ -168,12 +168,20 @@ class DashboardControllerApprentice extends GetxController {
       }
       // Build request body
       final filters = [
-        {
-          "field": "INT_STATUS_ID",
-          "value": statusId,
-          "operator": "=",
-          "logicType": "AND",
-        },
+        if (statusId == 'approval')
+          {
+            "field": "INT_STATUS_ID",
+            "value": ["6", "7", "8"],
+            "operator": "IN",
+            "logicType": "AND",
+          }
+        else
+          {
+            "field": "INT_STATUS_ID",
+            "value": statusId,
+            "operator": "=",
+            "logicType": "AND",
+          },
         if (section != null && section.isNotEmpty)
           {
             "field": "VCHR_CODE_SECTION",
@@ -268,9 +276,7 @@ class DashboardControllerApprentice extends GetxController {
         //await fetchDataBy();
       } else {
         final error = json.decode(response.body);
-        throw Exception(
-          '${error['message'] ?? response.body}',
-        );
+        throw Exception('${error['message'] ?? response.body}');
       }
     } catch (e) {
       throw Exception('Failed to update two contract: $e');
@@ -324,6 +330,7 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].inTStatusId = 2;
         contract[i].useRApproverPer = userApprover;
+        contract[i].biTApproverPer = true;
         contract[i].vchRCodeApprover =
             'HDHN${DateFormat('yyyy-MM-dd').format(DateTime.now())}';
       }
@@ -356,17 +363,31 @@ class DashboardControllerApprentice extends GetxController {
     try {
       final contract = getSelectedItems();
       if (contract.isEmpty) {
-        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+        throw Exception('LoiGui');
       }
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        contract[i].biTApproverChief = true;
+        contract[i].biTApproverSectionManager = true;
         switch (contract[i].inTStatusId) {
           case 3:
+            if (contract[i].vchRReasultsLeader == 'NG' &&
+                contract[i].vchRNote == null) {
+              throw Exception(
+                '${tr('InputError1')} ${contract[i].vchREmployeeId}',
+              );
+            }
             contract[i].inTStatusId = 4;
             contract[i].nvchRPthcSection = userUpdate;
             contract[i].vchRLeaderEvalution = userApprover;
           case 4:
+            if (contract[i].vchRReasultsLeader == 'NG' &&
+                contract[i].vchRNote == null) {
+              throw Exception(
+                '${tr('InputError1')} ${contract[i].vchREmployeeId}',
+              );
+            }
             contract[i].inTStatusId = 6;
             contract[i].vchRLeaderEvalution = userUpdate;
             contract[i].useRApproverChief = userApprover;
@@ -382,7 +403,12 @@ class DashboardControllerApprentice extends GetxController {
       if (response.statusCode == 200) {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
-        controlleruser.SendMail('2', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net', '$userApprover@brothergroup.net');
+        controlleruser.SendMail(
+          '2',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+        );
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -390,7 +416,7 @@ class DashboardControllerApprentice extends GetxController {
         );
       }
     } catch (e) {
-      throw Exception('Failed to update two contract: $e');
+      rethrow;
     } finally {
       isLoading(false);
     }
@@ -417,16 +443,17 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].useRApproverChief = userApprover;
             if (contract[i].biTApproverChief == true) {
               contract[i].inTStatusId = 7;
-              mailSend = await
-                  NextApprovel(
-                        section: contract[i].vchRCodeSection,
-                        chucVu: "Section Manager",
-                      );
+              mailSend = await NextApprovel(
+                section: contract[i].vchRCodeSection,
+                chucVu: "Section Manager",
+              );
             } else {
               if ((contract[i].nvchRApproverChief?.isEmpty ?? true)) {
-                throw Exception('${tr('InputError')} ${contract[i].vchREmployeeName}');
+                throw Exception(
+                  '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
+                );
               }
-              contract[i].inTStatusId = 4;
+              contract[i].inTStatusId = 3;
               notApproval.add(contract[i]);
             }
           case 7:
@@ -439,9 +466,11 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].inTStatusId = 9;
             } else {
               if ((contract[i].nvchRApproverManager?.isEmpty ?? true)) {
-                throw Exception('${tr('InputError')} ${contract[i].vchREmployeeName}');
+                throw Exception(
+                  '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
+                );
               }
-              contract[i].inTStatusId = 4;
+              contract[i].inTStatusId = 3;
               notApproval.add(contract[i]);
             }
         }
@@ -464,16 +493,6 @@ class DashboardControllerApprentice extends GetxController {
             "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
             "vuduc.hai@brother-bivn.com.vn",
           );
-        }else{ /// de test mail, xu dung xong xoa
-          /// de test mail, xu dung xong xoa
-          if(mailSend !="k"){
-            controlleruser.SendMail(
-              '2',
-              "vietdo@brothergroup.net",
-              "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
-              "vuduc.hai@brother-bivn.com.vn",
-            );
-          }
         }
         // mail canh bao
         //Special case for section "1120-1 : ADM-PER"
@@ -486,7 +505,7 @@ class DashboardControllerApprentice extends GetxController {
               .where((section) => section == sectionAp);
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            ccSection.toString(),
+            '$ccSection;${specialSection.mailcc}',
             specialSection.mailbcc.toString(),
             notApproval,
           );
@@ -498,7 +517,7 @@ class DashboardControllerApprentice extends GetxController {
         );
       }
     } catch (e) {
-      throw Exception('Failed to update two contract: $e');
+      throw Exception('$e');
     } finally {
       isLoading(false);
     }
@@ -822,6 +841,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRLyThuyet = diem;
       filterdataList[index].vchRLyThuyet = diem;
       dataList.refresh();
@@ -834,6 +863,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRThucHanh = diem;
       filterdataList[index].vchRThucHanh = diem;
       dataList.refresh();
@@ -846,6 +885,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRThucHanh == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRCompleteWork = diem;
       filterdataList[index].vchRCompleteWork = diem;
       dataList.refresh();
@@ -858,6 +907,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRThucHanh == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRLearnWork = diem;
       filterdataList[index].vchRLearnWork = diem;
       dataList.refresh();
@@ -870,6 +929,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRThichNghi = diem;
       filterdataList[index].vchRThichNghi = diem;
       dataList.refresh();
@@ -882,6 +951,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRThucHanh== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRUseful = diem;
       filterdataList[index].vchRUseful = diem;
       dataList.refresh();
@@ -894,6 +973,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRThucHanh== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vchRContact = diem;
       filterdataList[index].vchRContact = diem;
       dataList.refresh();
@@ -906,6 +995,16 @@ class DashboardControllerApprentice extends GetxController {
       (item) => item.vchREmployeeId == employeeCode,
     );
     if (index != -1) {
+      if (!diem.contains('OK')) {
+        dataList[index].vchRReasultsLeader = 'NG';
+        filterdataList[index].vchRReasultsLeader = 'NG';
+      } else if (dataList[index].vchRLyThuyet == 'OK' &&
+          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
+          && dataList[index].vchRContact== 'OK' && dataList[index].vchRThucHanh== 'OK' && dataList[index].vchRUseful== 'OK'
+          ) {
+        dataList[index].vchRReasultsLeader = 'OK';
+        filterdataList[index].vchRReasultsLeader = 'OK';
+      }
       dataList[index].vcHNeedViolation = diem;
       filterdataList[index].vcHNeedViolation = diem;
       dataList.refresh();

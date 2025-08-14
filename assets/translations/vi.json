@@ -134,5 +134,6 @@
   "Apporval":"Phê duyệt",
   "LydoTuChoi":"Lý do từ chối",
   "khac":"Khác",
-  "DeXuat":"Người để xuất đánh giá của phòng ban"
+  "DeXuat":"Người để xuất đánh giá của phòng ban",
+  "NotApproval":"Yêu cầu nhập lý do không phê duyệt cho"
 }

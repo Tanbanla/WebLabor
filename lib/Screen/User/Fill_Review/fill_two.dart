@@ -558,224 +558,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       ),
     );
   }
-
-  // void _showExportDialog() {
-  //   final controller = Get.find<DashboardControllerTwo>();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(tr('export')),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-  //           const SizedBox(height: 16),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [_buildExportOption(Iconsax.document_text, 'Excel')],
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: Text(tr('Cancel')),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             try {
-  //               controller.isLoadingExport.value = true;
-
-  //               // Tạo file Excel
-  //               final excel = Excel.createExcel();
-  //               final sheet = excel['Sheet1'];
-
-  //               // Thêm tiêu đề các cột
-  //               sheet.appendRow([
-  //                 TextCellValue(tr('stt')),
-  //                 TextCellValue(tr('employeeCode')),
-  //                 TextCellValue(tr('gender')),
-  //                 TextCellValue(tr('fullName')),
-  //                 TextCellValue(tr('department')),
-  //                 TextCellValue(tr('group')),
-  //                 TextCellValue(tr('age')),
-  //                 TextCellValue(tr('position')),
-  //                 TextCellValue(tr('salaryGrade')),
-  //                 TextCellValue(tr('contractEffective')),
-  //                 TextCellValue(tr('contractEndDate')),
-  //                 TextCellValue(tr('earlyLateCount')),
-  //                 TextCellValue(tr('paidLeave')),
-  //                 TextCellValue(tr('unpaidLeave')),
-  //                 TextCellValue(tr('unreportedLeave')),
-  //                 TextCellValue(tr('violationCount')),
-  //                 TextCellValue(tr('reason')),
-  //                 //TextCellValue(tr('healthCheckResult')),
-  //                 TextCellValue(tr('congviec')),
-  //                 TextCellValue(tr('tinhthan')),
-  //                 TextCellValue(tr('khac')),
-  //                 TextCellValue(tr('note')),
-  //                 TextCellValue(tr('evaluationResult')),
-  //                 TextCellValue(tr('notRehirable')),
-  //                 TextCellValue(tr('notRehirableReason')),
-  //               ]);
-
-  //               // Thêm dữ liệu từ controller
-  //               for (int i = 0; i < controller.filterdataList.length; i++) {
-  //                 final item = controller.filterdataList[i];
-  //                 sheet.appendRow([
-  //                   TextCellValue((i + 1).toString()),
-  //                   TextCellValue(item.vchREmployeeId ?? ''),
-  //                   TextCellValue(item.vchRTyperId ?? ''),
-  //                   TextCellValue(item.vchREmployeeName ?? ''),
-  //                   TextCellValue(item.vchRNameSection ?? ''),
-  //                   TextCellValue(item.chRCostCenterName ?? ''),
-  //                   TextCellValue(
-  //                     getAgeFromBirthday(item.dtMBrithday).toString(),
-  //                   ),
-  //                   TextCellValue(item.chRPosition ?? ''),
-  //                   TextCellValue(item.chRCodeGrade ?? ''),
-  //                   TextCellValue(
-  //                     item.dtMJoinDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMJoinDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(
-  //                     item.dtMEndDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMEndDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(item.fLGoLeaveLate.toString()),
-  //                   TextCellValue(item.fLPaidLeave.toString()),
-  //                   TextCellValue(item.fLNotPaidLeave.toString()),
-  //                   TextCellValue(item.fLNotLeaveDay.toString()),
-  //                   TextCellValue(item.inTViolation.toString()),
-  //                   TextCellValue(item.nvarchaRViolation ?? ''),
-  //                   TextCellValue(item.nvchRCompleteWork ?? ''),
-  //                   TextCellValue(item.nvchRUseful ?? ''),
-  //                   TextCellValue(item.nvchROther?? ''),
-  //                   TextCellValue(item.vchRNote ?? ''),
-  //       //            TextCellValue(item.nvarchaRHealthResults ?? ''),
-  //                   TextCellValue(item.vchRReasultsLeader ?? ''),
-  //                   TextCellValue(item.biTNoReEmployment?? true),
-  //                   TextCellValue(item.nvchRNoReEmpoyment ?? ''),
-  //                 ]);
-  //               }
-
-  //               // Lưu file
-  //               final bytes = excel.encode(); // Sử dụng encode() thay vì save()
-  //               if (bytes == null) throw Exception(tr('Notsavefile'));
-
-  //               // Tạo tên file
-  //               final fileName =
-  //                   'DanhSachDanhGiaHopDongKhongXD_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-  //               // Xử lý tải file xuống
-  //               if (kIsWeb) {
-  //                 // Cho trình duyệt web
-  //                 final blob = html.Blob(
-  //                   [bytes],
-  //                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  //                 );
-  //                 final url = html.Url.createObjectUrlFromBlob(blob);
-  //                 final anchor = html.AnchorElement(href: url)
-  //                   ..setAttribute('download', fileName)
-  //                   ..click();
-  //                 html.Url.revokeObjectUrl(url);
-  //               } else {
-  //                 // Cho mobile/desktop
-  //                 final String? outputFile = await FilePicker.platform.saveFile(
-  //                   dialogTitle: tr('savefile'),
-  //                   fileName: fileName,
-  //                   type: FileType.custom,
-  //                   allowedExtensions: ['xlsx'],
-  //                 );
-
-  //                 if (outputFile != null) {
-  //                   final file = File(outputFile);
-  //                   await file.writeAsBytes(bytes, flush: true);
-  //                 }
-  //               }
-
-  //               // Đóng dialog sau khi export thành công
-  //               if (context.mounted) {
-  //                 Navigator.of(context).pop();
-  //               }
-  //               showDialog(
-  //                 context: context,
-  //                 builder: (context) => AlertDialog(
-  //                   icon: const Icon(
-  //                     Icons.check_circle,
-  //                     color: Colors.green,
-  //                     size: 50,
-  //                   ),
-  //                   title: Text(
-  //                     tr('Done'),
-  //                     style: TextStyle(fontWeight: FontWeight.bold),
-  //                   ),
-  //                   content: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     children: [
-  //                       Text(tr('exportDone')),
-  //                       const SizedBox(height: 10),
-  //                     ],
-  //                   ),
-  //                   actions: [
-  //                     ElevatedButton(
-  //                       onPressed: () => Navigator.of(context).pop(),
-  //                       style: ElevatedButton.styleFrom(
-  //                         backgroundColor: Colors.green,
-  //                         foregroundColor: Colors.white,
-  //                       ),
-  //                       child: Text(tr('Cancel')),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             } catch (e) {
-  //               if (context.mounted) {
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (context) => AlertDialog(
-  //                     title: Text('${tr('exportError')}${e.toString()}'),
-  //                     actions: [
-  //                       TextButton(
-  //                         onPressed: () => Navigator.of(context).pop(),
-  //                         child: Text(tr('Cancel')),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 );
-  //               }
-  //             } finally {
-  //               controller.isLoadingExport.value = false;
-  //             }
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: Obx(
-  //             () => controller.isLoadingExport.value
-  //                 ? const SizedBox(
-  //                     width: 20,
-  //                     height: 20,
-  //                     child: CircularProgressIndicator(
-  //                       strokeWidth: 2,
-  //                       color: Colors.white,
-  //                     ),
-  //                   )
-  //                 : const Text('Export'),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   void _showExportDialog() {
     final controller = Get.find<DashboardControllerTwo>();
 
@@ -805,7 +587,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 controller.isLoadingExport.value = true;
 
                 // 1. Đọc file mẫu từ assets
-                final ByteData templateData = await rootBundle.load('assets/templates/mau_danh_gia.xlsx');
+                final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
                 final Uint8List templateBytes = templateData.buffer.asUint8List();
                 
                 // 2. Mở file mẫu bằng excel package
@@ -835,7 +617,19 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) : '') as CellValue?;
                   sheet.cell(CellIndex.indexByString('K${startRow + i}')).value = (item.dtMEndDate != null 
                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) : '') as CellValue?;
-                  // Tiếp tục cho các cột khác...
+                  sheet.cell(CellIndex.indexByString('L${startRow + i}')).value = (item.fLGoLeaveLate.toString()) as CellValue?;
+                  sheet.cell(CellIndex.indexByString('M${startRow + i}')).value = (item.fLPaidLeave.toString()) as CellValue?;
+                  sheet.cell(CellIndex.indexByString('N${startRow + i}')).value = (item.fLNotPaidLeave.toString()) as CellValue?;
+                  sheet.cell(CellIndex.indexByString('O${startRow + i}')).value = (item.fLNotLeaveDay.toString()) as CellValue?;
+                  sheet.cell(CellIndex.indexByString('P${startRow + i}')).value = (item.inTViolation.toString()) as CellValue?;
+                  sheet.cell(CellIndex.indexByString('Q${startRow + i}')).value = (item.nvarchaRViolation ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('R${startRow + i}')).value = (item.nvchRCompleteWork ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('S${startRow + i}')).value = (item.nvchRUseful ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('T${startRow + i}')).value = (item.nvchROther?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('U${startRow + i}')).value = (item.vchRReasultsLeader ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('V${startRow + i}')).value = (item.vchRNote ?? '') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('W${startRow + i}')).value = (item.biTNoReEmployment ?? 'true') as CellValue?;
+                  sheet.cell(CellIndex.indexByString('X${startRow + i}')).value = (item.nvchRNoReEmpoyment ?? '') as CellValue?;
                 }
 
                 // 5. Lưu file
