@@ -121,12 +121,6 @@ class Common {
   }) {
     // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
     String buildTableRows() {
-      // return rejectedRequests
-      //     .map(
-      //       (request) =>
-      //           "<tr><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchRCodeApprover ?? 'N/A'}</td><td>${request.vchREmployeeId ?? 'N/A'}</td><td>${request.nvchRApproverPer ?? 'Không có lý do'}</td></tr>",
-      //     )
-      //     .join();
       return rejectedRequests.map((request) {
         // Xác định lý do từ chối dựa trên statusId
         String rejectionReason;

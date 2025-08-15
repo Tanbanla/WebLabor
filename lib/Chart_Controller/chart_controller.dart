@@ -9,7 +9,11 @@ import 'package:web_labor_contract/class/ChartYear.dart';
 class ContractStatsScreen extends StatefulWidget {
   final String? vaitro;
   final String? section;
-  const ContractStatsScreen({super.key, required this.vaitro, required this.section});
+  const ContractStatsScreen({
+    super.key,
+    required this.vaitro,
+    required this.section,
+  });
   @override
   // ignore: library_private_types_in_public_api
   _ContractStatsScreenState createState() => _ContractStatsScreenState();
@@ -47,12 +51,14 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          setState(() {
-          monthlyData = (jsonData['data'] as List).map((item) {
-            return ChartYear.fromJson(item); 
-          }).toList();
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              monthlyData = (jsonData['data'] as List).map((item) {
+                return ChartYear.fromJson(item);
+              }).toList();
+              _isLoading = false;
+            });
+          }
         } else {
           setState(() {
             _error = jsonData['message'] ?? 'Failed to load data';

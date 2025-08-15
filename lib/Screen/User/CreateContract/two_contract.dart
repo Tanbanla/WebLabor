@@ -546,7 +546,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
+    final authState = Provider.of<AuthState>(context, listen: false);
 
     showDialog(
       context: context,
@@ -716,502 +716,152 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  // void _showExportDialog1() {
-  //   final controller = Get.find<DashboardControllerTwo>();
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(tr('export')),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-  //           const SizedBox(height: 16),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [                  Icon(Iconsax.document_text, size: 40, color: Colors.blue),
-  //                 const SizedBox(height: 8),
-  //                 const Text('Excel', style: TextStyle(fontSize: 16)),]
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: Text(tr('Cancel')),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             try {
-  //               controller.isLoadingExport.value = true;
+  void _showExportDialog() {
+    final controller = Get.find<DashboardControllerTwo>();
 
-  //               // 1. Đọc file mẫu từ assets
-  //               final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
-  //               final Uint8List templateBytes = templateData.buffer.asUint8List();
-                
-  //               // 2. Mở file mẫu bằng excel package
-  //               final excel = Excel.decodeBytes(templateBytes);
-                
-  //               // 3. Lấy sheet cần làm việc (giả sử tên sheet là 'Sheet1')
-  //               final sheet = excel['Sheet1'];
-
-  //               // 4. Điền dữ liệu vào các ô cụ thể theo mẫu
-  //               // Giả sử dữ liệu bắt đầu từ dòng 2 (dòng 1 là tiêu đề)
-  //               int startRow = 7;
-                
-  //               for (int i = 0; i < controller.filterdataList.length; i++) {
-  //                 final item = controller.filterdataList[i];
-                  
-  //                 // Điền dữ liệu vào từng ô theo cột
-  //                 sheet.cell(CellIndex.indexByString('A${startRow + i}')).value =  TextCellValue((i + 1).toString());
-  //                 sheet.cell(CellIndex.indexByString('B${startRow + i}')).value = TextCellValue(item.vchREmployeeId ?? '');
-  //                 sheet.cell(CellIndex.indexByString('C${startRow + i}')).value = TextCellValue(item.vchRTyperId ?? '');
-  //                 sheet.cell(CellIndex.indexByString('D${startRow + i}')).value = TextCellValue(item.vchREmployeeName ?? '');
-  //                 sheet.cell(CellIndex.indexByString('E${startRow + i}')).value = TextCellValue(item.vchRNameSection ?? '');
-  //                 sheet.cell(CellIndex.indexByString('F${startRow + i}')).value = TextCellValue(item.chRCostCenterName ?? '');
-  //                 sheet.cell(CellIndex.indexByString('G${startRow + i}')).value = TextCellValue(getAgeFromBirthday(item.dtMBrithday).toString());
-  //                 sheet.cell(CellIndex.indexByString('H${startRow + i}')).value = TextCellValue(item.chRPosition ?? '');
-  //                 sheet.cell(CellIndex.indexByString('I${startRow + i}')).value = TextCellValue(item.chRCodeGrade ?? '');
-  //                 sheet.cell(CellIndex.indexByString('J${startRow + i}')).value = TextCellValue(item.dtMJoinDate != null 
-  //                     ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) : '');
-  //                 sheet.cell(CellIndex.indexByString('K${startRow + i}')).value = TextCellValue(item.dtMEndDate != null 
-  //                     ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) : '') ;
-  //                 sheet.cell(CellIndex.indexByString('L${startRow + i}')).value = TextCellValue(item.fLGoLeaveLate.toString());
-  //                 sheet.cell(CellIndex.indexByString('M${startRow + i}')).value = TextCellValue(item.fLPaidLeave.toString());
-  //                 sheet.cell(CellIndex.indexByString('N${startRow + i}')).value = TextCellValue(item.fLNotPaidLeave.toString());
-  //                 sheet.cell(CellIndex.indexByString('O${startRow + i}')).value = TextCellValue(item.fLNotLeaveDay.toString());
-  //                 sheet.cell(CellIndex.indexByString('P${startRow + i}')).value = TextCellValue(item.inTViolation.toString());
-  //                 sheet.cell(CellIndex.indexByString('Q${startRow + i}')).value = TextCellValue(item.nvarchaRViolation ?? '') ;
-  //                 sheet.cell(CellIndex.indexByString('R${startRow + i}')).value = TextCellValue(item.nvchRCompleteWork ?? '');
-  //                 sheet.cell(CellIndex.indexByString('S${startRow + i}')).value = TextCellValue(item.nvchRUseful ?? '') ;
-  //                 sheet.cell(CellIndex.indexByString('T${startRow + i}')).value = TextCellValue(item.nvchROther?? '') ;
-  //                 sheet.cell(CellIndex.indexByString('U${startRow + i}')).value = TextCellValue(item.vchRReasultsLeader ?? '');
-  //                 sheet.cell(CellIndex.indexByString('V${startRow + i}')).value = TextCellValue(item.vchRNote ?? '') ;
-  //                 sheet.cell(CellIndex.indexByString('W${startRow + i}')).value = TextCellValue(item.biTNoReEmployment.toString()) ;
-  //                 sheet.cell(CellIndex.indexByString('X${startRow + i}')).value = TextCellValue(item.nvchRNoReEmpoyment ?? '') ;
-  //               }
-
-  //               // 5. Lưu file
-  //               final bytes = excel.encode();
-  //               if (bytes == null) throw Exception(tr('Notsavefile'));
-
-  //               // 6. Tạo tên file
-  //               final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-  //               // 7. Xử lý tải file xuống
-  //               if (kIsWeb) {
-  //                 final blob = html.Blob(
-  //                   [bytes],
-  //                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  //                 );
-  //                 final url = html.Url.createObjectUrlFromBlob(blob);
-  //                 final anchor = html.AnchorElement(href: url)
-  //                   ..setAttribute('download', fileName)
-  //                   ..click();
-  //                 html.Url.revokeObjectUrl(url);
-  //               } else {
-  //                 final String? outputFile = await FilePicker.platform.saveFile(
-  //                   dialogTitle: tr('savefile'),
-  //                   fileName: fileName,
-  //                   type: FileType.custom,
-  //                   allowedExtensions: ['xlsx'],
-  //                 );
-
-  //                 if (outputFile != null) {
-  //                   await File(outputFile).writeAsBytes(bytes, flush: true);
-  //                 }
-  //               }
-
-  //               // Đóng dialog và hiển thị thông báo thành công
-  //               if (context.mounted) Navigator.of(context).pop();
-  //               _showSuccessDialog(context);
-                
-  //             } catch (e) {
-  //               if (context.mounted) {
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (context) => AlertDialog(
-  //                     title: Text('${tr('exportError')}${e.toString()}'),
-  //                     actions: [
-  //                       TextButton(
-  //                         onPressed: () => Navigator.of(context).pop(),
-  //                         child: Text(tr('Cancel')),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 );
-  //               }
-  //             } finally {
-  //               controller.isLoadingExport.value = false;
-  //             }
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: Obx(
-  //             () => controller.isLoadingExport.value
-  //                 ? const SizedBox(
-  //                     width: 20,
-  //                     height: 20,
-  //                     child: CircularProgressIndicator(
-  //                       strokeWidth: 2,
-  //                       color: Colors.white,
-  //                     ),
-  //                   )
-  //                 : Text(tr('Export')),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //   void _showSuccessDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-  //       title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(tr('exportDone')),
-  //           const SizedBox(height: 10),
-  //         ],
-  //       ),
-  //       actions: [
-  //         ElevatedButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: Text(tr('Cancel')),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-
-// void _showExportDialog() {
-//   final controller = Get.find<DashboardControllerTwo>();
-
-//   showDialog(
-//     context: context,
-//     builder: (context) => AlertDialog(
-//       title: Text(tr('export')),
-//       content: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-//           const SizedBox(height: 16),
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//             children: [
-//               Column(
-//                 children: [
-//                   Icon(Iconsax.document_text, size: 40, color: Colors.blue),
-//                   const SizedBox(height: 8),
-//                   const Text('Excel', style: TextStyle(fontSize: 16)),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//       actions: [
-//         TextButton(
-//           onPressed: () => Navigator.of(context).pop(),
-//           child: Text(tr('Cancel')),
-//         ),
-//         ElevatedButton(
-//           onPressed: () async {
-//             try {
-//               controller.isLoadingExport.value = true;
-              
-//               // 1. Đọc và mở file template
-//               final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
-//               final excel = Excel.decodeBytes(templateData.buffer.asUint8List());
-//               final sheet = excel['Sheet1'] ;//?? excel[excel.tables.keys.first];
-//               const startRow = 7;
-
-//               // 2. Điền dữ liệu
-//               for (int i = 0; i < controller.filterdataList.length; i++) {
-//                 final item = controller.filterdataList[i];
-//                 final row = startRow + i;
-                
-//                 // Danh sách các cột và giá trị tương ứng
-//                 final cells = {
-//                   'A': (i + 1).toString(),
-//                   'B': item.vchREmployeeId ?? '',
-//                   'C': item.vchRTyperId ?? '',
-//                   'D': item.vchREmployeeName ?? '',
-//                   'E': item.vchRNameSection ?? '',
-//                   'F': item.chRCostCenterName ?? '',
-//                   'G': getAgeFromBirthday(item.dtMBrithday).toString(),
-//                   'H': item.chRPosition ?? '',
-//                   'I': item.chRCodeGrade ?? '',
-//                   'J': item.dtMJoinDate != null 
-//                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) 
-//                       : '',
-//                   'K': item.dtMEndDate != null 
-//                       ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) 
-//                       : '',
-//                   'L': item.fLGoLeaveLate.toString(),
-//                   'M': item.fLPaidLeave.toString(),
-//                   'N': item.fLNotPaidLeave.toString(),
-//                   'O': item.fLNotLeaveDay.toString(),
-//                   'P': item.inTViolation.toString(),
-//                   'Q': item.nvarchaRViolation ?? '',
-//                   'R': item.nvchRCompleteWork ?? '',
-//                   'S': item.nvchRUseful ?? '',
-//                   'T': item.nvchROther ?? '',
-//                   'U': item.vchRReasultsLeader ?? '',
-//                   'V': item.vchRNote ?? '',
-//                   'W': item.biTNoReEmployment.toString(),
-//                   'X': item.nvchRNoReEmpoyment ?? '',
-//                 };
-
-//                 // Điền giá trị vào từng ô
-//                 cells.forEach((col, val) {
-//                   final cell = sheet.cell(CellIndex.indexByString('$col$row'));
-//                   cell.value = TextCellValue(val);
-//                   // Giữ nguyên định dạng từ template
-//                   var templateCell = sheet.cell(CellIndex.indexByString('$col${startRow-1}'));
-//                   cell.cellStyle = templateCell.cellStyle;
-//                 });
-//               }
-
-//               // 3. Xuất file
-//               final bytes = excel.encode();
-//               if (bytes == null) throw Exception(tr('Notsavefile'));
-
-//               final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-//               if (kIsWeb) {
-//                 final blob = html.Blob(
-//                   [bytes],
-//                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-//                 );
-//                 final url = html.Url.createObjectUrlFromBlob(blob);
-//                 final anchor = html.AnchorElement(href: url)
-//                   ..setAttribute('download', fileName)
-//                   ..click();
-//                 html.Url.revokeObjectUrl(url);
-//               } else {
-//                 final String? outputFile = await FilePicker.platform.saveFile(
-//                   dialogTitle: tr('savefile'),
-//                   fileName: fileName,
-//                   type: FileType.custom,
-//                   allowedExtensions: ['xlsx'],
-//                 );
-//                 if (outputFile != null) {
-//                   await File(outputFile).writeAsBytes(bytes, flush: true);
-//                 }
-//               }
-
-//               // 4. Hiển thị thông báo thành công
-//               if (context.mounted) {
-//                 Navigator.of(context).pop();
-//                 showDialog(
-//                   context: context,
-//                   builder: (context) => AlertDialog(
-//                     icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-//                     title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
-//                     content: Column(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: [
-//                         Text(tr('exportDone')),
-//                         const SizedBox(height: 10),
-//                       ],
-//                     ),
-//                     actions: [
-//                       ElevatedButton(
-//                         onPressed: () => Navigator.of(context).pop(),
-//                         style: ElevatedButton.styleFrom(
-//                           backgroundColor: Colors.green,
-//                           foregroundColor: Colors.white,
-//                         ),
-//                         child: Text(tr('Cancel')),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               }
-//             } catch (e) {
-//               if (context.mounted) {
-//                 showDialog(
-//                   context: context,
-//                   builder: (context) => AlertDialog(
-//                     title: Text('${tr('exportError')}${e.toString()}'),
-//                     actions: [
-//                       TextButton(
-//                         onPressed: () => Navigator.of(context).pop(),
-//                         child: Text(tr('Cancel')),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               }
-//             } finally {
-//               controller.isLoadingExport.value = false;
-//             }
-//           },
-//           style: ElevatedButton.styleFrom(
-//             backgroundColor: Colors.green,
-//             foregroundColor: Colors.white,
-//           ),
-//           child: Obx(
-//             () => controller.isLoadingExport.value
-//                 ? const SizedBox(
-//                     width: 20,
-//                     height: 20,
-//                     child: CircularProgressIndicator(
-//                       strokeWidth: 2,
-//                       color: Colors.white,
-//                     ),
-//                   )
-//                 : Text(tr('Export')),
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
-
-
-
-void _showExportDialog() {
-  final controller = Get.find<DashboardControllerTwo>();
-
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(tr('export')),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  Icon(Iconsax.document_text, size: 40, color: Colors.blue),
-                  const SizedBox(height: 8),
-                  const Text('Excel', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(tr('Cancel')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr('export')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+                    const SizedBox(height: 8),
+                    const Text('Excel', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
-        ElevatedButton(
-          onPressed: () async {
-            try {
-              controller.isLoadingExport.value = true;
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                controller.isLoadingExport.value = true;
 
-              // 1. Đọc file template
-              final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
-              final excel = Excel.decodeBytes(templateData.buffer.asUint8List());
-              final sheet = excel['Sheet1'] ;//?? excel[excel.tables.keys.first];
-              const startRow = 7; // Dòng bắt đầu điền dữ liệu
-
-              // 2. Điền dữ liệu vào các ô
-              for (int i = 0; i < controller.filterdataList.length; i++) {
-                final item = controller.filterdataList[i];
-                final row = startRow + i;
-
-                // Lấy style từ dòng mẫu (dòng 6)
-                final templateRow = startRow - 1;
-                final getStyle = (String column) => sheet
-                    .cell(CellIndex.indexByString('$column$templateRow'))
-                    .cellStyle;
-
-                // Điền dữ liệu với style được copy từ template
-                void setCellValue(String column, dynamic value) {
-                  final cell = sheet.cell(CellIndex.indexByString('$column$row'));
-                  cell.value = value is DateTime 
-                      ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
-                      : TextCellValue(value.toString());
-                  cell.cellStyle = getStyle(column);
-                }
-
-                // Điền từng giá trị vào các cột
-                setCellValue('A', i + 1);
-                setCellValue('B', item.vchREmployeeId ?? '');
-                setCellValue('C', item.vchRTyperId ?? '');
-                setCellValue('D', item.vchREmployeeName ?? '');
-                setCellValue('E', item.vchRNameSection ?? '');
-                setCellValue('F', item.chRCostCenterName ?? '');
-                setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
-                setCellValue('H', item.chRPosition ?? '');
-                setCellValue('I', item.chRCodeGrade ?? '');
-                if (item.dtMJoinDate != null) {
-                  setCellValue('J', DateTime.parse(item.dtMJoinDate!));
-                }
-                if (item.dtMEndDate != null) {
-                  setCellValue('K', DateTime.parse(item.dtMEndDate!));
-                }
-                setCellValue('L', item.fLGoLeaveLate);
-                setCellValue('M', item.fLPaidLeave);
-                setCellValue('N', item.fLNotPaidLeave);
-                setCellValue('O', item.fLNotLeaveDay);
-                setCellValue('P', item.inTViolation);
-                setCellValue('Q', item.nvarchaRViolation ?? '');
-                setCellValue('R', item.nvchRCompleteWork ?? '');
-                setCellValue('S', item.nvchRUseful ?? '');
-                setCellValue('T', item.nvchROther ?? '');
-                setCellValue('U', item.vchRReasultsLeader ?? '');
-                setCellValue('V', item.vchRNote ?? '');
-                setCellValue('W', item.biTNoReEmployment);
-                setCellValue('X', item.nvchRNoReEmpoyment ?? '');
-              }
-
-              // 3. Xuất file
-              final bytes = excel.encode();
-              if (bytes == null) throw Exception(tr('Notsavefile'));
-
-              final fileName = 'DanhSachDanhGiaHopDong2nam_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-              if (kIsWeb) {
-                final blob = html.Blob(
-                  [bytes],
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                // 1. Đọc file template
+                final ByteData templateData = await rootBundle.load(
+                  'assets/templates/HD2N.xlsx',
                 );
-                final url = html.Url.createObjectUrlFromBlob(blob);
-                final anchor = html.AnchorElement(href: url)
-                  ..setAttribute('download', fileName)
-                  ..click();
-                html.Url.revokeObjectUrl(url);
-              } else {
-                final String? outputFile = await FilePicker.platform.saveFile(
-                  dialogTitle: tr('savefile'),
-                  fileName: fileName,
-                  type: FileType.custom,
-                  allowedExtensions: ['xlsx'],
+                final excel = Excel.decodeBytes(
+                  templateData.buffer.asUint8List(),
                 );
 
-                if (outputFile != null) {
-                  await File(outputFile).writeAsBytes(bytes, flush: true);
-                }
-              }
+                final sheet =
+                    excel['Sheet1']; //?? excel[excel.tables.keys.first];
+                const startRow = 7; // Dòng bắt đầu điền dữ liệu
 
-              // 4. Hiển thị thông báo
-              if (context.mounted) {
-                Navigator.of(context).pop();
+                // 2. Điền dữ liệu vào các ô
+                for (int i = 0; i < controller.filterdataList.length; i++) {
+                  final item = controller.filterdataList[i];
+                  final row = startRow + i;
+
+                  // Lấy style từ dòng mẫu (dòng 6)
+                  final templateRow = startRow - 1;
+                  getStyle(String column) => sheet
+                      .cell(CellIndex.indexByString('$column$templateRow'))
+                      .cellStyle;
+
+                  // Điền dữ liệu với style được copy từ template
+                  void setCellValue(String column, dynamic value) {
+                    final cell = sheet.cell(
+                      CellIndex.indexByString('$column$row'),
+                    );
+                    cell.value = value is DateTime
+                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                        : TextCellValue(value.toString());
+                    cell.cellStyle = getStyle(column);
+                  }
+
+                  // Điền từng giá trị vào các cột
+                  setCellValue('A', i + 1);
+                  setCellValue('B', item.vchREmployeeId ?? '');
+                  setCellValue('C', item.vchRTyperId ?? '');
+                  setCellValue('D', item.vchREmployeeName ?? '');
+                  setCellValue('E', item.vchRNameSection ?? '');
+                  setCellValue('F', item.chRCostCenterName ?? '');
+                  setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
+                  setCellValue('H', item.chRPosition ?? '');
+                  setCellValue('I', item.chRCodeGrade ?? '');
+                  if (item.dtMJoinDate != null) {
+                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                  }
+                  setCellValue('L', item.fLGoLeaveLate);
+                  setCellValue('M', item.fLPaidLeave);
+                  setCellValue('N', item.fLNotPaidLeave);
+                  setCellValue('O', item.fLNotLeaveDay);
+                  setCellValue('P', item.inTViolation);
+                  setCellValue('Q', item.nvarchaRViolation ?? '');
+                  setCellValue('R', item.nvchRCompleteWork ?? '');
+                  setCellValue('S', item.nvchRUseful ?? '');
+                  setCellValue('T', item.nvchROther ?? '');
+                  setCellValue('U', item.vchRReasultsLeader ?? '');
+                  setCellValue('V', item.vchRNote ?? '');
+                  setCellValue('W', item.biTNoReEmployment);
+                  setCellValue('X', item.nvchRNoReEmpoyment ?? '');
+                }
+
+                // 3. Xuất file
+                final bytes = excel.encode();
+                if (bytes == null) throw Exception(tr('Notsavefile'));
+
+                final fileName =
+                    'DanhSachDanhGiaHopDong2nam_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+                if (kIsWeb) {
+                  final blob = html.Blob(
+                    [bytes],
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  );
+                  final url = html.Url.createObjectUrlFromBlob(blob);
+                  final anchor = html.AnchorElement(href: url)
+                    ..setAttribute('download', fileName)
+                    ..click();
+                  html.Url.revokeObjectUrl(url);
+                } else {
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: tr('savefile'),
+                    fileName: fileName,
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                  );
+
+                  if (outputFile != null) {
+                    await File(outputFile).writeAsBytes(bytes, flush: true);
+                  }
+                }
+
+                // 4. Hiển thị thông báo
+                if (context.mounted) {
+                  Navigator.of(context).pop();
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                      title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
+                      icon: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      title: Text(
+                        tr('Done'),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1231,47 +881,48 @@ void _showExportDialog() {
                       ],
                     ),
                   );
-              }
-            } catch (e) {
-              if (context.mounted) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('${tr('exportError')}${e.toString()}'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(tr('Cancel')),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            } finally {
-              controller.isLoadingExport.value = false;
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-          ),
-          child: Obx(
-            () => controller.isLoadingExport.value
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('${tr('exportError')}${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
                     ),
-                  )
-                : Text(tr('Export')),
+                  );
+                }
+              } finally {
+                controller.isLoadingExport.value = false;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(tr('Export')),
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -2078,13 +1729,9 @@ class _showAddDialog extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               // Dòng 1: Mã phòng ban + Tên phòng ban
-              SizedBox(
-                width: 500,
-                child: Row(
-                  children: [
+              SizedBox(width: 500, child: Row(children: [
                   ],
-                ),
-              ),
+                )),
               const SizedBox(height: 10),
               // Dòng 2: Mã NV + Giới tính
               Row(
@@ -2095,7 +1742,7 @@ class _showAddDialog extends StatelessWidget {
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
                   ),
-                ]
+                ],
               ),
               const SizedBox(height: 10),
               // Dòng 5: Ngày bắt đầu + Ngày kết thúc
@@ -2216,11 +1863,10 @@ class _showAddDialog extends StatelessWidget {
               if (errorMessage.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
-                  child: 
-                    Text(
-                      errorMessage.value,
-                      style: const TextStyle(color: Colors.red, fontSize: 14),
-                    ),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
                 ),
             ],
           ),
@@ -2238,8 +1884,7 @@ class _showAddDialog extends StatelessWidget {
           child: Text(tr('Cancel')),
         ),
         Obx(
-          () => 
-          ElevatedButton(
+          () => ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Common.primaryColor,
               foregroundColor: Colors.white,
@@ -2254,28 +1899,40 @@ class _showAddDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(true);
                     if (twoContract.vchREmployeeId?.isEmpty ?? true) {
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorEmployeeID'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorEmployeeID'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(twoContract.dtMJoinDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (twoContract.dtMJoinDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(twoContract.dtMEndDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (twoContract.dtMEndDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
@@ -2293,15 +1950,24 @@ class _showAddDialog extends StatelessWidget {
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
-                        builder: (context) => DialogNotification(message: tr('MessageSuss'), icon: Icons.check_circle, color: Colors.green, title: tr('tilteSuss'))
+                        builder: (context) => DialogNotification(
+                          message: tr('MessageSuss'),
+                          icon: Icons.check_circle,
+                          color: Colors.green,
+                          title: tr('tilteSuss'),
+                        ),
                       );
                     } catch (e) {
                       // errorMessage.value =
                       //     '${tr('ErrorUpdate')}${e.toString()}';
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: '${tr('ErrorUpdate')}${e.toString()}', title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: '${tr('ErrorUpdate')}${e.toString()}',
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                     } finally {
                       controller.isLoading(false);

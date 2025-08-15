@@ -666,7 +666,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 19;
+      int _i = 7;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -674,7 +674,6 @@ class DashboardControllerTwo extends GetxController {
         final twocontract = TwoContract()
           ..id = 0
           ..vchRCodeApprover
-          //'HD2N' + formatDateTime(DateTime.now()).toString()
           ..vchRCodeSection = row[4]?.value?.toString()
           ..vchRNameSection = row[4]?.value?.toString()
           ..vchREmployeeId = row[1]?.value?.toString()
@@ -706,20 +705,20 @@ class DashboardControllerTwo extends GetxController {
               : 0 //double.parse(row[12]!.value.toString())
           ..fLNotPaidLeave = row[13]?.value != null
               ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0 //double.parse(row[13]!.value.toString())
+              : 0 
           ..fLNotLeaveDay = row[14]?.value != null
               ? double.tryParse(row[14]!.value.toString()) ?? 0
-              : 0 //double.parse(row[14]!.value.toString())
+              : 0 
           ..inTViolation = row[15]?.value != null
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvchRCompleteWork
-          ..nvchRUseful
-          ..nvchROther
-          ..vchRReasultsLeader
-          ..biTNoReEmployment
-          ..nvchRNoReEmpoyment
+          ..nvarchaRViolation //= row[16]!.value.toString()
+          ..nvchRCompleteWork //= row[17]!.value.toString()
+          ..nvchRUseful //= row[18]!.value.toString()
+          ..nvchROther //= row[19]!.value.toString()
+          ..vchRReasultsLeader //= row[20]!.value.toString()
+          ..biTNoReEmployment = true
+          ..nvchRNoReEmpoyment//= row[23]!.value.toString()
           ..nvchRPthcSection
           ..vchRLeaderEvalution
           ..dtMLeadaerEvalution
@@ -740,7 +739,7 @@ class DashboardControllerTwo extends GetxController {
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 1
-          ..vchRNote
+          ..vchRNote //= row[21]!.value.toString()
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
@@ -799,7 +798,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 19;
+      int _i = 7;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -847,13 +846,13 @@ class DashboardControllerTwo extends GetxController {
           ..inTViolation = row[15]?.value != null
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[16]!.value.toString()
-          ..nvchRCompleteWork
-          ..nvchRUseful
-          ..nvchROther
-          ..vchRReasultsLeader
-          ..biTNoReEmployment
-          ..nvchRNoReEmpoyment
+          ..nvarchaRViolation// = row[16]!.value.toString()
+          ..nvchRCompleteWork //= row[17]!.value.toString()
+          ..nvchRUseful //= row[18]!.value.toString()
+          ..nvchROther //= row[19]!.value.toString()
+          ..vchRReasultsLeader //= row[20]!.value.toString()
+          ..biTNoReEmployment = true
+          ..nvchRNoReEmpoyment// = row[23]!.value.toString()
           ..nvchRPthcSection
           ..vchRLeaderEvalution
           ..dtMLeadaerEvalution
@@ -874,7 +873,7 @@ class DashboardControllerTwo extends GetxController {
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 1
-          ..vchRNote
+          ..vchRNote //= row[21]!.value.toString()
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager

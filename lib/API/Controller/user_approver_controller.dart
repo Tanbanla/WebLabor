@@ -57,6 +57,7 @@ class DashboardControllerUserApprover extends GetxController {
           dataList.assignAll(
             data
                 .map((twocontract) => ApproverUser.fromJson(twocontract))
+                .where((users) => users.chREmployeeAdid != null && users.chREmployeeAdid !='')
                 .toList(),
           );
           filterdataList.assignAll(dataList);

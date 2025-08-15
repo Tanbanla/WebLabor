@@ -363,7 +363,7 @@ class DashboardControllerApprentice extends GetxController {
     try {
       final contract = getSelectedItems();
       if (contract.isEmpty) {
-        throw Exception('LoiGui');
+        throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userUpdate;
@@ -430,7 +430,7 @@ class DashboardControllerApprentice extends GetxController {
       String mailSend = "";
       String sectionAp = "";
       if (contract.isEmpty) {
-        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+        throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userApprover;
@@ -565,7 +565,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 19;
+      int _i = 8;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -606,17 +606,17 @@ class DashboardControllerApprentice extends GetxController {
           ..inTViolation = row[13]?.value != null
               ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation // = row[14]!.value.toString()
-          ..vchRLyThuyet
-          ..vchRThucHanh
-          ..vchRCompleteWork
-          ..vchRLearnWork
-          ..vchRThichNghi
-          ..vchRUseful
-          ..vchRContact
-          ..vcHNeedViolation
-          ..vchRReasultsLeader
-          ..biTNoReEmployment
+          ..nvarchaRViolation 
+          ..vchRLyThuyet //= row[14]!.value.toString()
+          ..vchRThucHanh// = row[15]!.value.toString()
+          ..vchRCompleteWork//= row[16]!.value.toString()
+          ..vchRLearnWork//= row[17]!.value.toString()
+          ..vchRThichNghi//= row[18]!.value.toString()
+          ..vchRUseful//= row[19]!.value.toString()
+          ..vchRContact//= row[20]!.value.toString()
+          ..vcHNeedViolation//= row[21]!.value.toString()
+          ..vchRReasultsLeader//= row[22]!.value.toString()
+          ..biTNoReEmployment = true
           ..nvchRNoReEmpoyment
           ..nvchRPthcSection
           ..vchRLeaderEvalution
@@ -638,7 +638,7 @@ class DashboardControllerApprentice extends GetxController {
           ..vchRUserUpdate = ''
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 1
-          ..vchRNote
+          ..vchRNote //= row[23]!.value.toString()
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
@@ -696,7 +696,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 19;
+      int _i = 8;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -748,7 +748,7 @@ class DashboardControllerApprentice extends GetxController {
           ..vchRContact
           ..vcHNeedViolation
           ..vchRReasultsLeader
-          ..biTNoReEmployment
+          ..biTNoReEmployment = true
           ..nvchRNoReEmpoyment
           ..nvchRPthcSection
           ..vchRLeaderEvalution

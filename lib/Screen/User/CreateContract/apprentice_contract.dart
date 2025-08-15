@@ -24,7 +24,8 @@ class ApprenticeContractScreen extends StatefulWidget {
   const ApprenticeContractScreen({super.key});
 
   @override
-  State<ApprenticeContractScreen> createState() => _ApprenticeContractScreenState();
+  State<ApprenticeContractScreen> createState() =>
+      _ApprenticeContractScreenState();
 }
 
 class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
@@ -35,7 +36,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
 
   @override
   Widget build(BuildContext context) {
-    controller.changeStatus('1',null,null);
+    controller.changeStatus('1', null, null);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -72,7 +73,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   }
 
   Widget _buildApproverPer() {
-    final controller = Get.put(DashboardControllerUserApprover(),);
+    final controller = Get.put(DashboardControllerUserApprover());
     controller.changeStatus('ADM-PER', 'Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -161,9 +162,10 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               try {
                 final controllerTwo = Get.find<DashboardControllerApprentice>();
                 await controllerTwo.updateListApprenticeContract(
-                  selectedConfirmerId.value.toString(), authState.user!.chRUserid.toString()
-                ); 
-                await controllerTwo.changeStatus("1",null,null);
+                  selectedConfirmerId.value.toString(),
+                  authState.user!.chRUserid.toString(),
+                );
+                await controllerTwo.changeStatus("1", null, null);
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
@@ -552,7 +554,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
+    final authState = Provider.of<AuthState>(context, listen: false);
 
     showDialog(
       context: context,
@@ -652,15 +654,17 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                         if (kIsWeb) {
                           // Xử lý web
                           await controller.importFromExcelWeb(
-                            selectedFileData.value!, authState.user!.chRUserid.toString()
+                            selectedFileData.value!,
+                            authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1",null, null);
+                          await controller.changeStatus("1", null, null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileContract(
-                            selectedFile.value!,authState.user!.chRUserid.toString()
+                            selectedFile.value!,
+                            authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1",null,null);
+                          await controller.changeStatus("1", null, null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -720,362 +724,154 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
     );
   }
 
-  // void _showExportDialog() {
-  //   final controller = Get.find<DashboardControllerApprentice>();
+  void _showExportDialog() {
+    final controller = Get.find<DashboardControllerApprentice>();
 
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(tr('export')),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-  //           const SizedBox(height: 16),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [_buildExportOption(Iconsax.document_text, 'Excel')],
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: Text(tr('Cancel')),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             try {
-  //               controller.isLoadingExport.value = true;
-
-  //               // Tạo file Excel
-  //               final excel = Excel.createExcel();
-  //               final sheet = excel['Sheet1'];
-
-  //               // Thêm tiêu đề các cột
-  //               sheet.appendRow([
-  //                 TextCellValue(tr('stt')),
-  //                 TextCellValue(tr('employeeCode')),
-  //                 TextCellValue(tr('gender')),
-  //                 TextCellValue(tr('fullName')),
-  //                 TextCellValue(tr('department')),
-  //                 TextCellValue(tr('group')),
-  //                 TextCellValue(tr('age')),
-  //                 TextCellValue(tr('position')),
-  //                 TextCellValue(tr('salaryGrade')),
-  //                 TextCellValue(tr('contractEffective')),
-  //                 TextCellValue(tr('contractEndDate')),
-  //                 TextCellValue(tr('earlyLateCount')),
-  //                 // TextCellValue(tr('paidLeave')),
-  //                 // TextCellValue(tr('unpaidLeave')),
-  //                 TextCellValue(tr('unreportedLeave')),
-  //                 TextCellValue(tr('violationCount')),
-  //                 TextCellValue(tr('reason')),
-  //                 TextCellValue(tr('lythuyet')),
-  //                 TextCellValue(tr('thuchanh')),
-  //                 TextCellValue(tr('congviec')),
-  //                 TextCellValue(tr('hochoi')),
-  //                 TextCellValue(tr('thichnghi')),
-  //                 TextCellValue(tr('tinhthan')),
-  //                 TextCellValue(tr('baocao')),
-  //                 TextCellValue(tr('chaphanh')),
-  //                 TextCellValue(tr('ketqua')),
-  //                 TextCellValue(tr('note')),
-  //                 TextCellValue(tr('notRehirable')),
-  //                 TextCellValue(tr('Lydo')),
-  //               ]);
-
-  //               // Thêm dữ liệu từ controller
-  //               for (int i = 0; i < controller.filterdataList.length; i++) {
-  //                 final item = controller.filterdataList[i];
-  //                 sheet.appendRow([
-  //                   TextCellValue((i + 1).toString()),
-  //                   TextCellValue(item.vchREmployeeId ?? ''),
-  //                   TextCellValue(item.vchRTyperId ?? ''),
-  //                   TextCellValue(item.vchREmployeeName ?? ''),
-  //                   TextCellValue(item.vchRNameSection ?? ''),
-  //                   TextCellValue(item.chRCostCenterName ?? ''),
-  //                   TextCellValue(
-  //                     getAgeFromBirthday(item.dtMBrithday).toString(),
-  //                   ),
-  //                   TextCellValue(item.chRPosition ?? ''),
-  //                   TextCellValue(item.chRCodeGrade ?? ''),
-  //                   TextCellValue(
-  //                     item.dtMJoinDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMJoinDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(
-  //                     item.dtMEndDate != null
-  //                         ? DateFormat(
-  //                             'yyyy-MM-dd',
-  //                           ).format(DateTime.parse(item.dtMEndDate!))
-  //                         : '',
-  //                   ),
-  //                   TextCellValue(item.fLGoLeaveLate.toString()),
-  //                   TextCellValue(item.fLNotLeaveDay.toString()),
-  //                   TextCellValue(item.inTViolation.toString()),
-  //                   TextCellValue(item.nvarchaRViolation ?? ''),
-  //                   TextCellValue(item.vchRLyThuyet.toString()),
-  //                   TextCellValue(item.vchRThucHanh.toString()), 
-  //                   TextCellValue(item.vchRCompleteWork.toString()),
-  //                   TextCellValue(item.vchRLearnWork.toString()),
-  //                   TextCellValue(item.vchRThichNghi.toString()), 
-  //                   TextCellValue(item.vchRUseful.toString()),
-  //                   TextCellValue(item.vchRContact.toString()), 
-  //                   TextCellValue(item.vcHNeedViolation.toString()), 
-  //                   TextCellValue(item.vchRReasultsLeader ?? ''),
-  //                   TextCellValue(item.vchRNote.toString()), 
-  //                   TextCellValue(item.biTNoReEmployment.toString()),
-  //                   TextCellValue(item.nvchRNoReEmpoyment ?? ''),
-  //                 ]);
-  //               }
-
-  //               // Lưu file
-  //               final bytes = excel.encode(); // Sử dụng encode() thay vì save()
-  //               if (bytes == null) throw Exception(tr('Notsavefile'));
-
-  //               // Tạo tên file
-  //               final fileName =
-  //                   'DanhSachDanhGiaHopDongHocNgheThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-  //               // Xử lý tải file xuống
-  //               if (kIsWeb) {
-  //                 // Cho trình duyệt web
-  //                 final blob = html.Blob(
-  //                   [bytes],
-  //                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  //                 );
-  //                 final url = html.Url.createObjectUrlFromBlob(blob);
-  //                 final anchor = html.AnchorElement(href: url)
-  //                   ..setAttribute('download', fileName)
-  //                   ..click();
-  //                 html.Url.revokeObjectUrl(url);
-  //               } else {
-  //                 // Cho mobile/desktop
-  //                 final String? outputFile = await FilePicker.platform.saveFile(
-  //                   dialogTitle: tr('savefile'),
-  //                   fileName: fileName,
-  //                   type: FileType.custom,
-  //                   allowedExtensions: ['xlsx'],
-  //                 );
-
-  //                 if (outputFile != null) {
-  //                   final file = File(outputFile);
-  //                   await file.writeAsBytes(bytes, flush: true);
-  //                 }
-  //               }
-
-  //               // Đóng dialog sau khi export thành công
-  //               if (context.mounted) {
-  //                 Navigator.of(context).pop();
-  //               }
-  //               showDialog(
-  //                 context: context,
-  //                 builder: (context) => AlertDialog(
-  //                   icon: const Icon(
-  //                     Icons.check_circle,
-  //                     color: Colors.green,
-  //                     size: 50,
-  //                   ),
-  //                   title: Text(
-  //                     tr('Done'),
-  //                     style: TextStyle(fontWeight: FontWeight.bold),
-  //                   ),
-  //                   content: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     children: [
-  //                       Text(tr('exportDone')),
-  //                       const SizedBox(height: 10),
-  //                     ],
-  //                   ),
-  //                   actions: [
-  //                     ElevatedButton(
-  //                       onPressed: () => Navigator.of(context).pop(),
-  //                       style: ElevatedButton.styleFrom(
-  //                         backgroundColor: Colors.green,
-  //                         foregroundColor: Colors.white,
-  //                       ),
-  //                       child: Text(tr('Cancel')),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             } catch (e) {
-  //               if (context.mounted) {
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (context) => AlertDialog(
-  //                     title: Text('${tr('exportError')}${e.toString()}'),
-  //                     actions: [
-  //                       TextButton(
-  //                         onPressed: () => Navigator.of(context).pop(),
-  //                         child: Text(tr('Cancel')),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 );
-  //               }
-  //             } finally {
-  //               controller.isLoadingExport.value = false;
-  //             }
-  //           },
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: Obx(
-  //             () => controller.isLoadingExport.value
-  //                 ? const SizedBox(
-  //                     width: 20,
-  //                     height: 20,
-  //                     child: CircularProgressIndicator(
-  //                       strokeWidth: 2,
-  //                       color: Colors.white,
-  //                     ),
-  //                   )
-  //                 : const Text('Export'),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-void _showExportDialog() {
-  final controller = Get.find<DashboardControllerApprentice>();
-
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(tr('export')),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  Icon(Iconsax.document_text, size: 40, color: Colors.blue),
-                  const SizedBox(height: 8),
-                  const Text('Excel', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(tr('Cancel')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr('export')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+                    const SizedBox(height: 8),
+                    const Text('Excel', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
-        ElevatedButton(
-          onPressed: () async {
-            try {
-              controller.isLoadingExport.value = true;
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                controller.isLoadingExport.value = true;
 
-              // 1. Đọc file template
-              final ByteData templateData = await rootBundle.load('assets/templates/HDTV.xlsx');
-              final excel = Excel.decodeBytes(templateData.buffer.asUint8List());
-              final sheet = excel['Sheet1'] ;//?? excel[excel.tables.keys.first];
-              const startRow = 7; // Dòng bắt đầu điền dữ liệu
-
-              // 2. Điền dữ liệu vào các ô
-              for (int i = 0; i < controller.filterdataList.length; i++) {
-                final item = controller.filterdataList[i];
-                final row = startRow + i;
-
-                // Lấy style từ dòng mẫu (dòng 6)
-                final templateRow = startRow - 1;
-                final getStyle = (String column) => sheet
-                    .cell(CellIndex.indexByString('$column$templateRow'))
-                    .cellStyle;
-
-                // Điền dữ liệu với style được copy từ template
-                void setCellValue(String column, dynamic value) {
-                  final cell = sheet.cell(CellIndex.indexByString('$column$row'));
-                  cell.value = value is DateTime 
-                      ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
-                      : TextCellValue(value.toString());
-                  cell.cellStyle = getStyle(column);
-                }
-
-                // Điền từng giá trị vào các cột
-                setCellValue('A', i + 1);
-                setCellValue('B', item.vchREmployeeId ?? '');
-                setCellValue('C', item.vchRTyperId ?? '');
-                setCellValue('D', item.vchREmployeeName ?? '');
-                setCellValue('E', item.vchRNameSection ?? '');
-                setCellValue('F', item.chRCostCenterName ?? '');
-                setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
-                setCellValue('H', item.chRPosition ?? '');
-                setCellValue('I', item.chRCodeGrade ?? '');
-                if (item.dtMJoinDate != null) {
-                  setCellValue('J', DateTime.parse(item.dtMJoinDate!));
-                }
-                if (item.dtMEndDate != null) {
-                  setCellValue('K', DateTime.parse(item.dtMEndDate!));
-                }
-                setCellValue('L', item.fLGoLeaveLate?? '');
-                setCellValue('M', item.fLNotLeaveDay?? '');
-                setCellValue('N', item.inTViolation?? '');
-                setCellValue('O', item.vchRLyThuyet?? '');
-                setCellValue('P', item.vchRThucHanh?? '');
-                setCellValue('Q', item.vchRCompleteWork?? '');
-                setCellValue('R', item.vchRLearnWork ?? '');
-                setCellValue('S', item.vchRThichNghi ?? '');
-                setCellValue('T', item.vchRUseful ?? '');
-                setCellValue('U', item.vchRContact ?? '');
-                setCellValue('V', item.vcHNeedViolation?? '');
-                setCellValue('W', item.vchRReasultsLeader);
-                setCellValue('X', item.vchRNote);
-                setCellValue('Y', item.biTNoReEmployment.toString());
-                setCellValue('Z', item.vchRUseful ?? '');
-              }
-
-              // 3. Xuất file
-              final bytes = excel.encode();
-              if (bytes == null) throw Exception(tr('Notsavefile'));
-
-              final fileName = 'DanhSachDanhGiaHopDongThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-              if (kIsWeb) {
-                final blob = html.Blob(
-                  [bytes],
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                // 1. Đọc file template
+                final ByteData templateData = await rootBundle.load(
+                  'assets/templates/HDTV.xlsx',
                 );
-                final url = html.Url.createObjectUrlFromBlob(blob);
-                final anchor = html.AnchorElement(href: url)
-                  ..setAttribute('download', fileName)
-                  ..click();
-                html.Url.revokeObjectUrl(url);
-              } else {
-                final String? outputFile = await FilePicker.platform.saveFile(
-                  dialogTitle: tr('savefile'),
-                  fileName: fileName,
-                  type: FileType.custom,
-                  allowedExtensions: ['xlsx'],
+                final excel = Excel.decodeBytes(
+                  templateData.buffer.asUint8List(),
                 );
+                final sheet =
+                    excel['Sheet1']; //?? excel[excel.tables.keys.first];
+                const startRow = 8; // Dòng bắt đầu điền dữ liệu
 
-                if (outputFile != null) {
-                  await File(outputFile).writeAsBytes(bytes, flush: true);
+                // 2. Điền dữ liệu vào các ô
+                for (int i = 0; i < controller.filterdataList.length; i++) {
+                  final item = controller.filterdataList[i];
+                  final row = startRow + i;
+
+                  // Lấy style từ dòng mẫu (dòng 6)
+                  final templateRow = startRow - 1;
+                  getStyle(String column) => sheet
+                      .cell(CellIndex.indexByString('$column$templateRow'))
+                      .cellStyle;
+
+                  // Điền dữ liệu với style được copy từ template
+                  void setCellValue(String column, dynamic value) {
+                    final cell = sheet.cell(
+                      CellIndex.indexByString('$column$row'),
+                    );
+                    cell.value = value is DateTime
+                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                        : TextCellValue(value.toString());
+                    cell.cellStyle = getStyle(column);
+                  }
+
+                  // Điền từng giá trị vào các cột
+                  setCellValue('A', i + 1);
+                  setCellValue('B', item.vchREmployeeId ?? '');
+                  setCellValue('C', item.vchRTyperId ?? '');
+                  setCellValue('D', item.vchREmployeeName ?? '');
+                  setCellValue('E', item.vchRNameSection ?? '');
+                  setCellValue('F', item.chRCostCenterName ?? '');
+                  setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
+                  setCellValue('H', item.chRPosition ?? '');
+                  setCellValue('I', item.chRCodeGrade ?? '');
+                  if (item.dtMJoinDate != null) {
+                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                  }
+                  setCellValue('L', item.fLGoLeaveLate ?? '');
+                  setCellValue('M', item.fLNotLeaveDay ?? '');
+                  setCellValue('N', item.inTViolation ?? '');
+                  setCellValue('O', item.vchRLyThuyet ?? '');
+                  setCellValue('P', item.vchRThucHanh ?? '');
+                  setCellValue('Q', item.vchRCompleteWork ?? '');
+                  setCellValue('R', item.vchRLearnWork ?? '');
+                  setCellValue('S', item.vchRThichNghi ?? '');
+                  setCellValue('T', item.vchRUseful ?? '');
+                  setCellValue('U', item.vchRContact ?? '');
+                  setCellValue('V', item.vcHNeedViolation ?? '');
+                  setCellValue('W', item.vchRReasultsLeader);
+                  setCellValue('X', item.vchRNote);
+                  setCellValue('Y', item.biTNoReEmployment.toString());
+                  setCellValue('Z', item.vchRUseful ?? '');
+
                 }
-              }
 
-              // 4. Hiển thị thông báo
-              if (context.mounted) {
-                Navigator.of(context).pop();
+                // 3. Xuất file
+                final bytes = excel.encode();
+                if (bytes == null) throw Exception(tr('Notsavefile'));
+
+                final fileName =
+                    'DanhSachDanhGiaHopDongThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+                if (kIsWeb) {
+                  final blob = html.Blob(
+                    [bytes],
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  );
+                  final url = html.Url.createObjectUrlFromBlob(blob);
+                  final anchor = html.AnchorElement(href: url)
+                    ..setAttribute('download', fileName)
+                    ..click();
+                  html.Url.revokeObjectUrl(url);
+                } else {
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: tr('savefile'),
+                    fileName: fileName,
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                  );
+
+                  if (outputFile != null) {
+                    await File(outputFile).writeAsBytes(bytes, flush: true);
+                  }
+                }
+
+                // 4. Hiển thị thông báo
+                if (context.mounted) {
+                  Navigator.of(context).pop();
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                      title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
+                      icon: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      title: Text(
+                        tr('Done'),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1095,48 +891,47 @@ void _showExportDialog() {
                       ],
                     ),
                   );
-              }
-            } catch (e) {
-              if (context.mounted) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('${tr('exportError')}${e.toString()}'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(tr('Cancel')),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            } finally {
-              controller.isLoadingExport.value = false;
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-          ),
-          child: Obx(
-            () => controller.isLoadingExport.value
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('${tr('exportError')}${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
                     ),
-                  )
-                : Text(tr('Export')),
+                  );
+                }
+              } finally {
+                controller.isLoadingExport.value = false;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(tr('Export')),
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
@@ -1152,16 +947,6 @@ void _showExportDialog() {
     } catch (e) {
       return 'Invalid date';
     }
-  }
-
-  Widget _buildExportOption(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
-      ],
-    );
   }
 }
 
@@ -1213,8 +998,7 @@ class MyData extends DataTableSource {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) =>
-                        _EditContractDialog(contract: data),
+                    builder: (context) => _EditContractDialog(contract: data),
                   );
                 },
               ),
@@ -1272,8 +1056,8 @@ class MyData extends DataTableSource {
         DataCell(
           Text(
             data.dtMBrithday != null
-                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
-                  : "",
+                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
@@ -1285,33 +1069,33 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-              data.chRCodeGrade?.toString() ?? "",
+            data.chRCodeGrade?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-              data.dtMJoinDate != null
-                  ? DateFormat(
-                      'yyyy-MM-dd',
-                    ).format(DateTime.parse(data.dtMJoinDate!))
-                  : "",
+            data.dtMJoinDate != null
+                ? DateFormat(
+                    'yyyy-MM-dd',
+                  ).format(DateTime.parse(data.dtMJoinDate!))
+                : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-              data.dtMEndDate != null
-                  ? DateFormat(
-                      'yyyy-MM-dd',
-                    ).format(DateTime.parse(data.dtMEndDate!))
-                  : "",
+            data.dtMEndDate != null
+                ? DateFormat(
+                    'yyyy-MM-dd',
+                  ).format(DateTime.parse(data.dtMEndDate!))
+                : "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
         DataCell(
           Text(
-              data.fLGoLeaveLate?.toString() ?? "",
+            data.fLGoLeaveLate?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
@@ -1464,6 +1248,7 @@ class MyData extends DataTableSource {
       ),
     );
   }
+
   @override
   bool get isRowCountApproximate => false;
 
@@ -1590,7 +1375,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10, width: 500,),
+              const SizedBox(height: 10, width: 500),
 
               // Dòng 4: Vị trí + Bậc lương
               Row(
@@ -1742,42 +1527,62 @@ class _EditContractDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(true);
                     if (contract.vchREmployeeId?.isEmpty ?? true) {
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorEmployeeID'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorEmployeeID'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(contract.dtMJoinDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (contract.dtMJoinDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(contract.dtMEndDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (contract.dtMEndDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
                     try {
-                      await controller.updateApprenticeContract(edited, authState.user!.chRUserid.toString());
+                      await controller.updateApprenticeContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1",null,null);
+                      await controller.changeStatus("1", null, null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
-                        builder: (context) => DialogNotification(message: tr('MessageSuss'), icon: Icons.check_circle, color: Colors.green, title: tr('tilteSuss'))
+                        builder: (context) => DialogNotification(
+                          message: tr('MessageSuss'),
+                          icon: Icons.check_circle,
+                          color: Colors.green,
+                          title: tr('tilteSuss'),
+                        ),
                       );
                     } catch (e) {
                       errorMessage.value =
@@ -1879,7 +1684,7 @@ class _DeleteContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1",null,null);
+                      await controller.changeStatus("1", null, null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -2078,8 +1883,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('earlyLateCount'),
-                      onChanged: (value) => twoContract.fLGoLeaveLate =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLGoLeaveLate = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -2087,8 +1892,8 @@ class _showAddDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactTextField(
                       label: tr('unreportedLeave'),
-                      onChanged: (value) => twoContract.fLNotLeaveDay =
-                          double.tryParse(value),
+                      onChanged: (value) =>
+                          twoContract.fLNotLeaveDay = double.tryParse(value),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -2157,45 +1962,65 @@ class _showAddDialog extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(true);
                     if (twoContract.vchREmployeeId?.isEmpty ?? true) {
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorEmployeeID'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorEmployeeID'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(twoContract.dtMJoinDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (twoContract.dtMJoinDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
-                    if(twoContract.dtMEndDate?.isEmpty ?? true){
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('ErrorNotFill'), title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                    if (twoContract.dtMEndDate?.isEmpty ?? true) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('ErrorNotFill'),
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
                     }
                     try {
-                      await controller.addApprenticeContract(twoContract, olded, authState.user!.chRUserid.toString());
+                      await controller.addApprenticeContract(
+                        twoContract,
+                        olded,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1",null,null);
+                      await controller.changeStatus("1", null, null);
                     } catch (e) {
                       // errorMessage.value =
                       //     '${tr('ErrorUpdate')}${e.toString()}';
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: '${tr('ErrorUpdate')}${e.toString()}', title: tr('titleFail'), color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: '${tr('ErrorUpdate')}${e.toString()}',
+                          title: tr('titleFail'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                     } finally {
                       controller.isLoading(false);

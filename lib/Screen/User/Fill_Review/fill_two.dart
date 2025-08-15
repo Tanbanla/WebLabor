@@ -142,7 +142,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              confirmer.chREmployeeName ?? '',
+                              //confirmer.chREmployeeName ?? '',
+                              confirmer.chREmployeeAdid ?? '',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -572,7 +573,15 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [_buildExportOption(Iconsax.document_text, 'Excel')],
+              children: [
+                Column(
+                  children: [
+                    Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+                    const SizedBox(height: 8),
+                    const Text('Excel', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -586,60 +595,78 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
               try {
                 controller.isLoadingExport.value = true;
 
-                // 1. Đọc file mẫu từ assets
-                final ByteData templateData = await rootBundle.load('assets/templates/HD2N.xlsx');
-                final Uint8List templateBytes = templateData.buffer.asUint8List();
-                
-                // 2. Mở file mẫu bằng excel package
-                final excel = Excel.decodeBytes(templateBytes);
-                
-                // 3. Lấy sheet cần làm việc (giả sử tên sheet là 'Sheet1')
-                final sheet = excel['Sheet1'];
+                // 1. Đọc file template
+                final ByteData templateData = await rootBundle.load(
+                  'assets/templates/HD2N.xlsx',
+                );
+                final excel = Excel.decodeBytes(
+                  templateData.buffer.asUint8List(),
+                );
 
-                // 4. Điền dữ liệu vào các ô cụ thể theo mẫu
-                // Giả sử dữ liệu bắt đầu từ dòng 2 (dòng 1 là tiêu đề)
-                int startRow = 2;
-                
+                final sheet =
+                    excel['Sheet1']; //?? excel[excel.tables.keys.first];
+                const startRow = 7; // Dòng bắt đầu điền dữ liệu
+
+                // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < controller.filterdataList.length; i++) {
                   final item = controller.filterdataList[i];
-                  
-                  // Điền dữ liệu vào từng ô theo cột
-                  sheet.cell(CellIndex.indexByString('A${startRow + i}')).value = (i + 1).toString() as CellValue?;
-                  sheet.cell(CellIndex.indexByString('B${startRow + i}')).value = (item.vchREmployeeId ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('C${startRow + i}')).value = (item.vchRTyperId ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('D${startRow + i}')).value = (item.vchREmployeeName ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('E${startRow + i}')).value = (item.vchRNameSection ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('F${startRow + i}')).value = (item.chRCostCenterName ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('G${startRow + i}')).value = getAgeFromBirthday(item.dtMBrithday).toString() as CellValue?;
-                  sheet.cell(CellIndex.indexByString('H${startRow + i}')).value = (item.chRPosition ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('I${startRow + i}')).value = (item.chRCodeGrade ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('J${startRow + i}')).value = (item.dtMJoinDate != null 
-                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMJoinDate!)) : '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('K${startRow + i}')).value = (item.dtMEndDate != null 
-                      ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMEndDate!)) : '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('L${startRow + i}')).value = (item.fLGoLeaveLate.toString()) as CellValue?;
-                  sheet.cell(CellIndex.indexByString('M${startRow + i}')).value = (item.fLPaidLeave.toString()) as CellValue?;
-                  sheet.cell(CellIndex.indexByString('N${startRow + i}')).value = (item.fLNotPaidLeave.toString()) as CellValue?;
-                  sheet.cell(CellIndex.indexByString('O${startRow + i}')).value = (item.fLNotLeaveDay.toString()) as CellValue?;
-                  sheet.cell(CellIndex.indexByString('P${startRow + i}')).value = (item.inTViolation.toString()) as CellValue?;
-                  sheet.cell(CellIndex.indexByString('Q${startRow + i}')).value = (item.nvarchaRViolation ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('R${startRow + i}')).value = (item.nvchRCompleteWork ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('S${startRow + i}')).value = (item.nvchRUseful ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('T${startRow + i}')).value = (item.nvchROther?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('U${startRow + i}')).value = (item.vchRReasultsLeader ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('V${startRow + i}')).value = (item.vchRNote ?? '') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('W${startRow + i}')).value = (item.biTNoReEmployment ?? 'true') as CellValue?;
-                  sheet.cell(CellIndex.indexByString('X${startRow + i}')).value = (item.nvchRNoReEmpoyment ?? '') as CellValue?;
+                  final row = startRow + i;
+
+                  // Lấy style từ dòng mẫu (dòng 6)
+                  final templateRow = startRow - 1;
+                  getStyle(String column) => sheet
+                      .cell(CellIndex.indexByString('$column$templateRow'))
+                      .cellStyle;
+
+                  // Điền dữ liệu với style được copy từ template
+                  void setCellValue(String column, dynamic value) {
+                    final cell = sheet.cell(
+                      CellIndex.indexByString('$column$row'),
+                    );
+                    cell.value = value is DateTime
+                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                        : TextCellValue(value.toString());
+                    cell.cellStyle = getStyle(column);
+                  }
+
+                  // Điền từng giá trị vào các cột
+                  setCellValue('A', i + 1);
+                  setCellValue('B', item.vchREmployeeId ?? '');
+                  setCellValue('C', item.vchRTyperId ?? '');
+                  setCellValue('D', item.vchREmployeeName ?? '');
+                  setCellValue('E', item.vchRNameSection ?? '');
+                  setCellValue('F', item.chRCostCenterName ?? '');
+                  setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
+                  setCellValue('H', item.chRPosition ?? '');
+                  setCellValue('I', item.chRCodeGrade ?? '');
+                  if (item.dtMJoinDate != null) {
+                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                  }
+                  setCellValue('L', item.fLGoLeaveLate);
+                  setCellValue('M', item.fLPaidLeave);
+                  setCellValue('N', item.fLNotPaidLeave);
+                  setCellValue('O', item.fLNotLeaveDay);
+                  setCellValue('P', item.inTViolation);
+                  setCellValue('Q', item.nvarchaRViolation ?? '');
+                  setCellValue('R', item.nvchRCompleteWork ?? '');
+                  setCellValue('S', item.nvchRUseful ?? '');
+                  setCellValue('T', item.nvchROther ?? '');
+                  setCellValue('U', item.vchRReasultsLeader ?? '');
+                  setCellValue('V', item.vchRNote ?? '');
+                  setCellValue('W', item.biTNoReEmployment);
+                  setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
 
-                // 5. Lưu file
+                // 3. Xuất file
                 final bytes = excel.encode();
                 if (bytes == null) throw Exception(tr('Notsavefile'));
 
-                // 6. Tạo tên file
-                final fileName = 'DanhSachDanhGia_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+                final fileName =
+                    'DanhSachDanhGiaHopDong2nam_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
 
-                // 7. Xử lý tải file xuống
                 if (kIsWeb) {
                   final blob = html.Blob(
                     [bytes],
@@ -663,10 +690,41 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   }
                 }
 
-                // Đóng dialog và hiển thị thông báo thành công
-                if (context.mounted) Navigator.of(context).pop();
-                _showSuccessDialog(context);
-                
+                // 4. Hiển thị thông báo
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      icon: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      title: Text(
+                        tr('Done'),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(tr('exportDone')),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               } catch (e) {
                 if (context.mounted) {
                   showDialog(
@@ -707,33 +765,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       ),
     );
   }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-        title: Text(tr('Done'), style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(tr('exportDone')),
-            const SizedBox(height: 10),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(tr('Cancel')),
-          ),
-        ],
-      ),
-    );
-  }
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -748,16 +779,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     } catch (e) {
       return 'Invalid date';
     }
-  }
-
-  Widget _buildExportOption(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
-      ],
-    );
   }
 }
 
