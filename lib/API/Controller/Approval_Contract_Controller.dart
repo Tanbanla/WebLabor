@@ -71,14 +71,14 @@ class DashboardControllerApporver extends GetxController {
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..dtMApproverPer = formatDateTime(DateTime.now())
           ..useRApproverPer = userApprover
-          ..vchRLyThuyet = 'OK'
-          ..vchRThucHanh = 'OK'
-          ..vchRCompleteWork = 'OK'
-          ..vchRLearnWork = 'OK'
-          ..vchRThichNghi = 'OK'
-          ..vchRUseful = 'OK'
-          ..vchRContact = 'OK'
-          ..vcHNeedViolation = 'OK'
+          // ..vchRLyThuyet = 'OK'
+          // ..vchRThucHanh = 'OK'
+          //..vchRCompleteWork = 'OK'
+          // ..vchRLearnWork = 'OK'
+          // ..vchRThichNghi = 'OK'
+          //..vchRUseful = 'OK'
+          // ..vchRContact = 'OK'
+          // ..vcHNeedViolation = 'OK'
           ;
 
         if (contract.biTApproverPer) {
