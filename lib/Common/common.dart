@@ -10,7 +10,31 @@ class Common {
   static const String API = "http://172.26.248.62:8501/api/";
   //Login
   static const String loginEndpoint = "Account/validate-credentials";
+  static const String AccountLogin = "Account/login";
 
+// {
+//   "success": true,
+//   "status": 200,
+//   "message": "Authentication successfully",
+//   "error": null,
+//   "data": {
+//     "id": 32,
+//     "chR_USERID": "khanhmf",
+//     "chR_PASS": "",
+//     "nvchR_NAME_ID": "Nguyễn Duy Khánh",
+//     "chR_EMPLOYEE_ID": "M0114622",
+//     "chR_GROUP": "Admin",
+//     "inT_USERID_COMMON": 0,
+//     "chR_SEC_CODE": "3500: R&D-IT",
+//     "dtM_LAST_LOGIN": "2025-07-26T08:32:01.703",
+//     "inT_LOCK": 0,
+//     "inT_LOCK_DAY": 90,
+//     "vchR_USER_CREATE": "khanhmf",
+//     "dtM_CREATE": "2025-07-26T08:32:01.953",
+//     "vchR_USER_UPDATE": "khanhmf",
+//     "dtM_UPDATE": "2025-07-26T08:32:01.703"
+//   }
+// }
   //Master User
   //GET
   static const String UserGetAll = "User/get-all";
@@ -100,9 +124,10 @@ class Common {
       "ContractApprentice/delete-logic-multi/";
 
   // Api Chart Home
-  static const String ContractTotalByYear = "Report/get-quantity-total-contract-statistic-by-year/";
-  static const String ContractTotalByMonth = "Report/get-quantity-total-contract-statistic/";
-
+  static const String ContractTotalByYear =
+      "Report/get-quantity-total-contract-statistic-by-year/";
+  static const String ContractTotalByMonth =
+      "Report/get-quantity-total-contract-statistic/";
 
   // Send mail
   static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
