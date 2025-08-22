@@ -8,9 +8,8 @@ import 'package:web_labor_contract/class/User.dart';
 
 class AuthService {
   static const String _baseUrl = Common.API;
-  static const String _loginEndpoint = Common.loginEndpoint;
+  static const String _loginEndpoint = Common.AccountLogin; //loginEndpoint;
   static const int _timeoutSeconds = 10;
-
   static Future<Map<String, dynamic>> login({
     required String userADID,
     required String password,
@@ -28,59 +27,40 @@ class AuthService {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        if (responseData['data'] == true) {
-          final requestBody = {
-            "pageNumber": -1,
-            "pageSize": 10,
-            "filters": [
-              {
-                "field": "CHR_USERID",
-                "value": userADID,
-                "operator": "=",
-                "logicType": "AND",
-              },
-            ],
-          };
-          final response1 = await http.post(
-            Uri.parse(Common.API + Common.UserSreachBy),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode(requestBody),
-          );
+        if (responseData['success'] == true) {
+          // Kiểm tra nếu có dữ liệu user
+          if (responseData['data'] != null) {
+            final user = User.fromJson(responseData['data']);
+            // Lưu thông tin user vào AuthState
+            final authState = Provider.of<AuthState>(context, listen: false);
+            await authState.login(user);
 
-          if (response1.statusCode == 200) {
-            final jsonData = json.decode(response1.body);
-            if (jsonData['success'] == true) {
-              // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
-              final List<dynamic> data = jsonData['data']['data'] ?? [];
-              if (data.isEmpty) {
-                return {
-                  'success': false,
-                  'message': 'Không tìm thấy thông tin user',
-                };
-              }
-              final user = User.fromJson(data[0]);
-              // Lưu thông tin user vào AuthState
-              final authState = Provider.of<AuthState>(context, listen: false);
-              await authState.login(user);
-            } else {
-              return {
-                'success': false,
-                'message': jsonData['message'] ?? 'Failed to load data',
-              };
-            }
+            return {
+              'success': true,
+              'message': responseData['message'] ?? 'Login successful',
+              'user': user,
+            };
           } else {
-            return {'success': false, 'message': 'Login failed data null'};
+            return {
+              'success': false,
+              'message': 'Không tìm thấy thông tin user',
+            };
           }
+        } else {
+          // Trường hợp success = false từ server
           return {
-            'success': true,
-            'message': responseData['message'] ?? 'Login successful',
+            'success': false,
+            'message': responseData['message'] ?? 'Login failed',
           };
         }
+      } else {
+        // Trường hợp status code không phải 200
+        return {
+          'success': false,
+          'message':
+              responseData['message'] ?? 'HTTP error: ${response.statusCode}',
+        };
       }
-      return {
-        'success': false,
-        'message': responseData['message'] ?? 'Login failed',
-      };
     } catch (e) {
       return {'success': false, 'message': 'Network error: $e'};
     }
