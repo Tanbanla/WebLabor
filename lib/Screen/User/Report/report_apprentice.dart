@@ -1029,21 +1029,6 @@ class MyData extends DataTableSource {
       ],
     );
   }
-
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'OK':
-        return Colors.green;
-      case 'NG':
-        return Colors.red;
-      case 'Stop Working':
-        return Colors.orange;
-      case 'Finish L/C':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
 Widget _getDanhGiaView(String? status) {
     switch (status) {
       case 'OK':

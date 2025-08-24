@@ -89,7 +89,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                tr('approver'),
+                tr('approver1'),
                 style: TextStyle(
                   color: Common.primaryColor,
                   fontWeight: FontWeight.bold,
@@ -110,7 +110,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   Icons.arrow_drop_down,
                   color: Common.primaryColor.withOpacity(0.8),
                 ),
-                hint: Text(tr('pickapprover')),
+                hint: Text(tr('pickapprover1')),
                 items: controller.filterdataList.map((confirmer) {
                   return DropdownMenuItem<ApproverUser>(
                     value: confirmer,

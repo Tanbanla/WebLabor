@@ -421,7 +421,37 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+  // update thời gian tới hạn
+  Future<void> updateDTM_END(
+    ApprenticeContract contract,
+    String userUpdate,
+  ) async { 
+    try {
+      contract.vchRUserUpdate = userUpdate;
+      contract.dtMUpdate = formatDateTime(DateTime.now());
 
+      //contract.
+
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdateApprentice}${contract.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(contract.toJson()),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to update two contract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
   // update thong tin phe duyet
   Future<void> updateListApprenticeContractApproval(String userApprover) async {
     try {
