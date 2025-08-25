@@ -49,8 +49,9 @@ class TwoContract {
   dynamic useRApproverChief;
   dynamic useRApproverSectionManager;
   dynamic useRApproverDirector;
+  String? dtMDueDate;
 
-  TwoContract ({this.id, this.vchRCodeApprover, this.vchRCodeSection, this.vchRNameSection, this.vchREmployeeId, this.vchRTyperId, this.vchREmployeeName, this.dtMBrithday, this.chRPosition, this.chRCodeGrade, this.chRCostCenterName, this.dtMJoinDate, this.dtMEndDate, this.fLGoLeaveLate, this.fLPaidLeave, this.fLNotPaidLeave, this.fLNotLeaveDay, this.inTViolation, this.nvarchaRViolation, this.nvchRCompleteWork, this.nvchRUseful, this.nvchROther, this.vchRReasultsLeader, this.biTNoReEmployment, this.nvchRNoReEmpoyment, this.nvchRPthcSection, this.vchRLeaderEvalution, this.dtMLeadaerEvalution, this.biTApproverPer, this.nvchRApproverPer, this.dtMApproverPer, this.biTApproverChief, this.nvchRApproverChief, this.dtMApproverChief, this.biTApproverSectionManager, this.nvchRApproverManager, this.dtMApproverManager, this.biTApproverDirector, this.nvchRApproverDirector, this.dtMApproverDirector, this.vchRUserCreate, this.dtMCreate, this.vchRUserUpdate, this.dtMUpdate, this.inTStatusId, this.vchRNote, this.useRApproverPer, this.useRApproverChief, this.useRApproverSectionManager, this.useRApproverDirector});
+  TwoContract ({this.id, this.vchRCodeApprover, this.vchRCodeSection, this.vchRNameSection, this.vchREmployeeId, this.vchRTyperId, this.vchREmployeeName, this.dtMBrithday, this.chRPosition, this.chRCodeGrade, this.chRCostCenterName, this.dtMJoinDate, this.dtMEndDate, this.fLGoLeaveLate, this.fLPaidLeave, this.fLNotPaidLeave, this.fLNotLeaveDay, this.inTViolation, this.nvarchaRViolation, this.nvchRCompleteWork, this.nvchRUseful, this.nvchROther, this.vchRReasultsLeader, this.biTNoReEmployment, this.nvchRNoReEmpoyment, this.nvchRPthcSection, this.vchRLeaderEvalution, this.dtMLeadaerEvalution, this.biTApproverPer, this.nvchRApproverPer, this.dtMApproverPer, this.biTApproverChief, this.nvchRApproverChief, this.dtMApproverChief, this.biTApproverSectionManager, this.nvchRApproverManager, this.dtMApproverManager, this.biTApproverDirector, this.nvchRApproverDirector, this.dtMApproverDirector, this.vchRUserCreate, this.dtMCreate, this.vchRUserUpdate, this.dtMUpdate, this.inTStatusId, this.vchRNote, this.useRApproverPer, this.useRApproverChief, this.useRApproverSectionManager, this.useRApproverDirector, this.dtMDueDate});
 
   TwoContract .fromJson(Map<String, dynamic> json) {
     if(json["id"] is int) {
@@ -159,6 +160,9 @@ class TwoContract {
     useRApproverChief = json["useR_APPROVER_CHIEF"];
     useRApproverSectionManager = json["useR_APPROVER_SECTION_MANAGER"];
     useRApproverDirector = json["useR_APPROVER_DIRECTOR"];
+    if (json["dtM_DUE_DATE"] is String) {
+      dtMDueDate = json["dtM_DUE_DATE"];
+    }
   }
 
   static List<TwoContract > fromList(List<Map<String, dynamic>> list) {
@@ -217,6 +221,7 @@ class TwoContract {
     _data["useR_APPROVER_CHIEF"] = useRApproverChief;
     _data["useR_APPROVER_SECTION_MANAGER"] = useRApproverSectionManager;
     _data["useR_APPROVER_DIRECTOR"] = useRApproverDirector;
+    _data["dtM_DUE_DATE"] = dtMDueDate;
     return _data;
   }
 }
