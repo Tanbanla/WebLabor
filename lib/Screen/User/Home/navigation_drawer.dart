@@ -186,16 +186,25 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     switch (userGroup) {
       case 'Admin':
         return allCdms; // Admin có tất cả quyền
+      // Quyen cua PER
       case 'Per':
       case 'Chief Per':
         return allCdms.where((cdm) => cdm.title != tr("master")).toList();
+      // Quyen dien danh gia cua phong ban
       case 'PTHC':
+      case 'Technician':
+      case 'Staff':
+      case 'Operator':
+      case 'Supervisor':
       case 'Leader':
         return allCdms
             .where((cdm) => cdm.title == tr("fillEvaluation") || cdm.title == tr('home'))
             .toList();
+      // Quyen phe duyet
       case 'Chief Section':
       case 'Section Manager':
+      case 'General Director':
+      case 'Dept Manager':
       case 'Director':
         return allCdms.where((cdm) => cdm.title == tr("approval") || cdm.title == tr('home')).toList();
       default:

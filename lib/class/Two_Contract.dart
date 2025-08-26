@@ -232,7 +232,6 @@ class TwoContract {
 // Chief
 // Dept Manager
 // Leader
-// NULL
 // Supervisor
 // Section Manager
 // Staff

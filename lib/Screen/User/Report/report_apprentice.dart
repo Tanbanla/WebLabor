@@ -749,15 +749,23 @@ class MyData extends DataTableSource {
         //Action
         DataCell(
           Center(
-            child: _buildActionButton(
-              icon: Iconsax.edit_2,
-              color: Colors.blue,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => _EditContractDialog(contract: data),
-                );
-              },
+            child: Row(
+              children: [
+                _buildActionButton(
+                  icon: Iconsax.edit_2,
+                  color: Colors.blue,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _EditContractDialog(contract: data),
+                    );
+                  },
+                ),
+                _buildActionButton(icon: Iconsax.element_11, color: Colors.yellow,
+                onPressed: () {
+                  showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
+                })
+              ],
             ),
           ),
         ),
@@ -1207,7 +1215,7 @@ Widget _getDanhGiaView(String? status) {
   @override
   int get selectedRowCount => 0;
 }
-
+// Edit thông tin hợp đồng 
 class _EditContractDialog extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
@@ -1545,5 +1553,97 @@ class _EditContractDialog extends StatelessWidget {
     } catch (e) {
       return 'Invalid date';
     }
+  }
+}
+// Update gia hạn thời gian
+class _UpdateDtmDue extends StatelessWidget {
+  final ApprenticeContract contract;
+  final DashboardControllerApprentice controller = Get.find(); 
+
+  _UpdateDtmDue({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = ApprenticeContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            'Gia hạn đánh giá cho hợp đồng cho ${contract.vchREmployeeName}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(child: Column(
+
+        )),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      await controller.updateApprenticeContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      controller.fetchDummyData();
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
   }
 }

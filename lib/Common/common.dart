@@ -11,30 +11,7 @@ class Common {
   //Login
   static const String loginEndpoint = "Account/validate-credentials";
   static const String AccountLogin = "Account/login";
-
-// {
-//   "success": true,
-//   "status": 200,
-//   "message": "Authentication successfully",
-//   "error": null,
-//   "data": {
-//     "id": 32,
-//     "chR_USERID": "khanhmf",
-//     "chR_PASS": "",
-//     "nvchR_NAME_ID": "Nguyễn Duy Khánh",
-//     "chR_EMPLOYEE_ID": "M0114622",
-//     "chR_GROUP": "Admin",
-//     "inT_USERID_COMMON": 0,
-//     "chR_SEC_CODE": "3500: R&D-IT",
-//     "dtM_LAST_LOGIN": "2025-07-26T08:32:01.703",
-//     "inT_LOCK": 0,
-//     "inT_LOCK_DAY": 90,
-//     "vchR_USER_CREATE": "khanhmf",
-//     "dtM_CREATE": "2025-07-26T08:32:01.953",
-//     "vchR_USER_UPDATE": "khanhmf",
-//     "dtM_UPDATE": "2025-07-26T08:32:01.703"
-//   }
-// }
+  
   //Master User
   //GET
   static const String UserGetAll = "User/get-all";
