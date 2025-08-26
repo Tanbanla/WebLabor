@@ -949,7 +949,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
-      text: data.nvchRApproverPer ?? '',
+      text: data.nvchRNoReEmpoyment ?? '',
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((

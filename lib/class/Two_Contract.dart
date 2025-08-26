@@ -225,3 +225,29 @@ class TwoContract {
     return _data;
   }
 }
+// Director
+// Expert
+// Technician
+// General Director
+// Chief
+// Dept Manager
+// Leader
+// NULL
+// Supervisor
+// Section Manager
+// Staff
+// Operator
+
+
+// {
+//   "pageNumber": -1,
+//   "pageSize": 10,
+//   "filters": [
+//     {
+//       "field": "CHR_GROUP",
+//       "value": "Expert",
+//       "operator": "=",
+//       "logicType": "AND"
+//     }
+//   ]
+// }
