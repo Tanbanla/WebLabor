@@ -778,7 +778,7 @@ class MyData extends DataTableSource {
                 SizedBox(width: 3,),
                 _buildActionButton(icon: Iconsax.ram, color: Colors.brown,
                 onPressed: () {
-                  showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
+                  showDialog(context: context, builder: (context) => _UpdateKetQua(contract: data));
                 })
               ],
             ),
@@ -1543,6 +1543,7 @@ class _EditContractDialog extends StatelessWidget {
     }
   }
 }
+
 // Update gia hạn thời gian
 class _UpdateDtmDue extends StatelessWidget {
   final ApprenticeContract contract;
@@ -1566,7 +1567,7 @@ class _UpdateDtmDue extends StatelessWidget {
           Icon(Iconsax.lamp1, color: Common.primaryColor),
           const SizedBox(width: 10),
           Text(
-                'Gia hạn đánh giá cho hợp đồng cho',
+                tr("GiaHan"),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1593,7 +1594,7 @@ class _UpdateDtmDue extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
-                    '${DateFormat('yyyy-MM-dd',).format(DateTime.parse(edited.dtMDueDate!))}',
+                    tr("NgayHetHan")+DateFormat('yyyy-MM-dd',).format(DateTime.parse(edited.dtMDueDate!)),
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontWeight: FontWeight.w500,
@@ -1607,7 +1608,7 @@ class _UpdateDtmDue extends StatelessWidget {
                 initialDate: contract.dtMDueDate != null 
                     ? DateFormat('yyyy-MM-dd').parse(contract.dtMDueDate!)
                     : DateTime.now().add(const Duration(days: 30)),
-                label: "Thời gian gia hạn mới",
+                label: tr("NgayMoi"),
                 onDateSelected: (date) {
                   selectedDate = date;
                   edited.dtMDueDate = DateFormat('yyyy-MM-dd').format(date);
@@ -1659,13 +1660,13 @@ class _UpdateDtmDue extends StatelessWidget {
                     
                     // Kiểm tra nếu ngày mới không được chọn
                     if (selectedDate == null) {
-                      errorMessage.value = 'Vui lòng chọn ngày gia hạn';
+                      errorMessage.value = tr('ChonNgay');
                       return;
                     }
                     
                     // Kiểm tra nếu ngày mới không sau ngày hiện tại
                     if (selectedDate!.isBefore(DateTime.now())) {
-                      errorMessage.value = 'Ngày gia hạn phải sau ngày hiện tại';
+                      errorMessage.value = tr('NgayChonSai');
                       return;
                     }
                     controller.isLoading(true);
@@ -1683,7 +1684,7 @@ class _UpdateDtmDue extends StatelessWidget {
                         // Hiển thị thông báo thành công
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Đã gia hạn đánh giá thành công'),
+                            content: Text(tr('GiaHanSusses')),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -1776,5 +1777,203 @@ class _UpdateDtmDue extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+// update kết quả đánh giá cuối cùng
+class _UpdateKetQua extends StatelessWidget {
+  final ApprenticeContract contract;
+  final DashboardControllerApprentice controller = Get.find(); 
+
+  _UpdateKetQua({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = ApprenticeContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+    return AlertDialog(
+      titlePadding:  const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            tr("SuaKetQuaCC") + (contract.vchREmployeeName ?? ""),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: Row(
+        children: [
+          Obx(() {
+            final status =
+                edited.nvchRNoReEmpoyment ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(edited.toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                    edited.nvchRNoReEmpoyment = newValue;
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    
+                    controller.isLoading(true);
+                    try {
+                      await controller.updateApprenticeContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      
+                      // Refresh dữ liệu
+                      await controller.fetchDummyData();
+                      
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        // Hiển thị thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(tr('GiaHanSusses')),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'OK':
+        return Colors.green;
+      case 'NG':
+        return Colors.red;
+      case 'Stop Working':
+        return Colors.orange;
+      case 'Finish L/C':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
   }
 }

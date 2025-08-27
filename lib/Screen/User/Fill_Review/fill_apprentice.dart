@@ -805,7 +805,7 @@ class MyData extends DataTableSource {
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
     );
-    final NoteController = TextEditingController(text: data.vchRNote ?? '');
+    final noteController = TextEditingController(text: data.vchRNote ?? '');
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -1731,12 +1731,12 @@ class MyData extends DataTableSource {
                 // Chỉ update khi mất focus
                 controller.updateNote(
                   data.vchREmployeeId.toString(),
-                  NoteController.text,
+                  noteController.text,
                 );
               }
             },
             child: TextFormField(
-              controller: NoteController,
+              controller: noteController,
               style: TextStyle(fontSize: Common.sizeColumn),
               decoration: InputDecoration(
                 labelText: tr('note'),

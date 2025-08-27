@@ -140,9 +140,13 @@
   "pickapprover1": "Lựa chọn quản lý trung cấp phòng Nhân sự",
   "TimeDueError":"Đánh giá chưa gửi đi! Không thể sửa thời gian hoàn thành",
   "Loi":"Lỗi",
+  "GiaHan":"Gia hạn đánh giá cho hợp đồng cho ",
   "NgayHetHan":"Ngày hết hạn hiện tại:",
   "NgayMoi":"Thời gian gia hạn mới",
   "ChonNgay":"Vui lòng chọn ngày gia hạn",
   "NgayChonSai":"Ngày gia hạn phải sau ngày hiện tại",
-  "GiaHanSusses":"Đã gia hạn đánh giá thành công"
+  "GiaHanSusses":"Đã gia hạn đánh giá thành công",
+  "KetQuaCC":"Cập nhật đánh giá cuối cùng thành công",
+  "SuaKetQuaCC": "Sửa kết quả đánh giá cuối cùng cho",
+  "DaGui": "Đã gửi đánh giá đến bước tiếp theo"
 }

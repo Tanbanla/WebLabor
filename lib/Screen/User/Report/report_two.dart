@@ -261,6 +261,12 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 130,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
                     title: tr('employeeCode'),
                     width: 100,
                     fontSize: Common.sizeColumn,
@@ -428,12 +434,6 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('GiamDoc'),
-                    width: 150,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('Hientrang'),
                     width: 150,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -747,16 +747,39 @@ class MyData extends DataTableSource {
         //Action
         DataCell(
           Center(
-            child: _buildActionButton(
-              icon: Iconsax.edit_2,
-              color: Colors.blue,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) =>
-                      _EditTwoContractDialog(twoContract: data),
-                );
-              },
+            child: 
+            Row(
+              children: [
+                _buildActionButton(
+                  icon: Iconsax.edit_2,
+                  color: Colors.blue,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          _EditTwoContractDialog(twoContract: data),
+                    );
+                  },
+                ),
+                SizedBox(width: 3,),
+                _buildActionButton(icon: Iconsax.clock, color: Colors.orangeAccent,
+                onPressed: () {
+                  if (data.dtMDueDate != null) {
+                    showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
+                  }else{
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('TimeDueError'), title: tr('Loi'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                  }
+                }),
+                SizedBox(width: 3,),
+                _buildActionButton(icon: Iconsax.ram, color: Colors.brown,
+                onPressed: () {
+                  showDialog(context: context, builder: (context) => _UpdateKetQua(contract: data));
+                })
+              ],
             ),
           ),
         ),
@@ -1585,6 +1608,440 @@ class _EditTwoContractDialog extends StatelessWidget {
       return '$age';
     } catch (e) {
       return 'Invalid date';
+    }
+  }
+}
+
+// Update gia hạn thời gian
+class _UpdateDtmDue extends StatelessWidget {
+  final TwoContract contract;
+  final DashboardControllerTwo controller = Get.find(); 
+
+  _UpdateDtmDue({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = TwoContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+    DateTime? selectedDate;
+
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          const SizedBox(width: 10),
+          Text(
+                tr("GiaHan"),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Common.blackColor,
+                ),
+              ),
+              Text(
+                ' ${contract.vchREmployeeName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Common.primaryColor,
+                ),
+              ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Hiển thị ngày hết hạn hiện tại
+              if (contract.dtMDueDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    tr("NgayHetHan")+DateFormat('yyyy-MM-dd',).format(DateTime.parse(edited.dtMDueDate!)),
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              
+              // Date picker để chọn ngày mới
+              _buildDatePickerField(
+                context: context,
+                initialDate: contract.dtMDueDate != null 
+                    ? DateFormat('yyyy-MM-dd').parse(contract.dtMDueDate!)
+                    : DateTime.now().add(const Duration(days: 30)),
+                label: tr("NgayMoi"),
+                onDateSelected: (date) {
+                  selectedDate = date;
+                  edited.dtMDueDate = DateFormat('yyyy-MM-dd').format(date);
+                },
+              ),
+              
+              // Hiển thị thông báo lỗi
+              Obx(() => errorMessage.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        errorMessage.value,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                  : const SizedBox()),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    
+                    // Kiểm tra nếu ngày mới không được chọn
+                    if (selectedDate == null) {
+                      errorMessage.value = tr('ChonNgay');
+                      return;
+                    }
+                    
+                    // Kiểm tra nếu ngày mới không sau ngày hiện tại
+                    if (selectedDate!.isBefore(DateTime.now())) {
+                      errorMessage.value = tr('NgayChonSai');
+                      return;
+                    }
+                    controller.isLoading(true);
+                    try {
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      
+                      // Refresh dữ liệu
+                      await controller.fetchDummyData();
+                      
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        // Hiển thị thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(tr('GiaHanSusses')),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePickerField({
+    required BuildContext context,
+    required DateTime initialDate,
+    required String label,
+    required Function(DateTime) onDateSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: initialDate,
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: Common.primaryColor,
+                      onPrimary: Colors.white,
+                      onSurface: Colors.black,
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Common.primaryColor,
+                      ),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (picked != null && picked != initialDate) {
+              onDateSelected(picked);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateFormat('dd/MM/yyyy').format(initialDate),
+                  style: const TextStyle(fontSize: 14),
+                ),
+                Icon(Icons.calendar_today, color: Common.primaryColor, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+// update kết quả đánh giá cuối cùng
+class _UpdateKetQua extends StatelessWidget {
+  final TwoContract contract;
+  final DashboardControllerTwo controller = Get.find(); 
+
+  _UpdateKetQua({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = TwoContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+    return AlertDialog(
+      titlePadding:  const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.lamp1, color: Common.primaryColor),
+          SizedBox(width: 10),
+          Text(
+            tr("SuaKetQuaCC") + (contract.vchREmployeeName ?? ""),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
+        ],
+      ),
+      content: Row(
+        children: [
+          Obx(() {
+            final status =
+                edited.nvchRNoReEmpoyment ?? 'OK';
+            Visibility(
+              visible: false,
+              child: Text(edited.toString()),
+            );
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                    edited.nvchRNoReEmpoyment = newValue;
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'NG',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Stop Working',
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Stop Working',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'Finish L/C',
+                  child: Row(
+                    children: [
+                      Icon(Icons.done_all, color: Colors.blue, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Finish L/C',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: _getStatusColor(status),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    
+                    controller.isLoading(true);
+                    try {
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      
+                      // Refresh dữ liệu
+                      await controller.fetchDummyData();
+                      
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        // Hiển thị thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(tr('GiaHanSusses')),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'OK':
+        return Colors.green;
+      case 'NG':
+        return Colors.red;
+      case 'Stop Working':
+        return Colors.orange;
+      case 'Finish L/C':
+        return Colors.blue;
+      default:
+        return Colors.grey;
     }
   }
 }

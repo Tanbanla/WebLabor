@@ -27,6 +27,13 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   String get _trialContractText => tr('trialContract');
   @override
   Widget build(BuildContext context) {
+    final authState = Provider.of<AuthState>(context, listen: true);
+    controller.fetchData(
+      contractType: 'two',
+      statusId: '2',
+      section: null,
+      adid: authState.user?.chRUserid ?? '',
+    );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -108,7 +115,6 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                 ),
                 onChanged: (newValue) {
                   if (newValue != null) {
-                    //selectedContractType.value = newValue;
                     // Map the translated value to controller contract type
                     final contractType = newValue == tr('indefiniteContract')
                         ? 'two'
@@ -170,6 +176,16 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   authState.user!.chRUserid.toString(),
                   controller.currentContractType.toString(),
                 );
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  // Hiển thị thông báo thành công
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               } catch (e) {
                 errorMessage.value =
                     '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';

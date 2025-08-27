@@ -140,9 +140,13 @@
   "pickapprover1": "人事課の中級管理職を選択します",
   "TimeDueError": "評価が送信されていません！ 完了時間を修正できません",
   "Loi": "エラー",
+  "GiaHan": "契約の評価を更新する",
   "NgayHetHan": "現在の期限日:",
   "NgayMoi": "新しい更新時間",
   "ChonNgay": "更新日を選択してください",
   "NgayChonSai": "更新日は現在の日付の後でなければなりません",
-  "GiaHanSusses": "評価が正常に更新されました"
+  "GiaHanSusses": "評価が正常に更新されました",
+  "KetQuaCC": "最終評価の更新に成功しました",
+  "SuaKetQuaCC": "最終評価の結果を修正する：",
+  "DaGui": "評価を次のステップへ送信しました"
 }

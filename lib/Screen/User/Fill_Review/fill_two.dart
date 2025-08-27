@@ -114,58 +114,102 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 ),
               ),
               const SizedBox(width: 6),
-              DropdownButton<ApproverUser>(
-                value: selectedConfirmer.value,
-                underline: Container(),
-                isDense: true,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Common.primaryColor.withOpacity(0.8),
+                          GestureDetector(
+              onTap: () => _showSearchDialog(context, controller.filterdataList, 
+                  selectedConfirmer, selectedConfirmerId),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                dropdownColor: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                icon: Icon(
-                  Icons.arrow_drop_down,
-                  color: Common.primaryColor.withOpacity(0.8),
-                ),
-                hint: Text(tr('pickapprover')),
-                items: controller.filterdataList.map((confirmer) {
-                  return DropdownMenuItem<ApproverUser>(
-                    value: confirmer,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(Icons.person, color: Colors.blue, size: 16),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              //confirmer.chREmployeeName ?? '',
-                              confirmer.chREmployeeAdid ?? '',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    selectedConfirmer.value != null
+                        ? Text(
+                            selectedConfirmer.value!.chREmployeeAdid ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Common.primaryColor.withOpacity(0.8),
                             ),
-                          ],
-                        ),
-                      ],
+                          )
+                        : Text(
+                            tr('pickapprover'),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Common.primaryColor.withOpacity(0.8),
                     ),
-                  );
-                }).toList(),
-                onChanged: (ApproverUser? newValue) {
-                  selectedConfirmer.value = newValue;
-                  selectedConfirmerId.value = newValue?.chREmployeeAdid ?? '';
+                  ],
+                ),
+              ),
+            ),
+            if (selectedConfirmer.value != null) const SizedBox(width: 8),
+            if (selectedConfirmer.value != null)
+              IconButton(
+                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                onPressed: () {
+                  selectedConfirmer.value = null;
+                  selectedConfirmerId.value = '';
                 },
               ),
-              if (selectedConfirmer.value != null) const SizedBox(width: 8),
-              if (selectedConfirmer.value != null)
-                IconButton(
-                  icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                  onPressed: () {
-                    selectedConfirmer.value = null;
-                    selectedConfirmerId.value = '';
-                  },
-                ),
+              // DropdownButton<ApproverUser>(
+              //   value: selectedConfirmer.value,
+              //   underline: Container(),
+              //   isDense: true,
+              //   style: TextStyle(
+              //     fontSize: 14,
+              //     color: Common.primaryColor.withOpacity(0.8),
+              //   ),
+              //   dropdownColor: Colors.white,
+              //   borderRadius: BorderRadius.circular(8),
+              //   icon: Icon(
+              //     Icons.arrow_drop_down,
+              //     color: Common.primaryColor.withOpacity(0.8),
+              //   ),
+              //   hint: Text(tr('pickapprover')),
+              //   items: controller.filterdataList.map((confirmer) {
+              //     return DropdownMenuItem<ApproverUser>(
+              //       value: confirmer,
+              //       child: Row(
+              //         crossAxisAlignment: CrossAxisAlignment.center,
+              //         children: [
+              //           Icon(Icons.person, color: Colors.blue, size: 16),
+              //           const SizedBox(width: 8),
+              //           Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             children: [
+              //               Text(
+              //                 //confirmer.chREmployeeName ?? '',
+              //                 confirmer.chREmployeeAdid ?? '',
+              //                 style: TextStyle(fontWeight: FontWeight.bold),
+              //               ),
+              //             ],
+              //           ),
+              //         ],
+              //       ),
+              //     );
+              //   }).toList(),
+              //   onChanged: (ApproverUser? newValue) {
+              //     selectedConfirmer.value = newValue;
+              //     selectedConfirmerId.value = newValue?.chREmployeeAdid ?? '';
+              //   },
+              // ),
+              // if (selectedConfirmer.value != null) const SizedBox(width: 8),
+              // if (selectedConfirmer.value != null)
+              //   IconButton(
+              //     icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+              //     onPressed: () {
+              //       selectedConfirmer.value = null;
+              //       selectedConfirmerId.value = '';
+              //     },
+              //   ),
             ],
           ),
           const SizedBox(width: 30),
@@ -249,8 +293,74 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         ],
       );
     });
+    
   }
+void _showSearchDialog(BuildContext context, List<ApproverUser> items, 
+    Rx<ApproverUser?> selectedConfirmer, RxString selectedConfirmerId) {
+  final searchController = TextEditingController();
+  List<ApproverUser> filteredItems = List.from(items);
 
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Column(
+                children: [
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: tr('searchapprover'),
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredItems = items.where((item) {
+                          final adid = item.chREmployeeAdid?.toLowerCase() ?? '';
+                          final name = item.chREmployeeName?.toLowerCase() ?? '';
+                          final searchLower = value.toLowerCase();
+                          return adid.contains(searchLower) || 
+                          name.contains(searchLower);
+                        }).toList();
+                      });
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredItems.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredItems[index];
+                        return ListTile(
+                          leading: Icon(Icons.person, color: Colors.blue),
+                          title: Text(item.chREmployeeAdid ?? ''),
+                          subtitle: item.chREmployeeName != null
+                              ? Text(item.chREmployeeName!)
+                              : null,
+                          onTap: () {
+                            selectedConfirmer.value = item;
+                            selectedConfirmerId.value = item.chREmployeeAdid ?? '';
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1238,7 +1348,7 @@ class MyData extends DataTableSource {
                 // Chỉ update khi mất focus
                 controller.updateNote(
                   data.vchREmployeeId.toString(),
-                  reasonController.text,
+                  noteController.text,
                 );
               }
             },
