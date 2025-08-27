@@ -35,7 +35,7 @@
   "salaryGrade": "Bậc lương",
   "contractEffective": "Hiệu lực HD",
   "contractEndDate": "Ngày kết thúc HD",
-  "earlyLateCount": "Số lần đi mượn, về sớm",
+  "earlyLateCount": "Số lần đi muộn, về sớm",
   "paidLeave": "Nghỉ hưởng lương",
   "unpaidLeave": "Nghỉ không lương",
   "unreportedLeave": "Nghỉ không báo cáo",
@@ -137,5 +137,12 @@
   "DeXuat":"Người để xuất đánh giá của phòng ban",
   "NotApproval":"Yêu cầu nhập lý do không phê duyệt cho",
   "approver1": "Quản lý trung cấp phòng Nhân sự",
-  "pickapprover1": "Lựa chọn quản lý trung cấp phòng Nhân sự"
+  "pickapprover1": "Lựa chọn quản lý trung cấp phòng Nhân sự",
+  "TimeDueError":"Đánh giá chưa gửi đi! Không thể sửa thời gian hoàn thành",
+  "Loi":"Lỗi",
+  "NgayHetHan":"Ngày hết hạn hiện tại:",
+  "NgayMoi":"Thời gian gia hạn mới",
+  "ChonNgay":"Vui lòng chọn ngày gia hạn",
+  "NgayChonSai":"Ngày gia hạn phải sau ngày hiện tại",
+  "GiaHanSusses":"Đã gia hạn đánh giá thành công"
 }

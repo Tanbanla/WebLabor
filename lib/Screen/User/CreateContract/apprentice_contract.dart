@@ -1310,7 +1310,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchRCodeSection,
                       label: tr('department'),
                       onChanged: (value) => edited.vchRCodeSection = value,
@@ -1318,7 +1318,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRCostCenterName,
                       label: tr('group'),
                       onChanged: (value) => edited.chRCostCenterName = value,
@@ -1331,7 +1331,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchREmployeeId,
                       label: tr('employeeCode'),
                       onChanged: (value) => edited.vchREmployeeId = value,
@@ -1340,7 +1340,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchRTyperId,
                       label: tr('gender'),
                       onChanged: (value) => edited.vchRTyperId = value,
@@ -1355,7 +1355,7 @@ class _EditContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchREmployeeName,
                       label: tr('fullName'),
                       onChanged: (value) => edited.vchREmployeeName = value,
@@ -1364,7 +1364,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 80,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: getAgeFromBirthday(
                         contract.dtMBrithday,
                       ).toString(),
@@ -1381,7 +1381,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRPosition,
                       label: tr('position'),
                       onChanged: (value) => edited.chRPosition = value,
@@ -1390,7 +1390,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRCodeGrade,
                       label: tr('salaryGrade'),
                       onChanged: (value) => edited.chRCodeGrade = value,
@@ -1404,7 +1404,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMJoinDate!)),
@@ -1414,7 +1414,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMEndDate!)),
@@ -1443,7 +1443,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.fLGoLeaveLate?.toString(),
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
@@ -1453,7 +1453,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.fLNotLeaveDay?.toString(),
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
@@ -1468,7 +1468,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.inTViolation?.toString(),
                       label: tr('violationCount'),
                       onChanged: (value) =>
@@ -1481,7 +1481,7 @@ class _EditContractDialog extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
+              BuildCompactTextField(
                 initialValue: contract.nvarchaRViolation,
                 label: tr('reason'),
                 onChanged: (value) => edited.nvarchaRViolation = value,
@@ -1606,33 +1606,6 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildCompactTextField({
-    required String? initialValue,
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
-    );
-  }
-
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1749,7 +1722,7 @@ class _showAddDialog extends StatelessWidget {
                 child: Row(
                   children: [
                     // Expanded(
-                    //   child: _buildCompactTextField(
+                    //   child: BuildCompactTextField(
                     //     label: tr('department'),
                     //     onChanged: (value) =>
                     //         twoContract.vchRCodeSection = value,
@@ -1757,7 +1730,7 @@ class _showAddDialog extends StatelessWidget {
                     // ),
                     // const SizedBox(width: 10),
                     // Expanded(
-                    //   child: _buildCompactTextField(
+                    //   child: BuildCompactTextField(
                     //     label: tr('group'),
                     //     onChanged: (value) =>
                     //         twoContract.chRCostCenterName = value,
@@ -1771,7 +1744,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('employeeCode'),
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
@@ -1779,7 +1752,7 @@ class _showAddDialog extends StatelessWidget {
                   // const SizedBox(width: 10),
                   // SizedBox(
                   //   width: 100,
-                  //   child: _buildCompactTextField(
+                  //   child: BuildCompactTextField(
                   //     label: tr('gender'),
                   //     onChanged: (value) => twoContract.vchRTyperId = value,
                   //   ),
@@ -1793,7 +1766,7 @@ class _showAddDialog extends StatelessWidget {
               //   children: [
               //     Expanded(
               //       flex: 3,
-              //       child: _buildCompactTextField(
+              //       child: BuildCompactTextField(
               //         label: tr('fullName'),
               //         onChanged: (value) =>
               //             twoContract.vchREmployeeName = value,
@@ -1802,7 +1775,7 @@ class _showAddDialog extends StatelessWidget {
               //     const SizedBox(width: 10),
               //     SizedBox(
               //       width: 80,
-              //       child: _buildCompactTextField(
+              //       child: BuildCompactTextField(
               //         label: tr('age'),
               //         onChanged: (value) => olded = value,
               //         keyboardType: TextInputType.number,
@@ -1816,7 +1789,7 @@ class _showAddDialog extends StatelessWidget {
               // Row(
               //   children: [
               //     Expanded(
-              //       child: _buildCompactTextField(
+              //       child: BuildCompactTextField(
               //         label: tr('position'),
               //         onChanged: (value) => twoContract.chRPosition = value,
               //       ),
@@ -1824,7 +1797,7 @@ class _showAddDialog extends StatelessWidget {
               //     const SizedBox(width: 10),
               //     SizedBox(
               //       width: 100,
-              //       child: _buildCompactTextField(
+              //       child: BuildCompactTextField(
               //         label: tr('salaryGrade'),
               //         onChanged: (value) => twoContract.chRCodeGrade = value,
               //       ),
@@ -1881,7 +1854,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
                           twoContract.fLGoLeaveLate = double.tryParse(value),
@@ -1890,7 +1863,7 @@ class _showAddDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
                           twoContract.fLNotLeaveDay = double.tryParse(value),
@@ -1905,7 +1878,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('violationCount'),
                       onChanged: (value) =>
                           twoContract.inTViolation = int.tryParse(value),
@@ -1917,7 +1890,7 @@ class _showAddDialog extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
+              BuildCompactTextField(
                 label: tr('reason'),
                 onChanged: (value) => twoContract.nvarchaRViolation = value,
                 maxLines: 2,
@@ -2039,31 +2012,6 @@ class _showAddDialog extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCompactTextField({
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(fontSize: 12),
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 13),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
     );
   }
 

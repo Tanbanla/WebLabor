@@ -6,6 +6,7 @@ import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:web_labor_contract/class/Two_Contract.dart';
@@ -1298,7 +1299,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.vchRCodeSection,
                       label: tr('department'),
                       onChanged: (value) => edited.vchRCodeSection = value,
@@ -1306,7 +1307,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.chRCostCenterName,
                       label: tr('group'),
                       onChanged: (value) => edited.chRCostCenterName = value,
@@ -1319,7 +1320,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.vchREmployeeId,
                       label: tr('employeeCode'),
                       onChanged: (value) => edited.vchREmployeeId = value,
@@ -1328,7 +1329,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.vchRTyperId,
                       label: tr('gender'),
                       onChanged: (value) => edited.vchRTyperId = value,
@@ -1343,7 +1344,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.vchREmployeeName,
                       label: tr('fullName'),
                       onChanged: (value) => edited.vchREmployeeName = value,
@@ -1352,7 +1353,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 80,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: getAgeFromBirthday(
                         twoContract.dtMBrithday,
                       ).toString(),
@@ -1369,7 +1370,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.chRPosition,
                       label: tr('position'),
                       onChanged: (value) => edited.chRPosition = value,
@@ -1378,7 +1379,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.chRCodeGrade,
                       label: tr('salaryGrade'),
                       onChanged: (value) => edited.chRCodeGrade = value,
@@ -1392,7 +1393,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(twoContract.dtMJoinDate!)),
@@ -1402,7 +1403,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(twoContract.dtMEndDate!)),
@@ -1431,7 +1432,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.fLGoLeaveLate?.toString(),
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
@@ -1441,7 +1442,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.fLPaidLeave?.toString(),
                       label: tr('paidLeave'),
                       onChanged: (value) =>
@@ -1457,7 +1458,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.fLNotPaidLeave?.toString(),
                       label: tr('unpaidLeave'),
                       onChanged: (value) =>
@@ -1467,7 +1468,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.fLNotLeaveDay?.toString(),
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
@@ -1483,7 +1484,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: twoContract.inTViolation?.toString(),
                       label: tr('violationCount'),
                       onChanged: (value) =>
@@ -1496,7 +1497,7 @@ class _EditTwoContractDialog extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
+              BuildCompactTextField(
                 initialValue: twoContract.nvarchaRViolation,
                 label: tr('reason'),
                 onChanged: (value) => edited.nvarchaRViolation = value,
@@ -1568,32 +1569,6 @@ class _EditTwoContractDialog extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCompactTextField({
-    required String? initialValue,
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
     );
   }
 

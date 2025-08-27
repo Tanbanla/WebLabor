@@ -207,3 +207,47 @@ class _DialogNotificationState extends State<DialogNotification> {
     );
   }
 }
+
+// Custom nhập dữ liệu
+  class BuildCompactTextField extends StatefulWidget {
+  final String? initialValue;
+  final String label;
+  final Function(String) onChanged;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+
+  const BuildCompactTextField({
+    super.key, 
+    this.initialValue, 
+    required this.label, 
+    required this.onChanged, 
+    this.keyboardType, 
+    this.maxLines
+  });
+
+  @override
+  State<BuildCompactTextField> createState() => _BuildCompactTextFieldState();
+}
+
+class _BuildCompactTextFieldState extends State<BuildCompactTextField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      initialValue: widget.initialValue,
+      decoration: InputDecoration(
+        labelText: widget.label, // Sửa từ widget.initialValue thành widget.label
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: widget.keyboardType,
+      maxLines: widget.maxLines,
+      onChanged: widget.onChanged,
+    );
+  }
+}

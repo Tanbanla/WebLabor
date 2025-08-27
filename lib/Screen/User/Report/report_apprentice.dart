@@ -6,6 +6,7 @@ import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
+import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
@@ -259,6 +260,12 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 130,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
                     title: tr('employeeCode'),
                     width: 100,
                     fontSize: Common.sizeColumn,
@@ -421,12 +428,6 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('TruongPhong'),
-                    width: 150,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('Hientrang'),
                     width: 150,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -761,7 +762,21 @@ class MyData extends DataTableSource {
                     );
                   },
                 ),
-                _buildActionButton(icon: Iconsax.element_11, color: Colors.yellow,
+                SizedBox(width: 3,),
+                _buildActionButton(icon: Iconsax.clock, color: Colors.orangeAccent,
+                onPressed: () {
+                  if (data.dtMDueDate != null) {
+                    showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
+                  }else{
+                      showDialog(context: context, 
+                        builder: (context) => 
+                        DialogNotification(message: tr('TimeDueError'), title: tr('Loi'), color: Colors.red,
+                        icon:  Icons.error,)
+                      );
+                  }
+                }),
+                SizedBox(width: 3,),
+                _buildActionButton(icon: Iconsax.ram, color: Colors.brown,
                 onPressed: () {
                   showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
                 })
@@ -769,6 +784,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
           Text(
             data.vchREmployeeId ?? '',
@@ -1033,7 +1049,6 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(_getHienTrangColor(data.inTStatusId)),
       ],
     );
   }
@@ -1267,7 +1282,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchRCodeSection,
                       label: tr('department'),
                       onChanged: (value) => edited.vchRCodeSection = value,
@@ -1275,7 +1290,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRCostCenterName,
                       label: tr('group'),
                       onChanged: (value) => edited.chRCostCenterName = value,
@@ -1288,7 +1303,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchREmployeeId,
                       label: tr('employeeCode'),
                       onChanged: (value) => edited.vchREmployeeId = value,
@@ -1297,7 +1312,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchRTyperId,
                       label: tr('gender'),
                       onChanged: (value) => edited.vchRTyperId = value,
@@ -1312,7 +1327,7 @@ class _EditContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.vchREmployeeName,
                       label: tr('fullName'),
                       onChanged: (value) => edited.vchREmployeeName = value,
@@ -1321,7 +1336,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 80,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: getAgeFromBirthday(
                         contract.dtMBrithday,
                       ).toString(),
@@ -1338,7 +1353,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRPosition,
                       label: tr('position'),
                       onChanged: (value) => edited.chRPosition = value,
@@ -1347,7 +1362,7 @@ class _EditContractDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.chRCodeGrade,
                       label: tr('salaryGrade'),
                       onChanged: (value) => edited.chRCodeGrade = value,
@@ -1361,7 +1376,7 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMJoinDate!)),
@@ -1371,7 +1386,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMEndDate!)),
@@ -1400,22 +1415,22 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.fLGoLeaveLate?.toString(),
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
                           edited.fLGoLeaveLate = double.tryParse(value),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number, 
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.fLNotLeaveDay?.toString(),
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
                           edited.fLNotLeaveDay = double.tryParse(value),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number, 
                     ),
                   ),
                 ],
@@ -1425,12 +1440,12 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       initialValue: contract.inTViolation?.toString(),
                       label: tr('violationCount'),
                       onChanged: (value) =>
                           edited.inTViolation = int.tryParse(value),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number, 
                     ),
                   ),
                 ],
@@ -1438,7 +1453,7 @@ class _EditContractDialog extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
+              BuildCompactTextField(
                 initialValue: contract.nvarchaRViolation,
                 label: tr('reason'),
                 onChanged: (value) => edited.nvarchaRViolation = value,
@@ -1512,33 +1527,6 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildCompactTextField({
-    required String? initialValue,
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
-    );
-  }
-
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1567,6 +1555,7 @@ class _UpdateDtmDue extends StatelessWidget {
     final edited = ApprenticeContract.fromJson(contract.toJson());
     RxString errorMessage = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
+    DateTime? selectedDate;
 
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -1575,21 +1564,72 @@ class _UpdateDtmDue extends StatelessWidget {
       title: Row(
         children: [
           Icon(Iconsax.lamp1, color: Common.primaryColor),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Text(
-            'Gia hạn đánh giá cho hợp đồng cho ${contract.vchREmployeeName}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Common.primaryColor,
-            ),
-          ),
+                'Gia hạn đánh giá cho hợp đồng cho',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Common.blackColor,
+                ),
+              ),
+              Text(
+                ' ${contract.vchREmployeeName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Common.primaryColor,
+                ),
+              ),
         ],
       ),
       content: SingleChildScrollView(
-        child: Form(child: Column(
-
-        )),
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Hiển thị ngày hết hạn hiện tại
+              if (contract.dtMDueDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    '${DateFormat('yyyy-MM-dd',).format(DateTime.parse(edited.dtMDueDate!))}',
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              
+              // Date picker để chọn ngày mới
+              _buildDatePickerField(
+                context: context,
+                initialDate: contract.dtMDueDate != null 
+                    ? DateFormat('yyyy-MM-dd').parse(contract.dtMDueDate!)
+                    : DateTime.now().add(const Duration(days: 30)),
+                label: "Thời gian gia hạn mới",
+                onDateSelected: (date) {
+                  selectedDate = date;
+                  edited.dtMDueDate = DateFormat('yyyy-MM-dd').format(date);
+                },
+              ),
+              
+              // Hiển thị thông báo lỗi
+              Obx(() => errorMessage.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        errorMessage.value,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                  : const SizedBox()),
+            ],
+          ),
+        ),
       ),
       actions: [
         TextButton(
@@ -1616,19 +1656,42 @@ class _UpdateDtmDue extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    controller.isLoading(false);
+                    
+                    // Kiểm tra nếu ngày mới không được chọn
+                    if (selectedDate == null) {
+                      errorMessage.value = 'Vui lòng chọn ngày gia hạn';
+                      return;
+                    }
+                    
+                    // Kiểm tra nếu ngày mới không sau ngày hiện tại
+                    if (selectedDate!.isBefore(DateTime.now())) {
+                      errorMessage.value = 'Ngày gia hạn phải sau ngày hiện tại';
+                      return;
+                    }
+                    controller.isLoading(true);
                     try {
                       await controller.updateApprenticeContract(
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      controller.fetchDummyData();
+                      
+                      // Refresh dữ liệu
+                      await controller.fetchDummyData();
+                      
                       if (context.mounted) {
                         Navigator.of(context).pop();
+                        // Hiển thị thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Đã gia hạn đánh giá thành công'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       }
                     } catch (e) {
-                      errorMessage.value =
-                          '${tr('ErrorUpdate')}${e.toString()}';
+                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
                     }
                   },
             child: controller.isLoading.value
@@ -1641,6 +1704,74 @@ class _UpdateDtmDue extends StatelessWidget {
                     ),
                   )
                 : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePickerField({
+    required BuildContext context,
+    required DateTime initialDate,
+    required String label,
+    required Function(DateTime) onDateSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: initialDate,
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: Common.primaryColor,
+                      onPrimary: Colors.white,
+                      onSurface: Colors.black,
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Common.primaryColor,
+                      ),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (picked != null && picked != initialDate) {
+              onDateSelected(picked);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateFormat('dd/MM/yyyy').format(initialDate),
+                  style: const TextStyle(fontSize: 14),
+                ),
+                Icon(Icons.calendar_today, color: Common.primaryColor, size: 18),
+              ],
+            ),
           ),
         ),
       ],

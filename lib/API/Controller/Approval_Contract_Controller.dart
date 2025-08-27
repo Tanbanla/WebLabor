@@ -65,21 +65,25 @@ class DashboardControllerApporver extends GetxController {
             (contract.nvchRApproverPer?.isEmpty ?? true)) {
           throw Exception('${tr('InputError')} ${contract.vchREmployeeName}');
         }
-
+        // thời gian phản hồi
+        final dayDue = contractType == 'two' ? 14 : 7;
         contract
           ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..dtMApproverPer = formatDateTime(DateTime.now())
           ..useRApproverPer = userApprover
-          // ..vchRLyThuyet = 'OK'
-          // ..vchRThucHanh = 'OK'
-          //..vchRCompleteWork = 'OK'
-          // ..vchRLearnWork = 'OK'
-          // ..vchRThichNghi = 'OK'
-          //..vchRUseful = 'OK'
-          // ..vchRContact = 'OK'
-          // ..vcHNeedViolation = 'OK'
-          ;
+          ..dtMDueDate = formatDateTime(
+            DateTime.now().add(Duration(days: dayDue)),
+          )
+        // ..vchRLyThuyet = 'OK'
+        // ..vchRThucHanh = 'OK'
+        //..vchRCompleteWork = 'OK'
+        // ..vchRLearnWork = 'OK'
+        // ..vchRThichNghi = 'OK'
+        //..vchRUseful = 'OK'
+        // ..vchRContact = 'OK'
+        // ..vcHNeedViolation = 'OK'
+        ;
 
         if (contract.biTApproverPer) {
           contract.inTStatusId = 3;

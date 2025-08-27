@@ -1737,7 +1737,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('employeeCode'),
                       onChanged: (value) => twoContract.vchREmployeeId = value,
                     ),
@@ -1794,7 +1794,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
                           twoContract.fLGoLeaveLate = double.tryParse(value),
@@ -1803,7 +1803,7 @@ class _showAddDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('paidLeave'),
                       onChanged: (value) =>
                           twoContract.fLPaidLeave = double.tryParse(value),
@@ -1818,7 +1818,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('unpaidLeave'),
                       onChanged: (value) =>
                           twoContract.fLNotPaidLeave = double.tryParse(value),
@@ -1827,7 +1827,7 @@ class _showAddDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
                           twoContract.fLNotLeaveDay = double.tryParse(value),
@@ -1842,7 +1842,7 @@ class _showAddDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
+                    child: BuildCompactTextField(
                       label: tr('violationCount'),
                       onChanged: (value) =>
                           twoContract.inTViolation = int.tryParse(value),
@@ -1854,7 +1854,7 @@ class _showAddDialog extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
+              BuildCompactTextField(
                 label: tr('reason'),
                 onChanged: (value) => twoContract.nvarchaRViolation = value,
                 maxLines: 2,
@@ -1988,32 +1988,6 @@ class _showAddDialog extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildCompactTextField({
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(fontSize: 12),
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 13),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
-    );
-  }
-
   Widget _buildDatePickerField({
     required BuildContext context,
     required String? initialDate,
