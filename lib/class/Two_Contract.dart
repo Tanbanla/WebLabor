@@ -18,10 +18,10 @@ class TwoContract {
   double? fLNotLeaveDay;
   int? inTViolation;
   String? nvarchaRViolation;
-  dynamic nvchRCompleteWork;
-  dynamic nvchRUseful;
-  dynamic nvchROther;
-  dynamic vchRReasultsLeader;
+  String? nvchRCompleteWork;
+  String? nvchRUseful;
+  String? nvchROther;
+  String? vchRReasultsLeader;
   dynamic biTNoReEmployment;
   dynamic nvchRNoReEmpoyment;
   dynamic nvchRPthcSection;

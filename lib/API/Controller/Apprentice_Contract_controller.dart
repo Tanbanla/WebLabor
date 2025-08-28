@@ -323,7 +323,7 @@ class DashboardControllerApprentice extends GetxController {
     try {
       final contract = getSelectedItems();
       if (contract.isEmpty) {
-        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+        throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userUpdate;

@@ -76,8 +76,6 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
     // Extract section name safely
     // String sectionName =
     //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-
-    RxString errorMessage = ''.obs;
     return Obx(() {
       final currentValue = controller.currentContractType.value == 'two'
           ? _indefiniteContractText
@@ -169,7 +167,6 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           // Send button
           GestureDetector(
             onTap: () async {
-              errorMessage.value = '';
               try {
                 await controller.updateListContractApproval(
                   authState.user!.chRUserid.toString(),
@@ -177,7 +174,6 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   controller.currentContractType.toString(),
                 );
                 if (context.mounted) {
-                  Navigator.of(context).pop();
                   // Hiển thị thông báo thành công
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -187,8 +183,12 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   );
                 }
               } catch (e) {
-                errorMessage.value =
-                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${tr('sendFailed')} ${e.toString().replaceAll('', '')}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
               }
             },
             child: Obx(
@@ -227,17 +227,6 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          if (errorMessage.isNotEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 1),
-                child: Text(
-                  errorMessage.value,
-                  style: TextStyle(color: Colors.red, fontSize: 14),
-                ),
-              ),
-            ),
         ],
       );
     });

@@ -401,7 +401,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
-                   // các trường thông tin phê duyệt
+                  // các trường thông tin phê duyệt
                   DataColumnCustom(
                     title: tr('Nguoilap'),
                     width: 100,
@@ -563,7 +563,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     TextCellValue(item.vchRUserCreate.toString()),
                     TextCellValue(item.useRApproverPer.toString()),
                     TextCellValue(item.vchRLeaderEvalution ?? ''),
-                    TextCellValue(item.useRApproverChief?? ''),
+                    TextCellValue(item.useRApproverChief ?? ''),
                     TextCellValue(item.useRApproverSectionManager ?? ''),
                     TextCellValue(item.inTStatusId.toString()),
                   ]);
@@ -762,24 +762,40 @@ class MyData extends DataTableSource {
                     );
                   },
                 ),
-                SizedBox(width: 3,),
-                _buildActionButton(icon: Iconsax.clock, color: Colors.orangeAccent,
-                onPressed: () {
-                  if (data.dtMDueDate != null) {
-                    showDialog(context: context, builder: (context) => _UpdateDtmDue(contract: data));
-                  }else{
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: tr('TimeDueError'), title: tr('Loi'), color: Colors.red,
-                        icon:  Icons.error,)
+                SizedBox(width: 3),
+                _buildActionButton(
+                  icon: Iconsax.clock,
+                  color: Colors.orangeAccent,
+                  onPressed: () {
+                    if (data.dtMDueDate != null) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => _UpdateDtmDue(contract: data),
                       );
-                  }
-                }),
-                SizedBox(width: 3,),
-                _buildActionButton(icon: Iconsax.ram, color: Colors.brown,
-                onPressed: () {
-                  showDialog(context: context, builder: (context) => _UpdateKetQua(contract: data));
-                })
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('TimeDueError'),
+                          title: tr('Loi'),
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(width: 3),
+                _buildActionButton(
+                  icon: Iconsax.ram,
+                  color: Colors.brown,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _UpdateKetQua(contract: data),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -934,17 +950,23 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =() {
-              if (controller.filterdataList.length > index) {
-                return switch (data.inTStatusId) {
-                  6 => controller.filterdataList[index].biTApproverChief ?? true,
-                  7 => controller.filterdataList[index].biTApproverSectionManager ?? true,
-                  _ => true,
-                };
-              }
-              return true;
-            }();
-            final status = rawStatus ? 'OK' : 'NG';
+            final rawStatus = controller.filterdataList[index].biTNoReEmployment;
+            // () {
+            //   if (controller.filterdataList.length > index) {
+            //     return switch (data.inTStatusId) {
+            //       6 =>
+            //         controller.filterdataList[index].biTApproverChief ?? true,
+            //       7 =>
+            //         controller
+            //                 .filterdataList[index]
+            //                 .biTApproverSectionManager ??
+            //             true,
+            //       _ => true,
+            //     };
+            //   }
+            //   return true;
+            // }();
+            String status = rawStatus ? "OK" : "NG";
             return DropdownButton<String>(
               value: status,
               onChanged: (newValue) {
@@ -1036,7 +1058,7 @@ class MyData extends DataTableSource {
             data.vchRLeaderEvalution?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
-        ),       
+        ),
         DataCell(
           Text(
             data.useRApproverChief?.toString() ?? "",
@@ -1052,7 +1074,8 @@ class MyData extends DataTableSource {
       ],
     );
   }
-Widget _getDanhGiaView(String? status) {
+
+  Widget _getDanhGiaView(String? status) {
     switch (status) {
       case 'OK':
         return Row(
@@ -1108,6 +1131,7 @@ Widget _getDanhGiaView(String? status) {
         return Row();
     }
   }
+
   Widget _getHienTrangColor(int? IntStatus) {
     switch (IntStatus) {
       case 1:
@@ -1202,6 +1226,7 @@ Widget _getDanhGiaView(String? status) {
         );
     }
   }
+
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -1230,7 +1255,8 @@ Widget _getDanhGiaView(String? status) {
   @override
   int get selectedRowCount => 0;
 }
-// Edit thông tin hợp đồng 
+
+// Edit thông tin hợp đồng
 class _EditContractDialog extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
@@ -1420,7 +1446,7 @@ class _EditContractDialog extends StatelessWidget {
                       label: tr('earlyLateCount'),
                       onChanged: (value) =>
                           edited.fLGoLeaveLate = double.tryParse(value),
-                      keyboardType: TextInputType.number, 
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1430,7 +1456,7 @@ class _EditContractDialog extends StatelessWidget {
                       label: tr('unreportedLeave'),
                       onChanged: (value) =>
                           edited.fLNotLeaveDay = double.tryParse(value),
-                      keyboardType: TextInputType.number, 
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
@@ -1445,7 +1471,7 @@ class _EditContractDialog extends StatelessWidget {
                       label: tr('violationCount'),
                       onChanged: (value) =>
                           edited.inTViolation = int.tryParse(value),
-                      keyboardType: TextInputType.number, 
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
@@ -1527,6 +1553,7 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1547,7 +1574,7 @@ class _EditContractDialog extends StatelessWidget {
 // Update gia hạn thời gian
 class _UpdateDtmDue extends StatelessWidget {
   final ApprenticeContract contract;
-  final DashboardControllerApprentice controller = Get.find(); 
+  final DashboardControllerApprentice controller = Get.find();
 
   _UpdateDtmDue({required this.contract});
 
@@ -1567,21 +1594,21 @@ class _UpdateDtmDue extends StatelessWidget {
           Icon(Iconsax.lamp1, color: Common.primaryColor),
           const SizedBox(width: 10),
           Text(
-                tr("GiaHan"),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Common.blackColor,
-                ),
-              ),
-              Text(
-                ' ${contract.vchREmployeeName}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Common.primaryColor,
-                ),
-              ),
+            tr("GiaHan"),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Common.blackColor,
+            ),
+          ),
+          Text(
+            ' ${contract.vchREmployeeName}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Common.primaryColor,
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -1594,18 +1621,21 @@ class _UpdateDtmDue extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
-                    tr("NgayHetHan")+DateFormat('yyyy-MM-dd',).format(DateTime.parse(edited.dtMDueDate!)),
+                    tr("NgayHetHan") +
+                        DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(DateTime.parse(edited.dtMDueDate!)),
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              
+
               // Date picker để chọn ngày mới
               _buildDatePickerField(
                 context: context,
-                initialDate: contract.dtMDueDate != null 
+                initialDate: contract.dtMDueDate != null
                     ? DateFormat('yyyy-MM-dd').parse(contract.dtMDueDate!)
                     : DateTime.now().add(const Duration(days: 30)),
                 label: tr("NgayMoi"),
@@ -1614,20 +1644,19 @@ class _UpdateDtmDue extends StatelessWidget {
                   edited.dtMDueDate = DateFormat('yyyy-MM-dd').format(date);
                 },
               ),
-              
+
               // Hiển thị thông báo lỗi
-              Obx(() => errorMessage.value.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        errorMessage.value,
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 12,
+              Obx(
+                () => errorMessage.value.isNotEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          errorMessage.value,
+                          style: TextStyle(color: Colors.red, fontSize: 12),
                         ),
-                      ),
-                    )
-                  : const SizedBox()),
+                      )
+                    : const SizedBox(),
+              ),
             ],
           ),
         ),
@@ -1657,13 +1686,13 @@ class _UpdateDtmDue extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    
+
                     // Kiểm tra nếu ngày mới không được chọn
                     if (selectedDate == null) {
                       errorMessage.value = tr('ChonNgay');
                       return;
                     }
-                    
+
                     // Kiểm tra nếu ngày mới không sau ngày hiện tại
                     if (selectedDate!.isBefore(DateTime.now())) {
                       errorMessage.value = tr('NgayChonSai');
@@ -1675,10 +1704,10 @@ class _UpdateDtmDue extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      
+
                       // Refresh dữ liệu
                       await controller.fetchDummyData();
-                      
+
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -1690,7 +1719,8 @@ class _UpdateDtmDue extends StatelessWidget {
                         );
                       }
                     } catch (e) {
-                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
                     } finally {
                       controller.isLoading(false);
                     }
@@ -1770,7 +1800,11 @@ class _UpdateDtmDue extends StatelessWidget {
                   DateFormat('dd/MM/yyyy').format(initialDate),
                   style: const TextStyle(fontSize: 14),
                 ),
-                Icon(Icons.calendar_today, color: Common.primaryColor, size: 18),
+                Icon(
+                  Icons.calendar_today,
+                  color: Common.primaryColor,
+                  size: 18,
+                ),
               ],
             ),
           ),
@@ -1779,120 +1813,167 @@ class _UpdateDtmDue extends StatelessWidget {
     );
   }
 }
+
 // update kết quả đánh giá cuối cùng
 class _UpdateKetQua extends StatelessWidget {
   final ApprenticeContract contract;
-  final DashboardControllerApprentice controller = Get.find(); 
+  final DashboardControllerApprentice controller = Get.find();
 
   _UpdateKetQua({required this.contract});
 
   @override
   Widget build(BuildContext context) {
     final edited = ApprenticeContract.fromJson(contract.toJson());
-    RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
+    final errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: false);
+    final selectedStatus = (edited.vchRReasultsLeader ?? 'OK').obs;
+
     return AlertDialog(
-      titlePadding:  const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
       actionsPadding: const EdgeInsets.all(20),
       title: Row(
         children: [
           Icon(Iconsax.lamp1, color: Common.primaryColor),
-          SizedBox(width: 10),
-          Text(
-            tr("SuaKetQuaCC") + (contract.vchREmployeeName ?? ""),
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Common.primaryColor,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Row(
+              children: [
+                Text(
+                  "${tr("SuaKetQuaCC")} ",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Common.blackColor,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Text(
+                  "${contract.vchREmployeeName ?? ""} ",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-      content: Row(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Obx(() {
-            final status =
-                edited.nvchRNoReEmpoyment ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(edited.toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                    edited.nvchRNoReEmpoyment = newValue;
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
+          Row(
+            children: [
+              Text(
+                "${tr("ketqua")} ",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Common.blackColor,
                 ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
+              ),
+              Obx(
+                () => DropdownButton<String>(
+                  value: selectedStatus.value,
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      selectedStatus.value = newValue;
+                      edited.vchRReasultsLeader = newValue;
+                    }
+                  },
+                  items: [
+                    DropdownMenuItem(
+                      value: 'OK',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'OK',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: _getStatusColor(selectedStatus.value),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'NG',
+                      child: Row(
+                        children: [
+                          Icon(Icons.cancel, color: Colors.red, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            'NG',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: _getStatusColor(selectedStatus.value),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Stop Working',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.pause_circle,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Stop Working',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: _getStatusColor(selectedStatus.value),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Finish L/C',
+                      child: Row(
+                        children: [
+                          Icon(Icons.done_all, color: Colors.blue, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Finish L/C',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: _getStatusColor(selectedStatus.value),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          }),
+              ),
+            ],
+          ),
+
+          // Hiển thị thông báo lỗi
+          Obx(
+            () => errorMessage.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      errorMessage.value,
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  )
+                : const SizedBox(),
+          ),
         ],
       ),
       actions: [
@@ -1920,29 +2001,36 @@ class _UpdateKetQua extends StatelessWidget {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    
+
                     controller.isLoading(true);
                     try {
+                      // Cập nhật giá trị từ selectedStatus
+                      edited.vchRReasultsLeader = selectedStatus.value;
+                      if (selectedStatus.value != 'OK') {
+                        edited.biTNoReEmployment = false;
+                        //edited.nvchRApproverManager = 'Thay đổi từ sửa kết quả đánh giá cuối cùng';
+                      }
                       await controller.updateApprenticeContract(
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      
+
                       // Refresh dữ liệu
                       await controller.fetchDummyData();
-                      
+
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(tr('GiaHanSusses')),
+                            content: Text(tr('DonteCC')),
                             backgroundColor: Colors.green,
                           ),
                         );
                       }
                     } catch (e) {
-                      errorMessage.value = '${tr('ErrorUpdate')}${e.toString()}';
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
                     } finally {
                       controller.isLoading(false);
                     }
@@ -1962,6 +2050,7 @@ class _UpdateKetQua extends StatelessWidget {
       ],
     );
   }
+
   Color _getStatusColor(String? status) {
     switch (status) {
       case 'OK':

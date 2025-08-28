@@ -148,5 +148,7 @@
   "GiaHanSusses":"Đã gia hạn đánh giá thành công",
   "KetQuaCC":"Cập nhật đánh giá cuối cùng thành công",
   "SuaKetQuaCC": "Sửa kết quả đánh giá cuối cùng cho",
-  "DaGui": "Đã gửi đánh giá đến bước tiếp theo"
+  "DonteCC":"Sửa thành công kết quả đánh giá cuối cùng",
+  "DaGui": "Đã gửi đánh giá đến bước tiếp theo",
+  "searchapprover": "Chọn người gửi"
 }

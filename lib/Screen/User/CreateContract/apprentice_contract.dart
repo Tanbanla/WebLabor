@@ -77,7 +77,6 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
     controller.changeStatus('ADM-PER', 'Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
-    RxString errorMessage = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
 
     return Obx(() {
@@ -154,9 +153,13 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
           // Send button
           GestureDetector(
             onTap: () async {
-              errorMessage.value = '';
               if (selectedConfirmer.value == null) {
-                errorMessage.value = tr('pleasecomfirm');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(tr('pleasecomfirm')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
                 return;
               }
               try {
@@ -166,9 +169,24 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   authState.user!.chRUserid.toString(),
                 );
                 await controllerTwo.changeStatus("1", null, null);
+                if (context.mounted) {
+                  // Hiển thị thông báo thành công
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               } catch (e) {
-                errorMessage.value =
-                    '${tr('sendFailed')} ${e.toString().replaceAll('', '')}';
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: Obx(
@@ -207,17 +225,6 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          if (errorMessage.isNotEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 1),
-                child: Text(
-                  errorMessage.value,
-                  style: TextStyle(color: Colors.red, fontSize: 14),
-                ),
-              ),
-            ),
         ],
       );
     });

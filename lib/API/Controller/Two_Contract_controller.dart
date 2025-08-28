@@ -178,17 +178,20 @@ class DashboardControllerTwo extends GetxController {
       }
       // Build request body
       final filters = [
-        if(statusId == 'approval'){
+        if (statusId == 'approval')
+          {
             "field": "INT_STATUS_ID",
-            "value": ["6", "7","8"],
+            "value": ["6", "7", "8"],
             "operator": "IN",
-            "logicType": "AND"
-        }else{
+            "logicType": "AND",
+          }
+        else
+          {
             "field": "INT_STATUS_ID",
             "value": statusId,
             "operator": "=",
             "logicType": "AND",
-        },
+          },
         if (section != null && section.isNotEmpty)
           {
             "field": "VCHR_CODE_SECTION",
@@ -198,7 +201,6 @@ class DashboardControllerTwo extends GetxController {
           },
         if (adid != null && adid.isNotEmpty)
           {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
-        
       ];
 
       final requestBody = {
@@ -333,7 +335,7 @@ class DashboardControllerTwo extends GetxController {
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
-        throw Exception('Lỗi danh sách gửi đi không có dữ liệu!');
+        throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userUpdate;
@@ -705,10 +707,10 @@ class DashboardControllerTwo extends GetxController {
               : 0 //double.parse(row[12]!.value.toString())
           ..fLNotPaidLeave = row[13]?.value != null
               ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0 
+              : 0
           ..fLNotLeaveDay = row[14]?.value != null
               ? double.tryParse(row[14]!.value.toString()) ?? 0
-              : 0 
+              : 0
           ..inTViolation = row[15]?.value != null
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
@@ -718,7 +720,7 @@ class DashboardControllerTwo extends GetxController {
           ..nvchROther //= row[19]!.value.toString()
           ..vchRReasultsLeader //= row[20]!.value.toString()
           ..biTNoReEmployment = true
-          ..nvchRNoReEmpoyment//= row[23]!.value.toString()
+          ..nvchRNoReEmpoyment //= row[23]!.value.toString()
           ..nvchRPthcSection
           ..vchRLeaderEvalution
           ..dtMLeadaerEvalution
@@ -846,13 +848,13 @@ class DashboardControllerTwo extends GetxController {
           ..inTViolation = row[15]?.value != null
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation// = row[16]!.value.toString()
+          ..nvarchaRViolation // = row[16]!.value.toString()
           ..nvchRCompleteWork //= row[17]!.value.toString()
           ..nvchRUseful //= row[18]!.value.toString()
           ..nvchROther //= row[19]!.value.toString()
           ..vchRReasultsLeader //= row[20]!.value.toString()
           ..biTNoReEmployment = true
-          ..nvchRNoReEmpoyment// = row[23]!.value.toString()
+          ..nvchRNoReEmpoyment // = row[23]!.value.toString()
           ..nvchRPthcSection
           ..vchRLeaderEvalution
           ..dtMLeadaerEvalution

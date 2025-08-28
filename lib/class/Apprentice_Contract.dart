@@ -25,7 +25,7 @@ class ApprenticeContract {
   String? vchRContact;
   String? vcHNeedViolation;
   String? vchRReasultsLeader;
-  bool? biTNoReEmployment;
+  dynamic biTNoReEmployment;
   String? nvchRNoReEmpoyment;
   String? nvchRPthcSection;
   String? vchRLeaderEvalution;
