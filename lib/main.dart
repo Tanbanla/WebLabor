@@ -52,3 +52,13 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+//
+class LanguageNotifier {
+  static final ValueNotifier<Locale> _notifier = ValueNotifier<Locale>(Locale('vi'));
+  
+  static ValueNotifier<Locale> get notifier => _notifier;
+  
+  static void changeLanguage(Locale locale) {
+    _notifier.value = locale;
+  }
+}

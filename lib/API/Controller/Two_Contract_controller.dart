@@ -105,6 +105,10 @@ class DashboardControllerTwo extends GetxController {
                     query.toLowerCase(),
                   ) ??
                   false) ||
+              (item.chRCostCenterName?.toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ??
+                  false) ||
               (item.chRPosition?.toLowerCase().contains(query.toLowerCase()) ??
                   false),
         ),

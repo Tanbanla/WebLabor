@@ -17,6 +17,7 @@ import 'package:web_labor_contract/Screen/User/Report/report_two.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
+import 'package:web_labor_contract/main.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -32,9 +33,7 @@ class _MenuScreenState extends State<MenuScreen> {
   void initState() {
     super.initState();
     _currentBody = //FillTwoScreen();
-    HomeScreen(
-      changeBody: _changeBody,
-    ); // Khởi tạo trong initState
+        HomeScreen(); // Khởi tạo trong initState
   }
 
   void _changeBody(Widget newBody) {
@@ -49,16 +48,24 @@ class _MenuScreenState extends State<MenuScreen> {
   //
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar(),
-      //body: body(),
-      body: _currentBody,
-      // is HomeScreen
-      //     ? HomeScreen(changeBody: _changeBody) // Truyền callback khi là HomeScreen
-      //     : body(),
-      drawer: ComplexDrawer(changeBody: _changeBody, context: context),
-      drawerScrimColor: Colors.transparent,
-      backgroundColor: Colors.white,
+    // return Scaffold(
+    //   appBar: appBar(),
+    //   body: _currentBody,
+    //   drawer: ComplexDrawer(changeBody: _changeBody, context: context),
+    //   drawerScrimColor: Colors.transparent,
+    //   backgroundColor: Colors.white,
+    // );
+    return ValueListenableBuilder<Locale>(
+      valueListenable: LanguageNotifier.notifier,
+      builder: (context, locale, child) {
+        return Scaffold(
+          appBar: appBar(),
+          body: _currentBody,
+          drawer: ComplexDrawer(changeBody: _changeBody, context: context),
+          drawerScrimColor: Colors.transparent,
+          backgroundColor: Colors.white,
+        );
+      },
     );
   }
 
@@ -87,6 +94,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 onPressed: () {
                   context.setLocale(Locale('ja'));
+                  LanguageNotifier.changeLanguage(Locale('ja'));
                 },
               ),
               // Button tiếng Việt
@@ -99,6 +107,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 onPressed: () {
                   context.setLocale(Locale('vi'));
+                  LanguageNotifier.changeLanguage(Locale('vi'));
                 },
               ),
             ],
@@ -150,6 +159,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     super.didChangeDependencies();
     authState = Provider.of<AuthState>(context, listen: true); // Khởi tạo ở đây
   }
+
   List<CDM> get allCdms {
     return [
       CDM(Icons.home, tr('home'), [tr('home')]),
@@ -198,7 +208,10 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       case 'Supervisor':
       case 'Leader':
         return allCdms
-            .where((cdm) => cdm.title == tr("fillEvaluation") || cdm.title == tr('home'))
+            .where(
+              (cdm) =>
+                  cdm.title == tr("fillEvaluation") || cdm.title == tr('home'),
+            )
             .toList();
       // Quyen phe duyet
       case 'Chief Section':
@@ -206,7 +219,11 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       case 'General Director':
       case 'Dept Manager':
       case 'Director':
-        return allCdms.where((cdm) => cdm.title == tr("approval") || cdm.title == tr('home')).toList();
+        return allCdms
+            .where(
+              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home'),
+            )
+            .toList();
       default:
         return [allCdms.first]; // Chỉ hiển thị trang chủ nếu không có quyền
     }
@@ -283,7 +300,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       child: Padding(
         padding: EdgeInsets.only(top: 20, bottom: 30),
         child: ListTile(
-          leading: FlutterLogo(),
+          leading: Image.asset('assets/icons/icon_lc.png'),
           title: Text(
             tr('appTitle'),
             style: TextStyle(
@@ -310,7 +327,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             child: ListView.builder(
               itemCount: cdms.length,
               itemBuilder: (contex, index) {
-                // if(index==0) return controlButton();
                 return InkWell(
                   onTap: () {
                     setState(() {
@@ -462,9 +478,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           } else if (subMenu == preparationApprovalText) {
             widget.changeBody(ApprovalPrepartionScreen());
           } else if (subMenu == homeText) {
-            widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+            widget.changeBody(HomeScreen());
           } else {
-            widget.changeBody(HomeScreen(changeBody: (newPage) {}));
+            widget.changeBody(HomeScreen());
           }
         }
       },
@@ -494,8 +510,8 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         decoration: BoxDecoration(
           color: Colors.white70,
           image: DecorationImage(
-            //ảnh
-            image: AssetImage('assets/img/plant-one.png'),
+            //ảnh assets/img/signin.png
+            image: AssetImage('assets/icons/icon_lc.png'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(6),
@@ -575,3 +591,4 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     });
   }
 }
+

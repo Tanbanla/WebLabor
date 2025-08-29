@@ -138,7 +138,7 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         FilterChip(
-                          label: Text('Mới'),
+                          label: Text(tr('New')),
                           selected: _showNew,
                           onSelected: (selected) {
                             setState(() {
@@ -206,7 +206,7 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
     if (monthlyData.isEmpty) {
       return SizedBox(
         height: 300,
-        child: Center(child: Text('Không có dữ liệu')),
+        child: Center(child: Text('Sorry, No data 🥲')),
       );
     }
 

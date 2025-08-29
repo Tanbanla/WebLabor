@@ -104,329 +104,164 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     );
   }
 
-//   Widget _buildSearchAndActions() {
-//   final authState = Provider.of<AuthState>(context, listen: false);
-//   final DashboardControllerTwo controller = Get.find<DashboardControllerTwo>();
-
-//   // Extract section name safely
-//   String sectionName =
-//       authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-
-//   return Column(
-//     children: [
-//       Row(
-//         children: [
-//           Expanded(
-//             child: Container(
-//               decoration: BoxDecoration(
-//                 borderRadius: BorderRadius.circular(10),
-//                 color: Colors.white,
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.grey.withOpacity(0.1),
-//                     spreadRadius: 1,
-//                     blurRadius: 3,
-//                     offset: const Offset(0, 1),
-//                   ),
-//                 ],
-//               ),
-//               child: Obx(() => TextField(
-//                 controller: controller.searchTextController,
-//                 onChanged: (value) {
-//                   controller.searchQuery(value);
-//                 },
-//                 decoration: InputDecoration(
-//                   hintText: tr('searchhint'),
-//                   hintStyle: TextStyle(color: Colors.grey[400]),
-//                   prefixIcon: Icon(
-//                     Iconsax.search_normal,
-//                     color: Colors.grey[500],
-//                   ),
-//                   border: InputBorder.none,
-//                   contentPadding: const EdgeInsets.symmetric(
-//                     vertical: 14,
-//                     horizontal: 16,
-//                   ),
-//                   suffixIcon:
-//                       controller.searchTextController.text.isNotEmpty
-//                       ? IconButton(
-//                           icon: Icon(
-//                             Icons.close,
-//                             size: 20,
-//                             color: Colors.grey[500],
-//                           ),
-//                           onPressed: () {
-//                             controller.searchTextController.clear();
-//                             controller.searchQuery('');
-//                           },
-//                         )
-//                       : null,
-//                 ),
-//               )),
-//             ),
-//           ),
-//           // Action Buttons
-//           const SizedBox(width: 8),
-//           buildActionButton(
-//             icon: Iconsax.export,
-//             color: Colors.green,
-//             tooltip: tr('export'),
-//             onPressed: () => _showExportDialog(),
-//           ),
-//           const SizedBox(width: 8),
-//           // Send button
-//           Obx(() => GestureDetector(
-//             onTap: controller.isLoading.value
-//                 ? null
-//                 : () async {
-//                     try {
-//                       controller.isLoading(true);
-//                       await controller.updateListTwoContractApproval(
-//                         authState.user!.chRUserid.toString(),
-//                       );
-//                       // phan xem ai dang vao man so sanh
-//                       if (authState.user!.chRGroup.toString() ==
-//                               "Chief Section" ||
-//                           authState.user!.chRGroup.toString() == "Chief" ||
-//                           authState.user!.chRGroup.toString() == "Admin") {
-//                         // truong hop quan ly
-//                         await controller.changeStatus('6', sectionName, null);
-//                       } else if (authState.user!.chRGroup.toString() ==
-//                               "Section Manager" ||
-//                           authState.user!.chRGroup.toString() == "Dept Manager" ||
-//                           authState.user!.chRGroup.toString() == "Admin") {
-//                         // truong hop truong phong
-//                         await controller.changeStatus('7', sectionName, null);
-//                       } else if (authState.user!.chRGroup.toString() ==
-//                               "Director" ||
-//                           authState.user!.chRGroup.toString() ==
-//                               "General Director" ||
-//                           authState.user!.chRGroup.toString() == "Admin") {
-//                         await controller.changeStatus('8', null, null);
-//                       }
-                      
-//                       if (context.mounted) {
-//                         // Hiển thị thông báo thành công
-//                         ScaffoldMessenger.of(context).showSnackBar(
-//                           SnackBar(
-//                             content: Text(tr('DaGui')),
-//                             backgroundColor: Colors.green,
-//                           ),
-//                         );
-//                       }
-//                     } catch (e) {
-//                       if (context.mounted) {
-//                         ScaffoldMessenger.of(context).showSnackBar(
-//                           SnackBar(
-//                             content: Text(
-//                               '${tr('sendFailed')} ${e.toString()}',
-//                             ),
-//                             backgroundColor: Colors.red,
-//                           ),
-//                         );
-//                       }
-//                     } finally {
-//                       controller.isLoading(false);
-//                     }
-//                   },
-//             child: Container(
-//               width: 130,
-//               height: 36,
-//               decoration: BoxDecoration(
-//                 color: controller.isLoading.value
-//                     ? Colors.grey
-//                     : Common.primaryColor,
-//                 borderRadius: BorderRadius.circular(10),
-//               ),
-//               padding: const EdgeInsets.symmetric(
-//                 horizontal: 10,
-//                 vertical: 8,
-//               ),
-//               child: Center(
-//                 child: controller.isLoading.value
-//                     ? const SizedBox(
-//                         width: 20,
-//                         height: 20,
-//                         child: CircularProgressIndicator(
-//                           color: Colors.white,
-//                           strokeWidth: 2,
-//                         ),
-//                       )
-//                     : Text(
-//                         tr('Confirm'),
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 16,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//               ),
-//             ),
-//           )),
-//         ],
-//       ),
-//     ],
-//   );
-// }
-    Widget _buildSearchAndActions() {
+  Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: false);
-    final DashboardControllerTwo controller = Get.find<DashboardControllerTwo>();
+    final DashboardControllerTwo controller =
+        Get.find<DashboardControllerTwo>();
 
     // Extract section name safely
     String sectionName =
         authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller.searchTextController,
-                    onChanged: (value) {
-                      controller.searchQuery(value);
-                    },
-                    decoration: InputDecoration(
-                      hintText: tr('searchhint'),
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      prefixIcon: Icon(
-                        Iconsax.search_normal,
-                        color: Colors.grey[500],
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 16,
-                      ),
-                      suffixIcon:
-                          controller.searchTextController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.close,
-                                size: 20,
-                                color: Colors.grey[500],
-                              ),
-                              onPressed: () {
-                                controller.searchTextController.clear();
-                                controller.searchQuery('');
-                              },
-                            )
-                          : null,
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
                     ),
+                  ],
+                ),
+                child: TextField(
+                  controller: controller.searchTextController,
+                  onChanged: (value) {
+                    controller.searchQuery(value);
+                  },
+                  decoration: InputDecoration(
+                    hintText: tr('searchhint'),
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    prefixIcon: Icon(
+                      Iconsax.search_normal,
+                      color: Colors.grey[500],
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
+                    ),
+                    suffixIcon: controller.searchTextController.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 20,
+                              color: Colors.grey[500],
+                            ),
+                            onPressed: () {
+                              controller.searchTextController.clear();
+                              controller.searchQuery('');
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
-              // Action Buttons
-              const SizedBox(width: 8),
-              buildActionButton(
-                icon: Iconsax.export,
-                color: Colors.green,
-                tooltip: tr('export'),
-                onPressed: () => _showExportDialog(),
-              ),
-              // action send
-              const SizedBox(width: 20),
-              // Send button
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    await controller.updateListTwoContractApproval(
-                      authState.user!.chRUserid.toString(),
-                    );
-                    // phan xem ai dang vao man so sanh
-                    if (authState.user!.chRGroup.toString() ==
-                            "Chief Section" ||
-                        authState.user!.chRGroup.toString() == "Chief" ||
-                        authState.user!.chRGroup.toString() == "Admin") {
-                      // truong hop quan ly
-                      controller.changeStatus('6', sectionName, null);
-                    } else if (authState.user!.chRGroup.toString() ==
-                            "Section Manager" ||
-                        authState.user!.chRGroup.toString() == "Dept Manager" ||
-                        authState.user!.chRGroup.toString() == "Admin") {
-                      // truong hop truong phong
-                      controller.changeStatus('7', sectionName, null);
-                    } else if (authState.user!.chRGroup.toString() ==
-                            "Director" ||
-                        authState.user!.chRGroup.toString() ==
-                            "General Director" ||
-                        authState.user!.chRGroup.toString() == "Admin") {
-                      controller.changeStatus('8', null, null);
-                    }
-                    if (context.mounted) {
-                      // Hiển thị thông báo thành công
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(tr('DaGui')),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
-                  } catch (e) {
+            ),
+            // Action Buttons
+            const SizedBox(width: 8),
+            buildActionButton(
+              icon: Iconsax.export,
+              color: Colors.green,
+              tooltip: tr('export'),
+              onPressed: () => _showExportDialog(),
+            ),
+            // action send
+            const SizedBox(width: 20),
+            // Send button
+            GestureDetector(
+              onTap: () async {
+                try {
+                  await controller.updateListTwoContractApproval(
+                    authState.user!.chRUserid.toString(),
+                  );
+                  // phan xem ai dang vao man so sanh
+                  if (authState.user!.chRGroup.toString() == "Chief Section" ||
+                      authState.user!.chRGroup.toString() == "Chief" ||
+                      authState.user!.chRGroup.toString() == "Admin") {
+                    // truong hop quan ly
+                    controller.changeStatus('6', sectionName, null);
+                  } else if (authState.user!.chRGroup.toString() ==
+                          "Section Manager" ||
+                      authState.user!.chRGroup.toString() == "Dept Manager" ||
+                      authState.user!.chRGroup.toString() == "Admin") {
+                    // truong hop truong phong
+                    controller.changeStatus('7', sectionName, null);
+                  } else if (authState.user!.chRGroup.toString() ==
+                          "Director" ||
+                      authState.user!.chRGroup.toString() ==
+                          "General Director" ||
+                      authState.user!.chRGroup.toString() == "Admin") {
+                    controller.changeStatus('8', null, null);
+                  }
+                  if (context.mounted) {
+                    // Hiển thị thông báo thành công
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
-                        ),
-                        backgroundColor: Colors.red,
+                        content: Text(tr('DaGui')),
+                        backgroundColor: Colors.green,
                       ),
                     );
                   }
-                },
-                child: 
-                Obx(
-                  () => Container(
-                    width: 130,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: controller.isLoading.value
-                          ? Colors.grey
-                          : Common.primaryColor,
-                      borderRadius: BorderRadius.circular(10),
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                      ),
+                      backgroundColor: Colors.red,
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    child: Center(
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              tr('Confirm'),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                  );
+                }
+              },
+              child: Obx(
+                () => Container(
+                  width: 130,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: controller.isLoading.value
+                        ? Colors.grey
+                        : Common.primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  child: Center(
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
                             ),
-                    ),
+                          )
+                        : Text(
+                            tr('Confirm'),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
-      );
+            ),
+          ],
+        ),
+      ],
+    );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -905,13 +740,13 @@ class MyData extends DataTableSource {
     final data = controller.filterdataList[index];
     final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
-      // text: switch (data.inTStatusId) {
-      //   6 => data.nvchRApproverChief ?? '',
-      //   7 => data.nvchRApproverManager ?? '',
-      //   8 => data.nvchRApproverDirector ?? '',
-      //   _ => '', // Giá trị mặc định cho các trường hợp khác
-      //},
-      text: (''),
+      text: switch (data.inTStatusId) {
+        6 => data.nvchRApproverChief ?? '',
+        7 => data.nvchRApproverManager ?? '',
+        8 => data.nvchRApproverDirector ?? '',
+        _ => '', // Giá trị mặc định cho các trường hợp khác
+      },
+      //text: (''),
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -1793,19 +1628,27 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .toString()
                           .split(':')[1]
                           .trim();
-                          // phan xem ai dang vao man so sanh
-                        if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
-                            authState.user!.chRGroup.toString() == "Admin") {
-                          // truong hop quan ly
-                          controller.changeStatus('6', sectionName, null);
-                        } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
-                            authState.user!.chRGroup.toString() == "Admin") {
-                          // truong hop truong phong
-                          controller.changeStatus('7', sectionName, null);
-                        } else if (authState.user!.chRGroup.toString() == "Director" || authState.user!.chRGroup.toString() == "General Director" ||
-                            authState.user!.chRGroup.toString() == "Admin") {
-                          controller.changeStatus('8', null, null);
-                        }
+                      // phan xem ai dang vao man so sanh
+                      if (authState.user!.chRGroup.toString() ==
+                              "Chief Section" ||
+                          authState.user!.chRGroup.toString() == "Chief" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
+                        // truong hop quan ly
+                        controller.changeStatus('6', sectionName, null);
+                      } else if (authState.user!.chRGroup.toString() ==
+                              "Section Manager" ||
+                          authState.user!.chRGroup.toString() ==
+                              "Dept Manager" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
+                        // truong hop truong phong
+                        controller.changeStatus('7', sectionName, null);
+                      } else if (authState.user!.chRGroup.toString() ==
+                              "Director" ||
+                          authState.user!.chRGroup.toString() ==
+                              "General Director" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
+                        controller.changeStatus('8', null, null);
+                      }
                       // await controller.changeStatus(
                       //   "2",
                       //   sectionName,

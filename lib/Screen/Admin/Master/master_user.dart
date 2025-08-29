@@ -237,7 +237,6 @@ class _MasterUserState extends State<MasterUser> {
                 availableRowsPerPage: const [5, 10, 20, 50],
                 onRowsPerPageChanged: (value) {},
                 sortColumnIndex: controller.sortColumnIndex.value,
-
                 ///
                 sortAscending: controller.sortAscending.value,
                 sortArrowBuilder: (ascending, sorted) {
