@@ -384,7 +384,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         child: Container(
           height: 45,
           alignment: Alignment.center,
-          child: FlutterLogo(size: 40),
+          child: Image.asset('assets/icons/icon_lc.png'),
         ),
       ),
     );
