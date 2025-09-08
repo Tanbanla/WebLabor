@@ -596,9 +596,9 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   setCellValue('T', item.vchRUseful ?? '');
                   setCellValue('U', item.vchRContact ?? '');
                   setCellValue('V', item.vcHNeedViolation ?? '');
-                  setCellValue('W', item.vchRReasultsLeader);
-                  setCellValue('X', item.vchRNote);
-                  setCellValue('Y', item.biTNoReEmployment.toString());
+                  setCellValue('W', item.vchRReasultsLeader ?? '');
+                  setCellValue('X', item.vchRNote ?? '');
+                  setCellValue('Y', item.biTNoReEmployment ? "X":"");
                   setCellValue('Z', item.vchRUseful ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }

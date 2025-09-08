@@ -336,6 +336,7 @@ class DashboardControllerTwo extends GetxController {
     String userUpdate,
   ) async {
     try {
+      userApprover = 'vanug';
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
@@ -359,6 +360,13 @@ class DashboardControllerTwo extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMail(
+          '2',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+        );
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -537,7 +545,7 @@ class DashboardControllerTwo extends GetxController {
           // k mo vi mo se gui cho quan ly cac phong
           controlleruser.SendMail(
             '2',
-            "vietdo@brothergroup.net",
+            "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
             "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
             "vuduc.hai@brother-bivn.com.vn",
           );

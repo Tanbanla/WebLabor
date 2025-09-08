@@ -327,6 +327,7 @@ class DashboardControllerApprentice extends GetxController {
     String userUpdate,
   ) async {
     try {
+      userApprover = 'vanug';
       final contract = getSelectedItems();
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
@@ -348,6 +349,13 @@ class DashboardControllerApprentice extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMail(
+          '2',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net',
+        );
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -427,11 +435,12 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+
   // update thời gian tới hạn
   Future<void> updateDTM_END(
     ApprenticeContract contract,
     String userUpdate,
-  ) async { 
+  ) async {
     try {
       contract.vchRUserUpdate = userUpdate;
       contract.dtMUpdate = formatDateTime(DateTime.now());
@@ -458,6 +467,7 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+
   // update thong tin phe duyet
   Future<void> updateListApprenticeContractApproval(String userApprover) async {
     try {
@@ -525,7 +535,7 @@ class DashboardControllerApprentice extends GetxController {
           //controlleruser.SendMail('2', mailSend, mailSend, mailSend);
           controlleruser.SendMail(
             '2',
-            "vietdo@brothergroup.net",
+            "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
             "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
             "vuduc.hai@brother-bivn.com.vn",
           );
@@ -642,16 +652,16 @@ class DashboardControllerApprentice extends GetxController {
           ..inTViolation = row[13]?.value != null
               ? int.tryParse(row[13]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation 
+          ..nvarchaRViolation
           ..vchRLyThuyet //= row[14]!.value.toString()
-          ..vchRThucHanh// = row[15]!.value.toString()
-          ..vchRCompleteWork//= row[16]!.value.toString()
-          ..vchRLearnWork//= row[17]!.value.toString()
-          ..vchRThichNghi//= row[18]!.value.toString()
-          ..vchRUseful//= row[19]!.value.toString()
-          ..vchRContact//= row[20]!.value.toString()
-          ..vcHNeedViolation//= row[21]!.value.toString()
-          ..vchRReasultsLeader//= row[22]!.value.toString()
+          ..vchRThucHanh // = row[15]!.value.toString()
+          ..vchRCompleteWork //= row[16]!.value.toString()
+          ..vchRLearnWork //= row[17]!.value.toString()
+          ..vchRThichNghi //= row[18]!.value.toString()
+          ..vchRUseful //= row[19]!.value.toString()
+          ..vchRContact //= row[20]!.value.toString()
+          ..vcHNeedViolation //= row[21]!.value.toString()
+          ..vchRReasultsLeader //= row[22]!.value.toString()
           ..biTNoReEmployment = true
           ..nvchRNoReEmpoyment
           ..nvchRPthcSection
@@ -881,9 +891,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -903,9 +916,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -925,9 +941,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRThucHanh == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -947,9 +966,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRThucHanh == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -969,9 +991,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -991,9 +1016,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRThucHanh== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -1013,9 +1041,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRThucHanh== 'OK' && dataList[index].vcHNeedViolation== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vcHNeedViolation == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }
@@ -1035,9 +1066,12 @@ class DashboardControllerApprentice extends GetxController {
         dataList[index].vchRReasultsLeader = 'NG';
         filterdataList[index].vchRReasultsLeader = 'NG';
       } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK'&& dataList[index].vchRCompleteWork == 'OK'&&dataList[index].vchRLearnWork == 'OK'
-          && dataList[index].vchRContact== 'OK' && dataList[index].vchRThucHanh== 'OK' && dataList[index].vchRUseful== 'OK'
-          ) {
+          dataList[index].vchRThichNghi == 'OK' &&
+          dataList[index].vchRCompleteWork == 'OK' &&
+          dataList[index].vchRLearnWork == 'OK' &&
+          dataList[index].vchRContact == 'OK' &&
+          dataList[index].vchRThucHanh == 'OK' &&
+          dataList[index].vchRUseful == 'OK') {
         dataList[index].vchRReasultsLeader = 'OK';
         filterdataList[index].vchRReasultsLeader = 'OK';
       }

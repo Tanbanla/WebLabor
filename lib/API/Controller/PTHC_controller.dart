@@ -184,7 +184,7 @@ class DashboardControllerPTHC extends GetxController {
       }
       // 4. Refresh data
       final List<Pthc> importedPTHC = [];
-      int _i = 1;
+      int _i = 2;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -260,7 +260,7 @@ class DashboardControllerPTHC extends GetxController {
       }
       // 4. Refresh data
       final List<Pthc> importedPTHC = [];
-      int _i = 1;
+      int _i = 2;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];

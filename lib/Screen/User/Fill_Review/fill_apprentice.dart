@@ -99,7 +99,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus(sectionName, 'Leader,Supervisor,Staff');
+    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
 
@@ -727,9 +727,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   setCellValue('T', item.vchRUseful ?? '');
                   setCellValue('U', item.vchRContact ?? '');
                   setCellValue('V', item.vcHNeedViolation ?? '');
-                  setCellValue('W', item.vchRReasultsLeader);
-                  setCellValue('X', item.vchRNote);
-                  setCellValue('Y', item.biTNoReEmployment.toString());
+                  setCellValue('W', item.vchRReasultsLeader ?? '');
+                  setCellValue('X', item.vchRNote ?? '');
+                  setCellValue('Y', item.biTNoReEmployment ? "X":"");
                   setCellValue('Z', item.vchRUseful ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                   
