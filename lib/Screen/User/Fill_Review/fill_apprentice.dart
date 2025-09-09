@@ -99,7 +99,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff');
+    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
 

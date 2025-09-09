@@ -336,7 +336,10 @@ class DashboardControllerTwo extends GetxController {
     String userUpdate,
   ) async {
     try {
-      userApprover = 'vanug';
+      //sau test delete
+      if(userApprover == "fujiokmi"){
+        userApprover = 'vanug';
+      }
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
@@ -465,6 +468,12 @@ class DashboardControllerTwo extends GetxController {
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userApprover;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // Tìm vị trí bắt đầu của phần dept
+        int startIndex = (twocontract[i].vchRCodeSection ?? "").indexOf(" ") + 1;
+        int endIndex = (twocontract[i].vchRCodeSection ?? "").indexOf("-");
+        
+        String dept = (twocontract[i].vchRCodeSection ?? "").substring(startIndex, endIndex);
+
         // lay thong tin phong
         sectionAp = twocontract[i].vchRCodeSection.toString();
         switch (twocontract[i].inTStatusId) {
@@ -476,7 +485,8 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].inTStatusId = 7;
               mailSend = await NextApprovel(
                 section: twocontract[i].vchRCodeSection,
-                chucVu: "Section Manager",
+                chucVu: "Dept Manager",
+                dept: dept,
               );
             } else {
               if ((twocontract[i].nvchRApproverChief?.isEmpty ?? true)) {
@@ -495,6 +505,7 @@ class DashboardControllerTwo extends GetxController {
               mailSend = await NextApprovel(
                 section: twocontract[i].vchRCodeSection,
                 chucVu: "Director",
+                dept: dept,
               );
             } else {
               if ((twocontract[i].nvchRApproverManager?.isEmpty ?? true)) {
@@ -680,7 +691,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 7;
+      int _i = 20;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -710,23 +721,23 @@ class DashboardControllerTwo extends GetxController {
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
           ..dtMJoinDate = row[9]?.value?.toString()
-          ..dtMEndDate = row[10]?.value?.toString()
-          ..fLGoLeaveLate = row[11]?.value != null
-              ? double.tryParse(row[11]!.value.toString()) ?? 0
-              : 0 //double.parse(row[11]!.value.toString())
-          ..fLPaidLeave = row[12]?.value != null
-              ? double.tryParse(row[12]!.value.toString()) ?? 0
-              : 0 //double.parse(row[12]!.value.toString())
-          ..fLNotPaidLeave = row[13]?.value != null
+          ..dtMEndDate = row[12]?.value?.toString()
+          ..fLGoLeaveLate = row[13]?.value != null
               ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0
-          ..fLNotLeaveDay = row[14]?.value != null
+              : 0 //double.parse(row[11]!.value.toString())
+          ..fLPaidLeave = row[14]?.value != null
               ? double.tryParse(row[14]!.value.toString()) ?? 0
+              : 0 //double.parse(row[12]!.value.toString())
+          ..fLNotPaidLeave = row[15]?.value != null
+              ? double.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..inTViolation = row[15]?.value != null
-              ? int.tryParse(row[15]!.value.toString()) ?? 0
+          ..fLNotLeaveDay = row[16]?.value != null
+              ? double.tryParse(row[16]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation //= row[16]!.value.toString()
+          ..inTViolation = row[17]?.value != null
+              ? int.tryParse(row[17]!.value.toString()) ?? 0
+              : 0
+          ..nvarchaRViolation = row[18]!.value.toString()
           ..nvchRCompleteWork //= row[17]!.value.toString()
           ..nvchRUseful //= row[18]!.value.toString()
           ..nvchROther //= row[19]!.value.toString()
@@ -812,7 +823,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 7;
+      int _i = 20;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -1115,7 +1126,7 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý
-  Future<String> NextApprovel({String? section, String? chucVu}) async {
+  Future<String> NextApprovel({String? section, String? chucVu, String? dept}) async {
     try {
       isLoading(true);
 
@@ -1124,6 +1135,7 @@ class DashboardControllerTwo extends GetxController {
         queryParameters: {
           if (section != null) 'section': section,
           if (chucVu != null) 'positionGroups': chucVu,
+          if (dept != null) 'dept': dept,
         },
       );
 

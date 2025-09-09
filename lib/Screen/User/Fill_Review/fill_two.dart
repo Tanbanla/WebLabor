@@ -93,7 +93,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff,Chief');
+    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff,Chief,Section Manager');
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
 

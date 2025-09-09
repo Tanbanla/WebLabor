@@ -298,7 +298,7 @@ class _MasterPTHCState extends State<MasterPTHC> {
     Rx<Uint8List?> selectedFileData = Rx<Uint8List?>(null);
     RxString fileName = ''.obs;
     RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
+    final authState = Provider.of<AuthState>(context, listen: false);
 
     showDialog(
       context: context,

@@ -32,26 +32,12 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+    // String sectionName = authState.user!.chRSecCode
+    //     .toString()
+    //     .split(':')[1]
+    //     .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "Chief Section" ||
-        authState.user!.chRGroup.toString() == "Chief" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      // truong hop quan ly
-      controller.changeStatus('6', sectionName, null);
-    } else if (authState.user!.chRGroup.toString() == "Section Manager" ||
-        authState.user!.chRGroup.toString() == "Dept Manager" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      // truong hop truong phong
-      controller.changeStatus('7', sectionName, null);
-    } else if (authState.user!.chRGroup.toString() == "Director" ||
-        authState.user!.chRGroup.toString() == "General Director" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      controller.changeStatus('8', null, null);
-    }
+    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -110,8 +96,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         Get.find<DashboardControllerTwo>();
 
     // Extract section name safely
-    String sectionName =
-        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
+    // String sectionName =
+    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
     return Column(
       children: [
         Row(
@@ -182,24 +168,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     authState.user!.chRUserid.toString(),
                   );
                   // phan xem ai dang vao man so sanh
-                  if (authState.user!.chRGroup.toString() == "Chief Section" ||
-                      authState.user!.chRGroup.toString() == "Chief" ||
-                      authState.user!.chRGroup.toString() == "Admin") {
-                    // truong hop quan ly
-                    controller.changeStatus('6', sectionName, null);
-                  } else if (authState.user!.chRGroup.toString() ==
-                          "Section Manager" ||
-                      authState.user!.chRGroup.toString() == "Dept Manager" ||
-                      authState.user!.chRGroup.toString() == "Admin") {
-                    // truong hop truong phong
-                    controller.changeStatus('7', sectionName, null);
-                  } else if (authState.user!.chRGroup.toString() ==
-                          "Director" ||
-                      authState.user!.chRGroup.toString() ==
-                          "General Director" ||
-                      authState.user!.chRGroup.toString() == "Admin") {
-                    controller.changeStatus('8', null, null);
-                  }
+                  controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+
                   if (context.mounted) {
                     // Hiển thị thông báo thành công
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -1624,36 +1594,8 @@ class _EditTwoContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() ==
-                              "Chief Section" ||
-                          authState.user!.chRGroup.toString() == "Chief" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        // truong hop quan ly
-                        controller.changeStatus('6', sectionName, null);
-                      } else if (authState.user!.chRGroup.toString() ==
-                              "Section Manager" ||
-                          authState.user!.chRGroup.toString() ==
-                              "Dept Manager" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        // truong hop truong phong
-                        controller.changeStatus('7', sectionName, null);
-                      } else if (authState.user!.chRGroup.toString() ==
-                              "Director" ||
-                          authState.user!.chRGroup.toString() ==
-                              "General Director" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        controller.changeStatus('8', null, null);
-                      }
-                      // await controller.changeStatus(
-                      //   "2",
-                      //   sectionName,
-                      //   authState.user!.chRUserid.toString(),
-                      // );
+                      controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

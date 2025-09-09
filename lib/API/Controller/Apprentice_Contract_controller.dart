@@ -327,7 +327,10 @@ class DashboardControllerApprentice extends GetxController {
     String userUpdate,
   ) async {
     try {
-      userApprover = 'vanug';
+      //sau test delete
+      if(userApprover == "fujiokmi"){
+        userApprover = 'vanug';
+      }
       final contract = getSelectedItems();
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
@@ -481,6 +484,13 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userApprover;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
+       // Tìm vị trí bắt đầu của phần dept
+        int startIndex = (contract[i].vchRCodeSection ?? "").indexOf(" ") + 1;
+        int endIndex = (contract[i].vchRCodeSection ?? "").indexOf("-");
+        
+        String dept = (contract[i].vchRCodeSection ?? "").substring(startIndex, endIndex);
+
+        
         // lay thong tin phong
         sectionAp = contract[i].vchRCodeSection.toString();
         switch (contract[i].inTStatusId) {
@@ -491,7 +501,8 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].inTStatusId = 7;
               mailSend = await NextApprovel(
                 section: contract[i].vchRCodeSection,
-                chucVu: "Section Manager",
+                chucVu: "Dept Manager",
+                dept: dept,
               );
             } else {
               if ((contract[i].nvchRApproverChief?.isEmpty ?? true)) {
@@ -611,7 +622,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 8;
+      int _i = 20;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -642,15 +653,15 @@ class DashboardControllerApprentice extends GetxController {
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
           ..dtMJoinDate = formatDateTime(row[9]?.value?.toString())
-          ..dtMEndDate = formatDateTime(row[10]?.value?.toString())
-          ..fLGoLeaveLate = row[11]?.value != null
-              ? double.tryParse(row[11]!.value.toString()) ?? 0
+          ..dtMEndDate = formatDateTime(row[12]?.value?.toString())
+          ..fLGoLeaveLate = row[13]?.value != null
+              ? double.tryParse(row[13]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
-          ..fLNotLeaveDay = row[12]?.value != null
-              ? double.tryParse(row[12]!.value.toString()) ?? 0
+          ..fLNotLeaveDay = row[14]?.value != null
+              ? double.tryParse(row[14]!.value.toString()) ?? 0
               : 0 //double.parse(row[12]!.value.toString())
-          ..inTViolation = row[13]?.value != null
-              ? int.tryParse(row[13]!.value.toString()) ?? 0
+          ..inTViolation = row[15]?.value != null
+              ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
           ..nvarchaRViolation
           ..vchRLyThuyet //= row[14]!.value.toString()
@@ -742,7 +753,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 8;
+      int _i = 20;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -774,15 +785,15 @@ class DashboardControllerApprentice extends GetxController {
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
           ..dtMJoinDate = formatDateTime(row[9]?.value?.toString())
-          ..dtMEndDate = formatDateTime(row[10]?.value?.toString())
-          ..fLGoLeaveLate = row[11]?.value != null
-              ? double.tryParse(row[11]!.value.toString()) ?? 0
+          ..dtMEndDate = formatDateTime(row[12]?.value?.toString())
+          ..fLGoLeaveLate = row[13]?.value != null
+              ? double.tryParse(row[13]!.value.toString()) ?? 0
               : 0 //double.parse(row[11]!.value.toString())
-          ..fLNotLeaveDay = row[12]?.value != null
-              ? double.tryParse(row[12]!.value.toString()) ?? 0
+          ..fLNotLeaveDay = row[14]?.value != null
+              ? double.tryParse(row[14]!.value.toString()) ?? 0
               : 0 //double.parse(row[12]!.value.toString())
-          ..inTViolation = row[13]?.value != null
-              ? int.tryParse(row[13]!.value.toString()) ?? 0
+          ..inTViolation = row[15]?.value != null
+              ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
           ..nvarchaRViolation //= row[14]!.value.toString()
           ..vchRLyThuyet
@@ -1176,7 +1187,7 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý
-  Future<String> NextApprovel({String? section, String? chucVu}) async {
+  Future<String> NextApprovel({String? section, String? chucVu, String? dept}) async {
     try {
       isLoading(true);
 
@@ -1185,6 +1196,7 @@ class DashboardControllerApprentice extends GetxController {
         queryParameters: {
           if (section != null) 'section': section,
           if (chucVu != null) 'positionGroups': chucVu,
+          if (dept != null) 'dept': dept,
         },
       );
 

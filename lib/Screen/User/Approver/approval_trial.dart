@@ -34,20 +34,21 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+    // String sectionName = authState.user!.chRSecCode
+    //     .toString()
+    //     .split(':')[1]
+    //     .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      // truong hop quan ly
-      controller.changeStatus('6', sectionName, null);
-    } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      // truong hop truong phong
-      controller.changeStatus('7', sectionName, null);
-    }
+    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+    // if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
+    //     authState.user!.chRGroup.toString() == "Admin") {
+    //   // truong hop quan ly
+    //   controller.changeStatus('6', sectionName, null);
+    // } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
+    //     authState.user!.chRGroup.toString() == "Admin") {
+    //   // truong hop truong phong
+    //   controller.changeStatus('7', sectionName, null);
+    // }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -110,8 +111,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       DashboardControllerApprentice(),
     );
     // Extract section name safely
-    String sectionName =
-        authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
+    // String sectionName =
+    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
       return Column(
         children: [
           Row(
@@ -183,24 +184,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                       authState.user!.chRUserid.toString(),
                     );
                     // phan xem ai dang vao man so sanh
-                    if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
-                            authState.user!.chRGroup.toString() == "Admin") {
-                          // truong hop quan ly
-                          controller.changeStatus('6', sectionName, null);
-                        } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
-                            authState.user!.chRGroup.toString() == "Admin") {
-                          // truong hop truong phong
-                          controller.changeStatus('7', sectionName, null);
-                        }
-                    if (context.mounted) {
-                      // Hiển thị thông báo thành công
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(tr('DaGui')),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
+                    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -1458,25 +1442,12 @@ class _EditContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
+                      // String sectionName = authState.user!.chRSecCode
+                      //     .toString()
+                      //     .split(':')[1]
+                      //     .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        // truong hop quan ly
-                        controller.changeStatus('6', sectionName, null);
-                      } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        // truong hop truong phong
-                        controller.changeStatus('7', sectionName, null);
-                      }
-                      // await controller.changeStatus(
-                      //   "2",
-                      //   sectionName,
-                      //   authState.user!.chRUserid.toString(),
-                      // );
+                      controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
