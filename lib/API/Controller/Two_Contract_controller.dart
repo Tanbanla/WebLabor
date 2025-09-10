@@ -189,6 +189,13 @@ class DashboardControllerTwo extends GetxController {
             "operator": "IN",
             "logicType": "AND",
           }
+        else if (statusId == 'PTHC')
+          {
+            "field": "INT_STATUS_ID",
+            "value": ["3", "4"],
+            "operator": "IN",
+            "logicType": "AND",
+          }
         else
           {
             "field": "INT_STATUS_ID",
@@ -203,7 +210,7 @@ class DashboardControllerTwo extends GetxController {
             "operator": "like",
             "logicType": "AND",
           },
-        if (adid != null && adid.isNotEmpty)
+        if (adid != null && adid.isNotEmpty && statusId != 'approval')
           {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
       ];
 
@@ -469,11 +476,12 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].vchRUserUpdate = userApprover;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         // Tìm vị trí bắt đầu của phần dept
-        int startIndex = (twocontract[i].vchRCodeSection ?? "").indexOf(" ") + 1;
-        int endIndex = (twocontract[i].vchRCodeSection ?? "").indexOf("-");
-        
-        String dept = (twocontract[i].vchRCodeSection ?? "").substring(startIndex, endIndex);
+        List<String> parts = (twocontract[i].vchRCodeSection ?? "").split(": ");
+        String prPart = parts[1]; 
 
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
         // lay thong tin phong
         sectionAp = twocontract[i].vchRCodeSection.toString();
         switch (twocontract[i].inTStatusId) {
@@ -494,7 +502,7 @@ class DashboardControllerTwo extends GetxController {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
-              twocontract[i].inTStatusId = 3;
+              twocontract[i].inTStatusId = 4;
               notApproval.add(twocontract[i]);
             }
           case 7:
@@ -691,7 +699,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 20;
+      int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -823,7 +831,7 @@ class DashboardControllerTwo extends GetxController {
       }
       // 4. Refresh data
       final List<TwoContract> importedTwoContract = [];
-      int _i = 20;
+      int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];

@@ -10,7 +10,7 @@
   "approval": "Phê duyệt",
   "report": "Báo cáo",
   "settings": "Cài đặt",
-  "indefiniteContract": "Hợp đồng không xác định thời gian",
+  "indefiniteContract": "Hợp đồng xác định thời gian",
   "trialContract": "Hợp đồng học nghề & thử việc",
   "preparationApproval": "Phê duyệt chuẩn bị",
   "welcome": "Xin chào",
@@ -151,5 +151,9 @@
   "DonteCC":"Sửa thành công kết quả đánh giá cuối cùng",
   "DaGui": "Đã gửi đánh giá đến bước tiếp theo",
   "searchapprover": "Chọn người gửi",
-  "New":"Mới"
+  "New":"Mới",
+  "ChonNguoiDanhGia":"Chọn người đánh giá",
+  "reject":"Trả lại bước đánh giá trước",
+  "reasonReject":"Lý do trả lại",
+  "reasonRejectHint":"Nhập lý do trả lại"
 }

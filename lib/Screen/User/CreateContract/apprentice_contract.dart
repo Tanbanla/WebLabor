@@ -364,7 +364,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3350,
+              width: 2200, // Set a fixed width for horizontal scrolling
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -487,60 +487,13 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('lythuyet'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('thuchanh'),
-                    width: 120,
-                    fontSize: Common.sizeColumn,
-                    maxLines: 2,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('congviec'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('hochoi'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('thichnghi'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('tinhthan'),
-                    fontSize: Common.sizeColumn,
-                    width: 150,
-                    maxLines: 3,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('baocao'),
-                    fontSize: Common.sizeColumn,
-                    width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('chaphanh'),
-                    fontSize: Common.sizeColumn,
-                    width: 130,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('ketqua'),
-                    fontSize: Common.sizeColumn,
-                    width: 150,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('note'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('notRehirable'),
+                    title: tr('TruongPhong'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('Lydo'),
+                    title: tr('LydoTuChoi'),
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
@@ -966,7 +919,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
-      text: data.nvchRNoReEmpoyment ?? '',
+      text: data.nvchRApproverPer ?? '',
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -1122,35 +1075,6 @@ class MyData extends DataTableSource {
           Text(
             data.nvarchaRViolation?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(
-          TextFormField(
-            style: TextStyle(fontSize: Common.sizeColumn), // Added fontSize 12
-            decoration: InputDecoration(
-              labelText: tr('note'),
-              labelStyle: TextStyle(
-                fontSize: Common.sizeColumn,
-              ), // Added fontSize 12
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return tr('pleaseNote');
-              }
-              return null;
-            },
           ),
         ),
         DataCell(

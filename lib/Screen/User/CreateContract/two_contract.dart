@@ -367,7 +367,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2910,
+              width: 2400,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -502,37 +502,13 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('congviec'),
-                    width: 120,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('tinhthan'),
+                    title: tr('TruongPhong'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('khac'),
-                    width: 120,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('evaluationResult'),
-                    width: 150,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('notRehirable'),
-                    width: 170,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('notRehirableReason'),
+                    title: tr('LydoTuChoi'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -956,7 +932,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
-      text: data.nvchRNoReEmpoyment ?? '',
+      text: data.nvchRApproverPer ?? '',
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -1150,10 +1126,6 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
-        DataCell(Text("", style: TextStyle(fontSize: Common.sizeColumn))),
         DataCell(
           Obx(() {
             Visibility(

@@ -433,8 +433,8 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               ? 'Thông tin PTHC'
               : 'PTHC情報';
           final indefiniteContractText = currentLang == 'vi'
-              ? 'Hợp đồng không xác định thời gian'
-              : '期間不定の契約';
+              ? 'Hợp đồng xác định thời gian'
+              : '期限付き契約';
           final trialContractText = currentLang == 'vi'
               ? 'Hợp đồng học nghề & thử việc'
               : '試用・研修契約';

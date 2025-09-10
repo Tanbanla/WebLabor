@@ -840,12 +840,12 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
             children: [
               TextField(
                 decoration: InputDecoration(
-                  labelText: 'Nhập ADID',
+                  labelText: 'Nhập Mail',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onChanged: (value) => userAdd.vchREmployeeAdid = value,
+                onChanged: (value) => userAdd.vchRMail = value,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField(
@@ -861,6 +861,16 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                 onChanged: (value) {
                   userAdd.vchRNote = value;
                 },
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Phòng ban',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: (value) => userAdd.vchRCodeSection = value,
               ),
               const SizedBox(height: 12),
               if (errorMessage.isNotEmpty)
@@ -886,7 +896,7 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    if ((userAdd.vchREmployeeAdid?.isEmpty ?? true)||
+                    if ((userAdd.vchRMail?.isEmpty ?? true)||(userAdd.vchRCodeSection?.isEmpty ?? true)||
                         (userAdd.vchRNote?.isEmpty ?? true)){ 
                       showDialog(context: context, 
                         builder: (context) => 

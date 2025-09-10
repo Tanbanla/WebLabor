@@ -10,7 +10,7 @@
   "approval": "承認",
   "report": "レポート",
   "settings": "設定",
-  "indefiniteContract": "期間不定の契約",
+  "indefiniteContract": "期限付き契約",
   "trialContract": "試用・研修契約",
   "preparationApproval": "準備承認",
   "welcome": "ようこそ",
@@ -151,5 +151,9 @@
   "DonteCC":"最終レビュー結果が正常に編集されました",
   "DaGui": "評価を次のステップへ送信しました",
   "searchapprover": "送信者を選択",
-  "New":"新しい"
+  "New":"新しい",
+  "ChonNguoiDanhGia":"評価者を選択する",
+  "reject": "評価のステップを戻す",
+  "reasonReject": "戻す理由",
+  "reasonRejectHint": "戻す理由を入力してください"
 }

@@ -41,9 +41,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC"||authState.user!.chRGroup.toString() == "Admin") {
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
-      controller.changeStatus('3', sectionName, null);
+      controller.changeStatus("PTHC", sectionName, null);
     } else {
       // truong hop leader
       controller.changeStatus(
@@ -52,11 +53,6 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         authState.user!.chRUserid.toString(),
       );
     }
-    // controller.changeStatus(
-    //   '2',
-    //   sectionName,
-    //   authState.user!.chRUserid.toString(),
-    // );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -99,7 +95,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus('ADM-PER', 'Leader,Supervisor,Staff,Section Manager');
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Admin") {
+      // truong hop PTHC phong ban
+      controller.changeStatus(
+        'ADM-PER',
+        'Leader,Supervisor,Staff,Section Manager',
+      );
+    } else {
+      // truong hop leader
+      controller.changeStatus('ADM-PER', 'Section Manager');
+    }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
 
@@ -113,7 +119,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                tr('approver'),
+                authState.user!.chRGroup.toString() == "PTHC"
+                    ? tr('ChonNguoiDanhGia')
+                    : tr('approver'),
                 style: TextStyle(
                   color: Common.primaryColor,
                   fontWeight: FontWeight.bold,
@@ -121,49 +129,53 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               ),
               const SizedBox(width: 6),
               GestureDetector(
-              onTap: () => _showSearchDialog(context, controller.filterdataList, 
-                  selectedConfirmer, selectedConfirmerId),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
+                onTap: () => _showSearchDialog(
+                  context,
+                  controller.filterdataList,
+                  selectedConfirmer,
+                  selectedConfirmerId,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    selectedConfirmer.value != null
-                        ? Text(
-                            selectedConfirmer.value!.chREmployeeAdid ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Common.primaryColor.withOpacity(0.8),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      selectedConfirmer.value != null
+                          ? Text(
+                              selectedConfirmer.value!.chREmployeeAdid ?? '',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Common.primaryColor.withOpacity(0.8),
+                              ),
+                            )
+                          : Text(
+                              tr('pickapprover'),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
                             ),
-                          )
-                        : Text(
-                            tr('pickapprover'),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      color: Common.primaryColor.withOpacity(0.8),
-                    ),
-                  ],
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Common.primaryColor.withOpacity(0.8),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (selectedConfirmer.value != null) const SizedBox(width: 8),
-            if (selectedConfirmer.value != null)
-              IconButton(
-                icon: Icon(Icons.clear, size: 18, color: Colors.grey),
-                onPressed: () {
-                  selectedConfirmer.value = null;
-                  selectedConfirmerId.value = '';
-                },
-              ),
+              if (selectedConfirmer.value != null) const SizedBox(width: 8),
+              if (selectedConfirmer.value != null)
+                IconButton(
+                  icon: Icon(Icons.clear, size: 18, color: Colors.grey),
+                  onPressed: () {
+                    selectedConfirmer.value = null;
+                    selectedConfirmerId.value = '';
+                  },
+                ),
             ],
           ),
           const SizedBox(width: 30),
@@ -185,9 +197,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
+                if (authState.user!.chRGroup.toString() == "PTHC" ||
+                    authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
-                  await controllerTwo.changeStatus('3', sectionName, null);
+                  await controllerTwo.changeStatus('PTHC', sectionName, null);
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
@@ -207,11 +220,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString().replaceAll('', '')),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  SnackBar(
+                    content: Text(e.toString().replaceAll('', '')),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: Obx(
@@ -254,8 +267,13 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       );
     });
   }
-  void _showSearchDialog(BuildContext context, List<ApproverUser> items, 
-    Rx<ApproverUser?> selectedConfirmer, RxString selectedConfirmerId) {
+
+  void _showSearchDialog(
+    BuildContext context,
+    List<ApproverUser> items,
+    Rx<ApproverUser?> selectedConfirmer,
+    RxString selectedConfirmerId,
+  ) {
     final searchController = TextEditingController();
     List<ApproverUser> filteredItems = List.from(items);
 
@@ -281,11 +299,13 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                       onChanged: (value) {
                         setState(() {
                           filteredItems = items.where((item) {
-                            final adid = item.chREmployeeAdid?.toLowerCase() ?? '';
-                            final name = item.chREmployeeName?.toLowerCase() ?? '';
+                            final adid =
+                                item.chREmployeeAdid?.toLowerCase() ?? '';
+                            final name =
+                                item.chREmployeeName?.toLowerCase() ?? '';
                             final searchLower = value.toLowerCase();
-                            return adid.contains(searchLower) || 
-                            name.contains(searchLower);
+                            return adid.contains(searchLower) ||
+                                name.contains(searchLower);
                           }).toList();
                         });
                       },
@@ -304,7 +324,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                                 : null,
                             onTap: () {
                               selectedConfirmer.value = item;
-                              selectedConfirmerId.value = item.chREmployeeAdid ?? '';
+                              selectedConfirmerId.value =
+                                  item.chREmployeeAdid ?? '';
                               Navigator.pop(context);
                             },
                           );
@@ -320,6 +341,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       },
     );
   }
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,10 +751,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "X":"");
+                  setCellValue('Y', item.biTNoReEmployment ? "X" : "");
                   setCellValue('Z', item.vchRUseful ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
-                  
                 }
 
                 // 3. Xuất file
@@ -840,7 +861,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       ),
     );
   }
-  
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -898,15 +919,31 @@ class MyData extends DataTableSource {
         //Action
         DataCell(
           Center(
-            child: _buildActionButton(
-              icon: Iconsax.edit_2,
-              color: Colors.blue,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => _EditContractDialog(contract: data),
-                );
-              },
+            child: Row(
+              children: [
+                _buildActionButton(
+                  icon: Iconsax.edit_2,
+                  color: Colors.blue,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _EditContractDialog(contract: data),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                _buildActionButton(
+                  icon: Iconsax.back_square,
+                  color: Colors.red,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          _ReturnConApprenticetract(contract: data),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -1010,6 +1047,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRLyThuyet ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1097,6 +1139,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRThucHanh ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1184,6 +1231,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRCompleteWork ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1271,6 +1323,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRLearnWork ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1358,6 +1415,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRThichNghi ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1444,6 +1506,11 @@ class MyData extends DataTableSource {
         DataCell(
           Obx(() {
             final status = controller.filterdataList[index].vchRUseful ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1530,6 +1597,11 @@ class MyData extends DataTableSource {
         DataCell(
           Obx(() {
             final status = controller.filterdataList[index].vchRContact ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1617,6 +1689,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vcHNeedViolation ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1704,6 +1781,11 @@ class MyData extends DataTableSource {
           Obx(() {
             final status =
                 controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
+            final intStatus = data.inTStatusId ?? 0;
+            // Hiển thị trống nếu IntStatus = 3
+            if (intStatus == 3) {
+              return Text(''); // hoặc SizedBox.shrink()
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1787,6 +1869,8 @@ class MyData extends DataTableSource {
             );
           }),
         ),
+
+        // Ghi chu
         DataCell(
           Focus(
             onFocusChange: (hasFocus) {
@@ -1811,6 +1895,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        // Truong hop tuyen dung lai hay xong
         DataCell(
           Obx(() {
             Visibility(
@@ -2055,7 +2140,7 @@ class _EditContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10, width: 500,),
+              const SizedBox(height: 10, width: 500),
 
               // Dòng 4: Vị trí + Bậc lương
               Row(
@@ -2216,9 +2301,14 @@ class _EditContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Admin") {
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
-                        await controller.changeStatus('3', sectionName, null);
+                        await controller.changeStatus(
+                          'PTHC',
+                          sectionName,
+                          null,
+                        );
                       } else {
                         // truong hop leader
                         await controller.changeStatus(
@@ -2227,11 +2317,6 @@ class _EditContractDialog extends StatelessWidget {
                           authState.user!.chRUserid.toString(),
                         );
                       }
-                      // await controller.changeStatus(
-                      //   "2",
-                      //   sectionName,
-                      //   authState.user!.chRUserid.toString(),
-                      // );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
@@ -2296,5 +2381,210 @@ class _EditContractDialog extends StatelessWidget {
     } catch (e) {
       return 'Invalid date';
     }
+  }
+}
+
+// Class tu choi phe duyet
+class _ReturnConApprenticetract extends StatelessWidget {
+  final ApprenticeContract contract;
+  final DashboardControllerApprentice controller = Get.find();
+
+  _ReturnConApprenticetract({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = ApprenticeContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.back_square, color: Colors.red),
+          SizedBox(width: 10),
+          Row(
+            children: [
+              Text(
+                tr('reject'),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Common.grayColor,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${contract.vchREmployeeName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Common.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('reasonReject'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              _buildCompactTextField(
+                initialValue: contract.vchRNote,
+                label: tr('reasonRejectHint'),
+                onChanged: (value) => edited.vchRNote = value,
+                maxLines: 2,
+              ),
+              // TextFormField(
+              //   maxLines: 4,
+              //   decoration: InputDecoration(
+              //     hintText: tr('reasonRejectHint'),
+              //     isDense: true,
+              //     contentPadding: const EdgeInsets.symmetric(
+              //       horizontal: 12,
+              //       vertical: 12,
+              //     ),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     floatingLabelBehavior: FloatingLabelBehavior.auto,
+              //   ),
+              //   style: const TextStyle(fontSize: 14),
+              // ),
+              const SizedBox(height: 10),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      if (edited.inTStatusId == 3) {
+                        edited.inTStatusId = 1;
+                      }else if (edited.inTStatusId == 4) {
+                        edited.inTStatusId = 3;
+                      }
+                      if(edited.vchRNote == null || edited.vchRNote!.isEmpty){
+                        errorMessage.value = tr('reasonRejectHint');
+                        return;
+                      }
+                      await controller.updateApprenticeContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      String sectionName = authState.user!.chRSecCode
+                          .toString()
+                          .split(':')[1]
+                          .trim();
+                      // phan xem ai dang vao man so sanh
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Admin") {
+                        // truong hop PTHC phong ban
+                        await controller.changeStatus(
+                          'PTHC',
+                          sectionName,
+                          null,
+                        );
+                      } else {
+                        // truong hop leader
+                        await controller.changeStatus(
+                          '4',
+                          sectionName,
+                          authState.user!.chRUserid.toString(),
+                        );
+                      }
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
+  }
+  Widget _buildCompactTextField({
+    required String? initialValue,
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
   }
 }

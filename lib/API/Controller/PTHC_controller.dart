@@ -184,25 +184,26 @@ class DashboardControllerPTHC extends GetxController {
       }
       // 4. Refresh data
       final List<Pthc> importedPTHC = [];
-      int _i = 2;
+      int _i = 1;
+
       // Start from row 1 (skip header row) and process until empty row
-      while (rows[_i][2]?.value?.toString().isEmpty == false) {
+      while (_i < rows.length  && rows[_i][2]?.value?.toString().isNotEmpty == true) {
         final row = rows[_i];
-        // Create and populate pthc
+        // Create and populate user
         final pthc = Pthc()
           ..id = 0
-          ..vchRCodeSection = row[1]?.value?.toString()
-          ..vchRNameSection = row[1]?.value?.toString()
-          ..vchREmployeeId = row[2]?.value?.toString()
-          ..nvchREmployeeName = row[3]?.value?.toString()
-          ..vchREmployeeAdid = row[4]?.value?.toString()
-          ..vchRMail = row[5]?.value?.toString()
+          ..vchRCodeSection = row[0]?.value?.toString()
+          ..vchRNameSection = row[0]?.value?.toString()
+          ..vchREmployeeId = row[1]?.value?.toString()
+          ..nvchREmployeeName = row[2]?.value?.toString()
+          ..vchREmployeeAdid
+          ..vchRMail = row[3]?.value?.toString()
           ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 0
-          ..vchRNote = row[6]?.value?.toString();
+          ..vchRNote = row[4]?.value?.toString();
 
         // Validate required fields
         if (pthc.vchREmployeeAdid?.isEmpty == true ||
@@ -248,37 +249,48 @@ class DashboardControllerPTHC extends GetxController {
     try {
       isLoading(true);
 
-      // 1. Decode Excel file from bytes
-      final excel = Excel.decodeBytes(bytes);
+    // 1. Decode Excel file from bytes
+    final excel = Excel.decodeBytes(bytes);
 
-      // 2. Get the first sheet
-      final sheet = excel.tables.keys.first;
-      final rows = excel.tables[sheet]!.rows;
+    // 2. Get the first sheet
+    if (excel.tables.isEmpty) {
+      throw Exception('File Excel không có sheet nào');
+    }
+
+    final sheet = excel.tables.keys.first;
+    final table = excel.tables[sheet];
+    
+    if (table == null || table.rows.isEmpty) {
+      throw Exception('Sheet không có dữ liệu');
+    }
+
+    final rows = table.rows;
       // 3. Send to API or update local state
       if (rows.isEmpty || rows[0].length < 4) {
         throw Exception('File Excel không đúng định dạng');
       }
       // 4. Refresh data
       final List<Pthc> importedPTHC = [];
-      int _i = 2;
+      int _i = 1;
+
       // Start from row 1 (skip header row) and process until empty row
-      while (rows[_i][2]?.value?.toString().isEmpty == false) {
+      while (_i < rows.length  && rows[_i][2]?.value?.toString().isNotEmpty == true) {
         final row = rows[_i];
         // Create and populate user
         final pthc = Pthc()
           ..id = 0
-          ..vchRCodeSection = row[1]?.value?.toString()
-          ..vchRNameSection = row[1]?.value?.toString()
-          ..vchREmployeeId = row[2]?.value?.toString()
-          ..nvchREmployeeName = row[3]?.value?.toString()
-          ..vchREmployeeAdid = row[4]?.value?.toString()
-          ..vchRMail = row[5]?.value?.toString()
+          ..vchRCodeSection = row[0]?.value?.toString()
+          ..vchRNameSection = row[0]?.value?.toString()
+          ..vchREmployeeId = row[1]?.value?.toString()
+          ..nvchREmployeeName = row[2]?.value?.toString()
+          ..vchREmployeeAdid
+          ..vchRMail = row[3]?.value?.toString()
           ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 0
-          ..vchRNote = row[6]?.value?.toString();
+          ..vchRNote = row[4]?.value?.toString();
 
         // Validate required fields
         if (pthc.vchREmployeeAdid?.isEmpty == true ||

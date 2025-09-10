@@ -339,7 +339,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 2450,
+              width: 2150,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns

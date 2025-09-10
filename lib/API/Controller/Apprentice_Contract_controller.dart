@@ -181,6 +181,13 @@ class DashboardControllerApprentice extends GetxController {
             "operator": "IN",
             "logicType": "AND",
           }
+        else if (statusId == 'PTHC')
+          {
+            "field": "INT_STATUS_ID",
+            "value": ["3", "4"],
+            "operator": "IN",
+            "logicType": "AND",
+          }
         else
           {
             "field": "INT_STATUS_ID",
@@ -195,7 +202,7 @@ class DashboardControllerApprentice extends GetxController {
             "operator": "like",
             "logicType": "AND",
           },
-        if (adid != null && adid.isNotEmpty)
+        if (adid != null && adid.isNotEmpty && statusId != 'approval')
           {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
       ];
 
@@ -328,7 +335,7 @@ class DashboardControllerApprentice extends GetxController {
   ) async {
     try {
       //sau test delete
-      if(userApprover == "fujiokmi"){
+      if (userApprover == "fujiokmi") {
         userApprover = 'vanug';
       }
       final contract = getSelectedItems();
@@ -341,6 +348,7 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].inTStatusId = 2;
         contract[i].useRApproverPer = userApprover;
         contract[i].biTApproverPer = true;
+        contract[i].nvchRApproverPer = '';
         contract[i].vchRCodeApprover =
             'HDHN${DateFormat('yyyy-MM-dd').format(DateTime.now())}';
       }
@@ -484,13 +492,14 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userApprover;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
-       // Tìm vị trí bắt đầu của phần dept
-        int startIndex = (contract[i].vchRCodeSection ?? "").indexOf(" ") + 1;
-        int endIndex = (contract[i].vchRCodeSection ?? "").indexOf("-");
-        
-        String dept = (contract[i].vchRCodeSection ?? "").substring(startIndex, endIndex);
+        // Tìm vị trí bắt đầu của phần dept
+        List<String> parts = (contract[i].vchRCodeSection ?? "").split(": ");
+        String prPart = parts[1]; 
 
-        
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
+
         // lay thong tin phong
         sectionAp = contract[i].vchRCodeSection.toString();
         switch (contract[i].inTStatusId) {
@@ -510,7 +519,7 @@ class DashboardControllerApprentice extends GetxController {
                   '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
                 );
               }
-              contract[i].inTStatusId = 3;
+              contract[i].inTStatusId = 4;
               notApproval.add(contract[i]);
             }
           case 7:
@@ -622,7 +631,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 20;
+      int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -753,7 +762,7 @@ class DashboardControllerApprentice extends GetxController {
       }
       // 4. Refresh data
       final List<ApprenticeContract> importedTwoContract = [];
-      int _i = 20;
+      int _i = 19;
       // Start from row 1 (skip header row) and process until empty row
       while (rows[_i][2]?.value?.toString().isEmpty == false) {
         final row = rows[_i];
@@ -1187,7 +1196,11 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý
-  Future<String> NextApprovel({String? section, String? chucVu, String? dept}) async {
+  Future<String> NextApprovel({
+    String? section,
+    String? chucVu,
+    String? dept,
+  }) async {
     try {
       isLoading(true);
 

@@ -34,21 +34,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
-    // String sectionName = authState.user!.chRSecCode
-    //     .toString()
-    //     .split(':')[1]
-    //     .trim();
     // phan xem ai dang vao man so sanh
     controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
-    // if (authState.user!.chRGroup.toString() == "Chief Section" || authState.user!.chRGroup.toString() == "Chief" ||
-    //     authState.user!.chRGroup.toString() == "Admin") {
-    //   // truong hop quan ly
-    //   controller.changeStatus('6', sectionName, null);
-    // } else if (authState.user!.chRGroup.toString() == "Section Manager" || authState.user!.chRGroup.toString() == "Dept Manager" ||
-    //     authState.user!.chRGroup.toString() == "Admin") {
-    //   // truong hop truong phong
-    //   controller.changeStatus('7', sectionName, null);
-    // }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
