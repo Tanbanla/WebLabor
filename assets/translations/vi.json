@@ -155,5 +155,12 @@
   "ChonNguoiDanhGia":"Chọn người đánh giá",
   "reject":"Trả lại bước đánh giá trước",
   "reasonReject":"Lý do trả lại",
-  "reasonRejectHint":"Nhập lý do trả lại"
+  "reasonRejectHint":"Nhập lý do trả lại",
+  "QuanLyCC":"Quản lý cấp cao phê duyệt",
+  "ChonTraVe": "Vui lòng chọn bước trả về",
+  "TraVePER":"Trả về PER",
+  "TraVePTHC":"Trả về PTHC",
+  "TraVeNguoiDanhGia":"Trả về người đánh giá",
+  "ResultOk":"Cập nhật thành công"
+
 }

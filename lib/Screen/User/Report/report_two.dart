@@ -421,13 +421,13 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('NguoiXacNhan'),
+                    title: tr('TruongPhong'),
                     width: 150,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('TruongPhong'),
+                    title: tr('QuanLyCC'),
                     width: 150,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -718,6 +718,7 @@ class MyData extends DataTableSource {
         _ => '', // Giá trị mặc định cho các trường hợp khác
       },
     );
+    final authState = Provider.of<AuthState>(context, listen: true);
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -791,6 +792,19 @@ class MyData extends DataTableSource {
                     showDialog(
                       context: context,
                       builder: (context) => _UpdateKetQua(contract: data),
+                    );
+                  },
+                ),
+                const SizedBox(width: 3),
+                if(authState.user?.chRGroup == 'Admin' || authState.user?.chRGroup == 'Chief Per')
+                _buildActionButton(
+                  icon: Iconsax.back_square,
+                  color: Colors.red,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          _ReturnContract(contract: data),
                     );
                   },
                 ),
@@ -1219,7 +1233,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: Colors.yellow[800])),
+          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
         );
       case 7:
         return Container(
@@ -1229,7 +1243,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.teal[100]!),
           ),
-          child: Text('Manager', style: TextStyle(color: Colors.teal[800])),
+          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
         );
       case 8:
         return Container(
@@ -2127,5 +2141,179 @@ class _UpdateKetQua extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+}
+
+// Trả lại các bước
+class _ReturnContract extends StatelessWidget {
+  final TwoContract contract;
+  final DashboardControllerTwo controller = Get.find();
+
+  _ReturnContract({required this.contract});
+
+  @override
+  Widget build(BuildContext context) {
+    final edited = TwoContract.fromJson(contract.toJson());
+    RxString errorMessage = ''.obs;
+    RxInt intStatus = 0.obs;
+    final authState = Provider.of<AuthState>(context, listen: true);
+
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      actionsPadding: const EdgeInsets.all(20),
+      title: Row(
+        children: [
+          Icon(Iconsax.back_square, color: Colors.red),
+          SizedBox(width: 10),
+          Text(
+            tr('reject'),
+            style: TextStyle(
+              color: Common.grayColor,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(width: 6),
+          Text(
+            edited.vchREmployeeName ?? "",
+            style: TextStyle(
+              color: Common.primaryColor,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Danh sách lựa chọn trả về
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr('ChonTraVe'),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Common.primaryColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Obx(
+                () => Column(
+                  children: [
+                    RadioListTile<int>(
+                      value: 1,
+                      groupValue: intStatus.value,
+                      title: Text(tr('TraVePER')),
+                      onChanged: (value) {
+                        intStatus.value = value!;
+                        edited.inTStatusId = value;
+                      },
+                      activeColor: Common.primaryColor,
+                    ),
+                    RadioListTile<int>(
+                      value: 3,
+                      groupValue: intStatus.value,
+                      title: Text(tr('TraVePTHC')),
+                      onChanged: (value) {
+                        intStatus.value = value!;
+                        edited.inTStatusId = value;
+                      },
+                      activeColor: Common.primaryColor,
+                    ),
+                    RadioListTile<int>(
+                      value: 4,
+                      groupValue: intStatus.value,
+                      title: Text(tr('TraVeNguoiDanhGia')),
+                      onChanged: (value) {
+                        intStatus.value = value!;
+                        edited.inTStatusId = value;
+                      },
+                      activeColor: Common.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          onPressed: controller.isLoading.value
+              ? null
+              : () => Navigator.of(context).pop(),
+          child: Text(tr('Cancel')),
+        ),
+        Obx(
+          () => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Common.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    errorMessage.value = '';
+                    controller.isLoading(false);
+                    try {
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                      );
+                      // Refresh dữ liệu
+                      await controller.fetchDummyData();
+
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        // Hiển thị thông báo thành công
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(tr('ResultOk')),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      errorMessage.value =
+                          '${tr('ErrorUpdate')}${e.toString()}';
+                    }
+                  },
+            child: controller.isLoading.value
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(tr('Save')),
+          ),
+        ),
+      ],
+    );
   }
 }

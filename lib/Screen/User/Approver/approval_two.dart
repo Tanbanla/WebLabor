@@ -37,7 +37,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     //     .split(':')[1]
     //     .trim();
     // phan xem ai dang vao man so sanh
-    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+    controller.changeStatus(
+      'approval',
+      null,
+      authState.user!.chRUserid.toString(),
+    );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -168,7 +172,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     authState.user!.chRUserid.toString(),
                   );
                   // phan xem ai dang vao man so sanh
-                  controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+                  controller.changeStatus(
+                    'approval',
+                    null,
+                    authState.user!.chRUserid.toString(),
+                  );
 
                   if (context.mounted) {
                     // Hiển thị thông báo thành công
@@ -262,7 +270,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3610,
+              width: 3740,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -309,6 +317,12 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   DataColumnCustom(
                     title: tr('action'),
                     width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 130,
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -573,7 +587,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   setCellValue('T', item.nvchROther ?? '');
                   setCellValue('U', item.vchRReasultsLeader ?? '');
                   setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment ? "X": "");
+                  setCellValue('W', item.biTNoReEmployment ? "X" : "");
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('Y', item.vchRLeaderEvalution ?? '');
                 }
@@ -760,6 +774,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
           Text(
             data.vchREmployeeId ?? '',
@@ -1266,6 +1281,101 @@ class MyData extends DataTableSource {
     }
   }
 
+  Widget _getHienTrangColor(int? IntStatus) {
+    switch (IntStatus) {
+      case 1:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blueGrey[100]!),
+          ),
+          child: Text('New', style: TextStyle(color: Colors.grey[800])),
+        );
+      case 2:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.purple[100]!),
+          ),
+          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+        );
+      case 3:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange[100]!),
+          ),
+          child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
+        );
+      case 4:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue[100]!),
+          ),
+          child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+        );
+      case 6:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.yellow[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.yellow[100]!),
+          ),
+          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+        );
+      case 7:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal[100]!),
+          ),
+          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+        );
+      case 8:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.brown[100]!),
+          ),
+          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+        );
+      case 9:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green[100]!),
+          ),
+          child: Text('Done', style: TextStyle(color: Colors.green[800])),
+        );
+      default:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red[100]!),
+          ),
+          child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
+        );
+    }
+  }
+
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -1595,7 +1705,11 @@ class _EditTwoContractDialog extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                       );
                       // phan xem ai dang vao man so sanh
-                      controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+                      controller.changeStatus(
+                        'approval',
+                        null,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }

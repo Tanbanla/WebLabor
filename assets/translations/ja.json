@@ -155,5 +155,11 @@
   "ChonNguoiDanhGia":"評価者を選択する",
   "reject": "評価のステップを戻す",
   "reasonReject": "戻す理由",
-  "reasonRejectHint": "戻す理由を入力してください"
+  "reasonRejectHint": "戻す理由を入力してください",
+  "QuanLyCC":"上級管理者の承認",
+  "ChonTraVe": "戻すステップを選択してください",
+  "TraVePER": "PERを戻す",
+  "TraVePTHC": "PTHCを戻す",
+  "TraVeNguoiDanhGia": "評価者を戻す",
+  "ResultOk":"更新に成功しました"
 }

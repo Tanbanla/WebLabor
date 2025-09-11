@@ -2449,22 +2449,6 @@ class _ReturnConApprenticetract extends StatelessWidget {
                 onChanged: (value) => edited.vchRNote = value,
                 maxLines: 2,
               ),
-              // TextFormField(
-              //   maxLines: 4,
-              //   decoration: InputDecoration(
-              //     hintText: tr('reasonRejectHint'),
-              //     isDense: true,
-              //     contentPadding: const EdgeInsets.symmetric(
-              //       horizontal: 12,
-              //       vertical: 12,
-              //     ),
-              //     border: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //     floatingLabelBehavior: FloatingLabelBehavior.auto,
-              //   ),
-              //   style: const TextStyle(fontSize: 14),
-              // ),
               const SizedBox(height: 10),
               if (errorMessage.isNotEmpty)
                 Padding(
