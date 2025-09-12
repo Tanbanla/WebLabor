@@ -838,14 +838,12 @@ class DashboardControllerTwo extends GetxController {
         // Create and populate
         final twocontract = TwoContract()
           ..id = 0
-          ..vchRCodeApprover //=
-          //'HD2N' + formatDateTime(DateTime.now()).toString()
+          ..vchRCodeApprover
           ..vchRCodeSection = row[4]?.value?.toString()
           ..vchRNameSection = row[4]?.value?.toString()
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
-          ..dtMBrithday
           ..dtMBrithday = () {
             try {
               final age = int.tryParse(row[6]?.value?.toString() ?? '0') ?? 0;
@@ -863,29 +861,29 @@ class DashboardControllerTwo extends GetxController {
           ..chRCodeGrade = row[8]?.value?.toString()
           ..chRCostCenterName = row[5]?.value?.toString()
           ..dtMJoinDate = row[9]?.value?.toString()
-          ..dtMEndDate = row[10]?.value?.toString()
-          ..fLGoLeaveLate = row[11]?.value != null
-              ? double.tryParse(row[11]!.value.toString()) ?? 0
-              : 0 //double.parse(row[11]!.value.toString())
-          ..fLPaidLeave = row[12]?.value != null
-              ? double.tryParse(row[12]!.value.toString()) ?? 0
-              : 0 //double.parse(row[12]!.value.toString())
-          ..fLNotPaidLeave = row[13]?.value != null
+          ..dtMEndDate = row[12]?.value?.toString()
+          ..fLGoLeaveLate = row[13]?.value != null
               ? double.tryParse(row[13]!.value.toString()) ?? 0
-              : 0 //double.parse(row[13]!.value.toString())
-          ..fLNotLeaveDay = row[14]?.value != null
+              : 0 //double.parse(row[11]!.value.toString())
+          ..fLPaidLeave = row[14]?.value != null
               ? double.tryParse(row[14]!.value.toString()) ?? 0
-              : 0 //double.parse(row[14]!.value.toString())
-          ..inTViolation = row[15]?.value != null
-              ? int.tryParse(row[15]!.value.toString()) ?? 0
+              : 0 //double.parse(row[12]!.value.toString())
+          ..fLNotPaidLeave = row[15]?.value != null
+              ? double.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation // = row[16]!.value.toString()
+          ..fLNotLeaveDay = row[16]?.value != null
+              ? double.tryParse(row[16]!.value.toString()) ?? 0
+              : 0
+          ..inTViolation = row[17]?.value != null
+              ? int.tryParse(row[17]!.value.toString()) ?? 0
+              : 0
+          ..nvarchaRViolation = row[18]!.value.toString()
           ..nvchRCompleteWork //= row[17]!.value.toString()
           ..nvchRUseful //= row[18]!.value.toString()
           ..nvchROther //= row[19]!.value.toString()
           ..vchRReasultsLeader //= row[20]!.value.toString()
           ..biTNoReEmployment = true
-          ..nvchRNoReEmpoyment // = row[23]!.value.toString()
+          ..nvchRNoReEmpoyment //= row[23]!.value.toString()
           ..nvchRPthcSection
           ..vchRLeaderEvalution
           ..dtMLeadaerEvalution

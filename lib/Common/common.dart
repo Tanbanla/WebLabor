@@ -33,7 +33,8 @@ class Common {
   // Người phê duyệt
   static const String UserApprover =
       "User/get-employee-section-manager-by-section";
-
+  // Lấy thông tin danh sách phòng ban
+  static const String UserSection = "User/get-all-section";
   // Master PTHC
   //GET
   static const String PTHCGetAll = "PthcSection/get-all";

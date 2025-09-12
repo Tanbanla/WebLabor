@@ -14,6 +14,7 @@ import 'package:web_labor_contract/class/TM_PTHC.dart';
 class DashboardControllerPTHC extends GetxController {
   var pthcList = <PthcGroup>[].obs;
   var filteredpthcList = <PthcGroup>[].obs;
+  var listSection = <String>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortColumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -156,9 +157,7 @@ class DashboardControllerPTHC extends GetxController {
         fetchPTHCData();
       } else {
         final errorResponse = json.decode(response.body);
-        throw Exception(
-          '${errorResponse['message'] ?? response.body}',
-        );
+        throw Exception('${errorResponse['message'] ?? response.body}');
       }
     } catch (e) {
       showError('Failed to add PTHC: $e');
@@ -187,7 +186,8 @@ class DashboardControllerPTHC extends GetxController {
       int _i = 1;
 
       // Start from row 1 (skip header row) and process until empty row
-      while (_i < rows.length  && rows[_i][2]?.value?.toString().isNotEmpty == true) {
+      while (_i < rows.length &&
+          rows[_i][2]?.value?.toString().isNotEmpty == true) {
         final row = rows[_i];
         // Create and populate user
         final pthc = Pthc()
@@ -249,22 +249,22 @@ class DashboardControllerPTHC extends GetxController {
     try {
       isLoading(true);
 
-    // 1. Decode Excel file from bytes
-    final excel = Excel.decodeBytes(bytes);
+      // 1. Decode Excel file from bytes
+      final excel = Excel.decodeBytes(bytes);
 
-    // 2. Get the first sheet
-    if (excel.tables.isEmpty) {
-      throw Exception('File Excel không có sheet nào');
-    }
+      // 2. Get the first sheet
+      if (excel.tables.isEmpty) {
+        throw Exception('File Excel không có sheet nào');
+      }
 
-    final sheet = excel.tables.keys.first;
-    final table = excel.tables[sheet];
-    
-    if (table == null || table.rows.isEmpty) {
-      throw Exception('Sheet không có dữ liệu');
-    }
+      final sheet = excel.tables.keys.first;
+      final table = excel.tables[sheet];
 
-    final rows = table.rows;
+      if (table == null || table.rows.isEmpty) {
+        throw Exception('Sheet không có dữ liệu');
+      }
+
+      final rows = table.rows;
       // 3. Send to API or update local state
       if (rows.isEmpty || rows[0].length < 4) {
         throw Exception('File Excel không đúng định dạng');
@@ -274,7 +274,8 @@ class DashboardControllerPTHC extends GetxController {
       int _i = 1;
 
       // Start from row 1 (skip header row) and process until empty row
-      while (_i < rows.length  && rows[_i][2]?.value?.toString().isNotEmpty == true) {
+      while (_i < rows.length &&
+          rows[_i][2]?.value?.toString().isNotEmpty == true) {
         final row = rows[_i];
         // Create and populate user
         final pthc = Pthc()
@@ -381,10 +382,8 @@ class DashboardControllerPTHC extends GetxController {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           await fetchPTHCData();
-        }else{
-          throw Exception(
-          'Data does not exist',
-        );
+        } else {
+          throw Exception('Data does not exist');
         }
       } else {
         final error = json.decode(response.body);
@@ -420,5 +419,33 @@ class DashboardControllerPTHC extends GetxController {
       }
     }
     return null;
+  }
+
+  // lay thong tin section
+  Future<void> fetchSectionList() async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.UserSection),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          listSection.assignAll(data.map((item) => item.toString()).toList());
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
   }
 }

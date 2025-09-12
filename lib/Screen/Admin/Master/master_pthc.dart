@@ -417,37 +417,37 @@ class _MasterPTHCState extends State<MasterPTHC> {
                             context,
                           ).pop(); // Close the import dialog first
                         }
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              icon: const Icon(
-                                Icons.check_circle,
-                                color: Colors.green,
-                                size: 50,
-                              ),
-                              title: const Text(
-                                'Thành công',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text('Import dữ liệu thành công'),
-                                  const SizedBox(height: 10),
-                                ],
-                              ),
-                              actions: [
-                                ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Đóng'),
-                                ),
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            icon: const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                            title: const Text(
+                              'Thành công',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('Import dữ liệu thành công'),
+                                const SizedBox(height: 10),
                               ],
                             ),
-                          );
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Đóng'),
+                              ),
+                            ],
+                          ),
+                        );
                       } on PlatformException catch (e) {
                         errorMessage.value = 'Lỗi hệ thống: ${e.message}';
                       } catch (e) {
@@ -711,7 +711,10 @@ class _DeletePTHCDialogState extends State<_DeletePTHCDialog> {
       }
 
       return AlertDialog(
-        title: const Text('Xóa PTHC', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Xóa PTHC',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -747,12 +750,19 @@ class _DeletePTHCDialogState extends State<_DeletePTHCDialog> {
               TextField(
                 controller: _inputController,
                 decoration: InputDecoration(
-                  labelText: _isADID.value ? 'Nhập ADID cần xóa' : 'Nhập Email cần xóa',
+                  labelText: _isADID.value
+                      ? 'Nhập ADID cần xóa'
+                      : 'Nhập Email cần xóa',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  errorText: _errorMessage.value.isEmpty ? null : _errorMessage.value,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  errorText: _errorMessage.value.isEmpty
+                      ? null
+                      : _errorMessage.value,
                 ),
                 onChanged: (value) => _errorMessage.value = '',
               ),
@@ -767,57 +777,42 @@ class _DeletePTHCDialogState extends State<_DeletePTHCDialog> {
         ),
         actions: [
           TextButton(
-            onPressed: controller.isLoading.value ? null : () => Navigator.pop(context),
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.pop(context),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: controller.isLoading.value ? null : () async {
-              if (_inputController.text.isEmpty) {
-                _errorMessage.value = 'Vui lòng nhập ${_isADID.value ? 'ADID' : 'Email'}';
-                return;
-              }
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    if (_inputController.text.isEmpty) {
+                      _errorMessage.value =
+                          'Vui lòng nhập ${_isADID.value ? 'ADID' : 'Email'}';
+                      return;
+                    }
 
-              controller.isLoading(true);
-              try {
-                await controller.deleteAdidOrMail(_inputController.text);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              } catch (e) {
-                  _errorMessage.value = 'Lỗi: ${e.toString()}';
-              } finally {
-                controller.isLoading(false);
-              }
-            },
+                    controller.isLoading(true);
+                    try {
+                      await controller.deleteAdidOrMail(_inputController.text);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    } catch (e) {
+                      _errorMessage.value = 'Lỗi: ${e.toString()}';
+                    } finally {
+                      controller.isLoading(false);
+                    }
+                  },
             child: const Text('Xóa'),
           ),
         ],
       );
     });
   }
-
-  // void _showSuccessDialog(BuildContext context, String message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       icon: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-  //       title: const Text('Thành công', style: TextStyle(fontWeight: FontWeight.bold)),
-  //       content: Text(message),
-  //       actions: [
-  //         ElevatedButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.green,
-  //             foregroundColor: Colors.white,
-  //           ),
-  //           child: const Text('Đóng'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
+
 class _ShowDialogAdd extends StatefulWidget {
   const _ShowDialogAdd();
   @override
@@ -828,6 +823,7 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DashboardControllerPTHC>();
+    controller.fetchSectionList();
     var userAdd = Pthc();
     RxString errorMessage = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
@@ -863,15 +859,32 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                 },
               ),
               const SizedBox(height: 12),
-              TextField(
+              DropdownButtonFormField(
                 decoration: InputDecoration(
                   labelText: 'Phòng ban',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onChanged: (value) => userAdd.vchRCodeSection = value,
+                items: controller.listSection
+                    .map((section) => DropdownMenuItem(
+                          value: section,
+                          child: Text(section),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  userAdd.vchRCodeSection = value;
+                },
               ),
+              // TextField(
+              //   decoration: InputDecoration(
+              //     labelText: 'Phòng ban',
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //   ),
+              //   onChanged: (value) => userAdd.vchRCodeSection = value,
+              // ),
               const SizedBox(height: 12),
               if (errorMessage.isNotEmpty)
                 Padding(
@@ -896,12 +909,17 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                 ? null
                 : () async {
                     errorMessage.value = '';
-                    if ((userAdd.vchRMail?.isEmpty ?? true)||(userAdd.vchRCodeSection?.isEmpty ?? true)||
-                        (userAdd.vchRNote?.isEmpty ?? true)){ 
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: 'Yêu cầu không để trống thông tin', title: 'Lỗi', color: Colors.red,
-                        icon:  Icons.error,)
+                    if ((userAdd.vchRMail?.isEmpty ?? true) ||
+                        (userAdd.vchRCodeSection?.isEmpty ?? true) ||
+                        (userAdd.vchRNote?.isEmpty ?? true)) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: 'Yêu cầu không để trống thông tin',
+                          title: 'Lỗi',
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                       controller.isLoading(false);
                       return;
@@ -913,49 +931,52 @@ class __ShowDialogAddState extends State<_ShowDialogAdd> {
                         authState.user!.chRUserid.toString(),
                       );
                       if (mounted) {
-                        Navigator.of(
-                          context,
-                        ).pop(); 
-                      // Close the import dialog first
+                        Navigator.of(context).pop();
+                        // Close the import dialog first
                       }
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            icon: const Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                              size: 50,
-                            ),
-                            title: const Text(
-                              'Thành công',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text('Thêm PHTC thành công'),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
-                            actions: [
-                              ElevatedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('Đóng'),
-                              ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          icon: const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 50,
+                          ),
+                          title: const Text(
+                            'Thành công',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Thêm PHTC thành công'),
+                              const SizedBox(height: 10),
                             ],
                           ),
-                        );
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Đóng'),
+                            ),
+                          ],
+                        ),
+                      );
                     } catch (e) {
                       // errorMessage.value =
                       //     'Lỗi khi thêm: ${e.toString().replaceAll('', '')}';
-                      showDialog(context: context, 
-                        builder: (context) => 
-                        DialogNotification(message: 'Lỗi khi thêm: ${e.toString().replaceAll('', '')}', title: 'Lỗi', color: Colors.red,
-                        icon:  Icons.error,)
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message:
+                              'Lỗi khi thêm: ${e.toString().replaceAll('', '')}',
+                          title: 'Lỗi',
+                          color: Colors.red,
+                          icon: Icons.error,
+                        ),
                       );
                     } finally {
                       controller.isLoading(false);
