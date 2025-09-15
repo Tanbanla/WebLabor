@@ -1319,6 +1319,11 @@ class _EditTwoContractDialog extends StatelessWidget {
     RxString errorMessage = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
 
+    final RxString earlyLateError = ''.obs;
+    final RxString unreportedLeaveError = ''.obs;
+    final RxString violationError = ''.obs;
+    final RxString fLNotLeaveDayError = ''.obs;
+    final RxString fLNotPaidLeaveError = ''.obs;
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1375,23 +1380,23 @@ class _EditTwoContractDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10, width: 500),
-              // Dòng 2: Mã NV + Giới tính
+// Dòng 2: Mã NV + Giới tính
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.vchREmployeeId,
+                    child: _buildCompactReadOnlyField(
+                      value: twoContract.vchREmployeeId.toString(),
                       label: tr('employeeCode'),
-                      onChanged: (value) => edited.vchREmployeeId = value,
+                      width: 400,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.vchRTyperId,
+                    child: _buildCompactReadOnlyField(
+                      value: twoContract.vchRTyperId.toString(),
                       label: tr('gender'),
-                      onChanged: (value) => edited.vchRTyperId = value,
+                      width: 100,
                     ),
                   ),
                 ],
@@ -1403,22 +1408,21 @@ class _EditTwoContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.vchREmployeeName,
+                    child: _buildCompactReadOnlyField(
+                      value: twoContract.vchREmployeeName.toString(),
                       label: tr('fullName'),
-                      onChanged: (value) => edited.vchREmployeeName = value,
+                      width: 420,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 80,
-                    child: BuildCompactTextField(
-                      initialValue: getAgeFromBirthday(
+                    child: _buildCompactReadOnlyField(
+                      value: getAgeFromBirthday(
                         twoContract.dtMBrithday,
                       ).toString(),
                       label: tr('age'),
-                      onChanged: (value) => edited.dtMBrithday = value,
-                      keyboardType: TextInputType.number,
+                      width: 80,
                     ),
                   ),
                 ],
@@ -1429,19 +1433,19 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.chRPosition,
+                    child: _buildCompactReadOnlyField(
+                      value: twoContract.chRPosition.toString(),
                       label: tr('position'),
-                      onChanged: (value) => edited.chRPosition = value,
+                      width: 400,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.chRCodeGrade,
+                    child: _buildCompactReadOnlyField(
+                      value: twoContract.chRCodeGrade.toString(),
                       label: tr('salaryGrade'),
-                      onChanged: (value) => edited.chRCodeGrade = value,
+                      width: 100,
                     ),
                   ),
                 ],
@@ -1452,22 +1456,22 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: DateFormat(
+                    child: _buildCompactReadOnlyField(
+                      value: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(twoContract.dtMJoinDate!)),
                       label: tr('contractEffective'),
-                      onChanged: (value) => edited.dtMJoinDate = value,
+                      width: 250,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: DateFormat(
+                    child: _buildCompactReadOnlyField(
+                      value: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(twoContract.dtMEndDate!)),
                       label: tr('contractEndDate'),
-                      onChanged: (value) => edited.dtMEndDate = value,
+                      width: 250,
                     ),
                   ),
                 ],
@@ -1630,7 +1634,43 @@ class _EditTwoContractDialog extends StatelessWidget {
       ],
     );
   }
-
+// widget không được phép sửa
+  Widget _buildCompactReadOnlyField({
+    required String value,
+    required String label,
+    double? width,
+  }) {
+    Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: width,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+            ),
+          ),
+        ),
+      ],
+    );
+    return content;
+  }
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {

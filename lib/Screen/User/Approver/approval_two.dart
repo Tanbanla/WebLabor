@@ -270,7 +270,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3740,
+              width: 3640,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -314,15 +314,20 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   // DataColumn2
-                  DataColumnCustom(
-                    title: tr('action'),
-                    width: 100,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
+                  // DataColumnCustom(
+                  //   title: tr('action'),
+                  //   width: 100,
+                  //   fontSize: Common.sizeColumn,
+                  // ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('Hientrang'),
                     width: 130,
                     maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('DotDanhGia'),
+                    width: 180,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -759,22 +764,28 @@ class MyData extends DataTableSource {
           ),
         ),
         //Action
+        // DataCell(
+        //   Center(
+        //     child: _buildActionButton(
+        //       icon: Iconsax.edit_2,
+        //       color: Colors.blue,
+        //       onPressed: () {
+        //         showDialog(
+        //           context: context,
+        //           builder: (context) =>
+        //               _EditTwoContractDialog(twoContract: data),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
-          Center(
-            child: _buildActionButton(
-              icon: Iconsax.edit_2,
-              color: Colors.blue,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) =>
-                      _EditTwoContractDialog(twoContract: data),
-                );
-              },
-            ),
+          Text(
+            data.vchRCodeApprover ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
           Text(
             data.vchREmployeeId ?? '',

@@ -782,9 +782,8 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "X":"");
+                  setCellValue('Y', item.biTNoReEmployment ? "X" : "");
                   setCellValue('Z', item.vchRUseful ?? '');
-
                 }
 
                 // 3. Xuất file
@@ -1202,6 +1201,9 @@ class _EditContractDialog extends StatelessWidget {
     RxString errorMessage = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
 
+    final RxString earlyLateError = ''.obs;
+    final RxString unreportedLeaveError = ''.obs;
+    final RxString violationError = ''.obs;
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1262,19 +1264,19 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.vchREmployeeId,
+                    child: _buildCompactReadOnlyField(
+                      value: contract.vchREmployeeId.toString(),
                       label: tr('employeeCode'),
-                      onChanged: (value) => edited.vchREmployeeId = value,
+                      width: 400,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: BuildCompactTextField(
-                      initialValue: contract.vchRTyperId,
+                    child: _buildCompactReadOnlyField(
+                      value: contract.vchRTyperId.toString(),
                       label: tr('gender'),
-                      onChanged: (value) => edited.vchRTyperId = value,
+                      width: 100,
                     ),
                   ),
                 ],
@@ -1286,22 +1288,21 @@ class _EditContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: BuildCompactTextField(
-                      initialValue: contract.vchREmployeeName,
+                    child: _buildCompactReadOnlyField(
+                      value: contract.vchREmployeeName.toString(),
                       label: tr('fullName'),
-                      onChanged: (value) => edited.vchREmployeeName = value,
+                      width: 420,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 80,
-                    child: BuildCompactTextField(
-                      initialValue: getAgeFromBirthday(
+                    child: _buildCompactReadOnlyField(
+                      value: getAgeFromBirthday(
                         contract.dtMBrithday,
                       ).toString(),
                       label: tr('age'),
-                      onChanged: (value) => edited.dtMBrithday = value,
-                      keyboardType: TextInputType.number,
+                      width: 80,
                     ),
                   ),
                 ],
@@ -1312,19 +1313,19 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.chRPosition,
+                    child: _buildCompactReadOnlyField(
+                      value: contract.chRPosition.toString(),
                       label: tr('position'),
-                      onChanged: (value) => edited.chRPosition = value,
+                      width: 400,
                     ),
                   ),
                   const SizedBox(width: 10),
                   SizedBox(
                     width: 100,
-                    child: BuildCompactTextField(
-                      initialValue: contract.chRCodeGrade,
+                    child: _buildCompactReadOnlyField(
+                      value: contract.chRCodeGrade.toString(),
                       label: tr('salaryGrade'),
-                      onChanged: (value) => edited.chRCodeGrade = value,
+                      width: 100,
                     ),
                   ),
                 ],
@@ -1335,22 +1336,22 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: DateFormat(
+                    child: _buildCompactReadOnlyField(
+                      value: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMJoinDate!)),
                       label: tr('contractEffective'),
-                      onChanged: (value) => edited.dtMJoinDate = value,
+                      width: 250,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: DateFormat(
+                    child: _buildCompactReadOnlyField(
+                      value: DateFormat(
                         'yyyy-MM-dd',
                       ).format(DateTime.parse(contract.dtMEndDate!)),
                       label: tr('contractEndDate'),
-                      onChanged: (value) => edited.dtMEndDate = value,
+                      width: 250,
                     ),
                   ),
                 ],
@@ -1374,41 +1375,179 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.fLGoLeaveLate?.toString(),
-                      label: tr('earlyLateCount'),
-                      onChanged: (value) =>
-                          edited.fLGoLeaveLate = double.tryParse(value),
-                      keyboardType: TextInputType.number,
+                    child: Obx(
+                      () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BuildCompactTextField(
+                            initialValue: contract.fLGoLeaveLate?.toString(),
+                            label: tr('earlyLateCount'),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9.]'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value.isEmpty) {
+                                earlyLateError.value = '';
+                                edited.fLGoLeaveLate = null;
+                                return;
+                              }
+                              if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
+                                earlyLateError.value = tr('onlyNumber');
+                              } else {
+                                earlyLateError.value = '';
+                                edited.fLGoLeaveLate = double.tryParse(value);
+                              }
+                            },
+                          ),
+                          if (earlyLateError.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                earlyLateError.value,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.fLNotLeaveDay?.toString(),
-                      label: tr('unreportedLeave'),
-                      onChanged: (value) =>
-                          edited.fLNotLeaveDay = double.tryParse(value),
-                      keyboardType: TextInputType.number,
+                    child: Obx(
+                      () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BuildCompactTextField(
+                            initialValue: contract.fLNotLeaveDay?.toString(),
+                            label: tr('unreportedLeave'),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9.]'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value.isEmpty) {
+                                unreportedLeaveError.value = '';
+                                edited.fLNotLeaveDay = null;
+                                return;
+                              }
+                              if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
+                                unreportedLeaveError.value = tr('onlyNumber');
+                              } else {
+                                unreportedLeaveError.value = '';
+                                edited.fLNotLeaveDay = double.tryParse(value);
+                              }
+                            },
+                          ),
+                          if (unreportedLeaveError.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                unreportedLeaveError.value,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              // Dòng 8: Số lần vi phạm
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.inTViolation?.toString(),
-                      label: tr('violationCount'),
-                      onChanged: (value) =>
-                          edited.inTViolation = int.tryParse(value),
-                      keyboardType: TextInputType.number,
+                    child: Obx(
+                      () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BuildCompactTextField(
+                            initialValue: contract.inTViolation?.toString(),
+                            label: tr('violationCount'),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            onChanged: (value) {
+                              if (value.isEmpty) {
+                                violationError.value = '';
+                                edited.inTViolation = null;
+                                return;
+                              }
+                              if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                violationError.value = tr('onlyNumber');
+                              } else {
+                                violationError.value = '';
+                                edited.inTViolation = int.tryParse(value);
+                              }
+                            },
+                          ),
+                          if (violationError.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                violationError.value,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: BuildCompactTextField(
+              //         initialValue: contract.fLGoLeaveLate?.toString(),
+              //         label: tr('earlyLateCount'),
+              //         onChanged: (value) =>
+              //             edited.fLGoLeaveLate = double.tryParse(value),
+              //         keyboardType: TextInputType.number,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 10),
+              //     Expanded(
+              //       child: BuildCompactTextField(
+              //         initialValue: contract.fLNotLeaveDay?.toString(),
+              //         label: tr('unreportedLeave'),
+              //         onChanged: (value) =>
+              //             edited.fLNotLeaveDay = double.tryParse(value),
+              //         keyboardType: TextInputType.number,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10),
+              // // Dòng 8: Số lần vi phạm + Mã phê duyệt
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: BuildCompactTextField(
+              //         initialValue: contract.inTViolation?.toString(),
+              //         label: tr('violationCount'),
+              //         onChanged: (value) =>
+              //             edited.inTViolation = int.tryParse(value),
+              //         keyboardType: TextInputType.number,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
@@ -1537,6 +1676,44 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
+  // widget không được phép sửa
+  Widget _buildCompactReadOnlyField({
+    required String value,
+    required String label,
+    double? width,
+  }) {
+    Widget content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: width,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+            ),
+          ),
+        ),
+      ],
+    );
+    return content;
+  }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {

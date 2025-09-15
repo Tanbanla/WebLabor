@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:web_labor_contract/Common/common.dart';
 
 class CustomField extends StatelessWidget {
@@ -207,47 +208,144 @@ class _DialogNotificationState extends State<DialogNotification> {
     );
   }
 }
-
-// Custom nhập dữ liệu
-  class BuildCompactTextField extends StatefulWidget {
-  final String? initialValue;
+class CompactReadOnlyField extends StatelessWidget {
+  final String value;
   final String label;
-  final Function(String) onChanged;
-  final TextInputType? keyboardType;
-  final int? maxLines;
+  final double? width;
+  final TextStyle? labelStyle;
+  final TextStyle? valueStyle;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final EdgeInsetsGeometry? padding;
 
-  const BuildCompactTextField({
-    super.key, 
-    this.initialValue, 
-    required this.label, 
-    required this.onChanged, 
-    this.keyboardType, 
-    this.maxLines
-  });
+  const CompactReadOnlyField({
+    Key? key,
+    required this.value,
+    required this.label,
+    this.width,
+    this.labelStyle,
+    this.valueStyle,
+    this.backgroundColor,
+    this.borderColor,
+    this.padding,
+  }) : super(key: key);
 
-  @override
-  State<BuildCompactTextField> createState() => _BuildCompactTextFieldState();
-}
-
-class _BuildCompactTextFieldState extends State<BuildCompactTextField> {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: widget.initialValue,
-      decoration: InputDecoration(
-        labelText: widget.label, // Sửa từ widget.initialValue thành widget.label
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: labelStyle ?? TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: backgroundColor ?? Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: borderColor ?? Colors.grey[300]!),
+            ),
+            child: Text(
+              value,
+              style: valueStyle ?? TextStyle(
+                fontSize: 14, 
+                color: Colors.grey[800]
+              ),
+            ),
+          ),
+        ],
       ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: widget.keyboardType,
-      maxLines: widget.maxLines,
-      onChanged: widget.onChanged,
     );
   }
 }
+// Custom nhập dữ liệu
+class BuildCompactTextField extends StatelessWidget {
+  final String? initialValue;
+  final String label;
+  final ValueChanged<String>? onChanged;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+  final bool readOnly;
+  final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
+
+  const BuildCompactTextField({
+    Key? key,
+    this.initialValue,
+    required this.label,
+    this.onChanged,
+    this.keyboardType,
+    this.maxLines,
+    this.readOnly = false,
+    this.validator,
+    this.inputFormatters,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      maxLines: maxLines ?? 1,
+      readOnly: readOnly,
+      validator: validator,
+      inputFormatters: inputFormatters,
+    );
+  }
+}
+//   class BuildCompactTextField extends StatefulWidget {
+//   final String? initialValue;
+//   final String label;
+//   final Function(String) onChanged;
+//   final TextInputType? keyboardType;
+//   final int? maxLines;
+
+//   const BuildCompactTextField({
+//     super.key, 
+//     this.initialValue, 
+//     required this.label, 
+//     required this.onChanged, 
+//     this.keyboardType, 
+//     this.maxLines
+//   });
+
+//   @override
+//   State<BuildCompactTextField> createState() => _BuildCompactTextFieldState();
+// }
+
+// class _BuildCompactTextFieldState extends State<BuildCompactTextField> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextFormField(
+//       initialValue: widget.initialValue,
+//       decoration: InputDecoration(
+//         labelText: widget.label, // Sửa từ widget.initialValue thành widget.label
+//         isDense: true,
+//         contentPadding: const EdgeInsets.symmetric(
+//           horizontal: 12,
+//           vertical: 12,
+//         ),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+//         floatingLabelBehavior: FloatingLabelBehavior.auto,
+//       ),
+//       style: const TextStyle(fontSize: 14),
+//       keyboardType: widget.keyboardType,
+//       maxLines: widget.maxLines,
+//       onChanged: widget.onChanged,
+//     );
+//   }
+// }

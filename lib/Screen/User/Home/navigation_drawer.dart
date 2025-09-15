@@ -198,6 +198,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         return allCdms; // Admin có tất cả quyền
       // Quyen cua PER
       case 'Per':
+        return allCdms.where((cdm) => cdm.title != tr("master") && cdm.title != tr("approval")).toList();
       case 'Chief Per':
         return allCdms.where((cdm) => cdm.title != tr("master")).toList();
       // Quyen dien danh gia cua phong ban
@@ -591,4 +592,3 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
     });
   }
 }
-
