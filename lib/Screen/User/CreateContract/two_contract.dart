@@ -1132,54 +1132,24 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =
-                controller.filterdataList[index].biTApproverPer ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+            final rawStatus = data.biTApproverPer;
+            if (rawStatus == false) {
+              return Row(
+                children: [
+                  Icon(Icons.cancel, color: Colors.red, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'X',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
+                ],
+              );
+            } else {
+              return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+            }
           }),
         ),
         DataCell(
@@ -1525,7 +1495,8 @@ class _EditTwoContractDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BuildCompactTextField(
-                            initialValue: twoContract.fLNotPaidLeave?.toString(),
+                            initialValue: twoContract.fLNotPaidLeave
+                                ?.toString(),
                             label: tr('unpaidLeave'),
                             keyboardType: TextInputType.number,
                             inputFormatters: [

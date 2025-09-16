@@ -917,7 +917,7 @@ class MyData extends DataTableSource {
     );
     final returnController = TextEditingController(
       text: [
-        data.nvchRNoReEmpoyment,
+        //data.nvchRNoReEmpoyment,
         data.nvchRApproverChief,
         data.nvchRApproverManager,
         data.nvchRApproverDirector,
@@ -1911,15 +1911,17 @@ class MyData extends DataTableSource {
           }),
         ),
 
-        // Ghi chu
+        // Ghi chú
         DataCell(
-          Focus(
+          (data.inTStatusId ?? 0) == 3
+              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
+              : Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
                 controller.updateNote(
-                  data.vchREmployeeId.toString(),
-                  noteController.text,
+            data.vchREmployeeId.toString(),
+            noteController.text,
                 );
               }
             },
@@ -1930,15 +1932,17 @@ class MyData extends DataTableSource {
                 labelText: tr('note'),
                 labelStyle: TextStyle(fontSize: Common.sizeColumn),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
           ),
         ),
-        // Truong hop tuyen dung lai hay xong
+        // Truong hop tuyen dung lai hay khong
         DataCell(
-          Obx(() {
+          (data.inTStatusId ?? 0) == 3
+              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
+              : Obx(() {
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1950,57 +1954,60 @@ class MyData extends DataTableSource {
               value: status,
               onChanged: (newValue) {
                 if (newValue != null) {
-                  controller.updateRehireStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                  );
+            controller.updateRehireStatus(
+              data.vchREmployeeId.toString(),
+              newValue == 'OK',
+            );
                 }
               },
               items: [
                 DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+            value: 'OK',
+            child: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 16),
+                SizedBox(width: 4),
+                Text(
+                  'O',
+                  style: TextStyle(
+              fontSize: Common.sizeColumn,
+              color: Colors.green,
                   ),
                 ),
+              ],
+            ),
+                ),
                 DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
+            value: 'NG',
+            child: Row(
+              children: [
+                Icon(Icons.cancel, color: Colors.red, size: 16),
+                SizedBox(width: 4),
+                Text(
+                  'X',
+                  style: TextStyle(
+              fontSize: Common.sizeColumn,
+              color: Colors.red,
                   ),
+                ),
+              ],
+            ),
                 ),
               ],
             );
           }),
         ),
+        // Lý do không tuyển lại
         DataCell(
-          Focus(
+          (data.inTStatusId ?? 0) == 3
+              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
+              : Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
                 // Chỉ update khi mất focus
                 controller.updateNotRehireReason(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
+            data.vchREmployeeId.toString(),
+            reasonController.text,
                 );
               }
             },
@@ -2011,7 +2018,7 @@ class MyData extends DataTableSource {
                 labelText: tr('reason'),
                 labelStyle: TextStyle(fontSize: Common.sizeColumn),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
@@ -2026,54 +2033,29 @@ class MyData extends DataTableSource {
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
             );
-            final rawStatus =
-                controller.filterdataList[index].biTApproverPer ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  // controller.updateApproval(
-                  //   data.vchREmployeeId.toString(),
-                  newValue == 'OK';
-                  // );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+            final rawStatus = [
+              data.nvchRNoReEmpoyment,
+              data.nvchRApproverChief,
+              data.nvchRApproverManager,
+              data.nvchRApproverDirector,
+            ].firstWhere((e) => e != null && e != '', orElse: () => '');
+            if (rawStatus == '') {
+              return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+            } else {
+              return Row(
+                children: [
+                  Icon(Icons.cancel, color: Colors.red, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'X',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
+                ],
+              );
+            }
           }),
         ),
         DataCell(

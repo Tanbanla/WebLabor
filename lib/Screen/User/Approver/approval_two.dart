@@ -957,91 +957,9 @@ class MyData extends DataTableSource {
         ),
         // ket qua danh gia
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateEvaluationStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+          _getDanhGiaView(
+            controller.filterdataList[index].vchRReasultsLeader ?? 'OK',
+          ),
         ),
         // tuyển dụng lại
         DataCell(
@@ -1053,51 +971,35 @@ class MyData extends DataTableSource {
             final rawStatus =
                 controller.filterdataList[index].biTNoReEmployment ?? true;
             final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+            if (status == 'OK') {
+              return Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'O',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.green,
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
+                ],
+              );
+            } else {
+              return Row(
+                children: [
+                  Icon(Icons.cancel, color: Colors.red, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'X',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
+            }
           }),
         ),
         // ly do k tuyen dung lai

@@ -433,22 +433,32 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].nvchRApproverChief = '';
         contract[i].nvchRApproverManager = '';
         contract[i].nvchRApproverDirector = '';
+        contract[i].biTApproverChief = true;
+        contract[i].biTApproverSectionManager = true;
+        contract[i].biTApproverDirector = true;
         switch (contract[i].inTStatusId) {
           case 3:
-            if (contract[i].vchRReasultsLeader == 'NG' &&
-                contract[i].vchRNote == null) {
-              throw Exception(
-                '${tr('InputError1')} ${contract[i].vchREmployeeId}',
-              );
-            }
             contract[i].inTStatusId = 4;
             contract[i].nvchRPthcSection = userUpdate;
             contract[i].vchRLeaderEvalution = userApprover;
           case 4:
-            if (contract[i].vchRReasultsLeader == 'NG' &&
-                contract[i].vchRNote == null) {
+            if(contract[i].vchRReasultsLeader != 'OK' &&(contract[i].vchRLyThuyet == 'OK' 
+            && contract[i].vchRThucHanh == 'OK'
+            && contract[i].vchRCompleteWork == 'OK'
+            && contract[i].vchRLearnWork == 'OK'
+            && contract[i].vchRThichNghi == 'OK'
+            && contract[i].vchRUseful == 'OK'
+            && contract[i].vchRContact == 'OK'
+            && contract[i].vcHNeedViolation == 'OK'
+            && (contract[i].vchRNote == ''|| contract[i].vchRNote == null)
+            )){
               throw Exception(
                 '${tr('InputError1')} ${contract[i].vchREmployeeId}',
+              );
+            }
+            if(contract[i].biTNoReEmployment == false && (contract[i].nvchRNoReEmpoyment == null || contract[i].nvchRNoReEmpoyment == "")){
+              throw Exception(
+                '${tr('InputError')} ${contract[i].vchREmployeeId}',
               );
             }
             contract[i].inTStatusId = 6;
@@ -604,7 +614,7 @@ class DashboardControllerApprentice extends GetxController {
                   '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
                 );
               }
-              contract[i].inTStatusId = 3;
+              contract[i].inTStatusId = 4;
               notApproval.add(contract[i]);
             }
         }
@@ -1179,6 +1189,10 @@ class DashboardControllerApprentice extends GetxController {
     if (index != -1) {
       dataList[index].vchRReasultsLeader = reason;
       filterdataList[index].vchRReasultsLeader = reason;
+      if (reason == 'OK') {
+        dataList[index].vchRNote = '';
+        filterdataList[index].vchRNote = '';
+      }
       dataList.refresh();
       filterdataList.refresh();
     }
@@ -1191,6 +1205,10 @@ class DashboardControllerApprentice extends GetxController {
     if (index != -1) {
       dataList[index].biTNoReEmployment = value;
       filterdataList[index].biTNoReEmployment = value;
+      if (value == true) {
+        dataList[index].nvchRNoReEmpoyment = "";
+        filterdataList[index].nvchRNoReEmpoyment = "";
+      }
       dataList.refresh();
       filterdataList.refresh();
     }

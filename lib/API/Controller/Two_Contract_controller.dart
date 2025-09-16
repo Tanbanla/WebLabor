@@ -445,22 +445,31 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].nvchRApproverChief = '';
         twocontract[i].nvchRApproverManager = '';
         twocontract[i].nvchRApproverDirector = '';
+        twocontract[i].biTApproverChief = true;
+        twocontract[i].biTApproverSectionManager = true;
+        twocontract[i].biTApproverDirector = true;
+        
         switch (twocontract[i].inTStatusId) {
           case 3:
-            if (twocontract[i].vchRReasultsLeader == 'NG' &&
-                twocontract[i].vchRNote == null) {
-              throw Exception(
-                '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
-              );
-            }
             twocontract[i].inTStatusId = 4;
             twocontract[i].nvchRPthcSection = userUpdate;
             twocontract[i].vchRLeaderEvalution = userApprover;
           case 4:
-            if (twocontract[i].vchRReasultsLeader == 'NG' &&
-                twocontract[i].vchRNote == null) {
+            if (twocontract[i].nvchROther != 'OK' && (twocontract[i].vchRNote == null || twocontract[i].vchRNote == "")) {
               throw Exception(
                 '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
+              );
+            }
+            if(twocontract[i].vchRReasultsLeader != 'OK' &&(twocontract[i].nvchRCompleteWork == 'OK' 
+            && twocontract[i].nvchRUseful == 'OK'
+            && twocontract[i].nvchROther == 'OK')){
+              throw Exception(
+                '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
+              );
+            }
+            if(twocontract[i].biTNoReEmployment == false && (twocontract[i].nvchRNoReEmpoyment == null || twocontract[i].nvchRNoReEmpoyment == "")){
+              throw Exception(
+                '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
             }
             twocontract[i].inTStatusId = 6;
@@ -559,7 +568,7 @@ class DashboardControllerTwo extends GetxController {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
-              twocontract[i].inTStatusId = 3;
+              twocontract[i].inTStatusId = 4;
               notApproval.add(twocontract[i]);
             }
           case 8:
@@ -577,7 +586,7 @@ class DashboardControllerTwo extends GetxController {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
-              twocontract[i].inTStatusId = 3;
+              twocontract[i].inTStatusId = 4;
               notApproval.add(twocontract[i]);
             }
         }
@@ -785,7 +794,7 @@ class DashboardControllerTwo extends GetxController {
           ..inTViolation = row[17]?.value != null
               ? int.tryParse(row[17]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[18]!.value.toString()
+          ..nvarchaRViolation = row[18]?.value.toString() ?? ''
           ..nvchRCompleteWork //= row[17]!.value.toString()
           ..nvchRUseful //= row[18]!.value.toString()
           ..nvchROther //= row[19]!.value.toString()
@@ -917,7 +926,7 @@ class DashboardControllerTwo extends GetxController {
           ..inTViolation = row[17]?.value != null
               ? int.tryParse(row[17]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation = row[18]!.value.toString()
+          ..nvarchaRViolation = row[18]?.value.toString() ?? ''
           ..nvchRCompleteWork //= row[17]!.value.toString()
           ..nvchRUseful //= row[18]!.value.toString()
           ..nvchROther //= row[19]!.value.toString()
@@ -1026,6 +1035,10 @@ class DashboardControllerTwo extends GetxController {
       }
       dataList[index].nvchROther = status;
       filterdataList[index].nvchROther = status;
+      if(status == 'OK'){
+        dataList[index].vchRNote = '';
+        filterdataList[index].vchRNote = '';
+      }
       dataList.refresh();
       filterdataList.refresh();
     }
@@ -1063,6 +1076,10 @@ class DashboardControllerTwo extends GetxController {
     if (index != -1) {
       dataList[index].biTNoReEmployment = value;
       filterdataList[index].biTNoReEmployment = value;
+      if (value == true) {
+        dataList[index].nvchRNoReEmpoyment = '';
+        filterdataList[index].nvchRNoReEmpoyment = '';
+      }
       dataList.refresh();
       filterdataList.refresh();
     }

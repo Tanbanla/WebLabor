@@ -36,7 +36,11 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final authState = Provider.of<AuthState>(context, listen: true);
     // phan xem ai dang vao man so sanh
     controller.fetchPTHCData();
-    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+    controller.changeStatus(
+      'approval',
+      null,
+      authState.user!.chRUserid.toString(),
+    );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -101,129 +105,132 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     // Extract section name safely
     // String sectionName =
     //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller.searchTextController,
-                    onChanged: (value) {
-                      controller.searchQuery(value);
-                    },
-                    decoration: InputDecoration(
-                      hintText: tr('searchhint'),
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      prefixIcon: Icon(
-                        Iconsax.search_normal,
-                        color: Colors.grey[500],
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 16,
-                      ),
-                      suffixIcon:
-                          controller.searchTextController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.close,
-                                size: 20,
-                                color: Colors.grey[500],
-                              ),
-                              onPressed: () {
-                                controller.searchTextController.clear();
-                                controller.searchQuery('');
-                              },
-                            )
-                          : null,
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 12),
-
-              // Action Buttons
-              const SizedBox(width: 8),
-              buildActionButton(
-                icon: Iconsax.export,
-                color: Colors.green,
-                tooltip: tr('export'),
-                onPressed: () => _showExportDialog(),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    await controller.updateListApprenticeContractApproval(
-                      authState.user!.chRUserid.toString(),
-                    );
-                    // phan xem ai dang vao man so sanh
-                    controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: Obx(
-                  () => Container(
-                    width: 130,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: controller.isLoading.value
-                          ? Colors.grey
-                          : Common.primaryColor,
-                      borderRadius: BorderRadius.circular(10),
+                child: TextField(
+                  controller: controller.searchTextController,
+                  onChanged: (value) {
+                    controller.searchQuery(value);
+                  },
+                  decoration: InputDecoration(
+                    hintText: tr('searchhint'),
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    prefixIcon: Icon(
+                      Iconsax.search_normal,
+                      color: Colors.grey[500],
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
                     ),
-                    child: Center(
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              tr('Confirm'),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    suffixIcon: controller.searchTextController.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 20,
+                              color: Colors.grey[500],
                             ),
-                    ),
+                            onPressed: () {
+                              controller.searchTextController.clear();
+                              controller.searchQuery('');
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
-      );
+            ),
+            const SizedBox(width: 12),
+
+            // Action Buttons
+            const SizedBox(width: 8),
+            buildActionButton(
+              icon: Iconsax.export,
+              color: Colors.green,
+              tooltip: tr('export'),
+              onPressed: () => _showExportDialog(),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () async {
+                try {
+                  await controller.updateListApprenticeContractApproval(
+                    authState.user!.chRUserid.toString(),
+                  );
+                  // phan xem ai dang vao man so sanh
+                  controller.changeStatus(
+                    'approval',
+                    null,
+                    authState.user!.chRUserid.toString(),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: Obx(
+                () => Container(
+                  width: 130,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: controller.isLoading.value
+                        ? Colors.grey
+                        : Common.primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  child: Center(
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            tr('Confirm'),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildDataTable() {
@@ -581,7 +588,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "X":"");
+                  setCellValue('Y', item.biTNoReEmployment ? "X" : "");
                   setCellValue('Z', item.vchRUseful ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }
@@ -927,51 +934,35 @@ class MyData extends DataTableSource {
             final rawStatus =
                 controller.filterdataList[index].biTNoReEmployment ?? true;
             final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+            if (status == 'OK') {
+              return Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'O',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.green,
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
+                ],
+              );
+            } else {
+              return Row(
+                children: [
+                  Icon(Icons.cancel, color: Colors.red, size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'X',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
+            }
           }),
         ),
         // ly do k tuyen dung lai
@@ -1089,7 +1080,8 @@ class MyData extends DataTableSource {
       ],
     );
   }
-      Widget _getHienTrangColor(int? IntStatus) {
+
+  Widget _getHienTrangColor(int? IntStatus) {
     switch (IntStatus) {
       case 1:
         return Container(
@@ -1547,7 +1539,11 @@ class _EditContractDialog extends StatelessWidget {
                       //     .split(':')[1]
                       //     .trim();
                       // phan xem ai dang vao man so sanh
-                      controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
+                      controller.changeStatus(
+                        'approval',
+                        null,
+                        authState.user!.chRUserid.toString(),
+                      );
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
