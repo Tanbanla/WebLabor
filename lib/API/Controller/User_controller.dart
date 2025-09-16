@@ -517,6 +517,8 @@ class DashboardControllerUser extends GetxController {
     String cc,
     String bcc,
     List<dynamic> rejectedRequests,
+    String loaituchoi,
+    String approverNG,
   ) async {
     try {
       isLoading(true);
@@ -528,6 +530,8 @@ class DashboardControllerUser extends GetxController {
         "mail_bcc": bcc == "null" ? "" : bcc,
         "body": Common.getRejectionEmailBody(
           confirmLink: "http://172.26.248.62:8055/",
+          loaiTuChoi: loaituchoi,
+          approverNG: approverNG,
           rejectedRequests: rejectedRequests,
         ),
       };

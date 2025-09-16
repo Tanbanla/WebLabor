@@ -37,6 +37,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     //     .split(':')[1]
     //     .trim();
     // phan xem ai dang vao man so sanh
+    controller.fetchPTHCData();
     controller.changeStatus(
       'approval',
       null,
@@ -270,7 +271,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3640,
+              width: 3980,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns

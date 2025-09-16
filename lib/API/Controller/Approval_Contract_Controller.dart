@@ -142,6 +142,8 @@ class DashboardControllerApporver extends GetxController {
             specialSection.mailcc.toString(),
             specialSection.mailbcc.toString(),
             notApproval,
+            "Từ chối phê duyệt",
+            userApprover
           );
         }
       } else {

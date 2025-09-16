@@ -39,6 +39,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .toString()
         .split(':')[1]
         .trim();
+    controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Admin") {
@@ -459,7 +460,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3640, //2570,
+              width: 3770, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -506,6 +507,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   DataColumnCustom(
                     title: tr('action'),
                     width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 130,
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -906,6 +913,14 @@ class MyData extends DataTableSource {
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
     );
+    final returnController = TextEditingController(
+      text: [
+        data.nvchRNoReEmpoyment,
+        data.nvchRApproverChief,
+        data.nvchRApproverManager,
+        data.nvchRApproverDirector,
+      ].firstWhere((e) => e != null && e != '', orElse: () => ''),
+    );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -964,6 +979,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
           Text(
             data.vchRCodeApprover ?? "",
@@ -1639,7 +1655,7 @@ class MyData extends DataTableSource {
               }
             },
             child: TextFormField(
-              controller: reasonController,
+              controller: returnController,
               style: TextStyle(fontSize: Common.sizeColumn),
               decoration: InputDecoration(
                 labelText: tr('reason'),
@@ -1659,6 +1675,101 @@ class MyData extends DataTableSource {
         ),
       ],
     );
+  }
+
+  Widget _getHienTrangColor(int? IntStatus) {
+    switch (IntStatus) {
+      case 1:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blueGrey[100]!),
+          ),
+          child: Text('New', style: TextStyle(color: Colors.grey[800])),
+        );
+      case 2:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.purple[100]!),
+          ),
+          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+        );
+      case 3:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange[100]!),
+          ),
+          child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
+        );
+      case 4:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue[100]!),
+          ),
+          child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+        );
+      case 6:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.yellow[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.yellow[100]!),
+          ),
+          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+        );
+      case 7:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal[100]!),
+          ),
+          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+        );
+      case 8:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.brown[100]!),
+          ),
+          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+        );
+      case 9:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green[100]!),
+          ),
+          child: Text('Done', style: TextStyle(color: Colors.green[800])),
+        );
+      default:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red[100]!),
+          ),
+          child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
+        );
+    }
   }
 
   Color _getStatusColor(String? status) {
@@ -2393,8 +2504,9 @@ class _ReturnTwoContract extends StatelessWidget {
                 child: Text(
                   tr('reasonReject'),
                   style: TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Common.primaryColor,
+                    color: Common.grayColor,
                   ),
                 ),
               ),
@@ -2495,9 +2607,14 @@ class _ReturnTwoContract extends StatelessWidget {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
                       }
-                      await controller.updateTwoContract(
+                      // await controller.updateTwoContract(
+                      //   edited,
+                      //   authState.user!.chRUserid.toString(),
+                      // );
+                      await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
+                        edited.vchRNote ?? "",
                       );
                       String sectionName = authState.user!.chRSecCode
                           .toString()

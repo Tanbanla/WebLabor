@@ -328,6 +328,40 @@ class DashboardControllerApprentice extends GetxController {
     }
   }
 
+  // Send mail phản hồi từ chối đánh giá
+  Future<void> sendEmailReturn(
+    ApprenticeContract contract,
+    String userApprover,
+    String reason,
+  ) async {
+    try {
+      //fetchPTHCData();
+      List<dynamic> notApproval = [];
+      notApproval.add(contract);
+      if (notApproval.isNotEmpty) {
+        final specialSection = pthcList.firstWhere(
+          (item) => item.section == "1120-1 : ADM-PER",
+        );
+        final ccSection = pthcList
+            .map((item) => item.mailcc)
+            .where((section) => section == contract.vchRCodeSection);
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMailCustom(
+          specialSection.mailto.toString(),
+          '$ccSection;${specialSection.mailcc}',
+          specialSection.mailbcc.toString(),
+          notApproval,
+          "Từ chối xác nhận",
+          userApprover,
+        );
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   //update thong tin to list
   Future<void> updateListApprenticeContract(
     String userApprover,
@@ -395,6 +429,10 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].biTApproverChief = true;
         contract[i].biTApproverSectionManager = true;
+        // cập nhật lại các lý do từ chối
+        contract[i].nvchRApproverChief = '';
+        contract[i].nvchRApproverManager = '';
+        contract[i].nvchRApproverDirector = '';
         switch (contract[i].inTStatusId) {
           case 3:
             if (contract[i].vchRReasultsLeader == 'NG' &&
@@ -479,10 +517,40 @@ class DashboardControllerApprentice extends GetxController {
     }
   }
 
+  /// Lay thông tin gửi mail
+  Future<void> fetchPTHCData() async {
+    try {
+      isLoading(true);
+      final response = await http.post(
+        Uri.parse(Common.API + Common.GetGroupPTHC),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          pthcList.assignAll(
+            data.map((user) => PthcGroup.fromJson(user)).toList(),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load dats');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // update thong tin phe duyet
   Future<void> updateListApprenticeContractApproval(String userApprover) async {
     try {
       final contract = getSelectedItems();
+      //fetchPTHCData();
       List<dynamic> notApproval = [];
       String mailSend = "";
       String sectionAp = "";
@@ -494,7 +562,7 @@ class DashboardControllerApprentice extends GetxController {
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         // Tìm vị trí bắt đầu của phần dept
         List<String> parts = (contract[i].vchRCodeSection ?? "").split(": ");
-        String prPart = parts[1]; 
+        String prPart = parts[1];
 
         // Tách phần phòng ban
         List<String> prParts = prPart.split("-");
@@ -574,6 +642,8 @@ class DashboardControllerApprentice extends GetxController {
             '$ccSection;${specialSection.mailcc}',
             specialSection.mailbcc.toString(),
             notApproval,
+            "Từ chối phê duyệt",
+            userApprover,
           );
         }
       } else {

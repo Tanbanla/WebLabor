@@ -2370,6 +2370,11 @@ class _ReturnContract extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
+                      await controller.sendEmailReturn(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                        "Trả về từ báo cáo của nhân sự"
+                      );
                       // Refresh dữ liệu
                       await controller.fetchDummyData();
 

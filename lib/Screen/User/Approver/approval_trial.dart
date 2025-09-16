@@ -35,6 +35,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
     // phan xem ai dang vao man so sanh
+    controller.fetchPTHCData();
     controller.changeStatus('approval', null, authState.user!.chRUserid.toString());
     return Scaffold(
       backgroundColor: Colors.grey[50],

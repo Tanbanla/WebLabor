@@ -41,6 +41,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .toString()
         .split(':')[1]
         .trim();
+    controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Admin") {
@@ -459,7 +460,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3600,
+              width: 4000,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -506,6 +507,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   DataColumnCustom(
                     title: tr('action'),
                     width: 100,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('Hientrang'),
+                    width: 130,
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -648,6 +655,19 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     width: 170,
                     fontSize: Common.sizeColumn,
                     maxLines: 2,
+                  ).toDataColumn2(),
+                  // Approval
+                  DataColumnCustom(
+                    title: tr('Apporval'), //tr('notRehirable'),
+                    width: 100,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
+                  ).toDataColumn2(),
+                  DataColumnCustom(
+                    title: tr('LydoTuChoi'), //tr('notRehirableReason'),
+                    width: 170,
+                    maxLines: 2,
+                    fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                 ],
                 source: MyData(context),
@@ -895,6 +915,14 @@ class MyData extends DataTableSource {
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',
     );
+    final returnController = TextEditingController(
+      text: [
+        data.nvchRNoReEmpoyment,
+        data.nvchRApproverChief,
+        data.nvchRApproverManager,
+        data.nvchRApproverDirector,
+      ].firstWhere((e) => e != null && e != '', orElse: () => ''),
+    );
     final noteController = TextEditingController(text: data.vchRNote ?? '');
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -953,6 +981,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+        DataCell(_getHienTrangColor(data.inTStatusId)),
         DataCell(
           Text(
             data.vchRCodeApprover ?? "",
@@ -1988,8 +2017,192 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
+
+        /// phần từ chối phê duyệt
+        // thuộc tính approver
+        DataCell(
+          Obx(() {
+            Visibility(
+              visible: false,
+              child: Text(controller.filterdataList[index].toString()),
+            );
+            final rawStatus =
+                controller.filterdataList[index].biTApproverPer ?? true;
+            final status = rawStatus ? 'OK' : 'NG';
+            return DropdownButton<String>(
+              value: status,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  // controller.updateApproval(
+                  //   data.vchREmployeeId.toString(),
+                  newValue == 'OK';
+                  // );
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'OK',
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'O',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'NG',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        DataCell(
+          Focus(
+            onFocusChange: (hasFocus) {
+              if (!hasFocus) {
+                // // Chỉ update khi mất focus
+                // controller.updateNoteApprovel(
+                //   data.vchREmployeeId.toString(),
+                //   reasonController.text,
+                // );
+              }
+            },
+            child: TextFormField(
+              controller: returnController,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              decoration: InputDecoration(
+                labelText: tr('reason'),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              // onChanged: (value) {
+              //   controller.updateNoteApprovel(
+              //     data.vchREmployeeId.toString(),
+              //     value,
+              //   );
+              // },
+            ),
+          ),
+        ),
       ],
     );
+  }
+
+  Widget _getHienTrangColor(int? IntStatus) {
+    switch (IntStatus) {
+      case 1:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blueGrey[100]!),
+          ),
+          child: Text('New', style: TextStyle(color: Colors.grey[800])),
+        );
+      case 2:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.purple[100]!),
+          ),
+          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+        );
+      case 3:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange[100]!),
+          ),
+          child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
+        );
+      case 4:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blue[100]!),
+          ),
+          child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+        );
+      case 6:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.yellow[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.yellow[100]!),
+          ),
+          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+        );
+      case 7:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal[100]!),
+          ),
+          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+        );
+      case 8:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.brown[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.brown[100]!),
+          ),
+          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+        );
+      case 9:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green[100]!),
+          ),
+          child: Text('Done', style: TextStyle(color: Colors.green[800])),
+        );
+      default:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red[100]!),
+          ),
+          child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
+        );
+    }
   }
 
   Color _getStatusColor(String? status) {
@@ -2492,7 +2705,8 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
- // widget không được phép sửa
+
+  // widget không được phép sửa
   Widget _buildCompactReadOnlyField({
     required String value,
     required String label,
@@ -2504,31 +2718,32 @@ class _EditContractDialog extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey[600],
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[600],
           ),
         ),
         const SizedBox(height: 4),
         SizedBox(
           width: width,
           child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Text(
-          value,
-          style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-        ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+            ),
           ),
         ),
       ],
     );
     return content;
   }
+
   Widget _buildCompactTextField({
     required String? initialValue,
     required String label,
@@ -2597,7 +2812,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
               Text(
                 tr('reject'),
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Common.grayColor,
                 ),
@@ -2679,16 +2894,21 @@ class _ReturnConApprenticetract extends StatelessWidget {
                     try {
                       if (edited.inTStatusId == 3) {
                         edited.inTStatusId = 1;
-                      }else if (edited.inTStatusId == 4) {
+                      } else if (edited.inTStatusId == 4) {
                         edited.inTStatusId = 3;
                       }
-                      if(edited.vchRNote == null || edited.vchRNote!.isEmpty){
+                      if (edited.vchRNote == null || edited.vchRNote!.isEmpty) {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
                       }
                       await controller.updateApprenticeContract(
                         edited,
                         authState.user!.chRUserid.toString(),
+                      );
+                      await controller.sendEmailReturn(
+                        edited,
+                        authState.user!.chRUserid.toString(),
+                        edited.vchRNote ?? ""
                       );
                       String sectionName = authState.user!.chRSecCode
                           .toString()
@@ -2734,6 +2954,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
       ],
     );
   }
+
   Widget _buildCompactTextField({
     required String? initialValue,
     required String label,

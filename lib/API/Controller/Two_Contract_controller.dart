@@ -337,6 +337,40 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
+  // Send mail phản hồi từ chối đánh giá
+  Future<void> sendEmailReturn(
+    TwoContract contract,
+    String userApprover,
+    String reason,
+  ) async {
+    try {
+      //fetchPTHCData();
+      List<dynamic> notApproval = [];
+      notApproval.add(contract);
+      if (notApproval.isNotEmpty) {
+        final specialSection = pthcList.firstWhere(
+          (item) => item.section == "1120-1 : ADM-PER",
+        );
+        final ccSection = pthcList
+            .map((item) => item.mailcc)
+            .where((section) => section == contract.vchRCodeSection);
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMailCustom(
+          specialSection.mailto.toString(),
+          '$ccSection;${specialSection.mailcc}',
+          specialSection.mailbcc.toString(),
+          notApproval,
+          "Từ chối xác nhận",
+          userApprover,
+        );
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   // udpate to list
   Future<void> updateListTwoContractPer(
     String userApprover,
@@ -344,7 +378,7 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       //sau test delete
-      if(userApprover == "fujiokmi"){
+      if (userApprover == "fujiokmi") {
         userApprover = 'vanug';
       }
       // List<TwoContract> twocontract,
@@ -407,6 +441,10 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].biTApproverChief = true;
         twocontract[i].biTApproverSectionManager = true;
         twocontract[i].biTApproverDirector = true;
+        // cập nhật lại các lý do từ chối
+        twocontract[i].nvchRApproverChief = '';
+        twocontract[i].nvchRApproverManager = '';
+        twocontract[i].nvchRApproverDirector = '';
         switch (twocontract[i].inTStatusId) {
           case 3:
             if (twocontract[i].vchRReasultsLeader == 'NG' &&
@@ -464,7 +502,7 @@ class DashboardControllerTwo extends GetxController {
   Future<void> updateListTwoContractApproval(String userApprover) async {
     try {
       // List<TwoContract> twocontract,
-      fetchPTHCData();
+      //fetchPTHCData();
       final twocontract = getSelectedItems();
       List<dynamic> notApproval = [];
       String mailSend = "";
@@ -477,7 +515,7 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         // Tìm vị trí bắt đầu của phần dept
         List<String> parts = (twocontract[i].vchRCodeSection ?? "").split(": ");
-        String prPart = parts[1]; 
+        String prPart = parts[1];
 
         // Tách phần phòng ban
         List<String> prParts = prPart.split("-");
@@ -584,6 +622,8 @@ class DashboardControllerTwo extends GetxController {
             '$ccEmails;${specialSection.mailcc}',
             specialSection.mailbcc.toString(),
             notApproval,
+            "Từ chối phê duyệt",
+            userApprover,
           );
         }
       } else {
@@ -1132,7 +1172,11 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý
-  Future<String> NextApprovel({String? section, String? chucVu, String? dept}) async {
+  Future<String> NextApprovel({
+    String? section,
+    String? chucVu,
+    String? dept,
+  }) async {
     try {
       isLoading(true);
 
