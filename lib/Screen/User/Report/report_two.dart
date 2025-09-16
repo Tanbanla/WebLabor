@@ -231,8 +231,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                 showCheckboxColumn: true,
                 showFirstLastButtons: true,
                 renderEmptyRowsInTheEnd: false,
-                rowsPerPage: 10,
-                availableRowsPerPage: const [5, 10, 20, 50],
+                rowsPerPage: 30,
+                availableRowsPerPage: const [30, 50, 100, 150],
                 onRowsPerPageChanged: (value) {},
                 sortColumnIndex: controller.sortCloumnIndex.value,
                 sortAscending: controller.sortAscending.value,
@@ -504,7 +504,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   TextCellValue(tr('unreportedLeave')),
                   TextCellValue(tr('violationCount')),
                   TextCellValue(tr('reason')),
-                  TextCellValue(tr('healthCheckResult')),
+                  // TextCellValue(tr('healthCheckResult')),
                   TextCellValue(tr('evaluationResult')),
                   TextCellValue(tr('notRehirable')),
                   TextCellValue(tr('notRehirableReason')),
@@ -536,14 +536,14 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     TextCellValue(
                       item.dtMJoinDate != null
                           ? DateFormat(
-                              'yyyy-MM-dd',
+                              'dd/MM/yyyy',
                             ).format(DateTime.parse(item.dtMJoinDate!))
                           : '',
                     ),
                     TextCellValue(
                       item.dtMEndDate != null
                           ? DateFormat(
-                              'yyyy-MM-dd',
+                              'dd/MM/yyyy',
                             ).format(DateTime.parse(item.dtMEndDate!))
                           : '',
                     ),

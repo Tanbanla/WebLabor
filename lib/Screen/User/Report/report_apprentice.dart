@@ -230,8 +230,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                 showCheckboxColumn: true,
                 showFirstLastButtons: true,
                 renderEmptyRowsInTheEnd: false,
-                rowsPerPage: 10,
-                availableRowsPerPage: const [5, 10, 20, 50],
+                rowsPerPage: 30,
+                availableRowsPerPage: const [30, 50, 100, 150],
                 onRowsPerPageChanged: (value) {},
                 sortColumnIndex: controller.sortCloumnIndex.value,
                 sortAscending: controller.sortAscending.value,
@@ -537,14 +537,14 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     TextCellValue(
                       item.dtMJoinDate != null
                           ? DateFormat(
-                              'yyyy-MM-dd',
+                              'dd/MM/yyyy',
                             ).format(DateTime.parse(item.dtMJoinDate!))
                           : '',
                     ),
                     TextCellValue(
                       item.dtMEndDate != null
                           ? DateFormat(
-                              'yyyy-MM-dd',
+                              'dd/MM/yyyy',
                             ).format(DateTime.parse(item.dtMEndDate!))
                           : '',
                     ),
