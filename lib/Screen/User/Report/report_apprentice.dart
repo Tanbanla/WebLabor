@@ -716,6 +716,7 @@ class MyData extends DataTableSource {
   final DashboardControllerApprentice controller = Get.find();
   final BuildContext context;
   MyData(this.context);
+  
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -977,21 +978,6 @@ class MyData extends DataTableSource {
             );
             final rawStatus =
                 controller.filterdataList[index].biTNoReEmployment;
-            // () {
-            //   if (controller.filterdataList.length > index) {
-            //     return switch (data.inTStatusId) {
-            //       6 =>
-            //         controller.filterdataList[index].biTApproverChief ?? true,
-            //       7 =>
-            //         controller
-            //                 .filterdataList[index]
-            //                 .biTApproverSectionManager ??
-            //             true,
-            //       _ => true,
-            //     };
-            //   }
-            //   return true;
-            // }();
             String status = rawStatus ? "OK" : "NG";
             return DropdownButton<String>(
               value: status,
@@ -1280,6 +1266,128 @@ class MyData extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+}
+
+// Add this method to the _ReportApprenticeState class to create column filters
+Widget _buildColumnFilters() {
+  final DashboardControllerApprentice controller = Get.find();
+  return Container(
+    color: Colors.grey[100],
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: 4680, // Same width as your data table
+        child: Row(
+          children: [
+            _buildFilterField(width: 70, hint: tr('stt')),
+            _buildFilterField(width: 100, hint: tr('action')),
+            _buildFilterField(
+              width: 130, 
+              hint: tr('Hientrang'),
+              onChanged: (value) => controller.filterByStatus(value),
+            ),
+            _buildFilterField(
+              width: 180, 
+              hint: tr('DotDanhGia'),
+              onChanged: (value) => controller.filterByApproverCode(value),
+            ),
+            _buildFilterField(
+              width: 100, 
+              hint: tr('employeeCode'),
+              onChanged: (value) => controller.filterByEmployeeId(value),
+            ),
+            _buildFilterField(
+              width: 60, 
+              hint: tr('gender'),
+              onChanged: (value) => controller.filterByGender(value),
+            ),
+            _buildFilterField(
+              width: 180, 
+              hint: tr('fullName'),
+              onChanged: (value) => controller.filterByEmployeeName(value),
+            ),
+            _buildFilterField(
+              width: 120, 
+              hint: tr('department'),
+              onChanged: (value) => controller.filterByDepartment(value),
+            ),
+            _buildFilterField(
+              width: 100, 
+              hint: tr('group'),
+              onChanged: (value) => controller.filterByGroup(value),
+            ),
+            _buildFilterField(width: 70, hint: tr('age')),
+            _buildFilterField(
+              width: 100, 
+              hint: tr('position'),
+              onChanged: (value) => controller.filterByPosition(value),
+            ),
+            _buildFilterField(width: 100, hint: tr('salaryGrade')),
+            _buildFilterField(width: 120, hint: tr('contractEffective')),
+            _buildFilterField(width: 120, hint: tr('contractEndDate')),
+            _buildFilterField(width: 110, hint: tr('earlyLateCount')),
+            _buildFilterField(width: 90, hint: tr('unreportedLeave')),
+            _buildFilterField(width: 130, hint: tr('violationCount')),
+            _buildFilterField(width: 150, hint: tr('reason')),
+            _buildFilterField(width: 130, hint: tr('lythuyet')),
+            _buildFilterField(width: 130, hint: tr('thuchanh')),
+            _buildFilterField(width: 130, hint: tr('congviec')),
+            _buildFilterField(width: 130, hint: tr('hochoi')),
+            _buildFilterField(width: 130, hint: tr('thichnghi')),
+            _buildFilterField(width: 150, hint: tr('tinhthan')),
+            _buildFilterField(width: 130, hint: tr('baocao')),
+            _buildFilterField(width: 130, hint: tr('chaphanh')),
+            _buildFilterField(
+              width: 150, 
+              hint: tr('ketqua'),
+              onChanged: (value) => controller.filterByResult(value),
+            ),
+            _buildFilterField(width: 150, hint: tr('note')),
+            _buildFilterField(width: 170, hint: tr('notRehirable')),
+            _buildFilterField(width: 170, hint: tr('Lydo')),
+            _buildFilterField(width: 100, hint: tr('Nguoilap')),
+            _buildFilterField(width: 150, hint: tr('Nhansu')),
+            _buildFilterField(width: 150, hint: tr('NguoiDanhgia')),
+            _buildFilterField(width: 150, hint: tr('TruongPhong')),
+            _buildFilterField(width: 150, hint: tr('QuanLyCC')),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// Helper method to build filter input fields
+Widget _buildFilterField({
+  required double width, 
+  required String hint, 
+  Function(String)? onChanged
+}) {
+  return Container(
+    width: width,
+    margin: const EdgeInsets.symmetric(horizontal: 6),
+    child: TextField(
+      style: TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(fontSize: 10, color: Colors.grey),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        isDense: true,
+      ),
+      onChanged: onChanged,
+    ),
+  );
 }
 
 // Edit thông tin hợp đồng
@@ -1989,6 +2097,8 @@ class _UpdateKetQua extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = ApprenticeContract.fromJson(contract.toJson());
     final errorMessage = ''.obs;
+    final reson = ''.obs;
+    final ketquaOld = (edited.vchRReasultsLeader ?? 'OK').obs;
     final authState = Provider.of<AuthState>(context, listen: false);
     final selectedStatus = (edited.vchRReasultsLeader ?? 'OK').obs;
 
@@ -2028,100 +2138,119 @@ class _UpdateKetQua extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          Column(
             children: [
-              Text(
-                "${tr("ketqua")} ",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Common.blackColor,
-                ),
+              Row(
+                children: [
+                  Text(
+                    "${tr("ketqua")} ",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Common.blackColor,
+                    ),
+                  ),
+                  Obx(
+                    () => DropdownButton<String>(
+                      value: selectedStatus.value,
+                      onChanged: (newValue) {
+                        if (newValue != null) {
+                          selectedStatus.value = newValue;
+                          edited.vchRReasultsLeader = newValue;
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 'OK',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'OK',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'NG',
+                          child: Row(
+                            children: [
+                              Icon(Icons.cancel, color: Colors.red, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                'NG',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Stop Working',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.pause_circle,
+                                color: Colors.orange,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Stop Working',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Finish L/C',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.done_all,
+                                color: Colors.blue,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Finish L/C',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Obx(
-                () => DropdownButton<String>(
-                  value: selectedStatus.value,
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      selectedStatus.value = newValue;
-                      edited.vchRReasultsLeader = newValue;
-                    }
-                  },
-                  items: [
-                    DropdownMenuItem(
-                      value: 'OK',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'OK',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'NG',
-                      child: Row(
-                        children: [
-                          Icon(Icons.cancel, color: Colors.red, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            'NG',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Stop Working',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.pause_circle,
-                            color: Colors.orange,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Stop Working',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Finish L/C',
-                      child: Row(
-                        children: [
-                          Icon(Icons.done_all, color: Colors.blue, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Finish L/C',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  _buildCompactTextField(
+                    initialValue: reson.value,
+                    label: tr('reason'),
+                    onChanged: (value) => reson.value = value,
+                    maxLines: 2,
+                  ),
+                ],
               ),
             ],
           ),
@@ -2168,15 +2297,21 @@ class _UpdateKetQua extends StatelessWidget {
 
                     controller.isLoading(true);
                     try {
+                      if(reson.value.isEmpty){
+                        errorMessage.value = tr('pleaseReason');
+                        controller.isLoading(false);
+                        return;
+                      }
                       // Cập nhật giá trị từ selectedStatus
                       edited.vchRReasultsLeader = selectedStatus.value;
                       if (selectedStatus.value != 'OK') {
                         edited.biTNoReEmployment = false;
                         //edited.nvchRApproverManager = 'Thay đổi từ sửa kết quả đánh giá cuối cùng';
                       }
-                      await controller.updateApprenticeContract(
+                      await controller.updateKetQuaApprenticeContract(
                         edited,
                         authState.user!.chRUserid.toString(),
+                        ketquaOld.value,
                       );
 
                       // Refresh dữ liệu
@@ -2228,6 +2363,31 @@ class _UpdateKetQua extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+  Widget _buildCompactTextField({
+    required String? initialValue,
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
   }
 }
 

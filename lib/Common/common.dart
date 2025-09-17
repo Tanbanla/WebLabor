@@ -162,4 +162,26 @@ class Common {
 
     return """---------------------------<br/>Kính gửi: Quản lý phòng ban<br/><br/>Hệ thống thông báo có <span style='color: red; font-weight: bold;'>${rejectedRequests.length} yêu cầu đánh giá BỊ TỪ CHỐI</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Lý do từ chối</th><th>Người từ chối</th><th>Loại từ chối</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>--------------------------------------<br/><br/>Hello,<br/><br/>The system informs you that <span style='color: red; font-weight: bold;'>${rejectedRequests.length} evaluation requests have been REJECTED</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Evaluation Type</th><th>Release Code</th><th>Employee Code</th><th>Rejection Reason</th><th>Rejection Person</th><th>Rejection Type</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Please click the link below to reconfirm:<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※This is an automated email from the LCES system. Please do not reply to this email.<br/>Please contact the responsible person to confirm the current status.""";
   }
+  // thông báo sửa kết quả đánh giá
+  static String getKetQuaEmailBody({
+    required String confirmLink,
+    required String ketquaOld,
+    required String ketquaNew,
+    required List<dynamic> rejectedRequests,
+  }) {
+    // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
+    String buildTableRows() {
+      return rejectedRequests.map((request) {
+        return "<tr>"
+            "<td>${request.vchRCodeApprover ?? 'N/A'}</td>"
+            "<td>${request.vchRCodeApprover ?? 'N/A'}</td>"
+            "<td>${request.vchREmployeeId ?? 'N/A'}</td>"
+            "<td>$ketquaOld</td>"
+            "<td>$ketquaNew</td>"
+            "</tr>";
+      }).join();
+    }
+
+    return """---------------------------<br/>Xin chào,<br/><br/>Hệ thống thông tin tới bạn Yêu cầu sửa đánh giá hợp đồng <span style='color: green; font-weight: bold;'>ĐÃ HOÀN THÀNH</span>.<br/><br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Kết quả trước sửa</th><th>Kết quả sau sửa</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.<br/>--------------------------------------<br/><br/>こんにちは,<br/><br/>完了した契約評価結果の修正依頼があったことをお知らせいたします。</span>.<br/><br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>評価契約類</th><th>発行コード</th><th>社員コード</th><th>修正前の結果</th><th>修正後の結果</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>以下のリンクをクリックして、内容をご確認ください。<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※このメールはLCESシステムから自動的に送付されたので、返事をしないで下さい。<br/>ご質問がある場合は、人事課の課長までお問い合わせください。""";
+  }
 }

@@ -77,6 +77,170 @@ class DashboardControllerApprentice extends GetxController {
     });
   }
 
+  void filterByStatus(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final statusId = item.inTStatusId;
+      final statusText = getStatusText(statusId);
+      return statusText.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Helper method to convert status ID to text
+  String getStatusText(int? statusId) {
+    switch (statusId) {
+      case 1:
+        return 'New';
+      case 2:
+        return 'Per';
+      case 3:
+        return 'PTHC';
+      case 4:
+        return 'Leader';
+      case 6:
+        return 'Manager';
+      case 7:
+        return 'Dept';
+      case 8:
+        return 'Director';
+      case 9:
+        return 'Done';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  // Filter by approver code (DotDanhGia)
+  void filterByApproverCode(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final code = item.vchRCodeApprover?.toLowerCase() ?? '';
+      return code.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee ID
+  void filterByEmployeeId(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final id = item.vchREmployeeId?.toLowerCase() ?? '';
+      return id.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by gender
+  void filterByGender(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final gender = item.vchRTyperId?.toLowerCase() ?? '';
+      return gender.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee name
+  void filterByEmployeeName(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final name = item.vchREmployeeName?.toLowerCase() ?? '';
+      return name.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by department
+  void filterByDepartment(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final department = item.vchRNameSection?.toLowerCase() ?? '';
+      return department.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by group
+  void filterByGroup(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final group = item.chRCostCenterName?.toLowerCase() ?? '';
+      return group.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by position
+  void filterByPosition(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final position = item.chRPosition?.toLowerCase() ?? '';
+      return position.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by result (ketqua)
+  void filterByResult(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final result = item.vchRReasultsLeader?.toLowerCase() ?? '';
+      return result.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Helper method to reset the filtered list to the original data
+  void refreshFilteredList() {
+    filterdataList.value = List.from(dataList);
+  }
+
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);
@@ -361,7 +525,45 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+Future<void> updateKetQuaApprenticeContract(
+    ApprenticeContract twocontract,
+    String userUpdate,
+    String ketquaOld,
+  ) async {
+    try {
+      List<ApprenticeContract> listOld = [];
+      listOld.add(twocontract);
+      twocontract.vchRUserUpdate = userUpdate;
+      twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract.toJson()),
+      );
+      if (response.statusCode == 200) {
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMailKetQua(
+          "${twocontract.useRApproverSectionManager}@brothergroup.net",
+          '$userUpdate@brothergroup.net',
+          'khanhmf@brothergroup.net',
+          listOld,
+          ketquaOld,
+          twocontract.vchRReasultsLeader.toString()
+        );
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to update contract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
   //update thong tin to list
   Future<void> updateListApprenticeContract(
     String userApprover,
@@ -442,21 +644,24 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].nvchRPthcSection = userUpdate;
             contract[i].vchRLeaderEvalution = userApprover;
           case 4:
-            if(contract[i].vchRReasultsLeader != 'OK' &&(contract[i].vchRLyThuyet == 'OK' 
-            && contract[i].vchRThucHanh == 'OK'
-            && contract[i].vchRCompleteWork == 'OK'
-            && contract[i].vchRLearnWork == 'OK'
-            && contract[i].vchRThichNghi == 'OK'
-            && contract[i].vchRUseful == 'OK'
-            && contract[i].vchRContact == 'OK'
-            && contract[i].vcHNeedViolation == 'OK'
-            && (contract[i].vchRNote == ''|| contract[i].vchRNote == null)
-            )){
+            if (contract[i].vchRReasultsLeader != 'OK' &&
+                (contract[i].vchRLyThuyet == 'OK' &&
+                    contract[i].vchRThucHanh == 'OK' &&
+                    contract[i].vchRCompleteWork == 'OK' &&
+                    contract[i].vchRLearnWork == 'OK' &&
+                    contract[i].vchRThichNghi == 'OK' &&
+                    contract[i].vchRUseful == 'OK' &&
+                    contract[i].vchRContact == 'OK' &&
+                    contract[i].vcHNeedViolation == 'OK' &&
+                    (contract[i].vchRNote == '' ||
+                        contract[i].vchRNote == null))) {
               throw Exception(
                 '${tr('InputError1')} ${contract[i].vchREmployeeId}',
               );
             }
-            if(contract[i].biTNoReEmployment == false && (contract[i].nvchRNoReEmpoyment == null || contract[i].nvchRNoReEmpoyment == "")){
+            if (contract[i].biTNoReEmployment == false &&
+                (contract[i].nvchRNoReEmpoyment == null ||
+                    contract[i].nvchRNoReEmpoyment == "")) {
               throw Exception(
                 '${tr('InputError')} ${contract[i].vchREmployeeId}',
               );

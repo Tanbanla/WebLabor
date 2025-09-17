@@ -559,8 +559,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     TextCellValue(item.biTNoReEmployment == true ? 'OK' : 'NG'),
                     TextCellValue(item.nvchRNoReEmpoyment ?? ''),
                     // các thuộc tính phê duyệt
-                    TextCellValue(item.vchRUserCreate?? ''),
-                    TextCellValue(item.useRApproverPer?? ''),
+                    TextCellValue(item.vchRUserCreate ?? ''),
+                    TextCellValue(item.useRApproverPer ?? ''),
                     TextCellValue(item.vchRLeaderEvalution ?? ''),
                     TextCellValue(item.useRApproverChief ?? ''),
                     TextCellValue(item.useRApproverSectionManager ?? ''),
@@ -801,18 +801,18 @@ class MyData extends DataTableSource {
                   },
                 ),
                 const SizedBox(width: 3),
-                if(authState.user?.chRGroup == 'Admin' || authState.user?.chRGroup == 'Chief Per')
-                _buildActionButton(
-                  icon: Iconsax.back_square,
-                  color: Colors.red,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          _ReturnContract(contract: data),
-                    );
-                  },
-                ),
+                if (authState.user?.chRGroup == 'Admin' ||
+                    authState.user?.chRGroup == 'Chief Per')
+                  _buildActionButton(
+                    icon: Iconsax.back_square,
+                    color: Colors.red,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => _ReturnContract(contract: data),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
@@ -1214,7 +1214,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+          child: Text(
+            'Per/人事課の中級管理職',
+            style: TextStyle(color: Colors.purple[800]),
+          ),
         );
       case 3:
         return Container(
@@ -1244,7 +1247,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+          child: Text(
+            'QLTC/中級管理職',
+            style: TextStyle(color: Colors.yellow[800]),
+          ),
         );
       case 7:
         return Container(
@@ -1254,7 +1260,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.teal[100]!),
           ),
-          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+          child: Text('QLCC/上級管理職', style: TextStyle(color: Colors.teal[800])),
         );
       case 8:
         return Container(
@@ -1264,7 +1270,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+          child: Text(
+            'Director/管掌取締役',
+            style: TextStyle(color: Colors.brown[800]),
+          ),
         );
       case 9:
         return Container(
@@ -1391,7 +1400,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10, width: 500),
-// Dòng 2: Mã NV + Giới tính
+              // Dòng 2: Mã NV + Giới tính
               Row(
                 children: [
                   Expanded(
@@ -1876,7 +1885,8 @@ class _EditTwoContractDialog extends StatelessWidget {
       ],
     );
   }
-// widget không được phép sửa
+
+  // widget không được phép sửa
   Widget _buildCompactReadOnlyField({
     required String value,
     required String label,
@@ -1913,6 +1923,7 @@ class _EditTwoContractDialog extends StatelessWidget {
     );
     return content;
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -2184,6 +2195,8 @@ class _UpdateKetQua extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = TwoContract.fromJson(contract.toJson());
     final errorMessage = ''.obs;
+    final reson = ''.obs;
+    final ketquaOld = (edited.vchRReasultsLeader ?? 'OK').obs;
     final authState = Provider.of<AuthState>(context, listen: false);
     final selectedStatus = (edited.vchRReasultsLeader ?? 'OK').obs;
 
@@ -2223,100 +2236,119 @@ class _UpdateKetQua extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          Column(
             children: [
-              Text(
-                "${tr("ketqua")} ",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Common.blackColor,
-                ),
+              Row(
+                children: [
+                  Text(
+                    "${tr("ketqua")} ",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Common.blackColor,
+                    ),
+                  ),
+                  Obx(
+                    () => DropdownButton<String>(
+                      value: selectedStatus.value,
+                      onChanged: (newValue) {
+                        if (newValue != null) {
+                          selectedStatus.value = newValue;
+                          edited.vchRReasultsLeader = newValue;
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 'OK',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'OK',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'NG',
+                          child: Row(
+                            children: [
+                              Icon(Icons.cancel, color: Colors.red, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                'NG',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Stop Working',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.pause_circle,
+                                color: Colors.orange,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Stop Working',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Finish L/C',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.done_all,
+                                color: Colors.blue,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Finish L/C',
+                                style: TextStyle(
+                                  fontSize: Common.sizeColumn,
+                                  color: _getStatusColor(selectedStatus.value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Obx(
-                () => DropdownButton<String>(
-                  value: selectedStatus.value,
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      selectedStatus.value = newValue;
-                      edited.vchRReasultsLeader = newValue;
-                    }
-                  },
-                  items: [
-                    DropdownMenuItem(
-                      value: 'OK',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'OK',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'NG',
-                      child: Row(
-                        children: [
-                          Icon(Icons.cancel, color: Colors.red, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            'NG',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Stop Working',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.pause_circle,
-                            color: Colors.orange,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Stop Working',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Finish L/C',
-                      child: Row(
-                        children: [
-                          Icon(Icons.done_all, color: Colors.blue, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Finish L/C',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: _getStatusColor(selectedStatus.value),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 10),
+              Column(
+                children: [
+                  _buildCompactTextField(
+                    initialValue: reson.value,
+                    label: tr('reason'),
+                    onChanged: (value) => reson.value = value,
+                    maxLines: 2,
+                  ),
+                ],
               ),
             ],
           ),
@@ -2363,15 +2395,21 @@ class _UpdateKetQua extends StatelessWidget {
 
                     controller.isLoading(true);
                     try {
+                      if(reson.value.isEmpty){
+                        errorMessage.value = tr('pleaseReason');
+                        controller.isLoading(false);
+                        return;
+                      }
                       // Cập nhật giá trị từ selectedStatus
                       edited.vchRReasultsLeader = selectedStatus.value;
                       if (selectedStatus.value != 'OK') {
                         edited.biTNoReEmployment = false;
                         //edited.nvchRApproverManager = 'Thay đổi từ sửa kết quả đánh giá cuối cùng';
                       }
-                      await controller.updateTwoContract(
+                      await controller.updateKetQuaTwoContract(
                         edited,
                         authState.user!.chRUserid.toString(),
+                        ketquaOld.value,
                       );
 
                       // Refresh dữ liệu
@@ -2423,6 +2461,32 @@ class _UpdateKetQua extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildCompactTextField({
+    required String? initialValue,
+    required String label,
+    required Function(String) onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+      ),
+      style: const TextStyle(fontSize: 14),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+    );
   }
 }
 
@@ -2568,7 +2632,7 @@ class _ReturnContract extends StatelessWidget {
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
-                        "Trả về từ báo cáo của nhân sự"
+                        "Trả về từ báo cáo của nhân sự",
                       );
                       // Refresh dữ liệu
                       await controller.fetchDummyData();

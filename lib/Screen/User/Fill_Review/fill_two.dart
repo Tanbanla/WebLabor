@@ -1662,7 +1662,7 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _getHienTrangColor(int? IntStatus) {
+    Widget _getHienTrangColor(int? IntStatus) {
     switch (IntStatus) {
       case 1:
         return Container(
@@ -1682,7 +1682,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+          child: Text('Per/人事課の中級管理職', style: TextStyle(color: Colors.purple[800])),
         );
       case 3:
         return Container(
@@ -1712,7 +1712,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+          child: Text('QLTC/中級管理職', style: TextStyle(color: Colors.yellow[800])),
         );
       case 7:
         return Container(
@@ -1722,7 +1722,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.teal[100]!),
           ),
-          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+          child: Text('QLCC/上級管理職', style: TextStyle(color: Colors.teal[800])),
         );
       case 8:
         return Container(
@@ -1732,7 +1732,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+          child: Text('Director/管掌取締役', style: TextStyle(color: Colors.brown[800])),
         );
       case 9:
         return Container(

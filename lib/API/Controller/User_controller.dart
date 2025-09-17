@@ -560,4 +560,48 @@ class DashboardControllerUser extends GetxController {
       isLoading(false);
     }
   }
+  // send mail KetQua
+  Future<void> SendMailKetQua(
+    String to,
+    String cc,
+    String bcc,
+    List<dynamic> rejectedRequests,
+    String ketquaOld,
+    String ketquaNew,
+  ) async {
+    try {
+      isLoading(true);
+      final requestBody = {
+        "title": "THÔNG BÁO: YÊU CẦU SỬA KẾT QUẢ ĐÁNH GIÁ HỢP ĐỒNG ĐÃ HOÀN THÀNH<br/>件名：通知：完了した契約評価結果の修正依頼",
+        "mail_from": "LaborContractEvaluationSystem@brothergroup.net",
+        "mail_to": to == "null" ? "" : to,
+        "mail_cc": cc == "null" ? "" : cc,
+        "mail_bcc": bcc == "null" ? "" : bcc,
+        "body": Common.getKetQuaEmailBody(
+          confirmLink: "http://172.26.248.62:8055/",
+          ketquaOld: ketquaOld,
+          ketquaNew: ketquaNew,
+          rejectedRequests: rejectedRequests,
+        ),
+      };
+      final response = await http.post(
+        Uri.parse(Common.SendMailCustom),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+
+        }
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch data: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
 }

@@ -336,7 +336,47 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+  // update thông tin sửa đánh giá cuối cùng   // update thông tin
+  Future<void> updateKetQuaTwoContract(
+    TwoContract twocontract,
+    String userUpdate,
+    String ketquaOld,
+  ) async {
+    try {
+      List<TwoContract> listOld = [];
+      listOld.add(twocontract);
+      twocontract.vchRUserUpdate = userUpdate;
+      twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract.toJson()),
+      );
+      if (response.statusCode == 200) {
+        final controlleruser = Get.put(DashboardControllerUser());
+        controlleruser.SendMailKetQua(
+          "${twocontract.useRApproverSectionManager}@brothergroup.net",
+          '$userUpdate@brothergroup.net',
+          'khanhmf@brothergroup.net',
+          listOld,
+          ketquaOld,
+          twocontract.vchRReasultsLeader.toString()
+        );
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
   // Send mail phản hồi từ chối đánh giá
   Future<void> sendEmailReturn(
     TwoContract contract,
