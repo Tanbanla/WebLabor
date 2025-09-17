@@ -758,12 +758,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
-                  if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
-                  }
-                  if (item.dtMEndDate != null) {
-                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
-                  }
+                    if (item.dtMJoinDate != null) {
+                    setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
+                    }
+                    if (item.dtMEndDate != null) {
+                    setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
+                    }
                   setCellValue('L', item.fLGoLeaveLate);
                   setCellValue('M', item.fLPaidLeave);
                   setCellValue('N', item.fLNotPaidLeave);
@@ -950,33 +950,17 @@ class MyData extends DataTableSource {
         //Action
         DataCell(
           Center(
-            child: Row(
-              children: [
-                _buildActionButton(
-                  icon: Iconsax.edit_2,
-                  color: Colors.blue,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          _EditTwoContractDialog(twoContract: data),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                _buildActionButton(
-                  icon: Iconsax.back_square,
-                  color: Colors.red,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
+            child: _buildActionButton(
+              icon: Iconsax.back_square,
+              color: Colors.red,
+              onPressed: () {
+                showDialog(
+                  context: context,
                       builder: (context) =>
                           _ReturnTwoContract(twoContract: data),
                     );
                   },
                 ),
-              ],
-            ),
           ),
         ),
         DataCell(_getHienTrangColor(data.inTStatusId)),

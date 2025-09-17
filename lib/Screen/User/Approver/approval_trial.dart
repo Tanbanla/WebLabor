@@ -570,10 +570,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
                   if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                  setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
                   }
                   if (item.dtMEndDate != null) {
-                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                  setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
                   }
                   setCellValue('L', item.fLGoLeaveLate ?? '');
                   setCellValue('M', item.fLNotLeaveDay ?? '');

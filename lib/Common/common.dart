@@ -142,7 +142,7 @@ class Common {
             } else if (!request.biTApproverDirector) {
               rejectionReason = request.nvchRApproverDirector ?? '';
             } else {
-              rejectionReason = 'Không có lý do';
+              rejectionReason = request.vchRNote ?? 'Không có lý do';
             }
             break;
           default:

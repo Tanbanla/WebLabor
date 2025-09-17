@@ -336,6 +336,7 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   // update thông tin sửa đánh giá cuối cùng   // update thông tin
   Future<void> updateKetQuaTwoContract(
     TwoContract twocontract,
@@ -362,7 +363,7 @@ class DashboardControllerTwo extends GetxController {
           'khanhmf@brothergroup.net',
           listOld,
           ketquaOld,
-          twocontract.vchRReasultsLeader.toString()
+          twocontract.vchRReasultsLeader.toString(),
         );
       } else {
         final error = json.decode(response.body);
@@ -377,6 +378,7 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   // Send mail phản hồi từ chối đánh giá
   Future<void> sendEmailReturn(
     TwoContract contract,
@@ -391,9 +393,9 @@ class DashboardControllerTwo extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        final ccSection = pthcList
-            .map((item) => item.mailcc)
-            .where((section) => section == contract.vchRCodeSection);
+        final ccSection = pthcList.where((section) => section == contract.vchRCodeSection)
+        .map((item) => item.mailcc).join(';');
+
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           specialSection.mailto.toString(),
@@ -488,26 +490,31 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].biTApproverChief = true;
         twocontract[i].biTApproverSectionManager = true;
         twocontract[i].biTApproverDirector = true;
-        
+
         switch (twocontract[i].inTStatusId) {
           case 3:
             twocontract[i].inTStatusId = 4;
             twocontract[i].nvchRPthcSection = userUpdate;
             twocontract[i].vchRLeaderEvalution = userApprover;
           case 4:
-            if (twocontract[i].nvchROther != 'OK' && (twocontract[i].vchRNote == null || twocontract[i].vchRNote == "")) {
+            if (twocontract[i].nvchROther != 'OK' &&
+                (twocontract[i].vchRNote == null ||
+                    twocontract[i].vchRNote == "")) {
               throw Exception(
                 '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            if(twocontract[i].vchRReasultsLeader != 'OK' &&(twocontract[i].nvchRCompleteWork == 'OK' 
-            && twocontract[i].nvchRUseful == 'OK'
-            && twocontract[i].nvchROther == 'OK')){
+            if (twocontract[i].vchRReasultsLeader != 'OK' &&
+                (twocontract[i].nvchRCompleteWork == 'OK' &&
+                    twocontract[i].nvchRUseful == 'OK' &&
+                    twocontract[i].nvchROther == 'OK')) {
               throw Exception(
                 '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            if(twocontract[i].biTNoReEmployment == false && (twocontract[i].nvchRNoReEmpoyment == null || twocontract[i].nvchRNoReEmpoyment == "")){
+            if (twocontract[i].biTNoReEmployment == false &&
+                (twocontract[i].nvchRNoReEmpoyment == null ||
+                    twocontract[i].nvchRNoReEmpoyment == "")) {
               throw Exception(
                 '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
@@ -1075,7 +1082,7 @@ class DashboardControllerTwo extends GetxController {
       }
       dataList[index].nvchROther = status;
       filterdataList[index].nvchROther = status;
-      if(status == 'OK'){
+      if (status == 'OK') {
         dataList[index].vchRNote = '';
         filterdataList[index].vchRNote = '';
       }

@@ -506,9 +506,9 @@ class DashboardControllerApprentice extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        final ccSection = pthcList
-            .map((item) => item.mailcc)
-            .where((section) => section == contract.vchRCodeSection);
+        final ccSection = pthcList.where((section) => section == contract.vchRCodeSection)
+        .map((item) => item.mailcc).join(';');
+        
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           specialSection.mailto.toString(),

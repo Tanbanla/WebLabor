@@ -763,12 +763,12 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
-                  if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
-                  }
-                  if (item.dtMEndDate != null) {
-                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
-                  }
+                    if (item.dtMJoinDate != null) {
+                    setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
+                    }
+                    if (item.dtMEndDate != null) {
+                    setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
+                    }
                   setCellValue('L', item.fLGoLeaveLate ?? '');
                   setCellValue('M', item.fLNotLeaveDay ?? '');
                   setCellValue('N', item.inTViolation ?? '');
@@ -782,7 +782,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "X" : "");
+                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "X" : ""));
                   setCellValue('Z', item.vchRUseful ?? '');
                 }
 

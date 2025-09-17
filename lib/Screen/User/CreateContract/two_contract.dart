@@ -701,7 +701,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
 
   void _showExportDialog() {
     final controller = Get.find<DashboardControllerTwo>();
-
+    String manv = '';
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -768,7 +768,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                         : TextCellValue(value.toString());
                     cell.cellStyle = getStyle(column);
                   }
-
+                  manv = item.vchREmployeeId ?? '';
                   // Điền từng giá trị vào các cột
                   setCellValue('A', i + 1);
                   setCellValue('B', item.vchREmployeeId ?? '');
@@ -780,10 +780,20 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
                   if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateTime.parse(item.dtMJoinDate!));
+                    setCellValue(
+                      'J',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
                   }
                   if (item.dtMEndDate != null) {
-                    setCellValue('K', DateTime.parse(item.dtMEndDate!));
+                    setCellValue(
+                      'K',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
                   }
                   setCellValue('L', item.fLGoLeaveLate);
                   setCellValue('M', item.fLPaidLeave);
@@ -796,7 +806,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   setCellValue('T', item.nvchROther ?? '');
                   setCellValue('U', item.vchRReasultsLeader ?? '');
                   setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment ? "X" : "");
+                  setCellValue('W', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "X" : ""));
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
 
@@ -870,7 +880,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('${tr('exportError')}${e.toString()}'),
+                      title: Text('${tr('exportError')}${e.toString()}$manv'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
