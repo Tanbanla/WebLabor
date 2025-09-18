@@ -35,16 +35,17 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    _currentBody = //FillTwoScreen();
-        HomeScreen(); // Khởi tạo trong initState
+    _currentBody = HomeScreen(
+      onNavigate: _changeBody, 
+    );
   }
-
   void _changeBody(Widget newBody) {
-    if (!mounted) return; // Kiểm tra mounted trước khi setState
-
+    if (!mounted) return;
     setState(() {
       _currentBody = newBody;
-      Navigator.of(context).pop(); // Đóng drawer nếu đang mở
+      if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+        Navigator.of(context).pop();
+      }
     });
   }
 
@@ -53,13 +54,6 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
     controller.fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
-    // return Scaffold(
-    //   appBar: appBar(),
-    //   body: _currentBody,
-    //   drawer: ComplexDrawer(changeBody: _changeBody, context: context),
-    //   drawerScrimColor: Colors.transparent,
-    //   backgroundColor: Colors.white,
-    // );
     return ValueListenableBuilder<Locale>(
       valueListenable: LanguageNotifier.notifier,
       builder: (context, locale, child) {
@@ -484,9 +478,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           } else if (subMenu == preparationApprovalText) {
             widget.changeBody(ApprovalPrepartionScreen());
           } else if (subMenu == homeText) {
-            widget.changeBody(HomeScreen());
+            widget.changeBody(HomeScreen(onNavigate: widget.changeBody, ));
           } else {
-            widget.changeBody(HomeScreen());
+            widget.changeBody(HomeScreen(onNavigate: widget.changeBody, ));
           }
         }
       },

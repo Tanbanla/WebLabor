@@ -8,12 +8,15 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
+import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
 import 'package:web_labor_contract/class/ChartMonth.dart';
 import 'package:web_labor_contract/main.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
+  // const HomeScreen({super.key});
+  final void Function(Widget)? onNavigate;
+  const HomeScreen({Key? key, this.onNavigate}) : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -117,6 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           value: contractStats.totalApprenticeWaitingApprove
                               .toString(),
                           width: size.width > 600 ? 500 : size.width * 0.75,
+                          onTap: () {
+                            widget.onNavigate?.call(ApprovalTrialScreen());
+                          },
                         ),
                         const SizedBox(width: 20),
                         _buildContractCard(
@@ -126,6 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           value: contractStats.totalTwoYearWaitingApprove
                               .toString(),
                           width: size.width > 600 ? 500 : size.width * 0.75,
+                          onTap: () {
+                            widget.onNavigate?.call(ApprovalTwoScreen());
+                          },
                         ),
                         const SizedBox(width: 20),
                         _buildContractCard(
@@ -232,58 +241,48 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildContractCard({
+Widget _buildContractCard({
     required IconData icon,
     required Color color,
     required String title,
     required String value,
     required double width,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            spreadRadius: 5,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildActionButton(icon: icon, color: color, onPressed: () {}),
-              const SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  title,
-                  style: TextStyle(color: color, fontSize: 16),
-                  overflow: TextOverflow.ellipsis,
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.4)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 42),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: color,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Text(
+            ),
+            Text(
               value,
               style: TextStyle(
-                color: color,
-                fontSize: 28,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: color,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
