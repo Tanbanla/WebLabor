@@ -17,6 +17,7 @@ import 'package:web_labor_contract/class/User_Approver.dart';
 class DashboardControllerTwo extends GetxController {
   var dataList = <TwoContract>[].obs;
   var filterdataList = <TwoContract>[].obs;
+  var listSection = <String>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -313,6 +314,7 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       twocontract.vchRUserUpdate = userUpdate;
+      twocontract.vchRNameSection = twocontract.vchRCodeSection;
       twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -437,6 +439,11 @@ class DashboardControllerTwo extends GetxController {
         twocontract[i].useRApproverPer = userApprover;
         twocontract[i].vchRCodeApprover =
             'HD2N${DateFormat('yyyy-MM-dd').format(DateTime.now())}'; //formatDateTime(DateTime.now()).toString();
+        twocontract[i].nvchRCompleteWork = 'OK';
+        twocontract[i].nvchRUseful = 'OK';
+        twocontract[i].nvchROther = 'OK';
+        twocontract[i].vchRReasultsLeader = 'OK';
+        twocontract[i].biTNoReEmployment = true;
       }
       isLoading(true);
       final response = await http.put(
@@ -1279,6 +1286,34 @@ class DashboardControllerTwo extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch approvers: ${e.toString()}');
       return "";
+    } finally {
+      isLoading(false);
+    }
+  }
+
+    // lay thong tin section
+  Future<void> fetchSectionList() async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.UserSection),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          listSection.assignAll(data.map((item) => item.toString()).toList());
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
     } finally {
       isLoading(false);
     }

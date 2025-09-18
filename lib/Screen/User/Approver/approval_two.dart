@@ -593,7 +593,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   setCellValue('T', item.nvchROther ?? '');
                   setCellValue('U', item.vchRReasultsLeader ?? '');
                   setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment ? "X" : "");
+                  setCellValue('W', item.biTNoReEmployment ? "" : "X");
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('Y', item.vchRLeaderEvalution ?? '');
                 }

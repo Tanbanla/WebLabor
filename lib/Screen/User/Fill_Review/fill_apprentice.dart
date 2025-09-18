@@ -778,7 +778,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "X" : "");
+                  setCellValue('Y', item.biTNoReEmployment ? "" : "X");
                   setCellValue('Z', item.vchRUseful ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }
@@ -2767,6 +2767,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
   Widget build(BuildContext context) {
     final edited = ApprenticeContract.fromJson(contract.toJson());
     RxString errorMessage = ''.obs;
+    RxString reson = ''.obs;
     final authState = Provider.of<AuthState>(context, listen: true);
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -2816,9 +2817,9 @@ class _ReturnConApprenticetract extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               _buildCompactTextField(
-                initialValue: contract.vchRNote,
+                initialValue: reson.value,
                 label: tr('reasonRejectHint'),
-                onChanged: (value) => edited.vchRNote = value,
+                onChanged: (value) => reson.value = value,
                 maxLines: 2,
               ),
               const SizedBox(height: 10),
@@ -2866,7 +2867,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                       } else if (edited.inTStatusId == 4) {
                         edited.inTStatusId = 3;
                       }
-                      if (edited.vchRNote == null || edited.vchRNote!.isEmpty) {
+                      if (reson.value.isEmpty) {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
                       }
@@ -2877,7 +2878,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
-                        edited.vchRNote ?? ""
+                        reson.value
                       );
                       String sectionName = authState.user!.chRSecCode
                           .toString()

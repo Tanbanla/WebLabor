@@ -36,6 +36,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   @override
   Widget build(BuildContext context) {
     controller.changeStatus('1', null, null);
+    controller.fetchSectionList();
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -768,6 +769,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                         : TextCellValue(value.toString());
                     cell.cellStyle = getStyle(column);
                   }
+
                   manv = item.vchREmployeeId ?? '';
                   // Điền từng giá trị vào các cột
                   setCellValue('A', i + 1);
@@ -806,7 +808,12 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   setCellValue('T', item.nvchROther ?? '');
                   setCellValue('U', item.vchRReasultsLeader ?? '');
                   setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "X" : ""));
+                  setCellValue(
+                    'W',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "X" : ""),
+                  );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
 
@@ -1275,10 +1282,34 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: twoContract.vchRCodeSection,
-                      label: tr('department'),
-                      onChanged: (value) => edited.vchRCodeSection = value,
+                    child: DropdownButtonFormField(
+                      value: controller.listSection.contains(edited.vchRCodeSection) 
+                          ? edited.vchRCodeSection 
+                          : null,
+                      decoration: InputDecoration(
+                        labelText: tr('department'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                      ),
+                      isExpanded: true,
+                      items: controller.listSection
+                          .toSet() // Ensure unique values
+                          .map(
+                            (section) => DropdownMenuItem(
+                              value: section,
+                              child: Text(section),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        edited.vchRCodeSection = value;
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1758,6 +1789,16 @@ class _EditTwoContractDialog extends StatelessWidget {
                         Navigator.of(context).pop();
                       }
                       await controller.changeStatus("1", null, null);
+                      showDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        builder: (context) => DialogNotification(
+                          message: tr('MessageSuss'),
+                          icon: Icons.check_circle,
+                          color: Colors.green,
+                          title: tr('tilteSuss'),
+                        ),
+                      );
                     } catch (e) {
                       errorMessage.value =
                           '${tr('ErrorUpdate')}${e.toString()}';
@@ -1842,6 +1883,12 @@ class _EditTwoContractDialog extends StatelessWidget {
       maxLines: maxLines,
       onChanged: onChanged,
     );
+  }
+
+  // so sánh bỏ khoảng trắng
+  String _removeAllSpaces(String? input) {
+    if (input == null) return '';
+    return input.replaceAll(RegExp(r'\s+'), '');
   }
 
   String getAgeFromBirthday(String? birthday) {

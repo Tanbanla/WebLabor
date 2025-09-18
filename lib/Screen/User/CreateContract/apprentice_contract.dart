@@ -36,6 +36,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchSectionList();
     controller.changeStatus('1', null, null);
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -1213,10 +1214,34 @@ class _EditContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: contract.vchRCodeSection,
-                      label: tr('department'),
-                      onChanged: (value) => edited.vchRCodeSection = value,
+                    child: DropdownButtonFormField(
+                      value: controller.listSection.contains(edited.vchRCodeSection) 
+                          ? edited.vchRCodeSection 
+                          : null,
+                      decoration: InputDecoration(
+                        labelText: tr('department'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                      ),
+                      isExpanded: true,
+                      items: controller.listSection
+                          .toSet() // Ensure unique values
+                          .map(
+                            (section) => DropdownMenuItem(
+                              value: section,
+                              child: Text(section),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        edited.vchRCodeSection = value;
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),

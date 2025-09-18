@@ -17,6 +17,7 @@ import 'package:web_labor_contract/class/User_Approver.dart';
 class DashboardControllerApprentice extends GetxController {
   var dataList = <ApprenticeContract>[].obs;
   var filterdataList = <ApprenticeContract>[].obs;
+  var listSection = <String>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -469,6 +470,7 @@ class DashboardControllerApprentice extends GetxController {
   ) async {
     try {
       contract.vchRUserUpdate = userUpdate;
+      contract.vchRNameSection = contract.vchRCodeSection;
       contract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -587,6 +589,16 @@ Future<void> updateKetQuaApprenticeContract(
         contract[i].nvchRApproverPer = '';
         contract[i].vchRCodeApprover =
             'HDHN${DateFormat('yyyy-MM-dd').format(DateTime.now())}';
+        contract[i].vchRLyThuyet = 'OK';
+        contract[i].vchRThucHanh = 'OK';
+        contract[i].vchRCompleteWork = 'OK';
+        contract[i].vchRLearnWork = 'OK';
+        contract[i].vchRThichNghi = 'OK';
+        contract[i].vchRUseful = 'OK';
+        contract[i].vchRContact = 'OK';
+        contract[i].vcHNeedViolation = 'OK';
+        contract[i].vchRReasultsLeader = 'OK';
+        contract[i].biTNoReEmployment = true;
       }
       isLoading(true);
       final response = await http.put(
@@ -1532,6 +1544,33 @@ Future<void> updateKetQuaApprenticeContract(
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch approvers: ${e.toString()}');
       return "";
+    } finally {
+      isLoading(false);
+    }
+  }
+      // lay thong tin section
+  Future<void> fetchSectionList() async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.UserSection),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          listSection.assignAll(data.map((item) => item.toString()).toList());
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
     } finally {
       isLoading(false);
     }
