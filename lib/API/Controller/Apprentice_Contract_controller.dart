@@ -1575,4 +1575,139 @@ Future<void> updateKetQuaApprenticeContract(
       isLoading(false);
     }
   }
+  //  Từ chối phê duyệt nhiều
+  Future<void>updateListContractReturnS(
+    String userApprover,
+    String reson,
+  ) async{
+      try {
+      final contract = getSelectedItems();
+      //fetchPTHCData();
+      List<dynamic> notApproval = [];
+      String sectionAp = "";
+      if (contract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
+      for (int i = 0; i < contract.length; i++) {
+        contract[i].vchRUserUpdate = userApprover;
+        contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // lay thong tin phong
+        sectionAp = contract[i].vchRCodeSection.toString();
+        switch (contract[i].inTStatusId) {
+          case 6:
+            contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            contract[i].useRApproverChief = userApprover;
+            contract[i].nvchRApproverChief = reson;
+            contract[i].biTApproverChief = false;
+
+              contract[i].inTStatusId = 4;
+              notApproval.add(contract[i]);
+          case 7:
+            contract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            contract[i].useRApproverSectionManager = userApprover;
+            contract[i].nvchRApproverManager = reson;
+            contract[i].biTApproverSectionManager = false;
+            contract[i].inTStatusId = 4;
+            notApproval.add(contract[i]);
+        }
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(contract),
+      );
+      if (response.statusCode == 200) {
+        final controlleruser = Get.put(DashboardControllerUser());
+        // mail canh bao
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+          final ccSection = pthcList
+              .map((item) => item.mailcc)
+              .where((section) => section == sectionAp);
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            '$ccSection;${specialSection.mailcc}',
+            specialSection.mailbcc.toString(),
+            notApproval,
+            "Từ chối phê duyệt",
+            userApprover,
+          );
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
+    }
+  }
+  Future<void>updateListContractReturnSPTHC(
+    String userApprover,
+    String reson,
+  ) async{
+      try {
+      final contract = getSelectedItems();
+      //fetchPTHCData();
+      List<dynamic> notApproval = [];
+      String sectionAp = "";
+      if (contract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
+      for (int i = 0; i < contract.length; i++) {
+        contract[i].vchRUserUpdate = userApprover;
+        contract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // lay thong tin phong
+        sectionAp = contract[i].vchRCodeSection.toString();
+        if (contract[i].inTStatusId == 3) {
+          contract[i].inTStatusId = 1;
+        } else if (contract[i].inTStatusId == 4) {
+          contract[i].inTStatusId = 3;
+        }
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListApprentice}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(contract),
+      );
+      if (response.statusCode == 200) {
+        final controlleruser = Get.put(DashboardControllerUser());
+        // mail canh bao
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+          final ccSection = pthcList
+              .map((item) => item.mailcc)
+              .where((section) => section == sectionAp);
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            '$ccSection;${specialSection.mailcc}',
+            specialSection.mailbcc.toString(),
+            notApproval,
+            "Từ chối xác nhận",
+            userApprover,
+          );
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
+    }
+  }
 }

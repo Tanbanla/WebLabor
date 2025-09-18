@@ -87,35 +87,25 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // so sanh du lieu
-  void searchQuery(String query) {
-    if (query.isEmpty) {
-      filterdataList.assignAll(dataList);
-    } else {
-      filterdataList.assignAll(
-        dataList.where(
-          (item) =>
-              (item.vchREmployeeId?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.vchREmployeeName?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.vchRNameSection?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.chRCostCenterName?.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ??
-                  false) ||
-              (item.chRPosition?.toLowerCase().contains(query.toLowerCase()) ??
-                  false),
-        ),
-      );
-    }
+void searchQuery(String query) {
+  final lowerQuery = query.toLowerCase();
+  if (lowerQuery.isEmpty) {
+    filterdataList.assignAll(dataList);
+  } else {
+    filterdataList.assignAll(
+      dataList.where((item) {
+        final combined = [
+          item.vchREmployeeId,
+          item.vchREmployeeName,
+          item.vchRNameSection,
+          item.chRCostCenterName,
+          item.chRPosition,
+        ].where((e) => e != null).join(' ').toLowerCase();
+        return combined.contains(lowerQuery);
+      }),
+    );
   }
+}
 
   // lay du lieu
   Future<void> fetchDummyData() async {
@@ -1315,6 +1305,153 @@ class DashboardControllerTwo extends GetxController {
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  //  Từ chối phê duyệt nhiều của Apporver
+  Future<void>updateListTwoContractReturnS(
+    String userApprover,
+    String reson,
+  ) async{
+    try {
+      final twocontract = getSelectedItems();
+      List<dynamic> notApproval = [];
+      String sectionAp = "";
+      if (twocontract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
+      for (int i = 0; i < twocontract.length; i++) {
+        twocontract[i].vchRUserUpdate = userApprover;
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // lay thong tin phong
+        sectionAp = twocontract[i].vchRCodeSection.toString();
+        switch (twocontract[i].inTStatusId) {
+          case 6:
+            twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverChief = userApprover;
+            twocontract[i].nvchRApproverChief = reson;
+            twocontract[i].biTApproverChief =false;
+            twocontract[i].inTStatusId = 4;
+            notApproval.add(twocontract[i]);
+          case 7:
+            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverSectionManager = userApprover;
+            twocontract[i].nvchRApproverManager = reson;
+            twocontract[i].biTApproverSectionManager =false;
+              twocontract[i].inTStatusId = 4;
+              notApproval.add(twocontract[i]);
+          case 8:
+            twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverDirector = userApprover;
+            twocontract[i].nvchRApproverDirector = reson;
+            twocontract[i].biTApproverDirector =false;
+              twocontract[i].inTStatusId = 4;
+              notApproval.add(twocontract[i]);
+        }
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        // mail canh bao
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+          final ccEmails = pthcList
+              .where((item) => item.mailcc != null && item.section == sectionAp)
+              .map((item) => item.mailcc!)
+              .join(';');
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            '$ccEmails;${specialSection.mailcc}',
+            specialSection.mailbcc.toString(),
+            notApproval,
+            "Từ chối phê duyệt",
+            userApprover,
+          );
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+  //  Từ chối phê duyệt nhiều của PTHC
+  Future<void>updateListTwoContractReturnSPTHC(
+    String userApprover,
+    String reson,
+  ) async{
+      try {
+      final twocontract = getSelectedItems();
+      List<dynamic> notApproval = [];
+      String sectionAp = "";
+      if (twocontract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
+      for (int i = 0; i < twocontract.length; i++) {
+        twocontract[i].vchRUserUpdate = userApprover;
+        twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
+        // lay thong tin phong
+        sectionAp = twocontract[i].vchRCodeSection.toString();
+        if (twocontract[i].inTStatusId == 3) {
+          twocontract[i].inTStatusId = 1;
+        } else if (twocontract[i].inTStatusId == 4) {
+          twocontract[i].inTStatusId = 3;
+        }
+      }
+      isLoading(true);
+      final response = await http.put(
+        Uri.parse('${Common.API}${Common.UpdataListTwo}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+      if (response.statusCode == 200) {
+        //await fetchDataBy();
+        final controlleruser = Get.put(DashboardControllerUser());
+        // mail canh bao
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+          final ccEmails = pthcList
+              .where((item) => item.mailcc != null && item.section == sectionAp)
+              .map((item) => item.mailcc!)
+              .join(';');
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            '$ccEmails;${specialSection.mailcc}',
+            specialSection.mailbcc.toString(),
+            notApproval,
+            "Từ chối xac nhận",
+            userApprover,
+          );
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server  ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      showError('Failed to update two contract: $e');
       rethrow;
     } finally {
       isLoading(false);

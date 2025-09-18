@@ -161,5 +161,6 @@
   "TraVePER": "PERを戻す",
   "TraVePTHC": "PTHCを戻す",
   "TraVeNguoiDanhGia": "評価者を戻す",
-  "ResultOk":"更新に成功しました"
+  "ResultOk":"更新に成功しました",
+  "ReturnS":"複数を拒否"
 }

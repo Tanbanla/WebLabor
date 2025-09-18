@@ -161,6 +161,7 @@
   "TraVePER":"Trả về PER",
   "TraVePTHC":"Trả về PTHC",
   "TraVeNguoiDanhGia":"Trả về người đánh giá",
-  "ResultOk":"Cập nhật thành công"
+  "ResultOk":"Cập nhật thành công",
+  "ReturnS":"Từ chối nhiều"
 
 }

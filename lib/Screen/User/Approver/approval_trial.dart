@@ -167,6 +167,14 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
               tooltip: tr('export'),
               onPressed: () => _showExportDialog(),
             ),
+            // từ chối nhiều
+            const SizedBox(width: 8),
+            buildActionButton(
+              icon: Iconsax.back_square,
+              color: Colors.orange,
+              tooltip: tr('ReturnS'),
+              onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(),),
+            ),
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () async {
@@ -699,6 +707,77 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     );
   }
 
+  void _ReturnSDialog(String adid){
+    final controller = Get.find<DashboardControllerApprentice>();
+    final reasonController = TextEditingController();
+    final messageError = ''.obs;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr('ReturnS')),
+        content: TextField(
+          controller: reasonController,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: tr('reason'),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                if (reasonController.text.isEmpty) {
+                  messageError.value = tr('pleaseReason');
+                  return;
+                }
+                await controller.updateListContractReturnS(
+                  adid,reasonController.text,
+                );
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(tr('Confirm')),
+          ),
+          Obx(() => messageError.value.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                  child: Text(
+                    messageError.value,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                )
+              : const SizedBox.shrink()),
+        ],
+      ),
+    );
+  }
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1231,25 +1310,6 @@ class MyData extends DataTableSource {
       default:
         return Row();
     }
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 18, color: color),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-      ),
-    );
   }
 
   @override

@@ -401,4 +401,91 @@ class DashboardControllerApporver extends GetxController {
     }
     return null;
   }
+  Future<void>updateListContractReturnS(
+    String userUpdate,
+    String reson,
+    String contractType,
+  ) async{
+      try {
+      fetchPTHCData();
+      final twocontract = getSelectedItems();
+      if (twocontract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
+
+      isLoading(true);
+      List<dynamic> notApproval = [];
+
+      for (var contract in twocontract) {
+        contract.biTApproverPer ??= true; // Set default value
+
+        if (!contract.biTApproverPer &&
+            (contract.nvchRApproverPer?.isEmpty ?? true)) {
+          throw Exception('${tr('InputError')} ${contract.vchREmployeeName}');
+        }
+        // thời gian phản hồi
+        final dayDue = contractType == 'two' ? 14 : 7;
+        contract
+          ..vchRUserUpdate = userUpdate
+          ..dtMUpdate = formatDateTime(DateTime.now())
+          ..dtMApproverPer = formatDateTime(DateTime.now())
+          ..useRApproverPer = userUpdate
+          ..dtMDueDate = formatDateTime(
+            DateTime.now().add(Duration(days: dayDue)),
+          )
+          ..nvchRApproverPer = reson
+        ;
+        contract.biTApproverPer =false;
+        contract.inTStatusId = 1;
+        notApproval.add(contract);
+      }
+
+      // Determine API endpoint
+      final apiEndpoint = contractType == 'two'
+          ? Common.UpdataListTwo
+          : Common.UpdataListApprentice;
+
+      // Send data to server
+      final response = await http.put(
+        Uri.parse('${Common.API}$apiEndpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(twocontract),
+      );
+
+      if (response.statusCode == 200) {
+        await fetchData(
+          adid: userUpdate,
+          statusId: '2',
+          section: null,
+          contractType: contractType,
+        );
+
+        final controlleruser = Get.put(DashboardControllerUser());
+        //Special case for section "1120-1 : ADM-PER"
+        if (notApproval.isNotEmpty) {
+          final specialSection = pthcList.firstWhere(
+            (item) => item.section == "1120-1 : ADM-PER",
+          );
+
+          controlleruser.SendMailCustom(
+            specialSection.mailto.toString(),
+            specialSection.mailcc.toString(),
+            specialSection.mailbcc.toString(),
+            notApproval,
+            "Từ chối phê duyệt",
+            userUpdate
+          );
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Error sending data to server: ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('$e');
+    } finally {
+      isLoading(false);
+    }
+  }
 }

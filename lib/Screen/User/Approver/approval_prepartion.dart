@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Approval_Contract_Controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
+import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -25,6 +26,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   //RxString selectedContractType  = RxString('');
   String get _indefiniteContractText => tr('indefiniteContract');
   String get _trialContractText => tr('trialContract');
+  String TypeValue = tr('indefiniteContract');
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
@@ -117,6 +119,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                     final contractType = newValue == tr('indefiniteContract')
                         ? 'two'
                         : 'apprentice';
+                    TypeValue = newValue;
                     controller.setContractType(contractType);
                     controller.fetchData(
                       contractType: contractType,
@@ -254,6 +257,10 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   }
 
   Widget _buildSearchAndActions() {
+    final authState = Provider.of<AuthState>(context, listen: true);
+    final contractType = TypeValue == tr('indefiniteContract')
+      ? 'two'
+      : 'apprentice';
     return Row(
       children: [
         Expanded(
@@ -305,7 +312,84 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           ),
         ),
         const SizedBox(width: 12),
+        // Add more action buttons here if needed
+        buildActionButton(
+          icon: Iconsax.back_square,
+          color: Colors.orange,
+          tooltip: tr('ReturnS'),
+          onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(),contractType ),
+        ),
       ],
+    );
+  }
+  void _ReturnSDialog(String adid, String typeContract){
+    final controller = Get.find<DashboardControllerApporver>();
+    final reasonController = TextEditingController();
+    final messageError = ''.obs;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr('ReturnS')),
+        content: TextField(
+          controller: reasonController,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: tr('reason'),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                if (reasonController.text.isEmpty) {
+                  messageError.value = tr('pleaseReason');
+                  return;
+                }
+                await controller.updateListContractReturnS(
+                  adid,reasonController.text,typeContract
+                );
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(tr('Confirm')),
+          ),
+          Obx(() => messageError.value.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                  child: Text(
+                    messageError.value,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                )
+              : const SizedBox.shrink()),
+        ],
+      ),
     );
   }
 
