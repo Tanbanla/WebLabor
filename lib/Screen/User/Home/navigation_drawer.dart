@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
@@ -18,6 +19,7 @@ import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
+import 'package:get/get.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -28,7 +30,8 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   late Widget _currentBody; // Sử dụng late thay vì khởi tạo ngay
-
+  final DashboardControllerPTHC controller = Get.put(DashboardControllerPTHC());
+  
   @override
   void initState() {
     super.initState();
@@ -48,6 +51,8 @@ class _MenuScreenState extends State<MenuScreen> {
   //
   @override
   Widget build(BuildContext context) {
+    final authState = Provider.of<AuthState>(context, listen: true);
+    controller.fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
     // return Scaffold(
     //   appBar: appBar(),
     //   body: _currentBody,

@@ -208,7 +208,7 @@ class DashboardControllerTwo extends GetxController {
           {
             "field": "VCHR_CODE_SECTION",
             "value": section,
-            "operator": "like",
+            "operator": "LIKE",
             "logicType": "AND",
           },
         if (adid != null && adid.isNotEmpty && statusId != 'approval')
@@ -395,8 +395,10 @@ class DashboardControllerTwo extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        final ccSection = pthcList.where((section) => section == contract.vchRCodeSection)
-        .map((item) => item.mailcc).join(';');
+        final ccSection = pthcList
+            .where((section) => section == contract.vchRCodeSection)
+            .map((item) => item.mailcc)
+            .join(';');
 
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
@@ -1291,7 +1293,7 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-    // lay thong tin section
+  // lay thong tin section
   Future<void> fetchSectionList() async {
     try {
       isLoading(true);

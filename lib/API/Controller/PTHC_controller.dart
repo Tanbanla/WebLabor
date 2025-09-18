@@ -14,6 +14,7 @@ import 'package:web_labor_contract/class/TM_PTHC.dart';
 class DashboardControllerPTHC extends GetxController {
   var pthcList = <PthcGroup>[].obs;
   var filteredpthcList = <PthcGroup>[].obs;
+  var listPTHCsection = <String>[].obs;
   var listSection = <String>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortColumnIndex = 0.obs;
@@ -440,6 +441,38 @@ class DashboardControllerPTHC extends GetxController {
         }
       } else {
         throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
+    }
+  }
+    // lay thong tin PTHC
+  Future<void> fetchPTHCSectionList(String manv) async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.GetSection}$manv'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          // Sửa chỗ này - cần chuyển đổi dữ liệu từ API thành List<String>
+          final List<dynamic> data = jsonData['data'];
+          listPTHCsection.assignAll(
+            data.map((item) => item.toString()).toList(),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception(
+          'Failed to load data with status code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch section data: $e');

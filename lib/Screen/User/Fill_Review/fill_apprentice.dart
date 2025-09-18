@@ -3,6 +3,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
@@ -32,6 +33,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
+  final DashboardControllerPTHC controllerPTHC = Get.put(DashboardControllerPTHC());
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -45,6 +47,15 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Admin") {
+
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        sectionName = '';
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName = '[${controllerPTHC.listPTHCsection
+            .map((e) => '"$e"')
+            .join(',')}]';
+        }
+      }
       // truong hop PTHC phong ban
       controller.changeStatus("PTHC", sectionName, null);
     } else {

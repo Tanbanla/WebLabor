@@ -43,7 +43,7 @@ class Common {
   static const String PTHCGetByCount = "PthcSection/get-count-by-condition";
   static const String PTHCSreachBy = "PthcSection/search-by-condition";
   // lấy thông tin phòng
-  static const String GetSection = "PthcSection/get-list-picsection-by-employeeadid?adid=M0114622";
+  static const String GetSection = "PthcSection/get-list-picsection-by-employeeadid?adid=";
   // POST
   static const String AddPTHC = "PthcSection/add";
   static const String AddListPTHC = "PthcSection/add-multi";

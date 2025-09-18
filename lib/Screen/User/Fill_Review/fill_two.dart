@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
@@ -30,6 +31,7 @@ class FillTwoScreen extends StatefulWidget {
 
 class _FillTwoScreenState extends State<FillTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
+  final DashboardControllerPTHC controllerPTHC = Get.put(DashboardControllerPTHC());
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -43,6 +45,14 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Admin") {
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        sectionName = '';
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName = '[${controllerPTHC.listPTHCsection
+            .map((e) => '"$e"')
+            .join(',')}]';
+        }
+      }
       // truong hop PTHC phong ban
       controller.changeStatus('PTHC', sectionName, null);
     } else {
@@ -1388,6 +1398,8 @@ class MyData extends DataTableSource {
         // Ghi chú
         DataCell(
           (data.inTStatusId ?? 0) == 3
+              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
+              : data.nvchROther == "OK"
               ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
               : Focus(
                   onFocusChange: (hasFocus) {
