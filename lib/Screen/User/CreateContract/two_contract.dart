@@ -797,11 +797,11 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                  setCellValue('L', item.fLGoLeaveLate);
-                  setCellValue('M', item.fLPaidLeave);
-                  setCellValue('N', item.fLNotPaidLeave);
-                  setCellValue('O', item.fLNotLeaveDay);
-                  setCellValue('P', item.inTViolation);
+                  setCellValue('L', item.fLGoLeaveLate?? "");
+                  setCellValue('M', item.fLPaidLeave?? "");
+                  setCellValue('N', item.fLNotPaidLeave?? "");
+                  setCellValue('O', item.fLNotLeaveDay?? "");
+                  setCellValue('P', item.inTViolation?? "");
                   setCellValue('Q', item.nvarchaRViolation ?? '');
                   setCellValue('R', item.nvchRCompleteWork ?? '');
                   setCellValue('S', item.nvchRUseful ?? '');
@@ -812,7 +812,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     'W',
                     item.biTNoReEmployment == null
                         ? ""
-                        : (item.biTNoReEmployment ? "X" : ""),
+                        : (item.biTNoReEmployment ? "" : "X"),
                   );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }

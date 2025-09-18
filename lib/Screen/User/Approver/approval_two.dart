@@ -582,18 +582,18 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     if (item.dtMEndDate != null) {
                     setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
                     }
-                  setCellValue('L', item.fLGoLeaveLate);
-                  setCellValue('M', item.fLPaidLeave);
-                  setCellValue('N', item.fLNotPaidLeave);
-                  setCellValue('O', item.fLNotLeaveDay);
-                  setCellValue('P', item.inTViolation);
+                  setCellValue('L', item.fLGoLeaveLate?? "");
+                  setCellValue('M', item.fLPaidLeave?? "");
+                  setCellValue('N', item.fLNotPaidLeave?? "");
+                  setCellValue('O', item.fLNotLeaveDay?? "");
+                  setCellValue('P', item.inTViolation?? "");
                   setCellValue('Q', item.nvarchaRViolation ?? '');
                   setCellValue('R', item.nvchRCompleteWork ?? '');
                   setCellValue('S', item.nvchRUseful ?? '');
                   setCellValue('T', item.nvchROther ?? '');
                   setCellValue('U', item.vchRReasultsLeader ?? '');
                   setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment ? "" : "X");
+                  setCellValue('W', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('Y', item.vchRLeaderEvalution ?? '');
                 }

@@ -286,26 +286,6 @@ Widget _buildContractCard({
       ),
     );
   }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 18, color: color),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-      ),
-    );
-  }
-
   Widget _buildLegend({required Color color, required String text}) {
     return Row(
       mainAxisSize: MainAxisSize.min,

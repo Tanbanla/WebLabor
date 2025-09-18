@@ -776,21 +776,21 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     if (item.dtMEndDate != null) {
                     setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
                     }
-                  setCellValue('L', item.fLGoLeaveLate ?? '');
-                  setCellValue('M', item.fLNotLeaveDay ?? '');
-                  setCellValue('N', item.inTViolation ?? '');
-                  setCellValue('O', item.vchRLyThuyet ?? '');
-                  setCellValue('P', item.vchRThucHanh ?? '');
-                  setCellValue('Q', item.vchRCompleteWork ?? '');
-                  setCellValue('R', item.vchRLearnWork ?? '');
-                  setCellValue('S', item.vchRThichNghi ?? '');
-                  setCellValue('T', item.vchRUseful ?? '');
-                  setCellValue('U', item.vchRContact ?? '');
-                  setCellValue('V', item.vcHNeedViolation ?? '');
-                  setCellValue('W', item.vchRReasultsLeader ?? '');
-                  setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment ? "" : "X");
-                  setCellValue('Z', item.vchRUseful ?? '');
+                  setCellValue('L', item.inTStatusId == 3 ? "" : (item.fLGoLeaveLate ?? ''));
+                  setCellValue('M', item.inTStatusId == 3 ? "" : (item.fLNotLeaveDay ?? ''));
+                  setCellValue('N', item.inTStatusId == 3 ? "" : (item.inTViolation ?? ''));
+                  setCellValue('O', item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''));
+                  setCellValue('P', item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''));
+                  setCellValue('Q', item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''));
+                  setCellValue('R', item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''));
+                  setCellValue('S', item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''));
+                  setCellValue('T', item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''));
+                  setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''));
+                  setCellValue('V', item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''));
+                  setCellValue('W', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
+                  setCellValue('X', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
+                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
+                  setCellValue('Z', item.inTStatusId == 3 ? "" : (item.nvchRNoReEmpoyment ?? ''));
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }
 

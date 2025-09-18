@@ -76,6 +76,8 @@ flutter:
     - assets/translations/
     - assets/templates/HD2N.xlsx
     - assets/templates/HDTV.xlsx
+    - assets/templates/Mau2N.xlsx
+    - assets/templates/MauTV.xlsx
     - assets/icons/
     # - assets/icons/
   #   - images/a_dot_ham.jpeg

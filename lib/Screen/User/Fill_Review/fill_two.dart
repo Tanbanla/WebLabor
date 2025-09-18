@@ -784,18 +784,18 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                  setCellValue('L', item.fLGoLeaveLate);
-                  setCellValue('M', item.fLPaidLeave);
-                  setCellValue('N', item.fLNotPaidLeave);
-                  setCellValue('O', item.fLNotLeaveDay);
-                  setCellValue('P', item.inTViolation);
-                  setCellValue('Q', item.nvarchaRViolation ?? '');
-                  setCellValue('R', item.nvchRCompleteWork ?? '');
-                  setCellValue('S', item.nvchRUseful ?? '');
-                  setCellValue('T', item.nvchROther ?? '');
-                  setCellValue('U', item.vchRReasultsLeader ?? '');
-                  setCellValue('V', item.vchRNote ?? '');
-                  setCellValue('W', item.biTNoReEmployment ? "" : "X");
+                    setCellValue('L', item.inTStatusId == 3 ? "" : (item.fLGoLeaveLate ?? ""));
+                    setCellValue('M', item.inTStatusId == 3 ? "" : (item.fLPaidLeave ?? ""));
+                    setCellValue('N', item.inTStatusId == 3 ? "" : (item.fLNotPaidLeave ?? ""));
+                    setCellValue('O', item.inTStatusId == 3 ? "" : (item.fLNotLeaveDay ?? ""));
+                    setCellValue('P', item.inTStatusId == 3 ? "" : (item.inTViolation ?? ""));
+                    setCellValue('Q', item.inTStatusId == 3 ? "" : (item.nvarchaRViolation ?? ''));
+                    setCellValue('R', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
+                    setCellValue('S', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
+                    setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
+                    setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
+                    setCellValue('V', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
+                  setCellValue('W', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
 

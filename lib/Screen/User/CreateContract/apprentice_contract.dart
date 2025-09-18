@@ -783,7 +783,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "X" : ""));
+                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
                   setCellValue('Z', item.vchRUseful ?? '');
                 }
 
