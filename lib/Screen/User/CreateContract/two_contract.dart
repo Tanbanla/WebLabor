@@ -334,6 +334,18 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             );
           },
         ),
+        const SizedBox(width: 8),
+        buildActionButton(
+          icon: Iconsax.trash,
+          color: Colors.red,
+          tooltip: tr('delete'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => _DeleteListContractDialog(),
+            );
+          },
+        ),
       ],
     );
   }
@@ -2326,5 +2338,55 @@ class _showAddDialog extends StatelessWidget {
         }
       },
     );
+  }
+}
+
+// xóa list danh sách
+class _DeleteListContractDialog extends StatelessWidget {
+  final DashboardControllerTwo controller = Get.find();
+
+  _DeleteListContractDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      // Thêm Obx để theo dõi trạng thái loading
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return AlertDialog(
+        title: Text(tr('CommfirmDelete')),
+        content: Text(tr('Areyoudelete')),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    try {
+                      await controller.deleteListTwoContract();
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                      await controller.changeStatus("1", null, null);
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: Text(tr('delete')),
+          ),
+        ],
+      );
+    });
   }
 }

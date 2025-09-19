@@ -76,7 +76,7 @@ class Common {
   //DELETE
   static const String DeleteTwoID = "ContractTwoYear/delete/";
   static const String DeleteTwoIDLogic = "ContractTwoYear/delete-logic/";
-  static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi/";
+  static const String DeleteTwoMultiID = "ContractTwoYear/delete-multi";
   static const String DeleteTwoMultiIDLogic =
       "ContractTwoYear/delete-logic-multi/";
 
@@ -99,7 +99,7 @@ class Common {
   static const String DeleteApprenticeIDLogic =
       "ContractApprentice/delete-logic/";
   static const String DeleteApprenticeMultiID =
-      "ContractApprentice/delete-multi/";
+      "ContractApprentice/delete-multi";
   static const String DeleteApprenticeMultiIDLogic =
       "ContractApprentice/delete-logic-multi/";
 

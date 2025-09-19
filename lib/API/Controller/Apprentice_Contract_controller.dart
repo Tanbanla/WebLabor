@@ -953,7 +953,41 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+// delete list
+  Future<void> deleteListApprenticeContract() async {
+    try {
+      isLoading(true);
+      final contract = getSelectedItems();
+      
+      if (contract.isEmpty) {
+        throw Exception(tr('LoiGui'));
+      }
 
+      // Lấy danh sách ID từ các item được chọn
+      final ids = contract.map((contract) => contract.id).toList();
+      
+      final endpoint = Common.DeleteApprenticeMultiID;
+      final response = await http.delete( // Thường xóa nhiều item dùng POST hoặc DELETE với body
+        Uri.parse('${Common.API}$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(ids), // Gửi danh sách ID dưới dạng JSON
+      );
+
+      if (response.statusCode == 200) {
+        // Xóa thành công, cập nhật UI
+        //await fetchDataBy();
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(
+          'Lỗi khi gửi dữ liệu lên server ${error['message'] ?? response.body}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to delete twoContract: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
   // import file
   Future<void> importExcelMobileContract(File file, String userUpdate) async {
     try {

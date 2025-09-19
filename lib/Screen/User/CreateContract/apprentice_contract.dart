@@ -331,6 +331,18 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
             );
           },
         ),
+        const SizedBox(width: 8),
+        buildActionButton(
+          icon: Iconsax.trash,
+          color: Colors.red,
+          tooltip: tr('delete'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => _DeleteListContractDialog(),
+            );
+          },
+        ),
       ],
     );
   }
@@ -764,12 +776,22 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
-                    if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
-                    }
-                    if (item.dtMEndDate != null) {
-                    setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
-                    }
+                  if (item.dtMJoinDate != null) {
+                    setCellValue(
+                      'J',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue(
+                      'K',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
+                  }
                   setCellValue('L', item.fLGoLeaveLate ?? '');
                   setCellValue('M', item.fLNotLeaveDay ?? '');
                   setCellValue('N', item.inTViolation ?? '');
@@ -783,7 +805,12 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
+                  setCellValue(
+                    'Y',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
                   setCellValue('Z', item.vchRUseful ?? '');
                 }
 
@@ -1215,8 +1242,11 @@ class _EditContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField(
-                      value: controller.listSection.contains(edited.vchRCodeSection) 
-                          ? edited.vchRCodeSection 
+                      value:
+                          controller.listSection.contains(
+                            edited.vchRCodeSection,
+                          )
+                          ? edited.vchRCodeSection
                           : null,
                       decoration: InputDecoration(
                         labelText: tr('department'),
@@ -2182,5 +2212,55 @@ class _showAddDialog extends StatelessWidget {
         }
       },
     );
+  }
+}
+
+// xóa list danh sách
+class _DeleteListContractDialog extends StatelessWidget {
+  final DashboardControllerApprentice controller = Get.find();
+
+  _DeleteListContractDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      // Thêm Obx để theo dõi trạng thái loading
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return AlertDialog(
+        title: Text(tr('CommfirmDelete')),
+        content: Text(tr('Areyoudelete')),
+        actions: [
+          TextButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: Text(tr('Cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: (controller.isLoading.value)
+                ? null
+                : () async {
+                    try {
+                      await controller.deleteListApprenticeContract();
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                      await controller.changeStatus("1", null, null);
+                    } catch (e) {
+                      // Xử lý lỗi nếu cần
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+            child: Text(tr('delete')),
+          ),
+        ],
+      );
+    });
   }
 }
