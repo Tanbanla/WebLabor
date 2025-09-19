@@ -2711,14 +2711,14 @@ class _ReturnTwoContract extends StatelessWidget {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
                       }
-                      await controller.updateTwoContract(
-                        edited,
-                        authState.user!.chRUserid.toString(),
-                      );
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
                         reson.value,
+                      );
+                      await controller.updateTwoContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
                       );
                       String sectionName = authState.user!.chRSecCode
                           .toString()

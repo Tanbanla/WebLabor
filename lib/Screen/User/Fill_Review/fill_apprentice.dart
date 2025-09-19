@@ -2975,14 +2975,14 @@ class _ReturnConApprenticetract extends StatelessWidget {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
                       }
-                      await controller.updateApprenticeContract(
-                        edited,
-                        authState.user!.chRUserid.toString(),
-                      );
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
                         reson.value
+                      );
+                      await controller.updateApprenticeContract(
+                        edited,
+                        authState.user!.chRUserid.toString(),
                       );
                       String sectionName = authState.user!.chRSecCode
                           .toString()
