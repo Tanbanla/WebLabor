@@ -565,7 +565,7 @@ class DashboardControllerApprentice extends GetxController {
 
       isLoading(true);
       final response = await http.put(
-        Uri.parse('${Common.API}${Common.UpdateTwo}${twocontract.id}'),
+        Uri.parse('${Common.API}${Common.UpdateApprentice}${twocontract.id}'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(twocontract.toJson()),
       );

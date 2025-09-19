@@ -698,16 +698,6 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       return 'Invalid date';
     }
   }
-
-  Widget _buildExportOption(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
-      ],
-    );
-  }
 }
 
 class MyData extends DataTableSource {
