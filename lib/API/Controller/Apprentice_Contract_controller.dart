@@ -503,22 +503,46 @@ class DashboardControllerApprentice extends GetxController {
     try {
       //fetchPTHCData();
       List<dynamic> notApproval = [];
-      notApproval.add(contract);
+      // Add current contract to the list of not approved items
+      final json = contract.toJson();
+      final contractCopy = ApprenticeContract.fromJson(json);
+
+      notApproval.add(contractCopy);
+
+      if (contract.inTStatusId == 3) {
+        contract.inTStatusId = 1;
+      } else if (contract.inTStatusId == 4) {
+        contract.inTStatusId = 3;
+      }
       if (notApproval.isNotEmpty) {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        final ccSection = pthcList.where((section) => section == contract.vchRCodeSection)
-        .map((item) => item.mailcc).join(';');
-        
+        // Lấy danh sách email cc theo section (nếu có)
+        final sectionCc = pthcList
+            .where((item) => item.section == contract.vchRCodeSection)
+            .map((item) => item.mailcc)
+            .where((e) => e != null && e.trim().isNotEmpty)
+            .cast<String>()
+            .toList();
+
+        // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+        final ccEmails = [
+          ...sectionCc,
+          if (specialSection.mailcc != null &&
+              specialSection.mailcc!.trim().isNotEmpty)
+            specialSection.mailcc?.trim(),
+        ].join(';');
+
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           specialSection.mailto.toString(),
-          '$ccSection;${specialSection.mailcc}',
+          ccEmails,
           specialSection.mailbcc.toString(),
           notApproval,
           "Từ chối xác nhận",
           userApprover,
+          reason,
         );
       }
     } catch (e) {
@@ -527,7 +551,8 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
-Future<void> updateKetQuaApprenticeContract(
+
+  Future<void> updateKetQuaApprenticeContract(
     ApprenticeContract twocontract,
     String userUpdate,
     String ketquaOld,
@@ -552,7 +577,7 @@ Future<void> updateKetQuaApprenticeContract(
           'khanhmf@brothergroup.net',
           listOld,
           ketquaOld,
-          twocontract.vchRReasultsLeader.toString()
+          twocontract.vchRReasultsLeader.toString(),
         );
       } else {
         final error = json.decode(response.body);
@@ -566,6 +591,7 @@ Future<void> updateKetQuaApprenticeContract(
       isLoading(false);
     }
   }
+
   //update thong tin to list
   Future<void> updateListApprenticeContract(
     String userApprover,
@@ -814,8 +840,10 @@ Future<void> updateKetQuaApprenticeContract(
                   '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
                 );
               }
+              final json = contract[i].toJson();
+              final contractCopy = ApprenticeContract.fromJson(json);
+              notApproval.add(contractCopy);
               contract[i].inTStatusId = 4;
-              notApproval.add(contract[i]);
             }
           case 7:
             //xu ly khi xong
@@ -831,8 +859,10 @@ Future<void> updateKetQuaApprenticeContract(
                   '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
                 );
               }
+              final json = contract[i].toJson();
+              final contractCopy = ApprenticeContract.fromJson(json);
+              notApproval.add(contractCopy);
               contract[i].inTStatusId = 4;
-              notApproval.add(contract[i]);
             }
         }
       }
@@ -861,16 +891,29 @@ Future<void> updateKetQuaApprenticeContract(
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccSection = pthcList
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
               .map((item) => item.mailcc)
-              .where((section) => section == sectionAp);
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            '$ccSection;${specialSection.mailcc}',
+            ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
             userApprover,
+            null,
           );
         }
       } else {
@@ -1548,7 +1591,8 @@ Future<void> updateKetQuaApprenticeContract(
       isLoading(false);
     }
   }
-      // lay thong tin section
+
+  // lay thong tin section
   Future<void> fetchSectionList() async {
     try {
       isLoading(true);
@@ -1575,12 +1619,13 @@ Future<void> updateKetQuaApprenticeContract(
       isLoading(false);
     }
   }
+
   //  Từ chối phê duyệt nhiều
-  Future<void>updateListContractReturnS(
+  Future<void> updateListContractReturnS(
     String userApprover,
     String reson,
-  ) async{
-      try {
+  ) async {
+    try {
       final contract = getSelectedItems();
       //fetchPTHCData();
       List<dynamic> notApproval = [];
@@ -1598,17 +1643,21 @@ Future<void> updateKetQuaApprenticeContract(
             contract[i].dtMApproverChief = formatDateTime(DateTime.now());
             contract[i].useRApproverChief = userApprover;
             contract[i].nvchRApproverChief = reson;
+            final json = contract[i].toJson();
+            final contractCopy = ApprenticeContract.fromJson(json);
+            notApproval.add(contractCopy);
             contract[i].biTApproverChief = false;
 
-              contract[i].inTStatusId = 4;
-              notApproval.add(contract[i]);
+            contract[i].inTStatusId = 4;
           case 7:
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
             contract[i].nvchRApproverManager = reson;
             contract[i].biTApproverSectionManager = false;
+            final json = contract[i].toJson();
+            final contractCopy = ApprenticeContract.fromJson(json);
+            notApproval.add(contractCopy);
             contract[i].inTStatusId = 4;
-            notApproval.add(contract[i]);
         }
       }
       isLoading(true);
@@ -1625,16 +1674,29 @@ Future<void> updateKetQuaApprenticeContract(
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccSection = pthcList
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
               .map((item) => item.mailcc)
-              .where((section) => section == sectionAp);
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            '$ccSection;${specialSection.mailcc}',
+            ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
             userApprover,
+            null,
           );
         }
       } else {
@@ -1649,11 +1711,12 @@ Future<void> updateKetQuaApprenticeContract(
       isLoading(false);
     }
   }
-  Future<void>updateListContractReturnSPTHC(
+
+  Future<void> updateListContractReturnSPTHC(
     String userApprover,
     String reson,
-  ) async{
-      try {
+  ) async {
+    try {
       final contract = getSelectedItems();
       //fetchPTHCData();
       List<dynamic> notApproval = [];
@@ -1661,11 +1724,16 @@ Future<void> updateKetQuaApprenticeContract(
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      // Deep clone selected contracts without requiring a copyWith method
+      notApproval = contract
+          .map((item) => ApprenticeContract.fromJson(item.toJson()))
+          .toList();
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userApprover;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         // lay thong tin phong
         sectionAp = contract[i].vchRCodeSection.toString();
+        //notApproval.add(contract[i]);
         if (contract[i].inTStatusId == 3) {
           contract[i].inTStatusId = 1;
         } else if (contract[i].inTStatusId == 4) {
@@ -1686,16 +1754,31 @@ Future<void> updateKetQuaApprenticeContract(
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccSection = pthcList
+
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
               .map((item) => item.mailcc)
-              .where((section) => section == sectionAp);
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
+
           controlleruser.SendMailCustom(
-            specialSection.mailto.toString(),
-            '$ccSection;${specialSection.mailcc}',
-            specialSection.mailbcc.toString(),
+            specialSection.mailto?.toString() ?? '',
+            ccEmails,
+            specialSection.mailbcc?.toString() ?? '',
             notApproval,
             "Từ chối xác nhận",
             userApprover,
+            reson,
           );
         }
       } else {

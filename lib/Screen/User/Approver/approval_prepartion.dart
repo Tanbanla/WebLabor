@@ -186,12 +186,14 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   );
                 }
               } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${tr('sendFailed')} ${e.toString().replaceAll('', '')}'),
-                      backgroundColor: Colors.red,
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
                     ),
-                  );
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: Obx(
@@ -259,8 +261,8 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
     final contractType = TypeValue == tr('indefiniteContract')
-      ? 'two'
-      : 'apprentice';
+        ? 'two'
+        : 'apprentice';
     return Row(
       children: [
         Expanded(
@@ -317,12 +319,16 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           icon: Iconsax.back_square,
           color: Colors.orange,
           tooltip: tr('ReturnS'),
-          onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(),contractType ),
+          onPressed: () => _ReturnSDialog(
+            authState.user!.chRUserid.toString(),
+            contractType,
+          ),
         ),
       ],
     );
   }
-  void _ReturnSDialog(String adid, String typeContract){
+
+  void _ReturnSDialog(String adid, String typeContract) {
     final controller = Get.find<DashboardControllerApporver>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -335,9 +341,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: tr('reason'),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
@@ -353,7 +357,15 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   return;
                 }
                 await controller.updateListContractReturnS(
-                  adid,reasonController.text,typeContract
+                  adid,
+                  reasonController.text,
+                  typeContract,
+                );
+                controller.fetchData(
+                  contractType: 'two',
+                  statusId: '2',
+                  section: null,
+                  adid: adid,
                 );
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -379,15 +391,17 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
             },
             child: Text(tr('Confirm')),
           ),
-          Obx(() => messageError.value.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
-                  child: Text(
-                    messageError.value,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => messageError.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                    child: Text(
+                      messageError.value,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -557,13 +571,13 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('Apporval'),//tr('notRehirable'),
+                    title: tr('Apporval'), //tr('notRehirable'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
-                    title: tr('LydoTuChoi'),//tr('notRehirableReason'),
+                    title: tr('LydoTuChoi'), //tr('notRehirableReason'),
                     width: 170,
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
@@ -585,7 +599,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
-      text:  data.nvchRApproverPer ?? ""
+      text: data.nvchRApproverPer ?? "",
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((

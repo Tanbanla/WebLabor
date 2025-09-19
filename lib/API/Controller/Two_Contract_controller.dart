@@ -87,25 +87,25 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // so sanh du lieu
-void searchQuery(String query) {
-  final lowerQuery = query.toLowerCase();
-  if (lowerQuery.isEmpty) {
-    filterdataList.assignAll(dataList);
-  } else {
-    filterdataList.assignAll(
-      dataList.where((item) {
-        final combined = [
-          item.vchREmployeeId,
-          item.vchREmployeeName,
-          item.vchRNameSection,
-          item.chRCostCenterName,
-          item.chRPosition,
-        ].where((e) => e != null).join(' ').toLowerCase();
-        return combined.contains(lowerQuery);
-      }),
-    );
+  void searchQuery(String query) {
+    final lowerQuery = query.toLowerCase();
+    if (lowerQuery.isEmpty) {
+      filterdataList.assignAll(dataList);
+    } else {
+      filterdataList.assignAll(
+        dataList.where((item) {
+          final combined = [
+            item.vchREmployeeId,
+            item.vchREmployeeName,
+            item.vchRNameSection,
+            item.chRCostCenterName,
+            item.chRPosition,
+          ].where((e) => e != null).join(' ').toLowerCase();
+          return combined.contains(lowerQuery);
+        }),
+      );
+    }
   }
-}
 
   // lay du lieu
   Future<void> fetchDummyData() async {
@@ -380,24 +380,44 @@ void searchQuery(String query) {
     try {
       //fetchPTHCData();
       List<dynamic> notApproval = [];
-      notApproval.add(contract);
+      final json = contract.toJson();
+      final contractCopy = TwoContract.fromJson(json);
+
+      notApproval.add(contractCopy);
+
+      if (contract.inTStatusId == 3) {
+        contract.inTStatusId = 1;
+      } else if (contract.inTStatusId == 4) {
+        contract.inTStatusId = 3;
+      }
       if (notApproval.isNotEmpty) {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        final ccSection = pthcList
-            .where((section) => section == contract.vchRCodeSection)
+        // Lấy danh sách email cc theo section (nếu có)
+        final sectionCc = pthcList
+            .where((item) => item.section == contract.vchRCodeSection)
             .map((item) => item.mailcc)
-            .join(';');
+            .where((e) => e != null && e.trim().isNotEmpty)
+            .cast<String>()
+            .toList();
 
+        // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+        final ccEmails = [
+          ...sectionCc,
+          if (specialSection.mailcc != null &&
+              specialSection.mailcc!.trim().isNotEmpty)
+            specialSection.mailcc?.trim(),
+        ].join(';');
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           specialSection.mailto.toString(),
-          '$ccSection;${specialSection.mailcc}',
+          ccEmails,
           specialSection.mailbcc.toString(),
           notApproval,
           "Từ chối xác nhận",
           userApprover,
+          reason,
         );
       }
     } catch (e) {
@@ -595,8 +615,10 @@ void searchQuery(String query) {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
+              final json = twocontract[i].toJson();
+              final contractCopy = TwoContract.fromJson(json);
+              notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
-              notApproval.add(twocontract[i]);
             }
           case 7:
             twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
@@ -614,8 +636,10 @@ void searchQuery(String query) {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
+              final json = twocontract[i].toJson();
+              final contractCopy = TwoContract.fromJson(json);
+              notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
-              notApproval.add(twocontract[i]);
             }
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
@@ -632,8 +656,10 @@ void searchQuery(String query) {
                   '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
                 );
               }
+              final json = twocontract[i].toJson();
+              final contractCopy = TwoContract.fromJson(json);
+              notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
-              notApproval.add(twocontract[i]);
             }
         }
       }
@@ -668,17 +694,29 @@ void searchQuery(String query) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccEmails = pthcList
-              .where((item) => item.mailcc != null && item.section == sectionAp)
-              .map((item) => item.mailcc!)
-              .join(';');
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
+              .map((item) => item.mailcc)
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            '$ccEmails;${specialSection.mailcc}',
+            ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
             userApprover,
+            null,
           );
         }
       } else {
@@ -1312,10 +1350,10 @@ void searchQuery(String query) {
   }
 
   //  Từ chối phê duyệt nhiều của Apporver
-  Future<void>updateListTwoContractReturnS(
+  Future<void> updateListTwoContractReturnS(
     String userApprover,
     String reson,
-  ) async{
+  ) async {
     try {
       final twocontract = getSelectedItems();
       List<dynamic> notApproval = [];
@@ -1333,23 +1371,29 @@ void searchQuery(String query) {
             twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
             twocontract[i].useRApproverChief = userApprover;
             twocontract[i].nvchRApproverChief = reson;
-            twocontract[i].biTApproverChief =false;
+            twocontract[i].biTApproverChief = false;
+            final json = twocontract[i].toJson();
+            final contractCopy = TwoContract.fromJson(json);
+            notApproval.add(contractCopy);
             twocontract[i].inTStatusId = 4;
-            notApproval.add(twocontract[i]);
           case 7:
             twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
             twocontract[i].useRApproverSectionManager = userApprover;
             twocontract[i].nvchRApproverManager = reson;
-            twocontract[i].biTApproverSectionManager =false;
-              twocontract[i].inTStatusId = 4;
-              notApproval.add(twocontract[i]);
+            twocontract[i].biTApproverSectionManager = false;
+            final json = twocontract[i].toJson();
+            final contractCopy = TwoContract.fromJson(json);
+            notApproval.add(contractCopy);
+            twocontract[i].inTStatusId = 4;
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
             twocontract[i].nvchRApproverDirector = reson;
-            twocontract[i].biTApproverDirector =false;
-              twocontract[i].inTStatusId = 4;
-              notApproval.add(twocontract[i]);
+            twocontract[i].biTApproverDirector = false;
+            final json = twocontract[i].toJson();
+            final contractCopy = TwoContract.fromJson(json);
+            notApproval.add(contractCopy);
+            twocontract[i].inTStatusId = 4;
         }
       }
       isLoading(true);
@@ -1367,17 +1411,29 @@ void searchQuery(String query) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccEmails = pthcList
-              .where((item) => item.mailcc != null && item.section == sectionAp)
-              .map((item) => item.mailcc!)
-              .join(';');
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
+              .map((item) => item.mailcc)
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            '$ccEmails;${specialSection.mailcc}',
+            ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
             userApprover,
+            null,
           );
         }
       } else {
@@ -1393,18 +1449,22 @@ void searchQuery(String query) {
       isLoading(false);
     }
   }
+
   //  Từ chối phê duyệt nhiều của PTHC
-  Future<void>updateListTwoContractReturnSPTHC(
+  Future<void> updateListTwoContractReturnSPTHC(
     String userApprover,
     String reson,
-  ) async{
-      try {
+  ) async {
+    try {
       final twocontract = getSelectedItems();
       List<dynamic> notApproval = [];
       String sectionAp = "";
       if (twocontract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      notApproval = twocontract
+          .map((item) => TwoContract.fromJson(item.toJson()))
+          .toList();
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userApprover;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
@@ -1431,17 +1491,29 @@ void searchQuery(String query) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          final ccEmails = pthcList
-              .where((item) => item.mailcc != null && item.section == sectionAp)
-              .map((item) => item.mailcc!)
-              .join(';');
+          // Lấy danh sách email cc theo section (nếu có)
+          final sectionCc = pthcList
+              .where((item) => item.section == sectionAp)
+              .map((item) => item.mailcc)
+              .where((e) => e != null && e.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+
+          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
+          final ccEmails = [
+            ...sectionCc,
+            if (specialSection.mailcc != null &&
+                specialSection.mailcc!.trim().isNotEmpty)
+              specialSection.mailcc?.trim(),
+          ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            '$ccEmails;${specialSection.mailcc}',
+            ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
-            "Từ chối xac nhận",
+            "Từ chối xác nhận",
             userApprover,
+            reson,
           );
         }
       } else {

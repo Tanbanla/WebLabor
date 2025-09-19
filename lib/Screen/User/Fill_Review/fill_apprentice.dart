@@ -45,7 +45,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .trim();
     controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
 
       if (authState.user!.chRGroup.toString() == "PTHC") {
@@ -108,7 +108,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    if (authState.user!.chRGroup.toString() == "PTHC" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus(
@@ -210,7 +210,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC" ||
+                if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
 
@@ -379,6 +379,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
+    String sectionName = authState.user!.chRSecCode
+        .toString()
+        .split(':')[1]
+        .trim();
     return Row(
       children: [
         Expanded(
@@ -445,7 +449,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               icon: Iconsax.back_square,
               color: Colors.orange,
               tooltip: tr('ReturnS'),
-              onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(),),
+              onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(), sectionName, authState.user!.chRGroup.toString()),
             ),
       ],
     );
@@ -909,7 +913,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     );
   }
 
-  void _ReturnSDialog(String adid){
+  void _ReturnSDialog(String adid, String sectionName, String group) {
     final controller = Get.find<DashboardControllerApprentice>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -943,6 +947,19 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 await controller.updateListContractReturnSPTHC(
                   adid,reasonController.text,
                 );
+                if (group == "PTHC" ||
+                    group == "Admin") {
+                  // truong hop PTHC phong ban
+
+                  await controller.changeStatus('PTHC', sectionName, null);
+                } else {
+                  // truong hop leader
+                  await controller.changeStatus(
+                    '4',
+                    sectionName,
+                    adid,
+                  );
+                }
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -2727,7 +2744,7 @@ class _EditContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(
@@ -2954,11 +2971,6 @@ class _ReturnConApprenticetract extends StatelessWidget {
                     errorMessage.value = '';
                     controller.isLoading(false);
                     try {
-                      if (edited.inTStatusId == 3) {
-                        edited.inTStatusId = 1;
-                      } else if (edited.inTStatusId == 4) {
-                        edited.inTStatusId = 3;
-                      }
                       if (reson.value.isEmpty) {
                         errorMessage.value = tr('reasonRejectHint');
                         return;
@@ -2977,7 +2989,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(

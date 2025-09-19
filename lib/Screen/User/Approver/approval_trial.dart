@@ -741,6 +741,11 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 await controller.updateListContractReturnS(
                   adid,reasonController.text,
                 );
+                controller.changeStatus(
+                    'approval',
+                    null,
+                    adid,
+                  );
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

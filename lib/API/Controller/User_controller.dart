@@ -519,6 +519,7 @@ class DashboardControllerUser extends GetxController {
     List<dynamic> rejectedRequests,
     String loaituchoi,
     String approverNG,
+    String? reson,
   ) async {
     try {
       isLoading(true);
@@ -533,6 +534,7 @@ class DashboardControllerUser extends GetxController {
           loaiTuChoi: loaituchoi,
           approverNG: approverNG,
           rejectedRequests: rejectedRequests,
+          reson: reson,
         ),
       };
       final response = await http.post(

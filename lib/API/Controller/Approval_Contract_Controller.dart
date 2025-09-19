@@ -91,8 +91,10 @@ class DashboardControllerApporver extends GetxController {
             phongban.add(contract.vchRCodeSection);
           }
         } else {
+          notApproval.add(contract
+          .map((item) => contractType == 'two' ? TwoContract.fromJson(item.toJson()) : ApprenticeContract.fromJson(item.toJson()))
+          .toList());
           contract.inTStatusId = 1;
-          notApproval.add(contract);
         }
       }
 
@@ -143,7 +145,8 @@ class DashboardControllerApporver extends GetxController {
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
-            userApprover
+            userApprover,
+            null
           );
         }
       } else {
@@ -436,8 +439,10 @@ class DashboardControllerApporver extends GetxController {
           ..nvchRApproverPer = reson
         ;
         contract.biTApproverPer =false;
+        notApproval.add(contract
+          .map((item) => contractType == 'two' ? TwoContract.fromJson(item.toJson()) : ApprenticeContract.fromJson(item.toJson()))
+          .toList());
         contract.inTStatusId = 1;
-        notApproval.add(contract);
       }
 
       // Determine API endpoint
@@ -473,7 +478,8 @@ class DashboardControllerApporver extends GetxController {
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
-            userUpdate
+            userUpdate,
+            null
           );
         }
       } else {

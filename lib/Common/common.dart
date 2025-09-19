@@ -125,6 +125,7 @@ class Common {
     required String loaiTuChoi,
     required String approverNG,
     required List<dynamic> rejectedRequests,
+    required String? reson,
   }) {
     // Tạo hàng cho bảng từ danh sách các yêu cầu bị từ chối
     String buildTableRows() {
@@ -132,20 +133,23 @@ class Common {
         // Xác định lý do từ chối dựa trên statusId
         String rejectionReason;
         switch (request.inTStatusId) {
-          case 1:
+          case 2:
             rejectionReason = request.nvchRApproverPer ?? 'Không có lý do';
-
             break;
           case 3:
-            if (!request.biTApproverChief) {
-              rejectionReason = request.nvchRApproverChief ?? '';
-            } else if (!request.biTApproverSectionManager) {
-              rejectionReason = request.nvchRApproverManager ?? '';
-            } else if (!request.biTApproverDirector) {
-              rejectionReason = request.nvchRApproverDirector ?? '';
-            } else {
-              rejectionReason = request.vchRNote ?? 'Không có lý do';
-            }
+            rejectionReason = reson ?? 'Không có lý do';
+            break;
+          case 4:
+            rejectionReason = reson ?? 'Không có lý do';
+            break;
+          case 6: 
+            rejectionReason = request.nvchRApproverChief ?? 'Không có lý do';
+            break;
+          case 7:
+            rejectionReason = request.nvchRApproverManager ?? 'Không có lý do';
+            break;
+          case 8:
+            rejectionReason = request.nvchRApproverDirector ?? 'Không có lý do';
             break;
           default:
             rejectionReason = 'Không có lý do';

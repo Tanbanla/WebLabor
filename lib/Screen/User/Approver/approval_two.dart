@@ -746,6 +746,12 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                 await controller.updateListTwoContractReturnS(
                   adid,reasonController.text,
                 );
+                // phan xem ai dang vao man so sanh
+                  controller.changeStatus(
+                    'approval',
+                    null,
+                    adid,
+                  );
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1202,20 +1208,6 @@ class MyData extends DataTableSource {
     );
   }
 
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'OK':
-        return Colors.green;
-      case 'NG':
-        return Colors.red;
-      case 'Stop Working':
-        return Colors.orange;
-      case 'Finish L/C':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
 
   Widget _getDanhGiaView(String? status) {
     switch (status) {
