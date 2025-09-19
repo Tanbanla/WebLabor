@@ -789,9 +789,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     if (item.dtMEndDate != null) {
                     setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
                     }
-                  setCellValue('L', item.inTStatusId == 3 ? "" : (item.fLGoLeaveLate ?? ''));
-                  setCellValue('M', item.inTStatusId == 3 ? "" : (item.fLNotLeaveDay ?? ''));
-                  setCellValue('N', item.inTStatusId == 3 ? "" : (item.inTViolation ?? ''));
+                  setCellValue('L', item.fLGoLeaveLate ?? '0');
+                  setCellValue('M', item.fLNotLeaveDay ?? '0');
+                  setCellValue('N', item.inTViolation ?? '0');
                   setCellValue('O', item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''));
                   setCellValue('P', item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''));
                   setCellValue('Q', item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''));

@@ -809,17 +809,17 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                  setCellValue('L', item.fLGoLeaveLate?? "");
-                  setCellValue('M', item.fLPaidLeave?? "");
-                  setCellValue('N', item.fLNotPaidLeave?? "");
-                  setCellValue('O', item.fLNotLeaveDay?? "");
-                  setCellValue('P', item.inTViolation?? "");
-                  setCellValue('Q', item.nvarchaRViolation ?? '');
-                  setCellValue('R', item.nvchRCompleteWork ?? '');
-                  setCellValue('S', item.nvchRUseful ?? '');
-                  setCellValue('T', item.nvchROther ?? '');
-                  setCellValue('U', item.vchRReasultsLeader ?? '');
-                  setCellValue('V', item.vchRNote ?? '');
+                    setCellValue('L',item.fLGoLeaveLate ?? "0");
+                    setCellValue('M',item.fLPaidLeave ?? "0");
+                    setCellValue('N',item.fLNotPaidLeave ?? "0");
+                    setCellValue('O', item.fLNotLeaveDay ?? "0");
+                    setCellValue('P', item.inTViolation ?? "0");
+                    setCellValue('Q', item.nvarchaRViolation ?? '');
+                    setCellValue('R', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
+                    setCellValue('S', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
+                    setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
+                    setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
+                    setCellValue('V', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
                   setCellValue(
                     'W',
                     item.biTNoReEmployment == null

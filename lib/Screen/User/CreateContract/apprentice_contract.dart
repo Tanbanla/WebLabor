@@ -792,9 +792,9 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                  setCellValue('L', item.fLGoLeaveLate ?? '');
-                  setCellValue('M', item.fLNotLeaveDay ?? '');
-                  setCellValue('N', item.inTViolation ?? '');
+                  setCellValue('L', item.fLGoLeaveLate ?? '0');
+                  setCellValue('M', item.fLNotLeaveDay ?? '0');
+                  setCellValue('N', item.inTViolation ?? '0');
                   setCellValue('O', item.vchRLyThuyet ?? '');
                   setCellValue('P', item.vchRThucHanh ?? '');
                   setCellValue('Q', item.vchRCompleteWork ?? '');

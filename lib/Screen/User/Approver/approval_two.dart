@@ -590,11 +590,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     if (item.dtMEndDate != null) {
                     setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
                     }
-                  setCellValue('L', item.fLGoLeaveLate?? "");
-                  setCellValue('M', item.fLPaidLeave?? "");
-                  setCellValue('N', item.fLNotPaidLeave?? "");
-                  setCellValue('O', item.fLNotLeaveDay?? "");
-                  setCellValue('P', item.inTViolation?? "");
+                  setCellValue('L', item.fLGoLeaveLate?? "0");
+                  setCellValue('M', item.fLPaidLeave?? "0");
+                  setCellValue('N', item.fLNotPaidLeave?? "0");
+                  setCellValue('O', item.fLNotLeaveDay?? "0");
+                  setCellValue('P', item.inTViolation?? "0");
                   setCellValue('Q', item.nvarchaRViolation ?? '');
                   setCellValue('R', item.nvchRCompleteWork ?? '');
                   setCellValue('S', item.nvchRUseful ?? '');

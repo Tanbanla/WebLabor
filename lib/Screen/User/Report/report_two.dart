@@ -520,7 +520,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
 
                 final sheet =
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
-                const startRow = 19; // Dòng bắt đầu điền dữ liệu
+                const startRow = 15; // Dòng bắt đầu điền dữ liệu
 
                 // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < controller.filterdataList.length; i++) {
@@ -572,17 +572,17 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                  setCellValue('N', item.fLGoLeaveLate ?? "");
-                  setCellValue('O', item.fLPaidLeave?? "");
-                  setCellValue('P', item.fLNotPaidLeave?? "");
-                  setCellValue('Q', item.fLNotLeaveDay?? "");
-                  setCellValue('R', item.inTViolation?? "");
+                  setCellValue('N', item.fLGoLeaveLate ?? "0");
+                  setCellValue('O', item.fLPaidLeave?? "0");
+                  setCellValue('P', item.fLNotPaidLeave?? "0");
+                  setCellValue('Q', item.fLNotLeaveDay?? "0");
+                  setCellValue('R', item.inTViolation?? "0");
                   setCellValue('S', item.nvarchaRViolation ?? '');
-                  setCellValue('T', item.nvchRCompleteWork ?? '');
-                  setCellValue('U', item.nvchRUseful ?? '');
-                  setCellValue('V', item.nvchROther ?? '');
-                  setCellValue('W', item.vchRReasultsLeader ?? '');
-                  setCellValue('X', item.vchRNote ?? '');
+                  setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
+                  setCellValue('U', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
+                  setCellValue('V', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
+                  setCellValue('W', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
+                  setCellValue('X', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
                   setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
                   setCellValue('Z', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('AA', item.vchRUserCreate ?? '');
@@ -2414,6 +2414,7 @@ class _UpdateKetQua extends StatelessWidget {
                         edited.biTNoReEmployment = false;
                         //edited.nvchRApproverManager = 'Thay đổi từ sửa kết quả đánh giá cuối cùng';
                       }
+                      edited.vchRNote = reson.value;
                       await controller.updateKetQuaTwoContract(
                         edited,
                         authState.user!.chRUserid.toString(),

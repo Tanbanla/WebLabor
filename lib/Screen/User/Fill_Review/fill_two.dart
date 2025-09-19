@@ -797,12 +797,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                    setCellValue('L', item.inTStatusId == 3 ? "" : (item.fLGoLeaveLate ?? ""));
-                    setCellValue('M', item.inTStatusId == 3 ? "" : (item.fLPaidLeave ?? ""));
-                    setCellValue('N', item.inTStatusId == 3 ? "" : (item.fLNotPaidLeave ?? ""));
-                    setCellValue('O', item.inTStatusId == 3 ? "" : (item.fLNotLeaveDay ?? ""));
-                    setCellValue('P', item.inTStatusId == 3 ? "" : (item.inTViolation ?? ""));
-                    setCellValue('Q', item.inTStatusId == 3 ? "" : (item.nvarchaRViolation ?? ''));
+                    setCellValue('L',item.fLGoLeaveLate ?? "0");
+                    setCellValue('M',item.fLPaidLeave ?? "0");
+                    setCellValue('N',item.fLNotPaidLeave ?? "0");
+                    setCellValue('O', item.fLNotLeaveDay ?? "0");
+                    setCellValue('P', item.inTViolation ?? "0");
+                    setCellValue('Q', item.nvarchaRViolation ?? '');
                     setCellValue('R', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
                     setCellValue('S', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
                     setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
