@@ -798,6 +798,8 @@ class MyData extends DataTableSource {
                   },
                 ),
                 SizedBox(width: 3),
+                if (authState.user?.chRGroup == 'Admin' ||
+                    authState.user?.chRGroup == 'Chief Per')
                 _buildActionButton(
                   icon: Iconsax.ram,
                   color: Colors.brown,
