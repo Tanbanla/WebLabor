@@ -212,30 +212,59 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
 
     return SizedBox(
       height: 300,
-      child: LineChart(
-        LineChartData(
-          lineTouchData: LineTouchData(enabled: true),
-          gridData: FlGridData(show: true),
+      child: BarChart(
+        BarChartData(
+          barTouchData: BarTouchData(
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                final month = monthlyData[groupIndex].month;
+                final label = rodIndex == 0
+                    ? tr('New')
+                    : rodIndex == 1
+                    ? tr('ChoDuyet')
+                    : tr('DaDuyet');
+                return BarTooltipItem(
+                  'Th$month\n$label: ${rod.toY.toInt()}',
+                  TextStyle(
+                    color: rodIndex == 0
+                        ? Colors.blue
+                        : rodIndex == 1
+                        ? Colors.orange
+                        : Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+              },
+            ),
+          ),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: true,
+            horizontalInterval: _calculateInterval(),
+            verticalInterval: 1,
+          ),
           titlesData: FlTitlesData(
             show: true,
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
+                reservedSize: 30,
+                interval: 1,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
                   if (index >= 0 && index < monthlyData.length) {
                     return Padding(
-                      padding: EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.only(top: 6),
                       child: Text(
-                        'Th${monthlyData[index].month}',
-                        style: TextStyle(fontSize: 10),
+                        'T${monthlyData[index].month}',
+                        style: TextStyle(fontSize: 10, color: Colors.grey[700]),
                       ),
                     );
                   }
                   return const SizedBox.shrink();
                 },
-                reservedSize: 30,
-                interval: 1,
               ),
             ),
             leftTitles: AxisTitles(
@@ -243,15 +272,20 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
                 showTitles: true,
                 interval: _calculateInterval(),
                 reservedSize: 40,
+                getTitlesWidget: (value, meta) => Text(
+                  value.toInt().toString(),
+                  style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+                ),
               ),
             ),
           ),
-          borderData: FlBorderData(show: true),
-          minX: 0,
-          maxX: (monthlyData.length).toDouble() - 1,
-          minY: 0,
+          borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.grey[300]!, width: 1),
+          ),
+          alignment: BarChartAlignment.spaceBetween,
           maxY: _getMaxYValue(),
-          lineBarsData: _buildLineBarsData(),
+          barGroups: _buildBarGroups(),
         ),
       ),
     );
@@ -259,7 +293,7 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
 
   double _calculateInterval() {
     double maxY = _getMaxYValue();
-    if (maxY <= 10) return 1;
+    if (maxY <= 10) return 2;
     if (maxY <= 50) return 5;
     if (maxY <= 100) return 10;
     if (maxY <= 500) return 50;
@@ -279,76 +313,42 @@ class _ContractStatsScreenState extends State<ContractStatsScreen> {
         max = data.totalApproved! as double;
       }
     }
-    return max + 10;
+    return max * 1; // Thêm 10% khoảng trống phía trên
   }
 
-  List<LineChartBarData> _buildLineBarsData() {
-    final List<LineChartBarData> lineBarsData = [];
-
-    if (_showNew) {
-      lineBarsData.add(
-        LineChartBarData(
-          spots: monthlyData.asMap().entries.map((entry) {
-            return FlSpot(
-              entry.key.toDouble(),
-              entry.value.totalNew?.toInt() as double,
-            );
-          }).toList(),
-          isCurved: true,
-          color: Colors.blue,
-          barWidth: 4,
-          isStrokeCapRound: true,
-          dotData: FlDotData(show: true),
-          belowBarData: BarAreaData(
-            show: true,
-            color: Colors.blue.withOpacity(0.3),
+  List<BarChartGroupData> _buildBarGroups() {
+    return monthlyData.asMap().entries.map((entry) {
+      final index = entry.key;
+      final data = entry.value;
+      final rods = <BarChartRodData>[];
+      if (_showNew) {
+        rods.add(
+          BarChartRodData(
+            toY: (data.totalNew ?? 0).toDouble(),
+            color: Colors.blue,
+            width: 8,
           ),
-        ),
-      );
-    }
-    if (_showWaitingApprove) {
-      lineBarsData.add(
-        LineChartBarData(
-          spots: monthlyData.asMap().entries.map((entry) {
-            return FlSpot(
-              entry.key.toDouble(),
-              entry.value.totalWaitingApprove?.toInt() as double,
-            );
-          }).toList(),
-          isCurved: true,
-          color: Colors.orange,
-          barWidth: 4,
-          isStrokeCapRound: true,
-          dotData: FlDotData(show: true),
-          belowBarData: BarAreaData(
-            show: true,
-            color: Colors.orange.withOpacity(0.3),
+        );
+      }
+      if (_showWaitingApprove) {
+        rods.add(
+          BarChartRodData(
+            toY: (data.totalWaitingApprove ?? 0).toDouble(),
+            color: Colors.orange,
+            width: 8,
           ),
-        ),
-      );
-    }
-
-    if (_showApproved) {
-      lineBarsData.add(
-        LineChartBarData(
-          spots: monthlyData.asMap().entries.map((entry) {
-            return FlSpot(
-              entry.key.toDouble(),
-              entry.value.totalApproved! as double,
-            );
-          }).toList(),
-          isCurved: true,
-          color: Colors.green,
-          barWidth: 4,
-          isStrokeCapRound: true,
-          dotData: FlDotData(show: true),
-          belowBarData: BarAreaData(
-            show: true,
-            color: Colors.green.withOpacity(0.3),
+        );
+      }
+      if (_showApproved) {
+        rods.add(
+          BarChartRodData(
+            toY: (data.totalApproved ?? 0).toDouble(),
+            color: Colors.green,
+            width: 8,
           ),
-        ),
-      );
-    }
-    return lineBarsData;
+        );
+      }
+      return BarChartGroupData(x: index, barRods: rods, barsSpace: 4);
+    }).toList();
   }
 }
