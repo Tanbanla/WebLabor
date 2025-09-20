@@ -147,21 +147,6 @@ class DashboardControllerApprentice extends GetxController {
     filterdataList.value = filteredList;
   }
 
-  // Filter by gender
-  void filterByGender(String query) {
-    if (query.isEmpty) {
-      refreshFilteredList();
-      return;
-    }
-
-    final filteredList = dataList.where((item) {
-      final gender = item.vchRTyperId?.toLowerCase() ?? '';
-      return gender.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
   // Filter by employee name
   void filterByEmployeeName(String query) {
     if (query.isEmpty) {
@@ -198,7 +183,6 @@ class DashboardControllerApprentice extends GetxController {
       refreshFilteredList();
       return;
     }
-
     final filteredList = dataList.where((item) {
       final group = item.chRCostCenterName?.toLowerCase() ?? '';
       return group.contains(query.toLowerCase());
@@ -206,37 +190,6 @@ class DashboardControllerApprentice extends GetxController {
 
     filterdataList.value = filteredList;
   }
-
-  // Filter by position
-  void filterByPosition(String query) {
-    if (query.isEmpty) {
-      refreshFilteredList();
-      return;
-    }
-
-    final filteredList = dataList.where((item) {
-      final position = item.chRPosition?.toLowerCase() ?? '';
-      return position.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Filter by result (ketqua)
-  void filterByResult(String query) {
-    if (query.isEmpty) {
-      refreshFilteredList();
-      return;
-    }
-
-    final filteredList = dataList.where((item) {
-      final result = item.vchRReasultsLeader?.toLowerCase() ?? '';
-      return result.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
   // Helper method to reset the filtered list to the original data
   void refreshFilteredList() {
     filterdataList.value = List.from(dataList);

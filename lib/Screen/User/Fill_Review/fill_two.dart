@@ -31,7 +31,9 @@ class FillTwoScreen extends StatefulWidget {
 
 class _FillTwoScreenState extends State<FillTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
-  final DashboardControllerPTHC controllerPTHC = Get.put(DashboardControllerPTHC());
+  final DashboardControllerPTHC controllerPTHC = Get.put(
+    DashboardControllerPTHC(),
+  );
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -43,14 +45,14 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .trim();
     controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       if (authState.user!.chRGroup.toString() == "PTHC") {
         sectionName = '';
         if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName = '[${controllerPTHC.listPTHCsection
-            .map((e) => '"$e"')
-            .join(',')}]';
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
         }
       }
       // truong hop PTHC phong ban
@@ -105,7 +107,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus(
@@ -207,7 +210,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                if (authState.user!.chRGroup.toString() == "PTHC" ||
+                    authState.user!.chRGroup.toString() == "Per" ||
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   await controllerTwo.changeStatus('PTHC', sectionName, null);
@@ -385,54 +389,75 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       children: [
         Expanded(
           child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
               color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
+                  spreadRadius: 2,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: TextField(
-              controller: controller.searchTextController,
-              onChanged: (value) {
-                controller.searchQuery(value);
-              },
-              decoration: InputDecoration(
-                hintText: tr('searchhint'),
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: Icon(
-                  Iconsax.search_normal,
-                  color: Colors.grey[500],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  tr('searchhint'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 16,
+                const SizedBox(width: 12),
+                _buildFilterFieldWithIcon(
+                  width: 240,
+                  hint: tr('DotDanhGia'),
+                  icon: Iconsax.document_filter,
+                  onChanged: (value) {
+                    controller.filterByApproverCode(value);
+                  },
                 ),
-                suffixIcon: controller.searchTextController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.close,
-                          size: 20,
-                          color: Colors.grey[500],
-                        ),
-                        onPressed: () {
-                          controller.searchTextController.clear();
-                          controller.searchQuery('');
-                        },
-                      )
-                    : null,
-              ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('employeeCode'),
+                  icon: Iconsax.tag,
+                  onChanged: (value) {
+                    controller.filterByEmployeeId(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 240,
+                  hint: tr('fullName'),
+                  icon: Iconsax.user,
+                  onChanged: (value) {
+                    controller.filterByEmployeeName(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 160,
+                  hint: tr('department'),
+                  icon: Iconsax.building_3,
+                  onChanged: (value) {
+                    controller.filterByDepartment(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('group'),
+                  icon: Iconsax.people,
+                  onChanged: (value) {
+                    controller.filterByGroup(value);
+                  },
+                ),
+              ],
             ),
           ),
         ),
-        const SizedBox(width: 12),
-
         // Action Buttons
         const SizedBox(width: 8),
         buildActionButton(
@@ -447,9 +472,53 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           icon: Iconsax.back_square,
           color: Colors.orange,
           tooltip: tr('ReturnS'),
-          onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(), sectionName, authState.user!.chRGroup.toString()),
+          onPressed: () => _ReturnSDialog(
+            authState.user!.chRUserid.toString(),
+            sectionName,
+            authState.user!.chRGroup.toString(),
+          ),
         ),
       ],
+    );
+  }
+
+  // Helper method to build filter input fields with icons
+  Widget _buildFilterFieldWithIcon({
+    required double width,
+    required String hint,
+    required IconData icon,
+    Function(String)? onChanged,
+  }) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          prefixIcon: Icon(icon, size: 20, color: Colors.grey[600]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.black54, width: 0.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+          ),
+          isDense: true,
+        ),
+        onChanged: onChanged,
+      ),
     );
   }
 
@@ -797,18 +866,40 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                    setCellValue('L',item.fLGoLeaveLate ?? "0");
-                    setCellValue('M',item.fLPaidLeave ?? "0");
-                    setCellValue('N',item.fLNotPaidLeave ?? "0");
-                    setCellValue('O', item.fLNotLeaveDay ?? "0");
-                    setCellValue('P', item.inTViolation ?? "0");
-                    setCellValue('Q', item.nvarchaRViolation ?? '');
-                    setCellValue('R', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
-                    setCellValue('S', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
-                    setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
-                    setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
-                    setCellValue('V', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
-                  setCellValue('W', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
+                  setCellValue('L', item.fLGoLeaveLate ?? "0");
+                  setCellValue('M', item.fLPaidLeave ?? "0");
+                  setCellValue('N', item.fLNotPaidLeave ?? "0");
+                  setCellValue('O', item.fLNotLeaveDay ?? "0");
+                  setCellValue('P', item.inTViolation ?? "0");
+                  setCellValue('Q', item.nvarchaRViolation ?? '');
+                  setCellValue(
+                    'R',
+                    item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''),
+                  );
+                  setCellValue(
+                    'S',
+                    item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''),
+                  );
+                  setCellValue(
+                    'T',
+                    item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''),
+                  );
+                  setCellValue(
+                    'U',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.vchRReasultsLeader ?? ''),
+                  );
+                  setCellValue(
+                    'V',
+                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
+                  );
+                  setCellValue(
+                    'W',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
 
@@ -918,7 +1009,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     );
   }
 
-  void _ReturnSDialog(String adid, String sectionName, String group){
+  void _ReturnSDialog(String adid, String sectionName, String group) {
     final controller = Get.find<DashboardControllerTwo>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -931,9 +1022,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: tr('reason'),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
@@ -949,19 +1038,15 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   return;
                 }
                 await controller.updateListTwoContractReturnSPTHC(
-                  adid,reasonController.text,
+                  adid,
+                  reasonController.text,
                 );
-                if (group == "PTHC" ||
-                    group == "Admin") {
+                if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
                   await controller.changeStatus('PTHC', sectionName, null);
                 } else {
                   // truong hop leader
-                  await controller.changeStatus(
-                    '4',
-                    sectionName,
-                    adid,
-                  );
+                  await controller.changeStatus('4', sectionName, adid);
                 }
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -987,19 +1072,22 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             },
             child: Text(tr('Confirm')),
           ),
-          Obx(() => messageError.value.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
-                  child: Text(
-                    messageError.value,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => messageError.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                    child: Text(
+                      messageError.value,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -1050,6 +1138,7 @@ class MyData extends DataTableSource {
       ),
     );
   }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -2481,7 +2570,8 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(
@@ -2742,7 +2832,8 @@ class _ReturnTwoContract extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Common {
-  //color
+  //color https://eduadmin-template.multipurposethemes.com/
   static var primaryColor = const Color(0xff296e48);
   static var blackColor = Colors.black54;
   static var greenColor = const Color.fromARGB(255, 156, 179, 131);

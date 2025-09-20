@@ -33,8 +33,14 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    // Load initial data once
     controller.fetchDummyData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -57,11 +63,48 @@ class _ReportApprenticeState extends State<ReportApprentice> {
             // Data Table
             Expanded(
               child: Obx(() {
+                // trigger rebuild when list changes
                 Visibility(
                   visible: false,
                   child: Text(controller.filterdataList.length.toString()),
                 );
-                return _buildDataTable();
+                return Stack(
+                  children: [
+                    Positioned.fill(child: _buildDataTable()),
+                    if (controller.isLoading.value)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.white.withOpacity(0.6),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator(strokeWidth: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!controller.isLoading.value &&
+                        controller.filterdataList.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.inbox,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'No data',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
               }),
             ),
           ],
@@ -90,94 +133,134 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       ],
     );
   }
-
   Widget _buildSearchAndActions() {
-    final DashboardControllerApprentice controller = Get.put(
-      DashboardControllerApprentice(),
-    );
-    // Extract section name safely
-    RxString errorMessage = ''.obs;
-    return Obx(() {
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+    final DashboardControllerApprentice controller = Get.find();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width - 120,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                  child: TextField(
-                    controller: controller.searchTextController,
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(tr('searchhint'), style: TextStyle(color: Colors.grey[600], fontSize: 18)),
+                  const SizedBox(width: 12),
+                  _buildFilterFieldWithIcon(
+                    width: 240,
+                    hint: tr('DotDanhGia'),
+                    icon: Iconsax.document_filter,
                     onChanged: (value) {
-                      controller.searchQuery(value);
+                      controller.filterByApproverCode(value);
                     },
-                    decoration: InputDecoration(
-                      hintText: tr('searchhint'),
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      prefixIcon: Icon(
-                        Iconsax.search_normal,
-                        color: Colors.grey[500],
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 16,
-                      ),
-                      suffixIcon:
-                          controller.searchTextController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.close,
-                                size: 20,
-                                color: Colors.grey[500],
-                              ),
-                              onPressed: () {
-                                controller.searchTextController.clear();
-                                controller.searchQuery('');
-                              },
-                            )
-                          : null,
-                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-
-              // Action Buttons
-              const SizedBox(width: 8),
-              buildActionButton(
-                icon: Iconsax.export,
-                color: Colors.green,
-                tooltip: tr('export'),
-                onPressed: () => _showExportDialog(),
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (errorMessage.isNotEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 1),
-                child: Text(
-                  errorMessage.value,
-                  style: TextStyle(color: Colors.red, fontSize: 14),
-                ),
+                  const SizedBox(width: 6),
+                  _buildFilterFieldWithIcon(
+                    width: 140,
+                    hint: tr('employeeCode'),
+                    icon: Iconsax.tag,
+                    onChanged: (value) {
+                      controller.filterByEmployeeId(value);
+                    },
+                  ),
+                  const SizedBox(width: 6),
+                  _buildFilterFieldWithIcon(
+                    width: 240,
+                    hint: tr('fullName'),
+                    icon: Iconsax.user,
+                    onChanged: (value) {
+                      controller.filterByEmployeeName(value);
+                    },
+                  ),
+                  const SizedBox(width: 6),
+                  _buildFilterFieldWithIcon(
+                    width: 160,
+                    hint: tr('department'),
+                    icon: Iconsax.building_3,
+                    onChanged: (value) {
+                      controller.filterByDepartment(value);
+                    },
+                  ),
+                  const SizedBox(width: 6),
+                  _buildFilterFieldWithIcon(
+                    width: 140,
+                    hint: tr('group'),
+                    icon: Iconsax.people,
+                    onChanged: (value) {
+                      controller.filterByGroup(value);
+                    },
+                  ),
+                ],
               ),
             ),
-        ],
-      );
-    });
+            const SizedBox(width: 12),
+            buildActionButton(
+              icon: Iconsax.export,
+              color: Colors.green,
+              tooltip: tr('export'),
+              onPressed: () => _showExportDialog(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build filter input fields with icons
+  Widget _buildFilterFieldWithIcon({
+    required double width,
+    required String hint,
+    required IconData icon,
+    Function(String)? onChanged,
+  }) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          prefixIcon: Icon(icon, size: 20, color: Colors.grey[600]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.black54, width: 0.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+          ),
+          isDense: true,
+        ),
+        onChanged: onChanged,
+      ),
+    );
   }
 
   Widget _buildDataTable() {
@@ -230,8 +313,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                 showCheckboxColumn: true,
                 showFirstLastButtons: true,
                 renderEmptyRowsInTheEnd: false,
-                rowsPerPage: 30,
-                availableRowsPerPage: const [30, 50, 100, 150],
+                rowsPerPage: 50,
+                availableRowsPerPage: const [50, 100, 150, 200],
                 onRowsPerPageChanged: (value) {},
                 sortColumnIndex: controller.sortCloumnIndex.value,
                 sortAscending: controller.sortAscending.value,
@@ -1322,128 +1405,6 @@ class MyData extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
-}
-
-// Add this method to the _ReportApprenticeState class to create column filters
-Widget _buildColumnFilters() {
-  final DashboardControllerApprentice controller = Get.find();
-  return Container(
-    color: Colors.grey[100],
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        width: 4680, // Same width as your data table
-        child: Row(
-          children: [
-            _buildFilterField(width: 70, hint: tr('stt')),
-            _buildFilterField(width: 100, hint: tr('action')),
-            _buildFilterField(
-              width: 130,
-              hint: tr('Hientrang'),
-              onChanged: (value) => controller.filterByStatus(value),
-            ),
-            _buildFilterField(
-              width: 180,
-              hint: tr('DotDanhGia'),
-              onChanged: (value) => controller.filterByApproverCode(value),
-            ),
-            _buildFilterField(
-              width: 100,
-              hint: tr('employeeCode'),
-              onChanged: (value) => controller.filterByEmployeeId(value),
-            ),
-            _buildFilterField(
-              width: 60,
-              hint: tr('gender'),
-              onChanged: (value) => controller.filterByGender(value),
-            ),
-            _buildFilterField(
-              width: 180,
-              hint: tr('fullName'),
-              onChanged: (value) => controller.filterByEmployeeName(value),
-            ),
-            _buildFilterField(
-              width: 120,
-              hint: tr('department'),
-              onChanged: (value) => controller.filterByDepartment(value),
-            ),
-            _buildFilterField(
-              width: 100,
-              hint: tr('group'),
-              onChanged: (value) => controller.filterByGroup(value),
-            ),
-            _buildFilterField(width: 70, hint: tr('age')),
-            _buildFilterField(
-              width: 100,
-              hint: tr('position'),
-              onChanged: (value) => controller.filterByPosition(value),
-            ),
-            _buildFilterField(width: 100, hint: tr('salaryGrade')),
-            _buildFilterField(width: 120, hint: tr('contractEffective')),
-            _buildFilterField(width: 120, hint: tr('contractEndDate')),
-            _buildFilterField(width: 110, hint: tr('earlyLateCount')),
-            _buildFilterField(width: 90, hint: tr('unreportedLeave')),
-            _buildFilterField(width: 130, hint: tr('violationCount')),
-            _buildFilterField(width: 150, hint: tr('reason')),
-            _buildFilterField(width: 130, hint: tr('lythuyet')),
-            _buildFilterField(width: 130, hint: tr('thuchanh')),
-            _buildFilterField(width: 130, hint: tr('congviec')),
-            _buildFilterField(width: 130, hint: tr('hochoi')),
-            _buildFilterField(width: 130, hint: tr('thichnghi')),
-            _buildFilterField(width: 150, hint: tr('tinhthan')),
-            _buildFilterField(width: 130, hint: tr('baocao')),
-            _buildFilterField(width: 130, hint: tr('chaphanh')),
-            _buildFilterField(
-              width: 150,
-              hint: tr('ketqua'),
-              onChanged: (value) => controller.filterByResult(value),
-            ),
-            _buildFilterField(width: 150, hint: tr('note')),
-            _buildFilterField(width: 170, hint: tr('notRehirable')),
-            _buildFilterField(width: 170, hint: tr('Lydo')),
-            _buildFilterField(width: 100, hint: tr('Nguoilap')),
-            _buildFilterField(width: 150, hint: tr('Nhansu')),
-            _buildFilterField(width: 150, hint: tr('NguoiDanhgia')),
-            _buildFilterField(width: 150, hint: tr('TruongPhong')),
-            _buildFilterField(width: 150, hint: tr('QuanLyCC')),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-// Helper method to build filter input fields
-Widget _buildFilterField({
-  required double width,
-  required String hint,
-  Function(String)? onChanged,
-}) {
-  return Container(
-    width: width,
-    margin: const EdgeInsets.symmetric(horizontal: 6),
-    child: TextField(
-      style: TextStyle(fontSize: 12),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(fontSize: 10, color: Colors.grey),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        isDense: true,
-      ),
-      onChanged: onChanged,
-    ),
-  );
 }
 
 // Edit thông tin hợp đồng

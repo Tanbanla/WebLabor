@@ -257,49 +257,63 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
       children: [
         Expanded(
           child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
               color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
+                  spreadRadius: 2,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: TextField(
-              controller: controller.searchTextController,
-              onChanged: (value) {
-                controller.searchQuery(value);
-              },
-              decoration: InputDecoration(
-                hintText: tr('searchhint'),
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: Icon(
-                  Iconsax.search_normal,
-                  color: Colors.grey[500],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  tr('searchhint'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 16,
+                const SizedBox(width: 12),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('employeeCode'),
+                  icon: Iconsax.tag,
+                  onChanged: (value) {
+                    controller.filterByEmployeeId(value);
+                  },
                 ),
-                suffixIcon: controller.searchTextController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.close,
-                          size: 20,
-                          color: Colors.grey[500],
-                        ),
-                        onPressed: () {
-                          controller.searchTextController.clear();
-                          controller.searchQuery('');
-                        },
-                      )
-                    : null,
-              ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 240,
+                  hint: tr('fullName'),
+                  icon: Iconsax.user,
+                  onChanged: (value) {
+                    controller.filterByEmployeeName(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 160,
+                  hint: tr('department'),
+                  icon: Iconsax.building_3,
+                  onChanged: (value) {
+                    controller.filterByDepartment(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('group'),
+                  icon: Iconsax.people,
+                  onChanged: (value) {
+                    controller.filterByGroup(value);
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -344,6 +358,46 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
           },
         ),
       ],
+    );
+  }
+
+  // Helper method to build filter input fields with icons
+  Widget _buildFilterFieldWithIcon({
+    required double width,
+    required String hint,
+    required IconData icon,
+    Function(String)? onChanged,
+  }) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          prefixIcon: Icon(icon, size: 20, color: Colors.grey[600]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.black54, width: 0.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+          ),
+          isDense: true,
+        ),
+        onChanged: onChanged,
+      ),
     );
   }
 
@@ -943,7 +997,7 @@ class MyData extends DataTableSource {
 
   MyData(this.context);
 
-    void _copyToClipboard(String text) {
+  void _copyToClipboard(String text) {
     if (text.isEmpty) return;
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -971,6 +1025,7 @@ class MyData extends DataTableSource {
       ),
     );
   }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];

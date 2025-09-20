@@ -256,58 +256,67 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       children: [
         Expanded(
           child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
               color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
+                  spreadRadius: 2,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: TextField(
-              controller: controller.searchTextController,
-              onChanged: (value) {
-                controller.searchQuery(value);
-              },
-              // onEditingComplete: () {
-              //   // Khi nhấn nút Done/Enter trên bàn phím
-              //   controller.searchQuery(controller.searchTextController.text);
-              // },
-              decoration: InputDecoration(
-                hintText: tr('searchhint'),
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: Icon(
-                  Iconsax.search_normal,
-                  color: Colors.grey[500],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  tr('searchhint'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 16,
+                const SizedBox(width: 12),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('employeeCode'),
+                  icon: Iconsax.tag,
+                  onChanged: (value) {
+                    controller.filterByEmployeeId(value);
+                  },
                 ),
-                suffixIcon: controller.searchTextController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.close,
-                          size: 20,
-                          color: Colors.grey[500],
-                        ),
-                        onPressed: () {
-                          controller.searchTextController.clear();
-                          controller.searchQuery('');
-                        },
-                      )
-                    : null,
-              ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 240,
+                  hint: tr('fullName'),
+                  icon: Iconsax.user,
+                  onChanged: (value) {
+                    controller.filterByEmployeeName(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 160,
+                  hint: tr('department'),
+                  icon: Iconsax.building_3,
+                  onChanged: (value) {
+                    controller.filterByDepartment(value);
+                  },
+                ),
+                const SizedBox(width: 6),
+                _buildFilterFieldWithIcon(
+                  width: 140,
+                  hint: tr('group'),
+                  icon: Iconsax.people,
+                  onChanged: (value) {
+                    controller.filterByGroup(value);
+                  },
+                ),
+              ],
             ),
           ),
         ),
         const SizedBox(width: 12),
-
         // Action Buttons
         buildActionButton(
           icon: Iconsax.import,
@@ -347,6 +356,46 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
           },
         ),
       ],
+    );
+  }
+
+  // Helper method to build filter input fields with icons
+  Widget _buildFilterFieldWithIcon({
+    required double width,
+    required String hint,
+    required IconData icon,
+    Function(String)? onChanged,
+  }) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          prefixIcon: Icon(icon, size: 20, color: Colors.grey[600]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.black54, width: 0.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+          ),
+          isDense: true,
+        ),
+        onChanged: onChanged,
+      ),
     );
   }
 
@@ -809,17 +858,34 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                       ).format(DateTime.parse(item.dtMEndDate!)),
                     );
                   }
-                    setCellValue('L',item.fLGoLeaveLate ?? "0");
-                    setCellValue('M',item.fLPaidLeave ?? "0");
-                    setCellValue('N',item.fLNotPaidLeave ?? "0");
-                    setCellValue('O', item.fLNotLeaveDay ?? "0");
-                    setCellValue('P', item.inTViolation ?? "0");
-                    setCellValue('Q', item.nvarchaRViolation ?? '');
-                    setCellValue('R', item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''));
-                    setCellValue('S', item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''));
-                    setCellValue('T', item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''));
-                    setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
-                    setCellValue('V', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
+                  setCellValue('L', item.fLGoLeaveLate ?? "0");
+                  setCellValue('M', item.fLPaidLeave ?? "0");
+                  setCellValue('N', item.fLNotPaidLeave ?? "0");
+                  setCellValue('O', item.fLNotLeaveDay ?? "0");
+                  setCellValue('P', item.inTViolation ?? "0");
+                  setCellValue('Q', item.nvarchaRViolation ?? '');
+                  setCellValue(
+                    'R',
+                    item.inTStatusId == 3 ? "" : (item.nvchRCompleteWork ?? ''),
+                  );
+                  setCellValue(
+                    'S',
+                    item.inTStatusId == 3 ? "" : (item.nvchRUseful ?? ''),
+                  );
+                  setCellValue(
+                    'T',
+                    item.inTStatusId == 3 ? "" : (item.nvchROther ?? ''),
+                  );
+                  setCellValue(
+                    'U',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.vchRReasultsLeader ?? ''),
+                  );
+                  setCellValue(
+                    'V',
+                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
+                  );
                   setCellValue(
                     'W',
                     item.biTNoReEmployment == null
@@ -986,6 +1052,7 @@ class MyData extends DataTableSource {
       ),
     );
   }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -1316,8 +1383,11 @@ class _EditTwoContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField(
-                      value: controller.listSection.contains(edited.vchRCodeSection) 
-                          ? edited.vchRCodeSection 
+                      value:
+                          controller.listSection.contains(
+                            edited.vchRCodeSection,
+                          )
+                          ? edited.vchRCodeSection
                           : null,
                       decoration: InputDecoration(
                         labelText: tr('department'),

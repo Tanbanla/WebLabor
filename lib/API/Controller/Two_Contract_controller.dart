@@ -60,7 +60,83 @@ class DashboardControllerTwo extends GetxController {
     }
     return selectedItems;
   }
+  // Filter by approver code (DotDanhGia)
+  void filterByApproverCode(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
 
+    final filteredList = dataList.where((item) {
+      final code = item.vchRCodeApprover?.toLowerCase() ?? '';
+      return code.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee ID
+  void filterByEmployeeId(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final id = item.vchREmployeeId?.toLowerCase() ?? '';
+      return id.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee name
+  void filterByEmployeeName(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final name = item.vchREmployeeName?.toLowerCase() ?? '';
+      return name.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by department
+  void filterByDepartment(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final department = item.vchRNameSection?.toLowerCase() ?? '';
+      return department.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by group
+  void filterByGroup(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+    final filteredList = dataList.where((item) {
+      final group = item.chRCostCenterName?.toLowerCase() ?? '';
+      return group.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+  // Helper method to reset the filtered list to the original data
+  void refreshFilteredList() {
+    filterdataList.value = List.from(dataList);
+  }
   //sap xep du lieu
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
