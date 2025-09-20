@@ -804,6 +804,35 @@ class MyData extends DataTableSource {
   final DashboardControllerApprentice controller = Get.find();
   final BuildContext context;
   MyData(this.context);
+
+  void _copyToClipboard(String text) {
+    if (text.isEmpty) return;
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied: $text'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Widget _buildCopyCell(String? value) {
+    final txt = value ?? '';
+    return InkWell(
+      onTap: () => _copyToClipboard(txt),
+      child: Row(
+        children: [
+          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
+          Text(
+            txt,
+            style: TextStyle(fontSize: Common.sizeColumn),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -856,30 +885,18 @@ class MyData extends DataTableSource {
         //   ),
         // ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
-        DataCell(
-          Text(
-            data.vchRCodeApprover ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.vchREmployeeId ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchRCodeApprover
+        DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        // Copyable vchREmployeeId
+        DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
           Text(
             data.vchRTyperId ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(
-          Text(
-            data.vchREmployeeName ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchREmployeeName
+        DataCell(_buildCopyCell(data.vchREmployeeName)),
         DataCell(
           Text(
             data.vchRNameSection ?? "",

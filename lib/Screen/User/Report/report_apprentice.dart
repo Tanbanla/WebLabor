@@ -471,6 +471,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
           return 'Not Error';
       }
     }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -549,27 +550,79 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   setCellValue('I', getAgeFromBirthday(item.dtMBrithday));
                   setCellValue('J', item.chRPosition ?? '');
                   setCellValue('K', item.chRCodeGrade ?? '');
-                    if (item.dtMJoinDate != null) {
-                    setCellValue('L', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
-                    }
-                    if (item.dtMEndDate != null) {
-                    setCellValue('M', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
-                    }
+                  if (item.dtMJoinDate != null) {
+                    setCellValue(
+                      'L',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue(
+                      'M',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
+                  }
                   setCellValue('N', item.fLGoLeaveLate ?? '0');
                   setCellValue('O', item.fLNotLeaveDay ?? '0');
                   setCellValue('P', item.inTViolation ?? '0');
-                  setCellValue('Q', item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''));
-                  setCellValue('R', item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''));
-                  setCellValue('S', item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''));
-                  setCellValue('T', item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''));
-                  setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''));
-                  setCellValue('V', item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''));
-                  setCellValue('W', item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''));
-                  setCellValue('X', item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''));
-                  setCellValue('Y', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
-                  setCellValue('Z', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
-                  setCellValue('AA', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
-                  setCellValue('AB', item.inTStatusId == 3 ? "" : (item.nvchRNoReEmpoyment ?? ''));
+                  setCellValue(
+                    'Q',
+                    item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''),
+                  );
+                  setCellValue(
+                    'R',
+                    item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''),
+                  );
+                  setCellValue(
+                    'S',
+                    item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''),
+                  );
+                  setCellValue(
+                    'T',
+                    item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''),
+                  );
+                  setCellValue(
+                    'U',
+                    item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''),
+                  );
+                  setCellValue(
+                    'V',
+                    item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''),
+                  );
+                  setCellValue(
+                    'W',
+                    item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''),
+                  );
+                  setCellValue(
+                    'X',
+                    item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''),
+                  );
+                  setCellValue(
+                    'Y',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.vchRReasultsLeader ?? ''),
+                  );
+                  setCellValue(
+                    'Z',
+                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
+                  );
+                  setCellValue(
+                    'AA',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
+                  setCellValue(
+                    'AB',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.nvchRNoReEmpoyment ?? ''),
+                  );
                   setCellValue('AC', item.vchRUserCreate ?? '');
                   setCellValue('AD', item.useRApproverPer ?? '');
                   setCellValue('AE', item.vchRLeaderEvalution ?? '');
@@ -704,7 +757,36 @@ class MyData extends DataTableSource {
   final DashboardControllerApprentice controller = Get.find();
   final BuildContext context;
   MyData(this.context);
-  
+
+  void _copyToClipboard(String text) {
+    if (text.isEmpty) return;
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied: $text'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Widget _buildCopyCell(String? value) {
+    final txt = value ?? '';
+    return InkWell(
+      onTap: () => _copyToClipboard(txt),
+      child: Row(
+        children: [
+          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
+          Text(
+            txt,
+            style: TextStyle(fontSize: Common.sizeColumn),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -712,7 +794,7 @@ class MyData extends DataTableSource {
       text: switch (data.inTStatusId) {
         6 => data.nvchRApproverChief ?? '',
         7 => data.nvchRApproverManager ?? '',
-        _ => '', // Giá trị mặc định cho các trường hợp khác
+        _ => '',
       },
     );
     final authState = Provider.of<AuthState>(context, listen: true);
@@ -720,9 +802,7 @@ class MyData extends DataTableSource {
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
       ) {
-        if (index.isEven) {
-          return Colors.grey[50];
-        }
+        if (index.isEven) return Colors.grey[50];
         return null;
       }),
       onTap: () {},
@@ -738,11 +818,11 @@ class MyData extends DataTableSource {
             (index + 1).toString(),
             style: TextStyle(
               color: Colors.blue[800],
-              fontSize: Common.sizeColumn, // Added fontSize 12
+              fontSize: Common.sizeColumn,
             ),
           ),
         ),
-        //Action
+        // Action
         DataCell(
           Center(
             child: Row(
@@ -782,17 +862,17 @@ class MyData extends DataTableSource {
                 ),
                 SizedBox(width: 3),
                 if (authState.user?.chRGroup == 'Admin' ||
-                  authState.user?.chRGroup == 'Chief Per')
-                _buildActionButton(
-                  icon: Iconsax.ram,
-                  color: Colors.brown,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => _UpdateKetQua(contract: data),
-                    );
-                  },
-                ),
+                    authState.user?.chRGroup == 'Chief Per')
+                  _buildActionButton(
+                    icon: Iconsax.ram,
+                    color: Colors.brown,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => _UpdateKetQua(contract: data),
+                      );
+                    },
+                  ),
                 const SizedBox(width: 3),
                 if (authState.user?.chRGroup == 'Admin' ||
                     authState.user?.chRGroup == 'Chief Per')
@@ -811,30 +891,18 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
-        DataCell(
-          Text(
-            data.vchRCodeApprover ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.vchREmployeeId ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchRCodeApprover
+        DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        // Copyable vchREmployeeId
+        DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
           Text(
             data.vchRTyperId ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(
-          Text(
-            data.vchREmployeeName ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchREmployeeName
+        DataCell(_buildCopyCell(data.vchREmployeeName)),
         DataCell(
           Text(
             data.vchRNameSection ?? "",
@@ -911,8 +979,7 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-
-        // Cac thuoc tinh danh gia
+        // Đánh giá
         DataCell(
           _getDanhGiaView(
             controller.filterdataList[index].vchRLyThuyet ?? 'OK',
@@ -1021,7 +1088,6 @@ class MyData extends DataTableSource {
           Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
-                // Chỉ update khi mất focus
                 controller.updateNotRehireReasonApprovel(
                   data.vchREmployeeId.toString(),
                   reasonController.text,
@@ -1042,7 +1108,7 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        // các thuộc tính phê duyệt
+        // Phê duyệt
         DataCell(
           Text(
             data.vchRUserCreate?.toString() ?? "",
@@ -1273,43 +1339,43 @@ Widget _buildColumnFilters() {
             _buildFilterField(width: 70, hint: tr('stt')),
             _buildFilterField(width: 100, hint: tr('action')),
             _buildFilterField(
-              width: 130, 
+              width: 130,
               hint: tr('Hientrang'),
               onChanged: (value) => controller.filterByStatus(value),
             ),
             _buildFilterField(
-              width: 180, 
+              width: 180,
               hint: tr('DotDanhGia'),
               onChanged: (value) => controller.filterByApproverCode(value),
             ),
             _buildFilterField(
-              width: 100, 
+              width: 100,
               hint: tr('employeeCode'),
               onChanged: (value) => controller.filterByEmployeeId(value),
             ),
             _buildFilterField(
-              width: 60, 
+              width: 60,
               hint: tr('gender'),
               onChanged: (value) => controller.filterByGender(value),
             ),
             _buildFilterField(
-              width: 180, 
+              width: 180,
               hint: tr('fullName'),
               onChanged: (value) => controller.filterByEmployeeName(value),
             ),
             _buildFilterField(
-              width: 120, 
+              width: 120,
               hint: tr('department'),
               onChanged: (value) => controller.filterByDepartment(value),
             ),
             _buildFilterField(
-              width: 100, 
+              width: 100,
               hint: tr('group'),
               onChanged: (value) => controller.filterByGroup(value),
             ),
             _buildFilterField(width: 70, hint: tr('age')),
             _buildFilterField(
-              width: 100, 
+              width: 100,
               hint: tr('position'),
               onChanged: (value) => controller.filterByPosition(value),
             ),
@@ -1329,7 +1395,7 @@ Widget _buildColumnFilters() {
             _buildFilterField(width: 130, hint: tr('baocao')),
             _buildFilterField(width: 130, hint: tr('chaphanh')),
             _buildFilterField(
-              width: 150, 
+              width: 150,
               hint: tr('ketqua'),
               onChanged: (value) => controller.filterByResult(value),
             ),
@@ -1350,9 +1416,9 @@ Widget _buildColumnFilters() {
 
 // Helper method to build filter input fields
 Widget _buildFilterField({
-  required double width, 
-  required String hint, 
-  Function(String)? onChanged
+  required double width,
+  required String hint,
+  Function(String)? onChanged,
 }) {
   return Container(
     width: width,
@@ -1779,7 +1845,8 @@ class _EditContractDialog extends StatelessWidget {
       ],
     );
   }
-// widget không được phép sửa
+
+  // widget không được phép sửa
   Widget _buildCompactReadOnlyField({
     required String value,
     required String label,
@@ -1816,6 +1883,7 @@ class _EditContractDialog extends StatelessWidget {
     );
     return content;
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -2287,7 +2355,7 @@ class _UpdateKetQua extends StatelessWidget {
 
                     controller.isLoading(true);
                     try {
-                      if(reson.value.isEmpty){
+                      if (reson.value.isEmpty) {
                         errorMessage.value = tr('pleaseReason');
                         controller.isLoading(false);
                         return;
@@ -2355,6 +2423,7 @@ class _UpdateKetQua extends StatelessWidget {
         return Colors.grey;
     }
   }
+
   Widget _buildCompactTextField({
     required String? initialValue,
     required String label,
@@ -2524,7 +2593,7 @@ class _ReturnContract extends StatelessWidget {
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
-                        "Trả về từ báo cáo của nhân sự"
+                        "Trả về từ báo cáo của nhân sự",
                       );
                       // Refresh dữ liệu
                       await controller.fetchDummyData();

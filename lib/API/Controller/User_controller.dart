@@ -230,9 +230,7 @@ class DashboardControllerUser extends GetxController {
         fetchUserData();
       } else {
         final errorResponse = json.decode(response.body);
-        throw Exception(
-          '${errorResponse['message'] ?? response.body}',
-        );
+        throw Exception('${errorResponse['message'] ?? response.body}');
       }
     } catch (e) {
       showError('Failed to add user: $e');
@@ -425,7 +423,7 @@ class DashboardControllerUser extends GetxController {
   Future<void> deleteUser(int id) async {
     try {
       isLoading(true);
-      var endpoint = Common.DeleteIDLogic; 
+      var endpoint = Common.DeleteIDLogic;
       final index = userList.indexWhere(
         (item) => item.id == id && item.inTLock == 2,
       );
@@ -475,9 +473,19 @@ class DashboardControllerUser extends GetxController {
     }
     return null;
   }
+
   // send mail
   Future<void> SendMail(String code, String to, String cc, String bcc) async {
     try {
+      if (to.isEmpty || to == "null") {
+        to = "";
+      }
+      if (cc.isEmpty || cc == "null") {
+        cc = "";
+      }
+      if (bcc.isEmpty || bcc == "null") {
+        bcc = "";
+      }
       isLoading(true);
       final requestBody = {
         "code_master_mail": code,
@@ -562,6 +570,7 @@ class DashboardControllerUser extends GetxController {
       isLoading(false);
     }
   }
+
   // send mail KetQua
   Future<void> SendMailKetQua(
     String to,
@@ -574,7 +583,8 @@ class DashboardControllerUser extends GetxController {
     try {
       isLoading(true);
       final requestBody = {
-        "title": "THÔNG BÁO: YÊU CẦU SỬA KẾT QUẢ ĐÁNH GIÁ HỢP ĐỒNG ĐÃ HOÀN THÀNH<br/>件名：通知：完了した契約評価結果の修正依頼",
+        "title":
+            "THÔNG BÁO: YÊU CẦU SỬA KẾT QUẢ ĐÁNH GIÁ HỢP ĐỒNG ĐÃ HOÀN THÀNH<br/>件名：通知：完了した契約評価結果の修正依頼",
         "mail_from": "LaborContractEvaluationSystem@brothergroup.net",
         "mail_to": to == "null" ? "" : to,
         "mail_cc": cc == "null" ? "" : cc,
@@ -594,9 +604,7 @@ class DashboardControllerUser extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-
-        }
+        if (jsonData['success'] == true) {}
       } else {
         throw Exception('Failed to load users');
       }

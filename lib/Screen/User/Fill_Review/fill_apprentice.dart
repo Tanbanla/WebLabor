@@ -33,7 +33,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
-  final DashboardControllerPTHC controllerPTHC = Get.put(DashboardControllerPTHC());
+  final DashboardControllerPTHC controllerPTHC = Get.put(
+    DashboardControllerPTHC(),
+  );
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -45,15 +47,14 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .trim();
     controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
-
       if (authState.user!.chRGroup.toString() == "PTHC") {
         sectionName = '';
         if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName = '[${controllerPTHC.listPTHCsection
-            .map((e) => '"$e"')
-            .join(',')}]';
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
         }
       }
       // truong hop PTHC phong ban
@@ -108,12 +109,13 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .split(':')[1]
         .trim();
     final controller = Get.put(DashboardControllerUserApprover());
-    if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+    if (authState.user!.chRGroup.toString() == "PTHC" ||
+        authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus(
         'ADM-PER',
-        'Leader,Supervisor,Staff,Section Manager',
+        'Leader,Supervisor,Staff,Section Manager,Expert',
       );
     } else {
       // truong hop leader
@@ -210,7 +212,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                if (authState.user!.chRGroup.toString() == "PTHC" ||
+                    authState.user!.chRGroup.toString() == "Per" ||
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
 
@@ -443,14 +446,18 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           tooltip: tr('export'),
           onPressed: () => _showExportDialog(),
         ),
-                    // từ chối nhiều
-            const SizedBox(width: 8),
-            buildActionButton(
-              icon: Iconsax.back_square,
-              color: Colors.orange,
-              tooltip: tr('ReturnS'),
-              onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(), sectionName, authState.user!.chRGroup.toString()),
-            ),
+        // từ chối nhiều
+        const SizedBox(width: 8),
+        buildActionButton(
+          icon: Iconsax.back_square,
+          color: Colors.orange,
+          tooltip: tr('ReturnS'),
+          onPressed: () => _ReturnSDialog(
+            authState.user!.chRUserid.toString(),
+            sectionName,
+            authState.user!.chRGroup.toString(),
+          ),
+        ),
       ],
     );
   }
@@ -783,27 +790,79 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   setCellValue('G', getAgeFromBirthday(item.dtMBrithday));
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
-                    if (item.dtMJoinDate != null) {
-                    setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
-                    }
-                    if (item.dtMEndDate != null) {
-                    setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
-                    }
+                  if (item.dtMJoinDate != null) {
+                    setCellValue(
+                      'J',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue(
+                      'K',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
+                  }
                   setCellValue('L', item.fLGoLeaveLate ?? '0');
                   setCellValue('M', item.fLNotLeaveDay ?? '0');
                   setCellValue('N', item.inTViolation ?? '0');
-                  setCellValue('O', item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''));
-                  setCellValue('P', item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''));
-                  setCellValue('Q', item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''));
-                  setCellValue('R', item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''));
-                  setCellValue('S', item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''));
-                  setCellValue('T', item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''));
-                  setCellValue('U', item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''));
-                  setCellValue('V', item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''));
-                  setCellValue('W', item.inTStatusId == 3 ? "" : (item.vchRReasultsLeader ?? ''));
-                  setCellValue('X', item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''));
-                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
-                  setCellValue('Z', item.inTStatusId == 3 ? "" : (item.nvchRNoReEmpoyment ?? ''));
+                  setCellValue(
+                    'O',
+                    item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''),
+                  );
+                  setCellValue(
+                    'P',
+                    item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''),
+                  );
+                  setCellValue(
+                    'Q',
+                    item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''),
+                  );
+                  setCellValue(
+                    'R',
+                    item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''),
+                  );
+                  setCellValue(
+                    'S',
+                    item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''),
+                  );
+                  setCellValue(
+                    'T',
+                    item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''),
+                  );
+                  setCellValue(
+                    'U',
+                    item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''),
+                  );
+                  setCellValue(
+                    'V',
+                    item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''),
+                  );
+                  setCellValue(
+                    'W',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.vchRReasultsLeader ?? ''),
+                  );
+                  setCellValue(
+                    'X',
+                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
+                  );
+                  setCellValue(
+                    'Y',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
+                  setCellValue(
+                    'Z',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.nvchRNoReEmpoyment ?? ''),
+                  );
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }
 
@@ -926,9 +985,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: tr('reason'),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
@@ -936,7 +993,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(tr('Cancel')),
           ),
-          
+
           ElevatedButton(
             onPressed: () async {
               try {
@@ -945,20 +1002,16 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   return;
                 }
                 await controller.updateListContractReturnSPTHC(
-                  adid,reasonController.text,
+                  adid,
+                  reasonController.text,
                 );
-                if (group == "PTHC" ||
-                    group == "Admin") {
+                if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
 
                   await controller.changeStatus('PTHC', sectionName, null);
                 } else {
                   // truong hop leader
-                  await controller.changeStatus(
-                    '4',
-                    sectionName,
-                    adid,
-                  );
+                  await controller.changeStatus('4', sectionName, adid);
                 }
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -984,15 +1037,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             },
             child: Text(tr('Confirm')),
           ),
-          Obx(() => messageError.value.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
-                  child: Text(
-                    messageError.value,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => messageError.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                    child: Text(
+                      messageError.value,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -1019,6 +1074,35 @@ class MyData extends DataTableSource {
   final DashboardControllerApprentice controller = Get.find();
   final BuildContext context;
   MyData(this.context);
+  void _copyToClipboard(String text) {
+    if (text.isEmpty) return;
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied: $text'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  Widget _buildCopyCell(String? value) {
+    final txt = value ?? '';
+    return InkWell(
+      onTap: () => _copyToClipboard(txt),
+      child: Row(
+        children: [
+          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
+          Text(
+            txt,
+            style: TextStyle(fontSize: Common.sizeColumn),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -1063,45 +1147,32 @@ class MyData extends DataTableSource {
         //Action
         DataCell(
           Center(
-            child:                 
-              _buildActionButton(
-                  icon: Iconsax.back_square,
-                  color: Colors.red,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          _ReturnConApprenticetract(contract: data),
-                    );
-                  },
-                ),
+            child: _buildActionButton(
+              icon: Iconsax.back_square,
+              color: Colors.red,
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      _ReturnConApprenticetract(contract: data),
+                );
+              },
+            ),
           ),
         ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
-        DataCell(
-          Text(
-            data.vchRCodeApprover ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.vchREmployeeId ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchRCodeApprover
+        DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        // Copyable vchREmployeeId
+        DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
           Text(
             data.vchRTyperId ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
-        DataCell(
-          Text(
-            data.vchREmployeeName ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        // Copyable vchREmployeeName
+        DataCell(_buildCopyCell(data.vchREmployeeName)),
         DataCell(
           Text(
             data.vchRNameSection ?? "",
@@ -2012,113 +2083,118 @@ class MyData extends DataTableSource {
           (data.inTStatusId ?? 0) == 3
               ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
               : Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNote(
-            data.vchREmployeeId.toString(),
-            noteController.text,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: noteController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('note'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+                  onFocusChange: (hasFocus) {
+                    if (!hasFocus) {
+                      // Chỉ update khi mất focus
+                      controller.updateNote(
+                        data.vchREmployeeId.toString(),
+                        noteController.text,
+                      );
+                    }
+                  },
+                  child: TextFormField(
+                    controller: noteController,
+                    style: TextStyle(fontSize: Common.sizeColumn),
+                    decoration: InputDecoration(
+                      labelText: tr('note'),
+                      labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ),
         // Truong hop tuyen dung lai hay khong
         DataCell(
           (data.inTStatusId ?? 0) == 3
               ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
               : Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus =
-                controller.filterdataList[index].biTNoReEmployment ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-            controller.updateRehireStatus(
-              data.vchREmployeeId.toString(),
-              newValue == 'OK',
-            );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-            value: 'OK',
-            child: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  'O',
-                  style: TextStyle(
-              fontSize: Common.sizeColumn,
-              color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-                ),
-                DropdownMenuItem(
-            value: 'NG',
-            child: Row(
-              children: [
-                Icon(Icons.cancel, color: Colors.red, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  'X',
-                  style: TextStyle(
-              fontSize: Common.sizeColumn,
-              color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-                ),
-              ],
-            );
-          }),
+                  Visibility(
+                    visible: false,
+                    child: Text(controller.filterdataList[index].toString()),
+                  );
+                  final rawStatus =
+                      controller.filterdataList[index].biTNoReEmployment ??
+                      true;
+                  final status = rawStatus ? 'OK' : 'NG';
+                  return DropdownButton<String>(
+                    value: status,
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        controller.updateRehireStatus(
+                          data.vchREmployeeId.toString(),
+                          newValue == 'OK',
+                        );
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: 'OK',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 16,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              'O',
+                              style: TextStyle(
+                                fontSize: Common.sizeColumn,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'NG',
+                        child: Row(
+                          children: [
+                            Icon(Icons.cancel, color: Colors.red, size: 16),
+                            SizedBox(width: 4),
+                            Text(
+                              'X',
+                              style: TextStyle(
+                                fontSize: Common.sizeColumn,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }),
         ),
         // Lý do không tuyển lại
         DataCell(
           (data.inTStatusId ?? 0) == 3
               ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
               : Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNotRehireReason(
-            data.vchREmployeeId.toString(),
-            reasonController.text,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+                  onFocusChange: (hasFocus) {
+                    if (!hasFocus) {
+                      // Chỉ update khi mất focus
+                      controller.updateNotRehireReason(
+                        data.vchREmployeeId.toString(),
+                        reasonController.text,
+                      );
+                    }
+                  },
+                  child: TextFormField(
+                    controller: reasonController,
+                    style: TextStyle(fontSize: Common.sizeColumn),
+                    decoration: InputDecoration(
+                      labelText: tr('reason'),
+                      labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ),
 
         /// phần từ chối phê duyệt
@@ -2208,7 +2284,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text('Per/人事課の中級管理職', style: TextStyle(color: Colors.purple[800])),
+          child: Text(
+            'Per/人事課の中級管理職',
+            style: TextStyle(color: Colors.purple[800]),
+          ),
         );
       case 3:
         return Container(
@@ -2238,7 +2317,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('QLTC/中級管理職', style: TextStyle(color: Colors.yellow[800])),
+          child: Text(
+            'QLTC/中級管理職',
+            style: TextStyle(color: Colors.yellow[800]),
+          ),
         );
       case 7:
         return Container(
@@ -2258,7 +2340,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text('Director/管掌取締役', style: TextStyle(color: Colors.brown[800])),
+          child: Text(
+            'Director/管掌取締役',
+            style: TextStyle(color: Colors.brown[800]),
+          ),
         );
       case 9:
         return Container(
@@ -2744,7 +2829,8 @@ class _EditContractDialog extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(
@@ -2978,7 +3064,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                       await controller.sendEmailReturn(
                         edited,
                         authState.user!.chRUserid.toString(),
-                        reson.value
+                        reson.value,
                       );
                       await controller.updateApprenticeContract(
                         edited,
@@ -2989,7 +3075,8 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           .split(':')[1]
                           .trim();
                       // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||authState.user!.chRGroup.toString() == "Per" ||
+                      if (authState.user!.chRGroup.toString() == "PTHC" ||
+                          authState.user!.chRGroup.toString() == "Per" ||
                           authState.user!.chRGroup.toString() == "Admin") {
                         // truong hop PTHC phong ban
                         await controller.changeStatus(
