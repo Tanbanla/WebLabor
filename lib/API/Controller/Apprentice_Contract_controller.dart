@@ -1043,7 +1043,10 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-
+        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1175,7 +1178,10 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-
+        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1227,7 +1233,31 @@ class DashboardControllerApprentice extends GetxController {
     }
     return null;
   }
+  // check dữ liệu nhân viên
+  Future<bool> checkEmployeeExists(String employeeId) async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.GetEmployeeByStaffID}$employeeId'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          return jsonData['data'] as bool;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    } finally {
+      isLoading(false);
+    }
+  }
   // cac thuoc tinh update
   void updateVchrLythuyet(String employeeCode, String diem) {
     final index = dataList.indexWhere(

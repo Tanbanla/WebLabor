@@ -1,43 +1,5 @@
 
-class Employee {
-  bool? success;
-  dynamic status;
-  dynamic message;
-  dynamic error;
-  Data? data;
-
-  Employee({this.success, this.status, this.message, this.error, this.data});
-
-  Employee.fromJson(Map<String, dynamic> json) {
-    if(json["success"] is bool) {
-      success = json["success"];
-    }
-    status = json["status"];
-    message = json["message"];
-    error = json["error"];
-    if(json["data"] is Map) {
-      data = json["data"] == null ? null : Data.fromJson(json["data"]);
-    }
-  }
-
-  static List<Employee> fromList(List<Map<String, dynamic>> list) {
-    return list.map(Employee.fromJson).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["success"] = success;
-    _data["status"] = status;
-    _data["message"] = message;
-    _data["error"] = error;
-    if(data != null) {
-      _data["data"] = data?.toJson();
-    }
-    return _data;
-  }
-}
-
-class Data {
+class Employee  {
   int? id;
   String? chRStaffId;
   String? nvchRNameFull;
@@ -71,9 +33,9 @@ class Data {
   dynamic chRStatusDelete;
   String? vchRSkipCode;
 
-  Data({this.id, this.chRStaffId, this.nvchRNameFull, this.chRCodeDept, this.chRCodeSec, this.chRCodeGroup, this.chRCodeCenter, this.inTWorkcenter, this.iDCluster, this.iDStage, this.nvchRRemark, this.iDWorkLevel, this.dtMTerminateDate, this.dtMJoinDate, this.dtMJoinDateOption1, this.nvchRNumPhoneStaff, this.nvchRStageIncrease, this.chRCrtUserid, this.dtMCreate, this.chRUpdUserid, this.dtMUpdate, this.inTTotalDayoff, this.vchRShiftCode, this.vchRNote1, this.vchRNote2, this.vchROther1, this.vchROther2, this.vchROther3, this.dtMJoinSection, this.dtMMaternity, this.chRStatusDelete, this.vchRSkipCode});
+  Employee ({this.id, this.chRStaffId, this.nvchRNameFull, this.chRCodeDept, this.chRCodeSec, this.chRCodeGroup, this.chRCodeCenter, this.inTWorkcenter, this.iDCluster, this.iDStage, this.nvchRRemark, this.iDWorkLevel, this.dtMTerminateDate, this.dtMJoinDate, this.dtMJoinDateOption1, this.nvchRNumPhoneStaff, this.nvchRStageIncrease, this.chRCrtUserid, this.dtMCreate, this.chRUpdUserid, this.dtMUpdate, this.inTTotalDayoff, this.vchRShiftCode, this.vchRNote1, this.vchRNote2, this.vchROther1, this.vchROther2, this.vchROther3, this.dtMJoinSection, this.dtMMaternity, this.chRStatusDelete, this.vchRSkipCode});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  Employee.fromJson(Map<String, dynamic> json) {
     if(json["id"] is int) {
       id = json["id"];
     }
@@ -154,8 +116,8 @@ class Data {
     }
   }
 
-  static List<Data> fromList(List<Map<String, dynamic>> list) {
-    return list.map(Data.fromJson).toList();
+  static List<Employee > fromList(List<Map<String, dynamic>> list) {
+    return list.map(Employee .fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {

@@ -1027,7 +1027,10 @@ class DashboardControllerTwo extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-
+        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1159,7 +1162,10 @@ class DashboardControllerTwo extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-
+        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1189,7 +1195,32 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+  // check dữ liệu nhân viên
+  Future<bool> checkEmployeeExists(String employeeId) async {
+    try {
+      isLoading(true);
+      final response = await http.get(
+        Uri.parse('${Common.API}${Common.GetEmployeeByStaffID}$employeeId'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          return jsonData['data'] as bool;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } catch (e) {
+      showError('Failed to check employee: $e');
+      return false;
+    } finally {
+      isLoading(false);
+    }
+  }
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

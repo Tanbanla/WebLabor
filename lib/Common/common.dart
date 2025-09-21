@@ -19,6 +19,8 @@ class Common {
   static const String GetByIdUser = "User/get/";
   static const String UserGetByCount = "User/get-count-by-condition";
   static const String UserSreachBy = "User/search-by-condition";
+  // Lấy thongo thông tin nhân viên theo mã nhân viên từ Agent
+  static const String GetEmployeeByStaffID = "User/get-employee-by-staffid?staffId=";
   // POST
   static const String AddUser = "User/add";
   static const String AddListUser = "User/add-multi";
