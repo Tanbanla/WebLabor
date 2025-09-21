@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    final path = Uri.base.path; 
     return MaterialApp(
       title: 'Labor Contract Evaluation System',
       debugShowCheckedModeBanner: false,
