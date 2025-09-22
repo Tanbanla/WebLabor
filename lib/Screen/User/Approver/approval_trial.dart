@@ -633,10 +633,13 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 final sheet =
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
                 const startRow = 8; // Dòng bắt đầu điền dữ liệu
-
+                // Xác nhận danh sách xuất dữ liệu
+                List<ApprenticeContract> dataToExport = controller.getSelectedItems().isNotEmpty 
+                    ? controller.getSelectedItems() 
+                    : List.from(controller.filterdataList);
                 // 2. Điền dữ liệu vào các ô
-                for (int i = 0; i < controller.filterdataList.length; i++) {
-                  final item = controller.filterdataList[i];
+                for (int i = 0; i < dataToExport.length; i++) {
+                  final item = dataToExport[i];
                   final row = startRow + i;
 
                   // Lấy style từ dòng mẫu (dòng 6)

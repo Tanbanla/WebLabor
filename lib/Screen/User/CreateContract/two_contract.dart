@@ -57,7 +57,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             const SizedBox(height: 10),
 
             // Data Table
-Expanded(
+            Expanded(
               child: Obx(() {
                 // trigger rebuild when list changes
                 Visibility(
