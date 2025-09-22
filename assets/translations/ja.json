@@ -163,5 +163,6 @@
   "TraVeNguoiDanhGia": "評価者を戻す",
   "ResultOk":"更新に成功しました",
   "ReturnS":"複数を拒否",
-  "Rfilter":"フィルターをリセット"
+  "Rfilter":"フィルターをリセット",
+  "rowsPerPage":"1ページあたりの行数"
 }

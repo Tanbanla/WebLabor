@@ -36,7 +36,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     DashboardControllerPTHC(),
   );
   final ScrollController _scrollController = ScrollController();
-
+  // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
+  // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
+  int _rowsPerPage = 50;
+  int _firstRowIndex = 0; // track first row of current page
+  final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
@@ -567,7 +571,255 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     );
   }
 
-  Widget _buildDataTable() {
+  // Widget _buildDataTable() {
+  //   return Theme(
+  //     data: Theme.of(context).copyWith(
+  //       cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
+  //       dividerTheme: DividerThemeData(
+  //         color: Colors.grey[200],
+  //         thickness: 1,
+  //         space: 0,
+  //       ),
+  //     ),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(12),
+  //         color: Colors.white,
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.grey.withOpacity(0.1),
+  //             spreadRadius: 1,
+  //             blurRadius: 3,
+  //             offset: const Offset(0, 1),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Scrollbar(
+  //         controller: _scrollController,
+  //         thumbVisibility: true,
+  //         child: SingleChildScrollView(
+  //           controller: _scrollController,
+  //           scrollDirection: Axis.horizontal,
+  //           child: SizedBox(
+  //             width: 4020,
+  //             child: PaginatedDataTable2(
+  //               columnSpacing: 12,
+  //               minWidth: 2000, // Increased minWidth to accommodate all columns
+  //               horizontalMargin: 12,
+  //               dataRowHeight: 56,
+  //               headingRowHeight: 66,
+  //               headingTextStyle: TextStyle(
+  //                 color: Colors.blue[800],
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //               headingRowDecoration: BoxDecoration(
+  //                 borderRadius: const BorderRadius.vertical(
+  //                   top: Radius.circular(12),
+  //                 ),
+  //                 color: Colors.blue[50],
+  //               ),
+  //               showCheckboxColumn: true,
+  //               showFirstLastButtons: true,
+  //               renderEmptyRowsInTheEnd: false,
+  //               rowsPerPage: 30,
+  //               availableRowsPerPage: const [30, 50, 100, 150],
+  //               onRowsPerPageChanged: (value) {},
+  //               sortColumnIndex: controller.sortCloumnIndex.value,
+  //               sortAscending: controller.sortAscending.value,
+  //               sortArrowBuilder: (ascending, sorted) {
+  //                 return Icon(
+  //                   sorted
+  //                       ? ascending
+  //                             ? Iconsax.arrow_up_2
+  //                             : Iconsax.arrow_down_1
+  //                       : Iconsax.row_horizontal,
+  //                   size: 16,
+  //                   color: sorted ? Colors.blue[800] : Colors.grey,
+  //                 );
+  //               },
+  //               columns: [
+  //                 DataColumnCustom(
+  //                   title: tr('stt'),
+  //                   width: 70,
+  //                   onSort: controller.sortById,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 // DataColumn2
+  //                 DataColumnCustom(
+  //                   title: tr('action'),
+  //                   width: 100,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('Hientrang'),
+  //                   width: 130,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('DotDanhGia'),
+  //                   width: 180,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('employeeCode'),
+  //                   width: 100,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('gender'),
+  //                   width: 60,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('fullName'),
+  //                   width: 180,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('department'),
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('group'),
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('age'),
+  //                   width: 70,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('position'),
+  //                   width: 100,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('salaryGrade'),
+  //                   width: 100,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('contractEffective'),
+  //                   width: 120,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('contractEndDate'),
+  //                   width: 120,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('earlyLateCount'),
+  //                   width: 110,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('unreportedLeave'),
+  //                   width: 90,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('violationCount'),
+  //                   width: 130,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('reason'),
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('lythuyet'),
+  //                   width: 130,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('thuchanh'),
+  //                   width: 130,
+  //                   fontSize: Common.sizeColumn,
+  //                   maxLines: 2,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('congviec'),
+  //                   width: 130,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('hochoi'),
+  //                   width: 130,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('thichnghi'),
+  //                   width: 130,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('tinhthan'),
+  //                   fontSize: Common.sizeColumn,
+  //                   width: 150,
+  //                   maxLines: 3,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('baocao'),
+  //                   fontSize: Common.sizeColumn,
+  //                   width: 130,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('chaphanh'),
+  //                   fontSize: Common.sizeColumn,
+  //                   width: 130,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('ketqua'),
+  //                   fontSize: Common.sizeColumn,
+  //                   width: 150,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('note'),
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('notRehirable'),
+  //                   width: 170,
+  //                   fontSize: Common.sizeColumn,
+  //                   maxLines: 2,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('Lydo'),
+  //                   width: 170,
+  //                   fontSize: Common.sizeColumn,
+  //                   maxLines: 2,
+  //                 ).toDataColumn2(),
+  //                 // Approval
+  //                 DataColumnCustom(
+  //                   title: tr('Apporval'), //tr('notRehirable'),
+  //                   width: 100,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //                 DataColumnCustom(
+  //                   title: tr('LydoTuChoi'), //tr('notRehirableReason'),
+  //                   width: 170,
+  //                   maxLines: 2,
+  //                   fontSize: Common.sizeColumn,
+  //                 ).toDataColumn2(),
+  //               ],
+  //               source: MyData(context),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+    Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -590,50 +842,47 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             ),
           ],
         ),
-        child: Scrollbar(
-          controller: _scrollController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: 4020,
-              child: PaginatedDataTable2(
-                columnSpacing: 12,
-                minWidth: 2000, // Increased minWidth to accommodate all columns
-                horizontalMargin: 12,
-                dataRowHeight: 56,
-                headingRowHeight: 66,
-                headingTextStyle: TextStyle(
-                  color: Colors.blue[800],
-                  fontWeight: FontWeight.bold,
-                ),
-                headingRowDecoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  color: Colors.blue[50],
-                ),
-                showCheckboxColumn: true,
-                showFirstLastButtons: true,
-                renderEmptyRowsInTheEnd: false,
-                rowsPerPage: 30,
-                availableRowsPerPage: const [30, 50, 100, 150],
-                onRowsPerPageChanged: (value) {},
-                sortColumnIndex: controller.sortCloumnIndex.value,
-                sortAscending: controller.sortAscending.value,
-                sortArrowBuilder: (ascending, sorted) {
-                  return Icon(
-                    sorted
-                        ? ascending
-                              ? Iconsax.arrow_up_2
-                              : Iconsax.arrow_down_1
-                        : Iconsax.row_horizontal,
-                    size: 16,
-                    color: sorted ? Colors.blue[800] : Colors.grey,
-                  );
-                },
-                columns: [
+        child: Column(
+          children: [
+            Expanded(
+              child: Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: 4020, //2570,
+                    child: Builder(
+                      builder: (context) {
+                        final dataSource = MyData(context);
+                        final total = controller.filterdataList.length;
+                        if (_firstRowIndex >= total && total > 0) {
+                          _firstRowIndex =
+                              (total - 1) - ((total - 1) % _rowsPerPage);
+                        }
+                        final endIndex = (_firstRowIndex + _rowsPerPage) > total
+                            ? total
+                            : (_firstRowIndex + _rowsPerPage);
+                        final visibleCount = endIndex - _firstRowIndex;
+                        return DataTable2(
+                          columnSpacing: 12,
+                          minWidth: 2000,
+                          horizontalMargin: 12,
+                          dataRowHeight: 56,
+                          headingRowHeight: 66,
+                          headingTextStyle: TextStyle(
+                            color: Colors.blue[800],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          headingRowDecoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                            color: Colors.blue[50],
+                          ),
+                          showCheckboxColumn: true,
+                          columns: [
                   DataColumnCustom(
                     title: tr('stt'),
                     width: 70,
@@ -806,12 +1055,181 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
-                ],
-                source: MyData(context),
+                          ],
+                          rows: List.generate(
+                            visibleCount,
+                            (i) => dataSource.getRow(_firstRowIndex + i)!,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
+            _buildCustomPaginator(),
+          ],
         ),
+      ),
+    );
+  }
+    Widget _buildCustomPaginator() {
+    final total = controller.filterdataList.length;
+    final start = total == 0 ? 0 : _firstRowIndex + 1;
+    final end = (_firstRowIndex + _rowsPerPage) > total
+        ? total
+        : (_firstRowIndex + _rowsPerPage);
+
+    final isFirstPage = _firstRowIndex == 0;
+    final isLastPage = end >= total;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border(
+          top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left side - Rows per page selector
+          Row(
+            children: [
+              Text(
+                tr('rowsPerPage'),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.grey[300]!, width: 1),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: DropdownButton<int>(
+                  value: _rowsPerPage,
+                  underline: const SizedBox(), // Remove default underline
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                  items: _availableRowsPerPage
+                      .map(
+                        (e) => DropdownMenuItem<int>(
+                          value: e,
+                          child: Text(
+                            '$e',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() {
+                        _rowsPerPage = v;
+                        _firstRowIndex = 0;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          // Center - Page info
+          Text(
+            '$start - $end / $total',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          // Right side - Navigation buttons
+          Row(
+            children: [
+              // First page
+              IconButton(
+                icon: Icon(Icons.first_page, size: 20),
+                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
+                tooltip: tr('firstPage'),
+                onPressed: isFirstPage
+                    ? null
+                    : () {
+                        setState(() {
+                          _firstRowIndex = 0;
+                        });
+                      },
+              ),
+
+              // Previous page
+              IconButton(
+                icon: Icon(Icons.chevron_left, size: 24),
+                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
+                tooltip: tr('previousPage'),
+                onPressed: isFirstPage
+                    ? null
+                    : () {
+                        setState(() {
+                          _firstRowIndex = (_firstRowIndex - _rowsPerPage)
+                              .clamp(0, total);
+                        });
+                      },
+              ),
+
+              // Page indicator (optional)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  '${(_firstRowIndex ~/ _rowsPerPage) + 1}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              // Next page
+              IconButton(
+                icon: Icon(Icons.chevron_right, size: 24),
+                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
+                tooltip: tr('nextPage'),
+                onPressed: isLastPage
+                    ? null
+                    : () {
+                        setState(() {
+                          _firstRowIndex = (_firstRowIndex + _rowsPerPage)
+                              .clamp(0, (total - 1).clamp(0, total));
+                        });
+                      },
+              ),
+
+              // Last page
+              IconButton(
+                icon: Icon(Icons.last_page, size: 20),
+                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
+                tooltip: tr('lastPage'),
+                onPressed: isLastPage
+                    ? null
+                    : () {
+                        setState(() {
+                          final remainder = total % _rowsPerPage;
+                          _firstRowIndex = remainder == 0
+                              ? total - _rowsPerPage
+                              : total - remainder;
+                        });
+                      },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -988,7 +1406,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                   );
                   final url = html.Url.createObjectUrlFromBlob(blob);
-                  final anchor = html.AnchorElement(href: url)
+                  html.AnchorElement(href: url)
                     ..setAttribute('download', fileName)
                     ..click();
                   html.Url.revokeObjectUrl(url);
@@ -1214,6 +1632,7 @@ class MyData extends DataTableSource {
 
   @override
   DataRow? getRow(int index) {
+    if (index < 0 || index >= controller.filterdataList.length) return null;
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
       text: data.nvchRNoReEmpoyment ?? '',

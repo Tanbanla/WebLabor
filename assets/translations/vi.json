@@ -163,5 +163,6 @@
   "TraVeNguoiDanhGia":"Trả về người đánh giá",
   "ResultOk":"Cập nhật thành công",
   "ReturnS":"Từ chối nhiều",
-  "Rfilter":"Reset filter"
+  "Rfilter":"Reset filter",
+  "rowsPerPage":"Số hàng mỗi trang"
 }
