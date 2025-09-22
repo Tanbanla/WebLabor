@@ -1051,6 +1051,11 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
+        final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+        if  (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1186,6 +1191,11 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
+        final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1213,8 +1223,23 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
-
-  // ham format dateTime
+  // ham format String to date
+  DateTime? parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
+    final formats = [
+      'yyyy-MM-dd HH:mm:ss.SSS',
+      'yyyy-MM-dd HH:mm:ss',
+      'yyyy-MM-dd',
+    ];
+    for (var format in formats) {
+      try {
+        return DateFormat(format).parse(dateString.replaceAll(' ', ''));
+      } catch (e) {
+        continue;
+      }
+    }
+    return null;
+  }
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

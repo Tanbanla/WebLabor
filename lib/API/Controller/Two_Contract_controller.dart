@@ -1027,7 +1027,12 @@ class DashboardControllerTwo extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+        if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          _i++;
+          continue; // Skip invalid rows
+        }
+        final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1166,6 +1171,12 @@ class DashboardControllerTwo extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
+        final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+        if (
+            parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
+          _i++;
+          continue; // Skip invalid rows
+        }
         importedTwoContract.add(twocontract);
         _i++;
       }
@@ -1194,6 +1205,23 @@ class DashboardControllerTwo extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+    // ham format String to date
+  DateTime? parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
+    final formats = [
+      'yyyy-MM-dd HH:mm:ss.SSS',
+      'yyyy-MM-dd HH:mm:ss',
+      'yyyy-MM-dd',
+    ];
+    for (var format in formats) {
+      try {
+        return DateFormat(format).parse(dateString.replaceAll(' ', ''));
+      } catch (e) {
+        continue;
+      }
+    }
+    return null;
   }
   // check dữ liệu nhân viên
   Future<bool> checkEmployeeExists(String employeeId) async {
