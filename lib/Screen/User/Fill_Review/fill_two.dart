@@ -597,7 +597,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 3770, //2570,
+              width: 3790, //2570,
               child: PaginatedDataTable2(
                 columnSpacing: 12,
                 minWidth: 2000, // Increased minWidth to accommodate all columns
@@ -674,12 +674,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('department'),
-                    width: 120,
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
                     title: tr('group'),
-                    width: 100,
+                    maxLines: 2,
                     fontSize: Common.sizeColumn,
                   ).toDataColumn2(),
                   DataColumnCustom(
@@ -1259,18 +1259,8 @@ class MyData extends DataTableSource {
         ),
         // Copyable vchREmployeeName
         DataCell(_buildCopyCell(data.vchREmployeeName)),
-        DataCell(
-          Text(
-            data.vchRNameSection ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.chRCostCenterName ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-        ),
+        DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
+        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
         DataCell(
           Center(
             child: Text(
