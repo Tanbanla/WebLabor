@@ -57,13 +57,50 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             const SizedBox(height: 10),
 
             // Data Table
-            Expanded(
+Expanded(
               child: Obx(() {
+                // trigger rebuild when list changes
                 Visibility(
                   visible: false,
                   child: Text(controller.filterdataList.length.toString()),
                 );
-                return _buildDataTable();
+                return Stack(
+                  children: [
+                    Positioned.fill(child: _buildDataTable()),
+                    if (controller.isLoading.value)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.white.withOpacity(0.6),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator(strokeWidth: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!controller.isLoading.value &&
+                        controller.filterdataList.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.inbox,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'No data',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
               }),
             ),
           ],

@@ -18,6 +18,7 @@ class DashboardControllerTwo extends GetxController {
   var dataList = <TwoContract>[].obs;
   var filterdataList = <TwoContract>[].obs;
   var listSection = <String>[].obs;
+  var selectedStatus = ''.obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -161,7 +162,44 @@ class DashboardControllerTwo extends GetxController {
       }
     });
   }
+  void filterByStatus(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
 
+    final filteredList = dataList.where((item) {
+      final statusId = item.inTStatusId;
+      final statusText = getStatusText(statusId);
+      return statusText.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Helper method to convert status ID to text
+  String getStatusText(int? statusId) {
+    switch (statusId) {
+      case 1:
+        return 'New';
+      case 2:
+        return 'Per';
+      case 3:
+        return 'PTHC';
+      case 4:
+        return 'Leader';
+      case 6:
+        return 'Manager';
+      case 7:
+        return 'Dept';
+      case 8:
+        return 'Director';
+      case 9:
+        return 'Done';
+      default:
+        return 'Unknown';
+    }
+  }
   // so sanh du lieu
   void searchQuery(String query) {
     final lowerQuery = query.toLowerCase();

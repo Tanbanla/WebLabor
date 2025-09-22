@@ -8,7 +8,6 @@ import 'package:web_labor_contract/API/Controller/user_approver_controller.dart'
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
-import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
@@ -89,11 +88,48 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             // Data Table
             Expanded(
               child: Obx(() {
+                // trigger rebuild when list changes
                 Visibility(
                   visible: false,
                   child: Text(controller.filterdataList.length.toString()),
                 );
-                return _buildDataTable();
+                return Stack(
+                  children: [
+                    Positioned.fill(child: _buildDataTable()),
+                    if (controller.isLoading.value)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.white.withOpacity(0.6),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator(strokeWidth: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!controller.isLoading.value &&
+                        controller.filterdataList.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.inbox,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'No data',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
               }),
             ),
           ],
@@ -2472,546 +2508,6 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
-
-class _EditContractDialog extends StatelessWidget {
-  final ApprenticeContract contract;
-  final DashboardControllerApprentice controller = Get.find();
-
-  _EditContractDialog({required this.contract});
-
-  @override
-  Widget build(BuildContext context) {
-    final edited = ApprenticeContract.fromJson(contract.toJson());
-    RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
-
-    final RxString earlyLateError = ''.obs;
-    final RxString unreportedLeaveError = ''.obs;
-    final RxString violationError = ''.obs;
-    return AlertDialog(
-      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-      actionsPadding: const EdgeInsets.all(20),
-      title: Row(
-        children: [
-          Icon(Iconsax.lamp1, color: Common.primaryColor),
-          SizedBox(width: 10),
-          Text(
-            '${tr('edit')} ${contract.vchREmployeeName}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Common.primaryColor,
-            ),
-          ),
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: Form(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Tiêu đề phần Information
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tr('Information'),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Common.primaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Dòng 1: Mã phòng ban + Tên phòng ban
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.vchRCodeSection,
-                      label: tr('department'),
-                      onChanged: (value) => edited.vchRCodeSection = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.chRCostCenterName,
-                      label: tr('group'),
-                      onChanged: (value) => edited.chRCostCenterName = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Dòng 2: Mã NV + Giới tính
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactReadOnlyField(
-                      value: contract.vchREmployeeId.toString(),
-                      label: tr('employeeCode'),
-                      width: 400,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: _buildCompactReadOnlyField(
-                      value: contract.vchRTyperId.toString(),
-                      label: tr('gender'),
-                      width: 100,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 3: Tên NV + Tuổi
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: _buildCompactReadOnlyField(
-                      value: contract.vchREmployeeName.toString(),
-                      label: tr('fullName'),
-                      width: 420,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 80,
-                    child: _buildCompactReadOnlyField(
-                      value: getAgeFromBirthday(
-                        contract.dtMBrithday,
-                      ).toString(),
-                      label: tr('age'),
-                      width: 80,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10, width: 500),
-
-              // Dòng 4: Vị trí + Bậc lương
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactReadOnlyField(
-                      value: contract.chRPosition.toString(),
-                      label: tr('position'),
-                      width: 400,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: _buildCompactReadOnlyField(
-                      value: contract.chRCodeGrade.toString(),
-                      label: tr('salaryGrade'),
-                      width: 100,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactReadOnlyField(
-                      value: DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateTime.parse(contract.dtMJoinDate!)),
-                      label: tr('contractEffective'),
-                      width: 250,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCompactReadOnlyField(
-                      value: DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateTime.parse(contract.dtMEndDate!)),
-                      label: tr('contractEndDate'),
-                      width: 250,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Tiêu đề phần thống kê
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tr('titleEidt1'),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Common.primaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
-              Row(
-                children: [
-                  Expanded(
-                    child: Obx(
-                      () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BuildCompactTextField(
-                            initialValue: contract.fLGoLeaveLate?.toString(),
-                            label: tr('earlyLateCount'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.]'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value.isEmpty) {
-                                earlyLateError.value = '';
-                                edited.fLGoLeaveLate = null;
-                                return;
-                              }
-                              if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
-                                earlyLateError.value = tr('onlyNumber');
-                              } else {
-                                earlyLateError.value = '';
-                                edited.fLGoLeaveLate = double.tryParse(value);
-                              }
-                            },
-                          ),
-                          if (earlyLateError.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                earlyLateError.value,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Obx(
-                      () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BuildCompactTextField(
-                            initialValue: contract.fLNotLeaveDay?.toString(),
-                            label: tr('unreportedLeave'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9.]'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value.isEmpty) {
-                                unreportedLeaveError.value = '';
-                                edited.fLNotLeaveDay = null;
-                                return;
-                              }
-                              if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value)) {
-                                unreportedLeaveError.value = tr('onlyNumber');
-                              } else {
-                                unreportedLeaveError.value = '';
-                                edited.fLNotLeaveDay = double.tryParse(value);
-                              }
-                            },
-                          ),
-                          if (unreportedLeaveError.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                unreportedLeaveError.value,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Dòng 8: Số lần vi phạm
-              Row(
-                children: [
-                  Expanded(
-                    child: Obx(
-                      () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BuildCompactTextField(
-                            initialValue: contract.inTViolation?.toString(),
-                            label: tr('violationCount'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onChanged: (value) {
-                              if (value.isEmpty) {
-                                violationError.value = '';
-                                edited.inTViolation = null;
-                                return;
-                              }
-                              if (!RegExp(r'^\d+$').hasMatch(value)) {
-                                violationError.value = tr('onlyNumber');
-                              } else {
-                                violationError.value = '';
-                                edited.inTViolation = int.tryParse(value);
-                              }
-                            },
-                          ),
-                          if (violationError.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                violationError.value,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: _buildCompactTextField(
-              //         initialValue: contract.fLGoLeaveLate?.toString(),
-              //         label: tr('earlyLateCount'),
-              //         onChanged: (value) =>
-              //             edited.fLGoLeaveLate = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 10),
-              //     Expanded(
-              //       child: _buildCompactTextField(
-              //         initialValue: contract.fLNotLeaveDay?.toString(),
-              //         label: tr('unreportedLeave'),
-              //         onChanged: (value) =>
-              //             edited.fLNotLeaveDay = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 10),
-              // // Dòng 8: Số lần vi phạm + Mã phê duyệt
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: _buildCompactTextField(
-              //         initialValue: contract.inTViolation?.toString(),
-              //         label: tr('violationCount'),
-              //         onChanged: (value) =>
-              //             edited.inTViolation = int.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              const SizedBox(height: 12),
-
-              // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
-                initialValue: contract.nvarchaRViolation,
-                label: tr('reason'),
-                onChanged: (value) => edited.nvarchaRViolation = value,
-                maxLines: 2,
-              ),
-
-              if (errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    errorMessage.value,
-                    style: const TextStyle(color: Colors.red, fontSize: 14),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey[700],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          ),
-          onPressed: controller.isLoading.value
-              ? null
-              : () => Navigator.of(context).pop(),
-          child: Text(tr('Cancel')),
-        ),
-        Obx(
-          () => ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Common.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: (controller.isLoading.value)
-                ? null
-                : () async {
-                    errorMessage.value = '';
-                    controller.isLoading(false);
-                    try {
-                      await controller.updateApprenticeContract(
-                        edited,
-                        authState.user!.chRUserid.toString(),
-                      );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
-                      // phan xem ai dang vao man so sanh
-                      if (authState.user!.chRGroup.toString() == "PTHC" ||
-                          authState.user!.chRGroup.toString() == "Per" ||
-                          authState.user!.chRGroup.toString() == "Admin") {
-                        // truong hop PTHC phong ban
-                        await controller.changeStatus(
-                          'PTHC',
-                          sectionName,
-                          null,
-                        );
-                      } else {
-                        // truong hop leader
-                        await controller.changeStatus(
-                          '4',
-                          sectionName,
-                          authState.user!.chRUserid.toString(),
-                        );
-                      }
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    } catch (e) {
-                      errorMessage.value =
-                          '${tr('ErrorUpdate')}${e.toString()}';
-                    }
-                  },
-            child: controller.isLoading.value
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(tr('Save')),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // widget không được phép sửa
-  Widget _buildCompactReadOnlyField({
-    required String value,
-    required String label,
-    double? width,
-  }) {
-    Widget content = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 4),
-        SizedBox(
-          width: width,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-            ),
-          ),
-        ),
-      ],
-    );
-    return content;
-  }
-
-  Widget _buildCompactTextField({
-    required String? initialValue,
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
-    );
-  }
-
-  String getAgeFromBirthday(String? birthday) {
-    if (birthday == null || birthday.isEmpty) return '';
-    try {
-      final birthDate = DateTime.parse(birthday);
-      final now = DateTime.now();
-      int age = now.year - birthDate.year;
-      if (now.month < birthDate.month ||
-          (now.month == birthDate.month && now.day < birthDate.day)) {
-        age--;
-      }
-      return '$age';
-    } catch (e) {
-      return 'Invalid date';
-    }
-  }
-}
-
 // Class tu choi phe duyet
 class _ReturnConApprenticetract extends StatelessWidget {
   final ApprenticeContract contract;

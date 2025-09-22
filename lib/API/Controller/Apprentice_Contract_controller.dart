@@ -18,6 +18,7 @@ class DashboardControllerApprentice extends GetxController {
   var dataList = <ApprenticeContract>[].obs;
   var filterdataList = <ApprenticeContract>[].obs;
   var listSection = <String>[].obs;
+  var selectedStatus = ''.obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;

@@ -133,6 +133,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       ],
     );
   }
+
   Widget _buildSearchAndActions() {
     final DashboardControllerApprentice controller = Get.find();
     return Container(
@@ -161,7 +162,10 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(tr('searchhint'), style: TextStyle(color: Colors.grey[600], fontSize: 18)),
+                  Text(
+                    tr('searchhint'),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 18),
+                  ),
                   const SizedBox(width: 12),
                   _buildFilterFieldWithIcon(
                     width: 240,
@@ -170,6 +174,100 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     onChanged: (value) {
                       controller.filterByApproverCode(value);
                     },
+                  ),
+                  const SizedBox(width: 6),
+                  // Dropdown filter for status instead of text input
+                  SizedBox(
+                    width: 220,
+                    child: Obx(() { // Thay YourController bằng controller thực tế
+                      final statusOptions = <Map<String, dynamic>>[
+                        {'code': '', 'label': tr('all')},
+                        {'code': 'New', 'label': 'New'},
+                        {'code': 'Per', 'label': 'Per/人事課の中級管理職'},
+                        {'code': 'PTHC', 'label': 'PTHC'},
+                        {'code': 'Leader', 'label': 'Leader'},
+                        {'code': 'QLTC', 'label': 'QLTC/中級管理職'},
+                        {'code': 'QLCC', 'label': 'QLCC/上級管理職'},
+                        {'code': 'Director', 'label': 'Director/管掌取締役'},
+                        {'code': 'Done', 'label': 'Done'},
+                      ];
+
+                      return DropdownButtonFormField<String>(
+                        value: controller.selectedStatus.value.isEmpty ? null : controller.selectedStatus.value,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          hintText: tr('status'),
+                          hintStyle: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[500],
+                          ),
+                          prefixIcon: Icon(
+                            Iconsax.activity,
+                            size: 20,
+                            color: Colors.grey[600],
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Colors.black54,
+                              width: 0.5,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.blue[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          isDense: true,
+                        ),
+                        isExpanded: true,
+                        hint: Text(
+                          tr('status'),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        items: statusOptions.map((option) {
+                          return DropdownMenuItem<String>(
+                            value: option['code'] as String,
+                            child: Text(
+                              option['label'] as String,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          controller.selectedStatus.value = value ?? '';
+                          controller.filterByStatus(value ?? '');
+                        },
+                        dropdownColor: Colors.white,
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.grey[600],
+                          size: 24,
+                        ),
+                        iconSize: 16,
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(8),
+                        menuMaxHeight: 300,
+                      );
+                    }),
                   ),
                   const SizedBox(width: 6),
                   _buildFilterFieldWithIcon(

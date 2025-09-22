@@ -91,9 +91,15 @@ class DashboardControllerApporver extends GetxController {
             phongban.add(contract.vchRCodeSection);
           }
         } else {
-          notApproval.add(contract
-          .map((item) => contractType == 'two' ? TwoContract.fromJson(item.toJson()) : ApprenticeContract.fromJson(item.toJson()))
-          .toList());
+          notApproval.add(
+            contract
+                .map(
+                  (item) => contractType == 'two'
+                      ? TwoContract.fromJson(item.toJson())
+                      : ApprenticeContract.fromJson(item.toJson()),
+                )
+                .toList(),
+          );
           contract.inTStatusId = 1;
         }
       }
@@ -146,7 +152,7 @@ class DashboardControllerApporver extends GetxController {
             notApproval,
             "Từ chối phê duyệt",
             userApprover,
-            null
+            null,
           );
         }
       } else {
@@ -217,6 +223,124 @@ class DashboardControllerApporver extends GetxController {
   }
 
   // so sanh du lieu
+  void filterByStatus(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final statusId = item.inTStatusId;
+      final statusText = getStatusText(statusId);
+      return statusText.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Helper method to convert status ID to text
+  String getStatusText(int? statusId) {
+    switch (statusId) {
+      case 1:
+        return 'New';
+      case 2:
+        return 'Per';
+      case 3:
+        return 'PTHC';
+      case 4:
+        return 'Leader';
+      case 6:
+        return 'Manager';
+      case 7:
+        return 'Dept';
+      case 8:
+        return 'Director';
+      case 9:
+        return 'Done';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  // Filter by approver code (DotDanhGia)
+  void filterByApproverCode(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final code = item.vchRCodeApprover?.toLowerCase() ?? '';
+      return code.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee ID
+  void filterByEmployeeId(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final id = item.vchREmployeeId?.toLowerCase() ?? '';
+      return id.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by employee name
+  void filterByEmployeeName(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final name = item.vchREmployeeName?.toLowerCase() ?? '';
+      return name.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by department
+  void filterByDepartment(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+
+    final filteredList = dataList.where((item) {
+      final department = item.vchRNameSection?.toLowerCase() ?? '';
+      return department.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Filter by group
+  void filterByGroup(String query) {
+    if (query.isEmpty) {
+      refreshFilteredList();
+      return;
+    }
+    final filteredList = dataList.where((item) {
+      final group = item.chRCostCenterName?.toLowerCase() ?? '';
+      return group.contains(query.toLowerCase());
+    }).toList();
+
+    filterdataList.value = filteredList;
+  }
+
+  // Helper method to reset the filtered list to the original data
+  void refreshFilteredList() {
+    filterdataList.value = List.from(dataList);
+  }
+
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);
@@ -404,12 +528,13 @@ class DashboardControllerApporver extends GetxController {
     }
     return null;
   }
-  Future<void>updateListContractReturnS(
+
+  Future<void> updateListContractReturnS(
     String userUpdate,
     String reson,
     String contractType,
-  ) async{
-      try {
+  ) async {
+    try {
       fetchPTHCData();
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
@@ -436,12 +561,17 @@ class DashboardControllerApporver extends GetxController {
           ..dtMDueDate = formatDateTime(
             DateTime.now().add(Duration(days: dayDue)),
           )
-          ..nvchRApproverPer = reson
-        ;
-        contract.biTApproverPer =false;
-        notApproval.add(contract
-          .map((item) => contractType == 'two' ? TwoContract.fromJson(item.toJson()) : ApprenticeContract.fromJson(item.toJson()))
-          .toList());
+          ..nvchRApproverPer = reson;
+        contract.biTApproverPer = false;
+        notApproval.add(
+          contract
+              .map(
+                (item) => contractType == 'two'
+                    ? TwoContract.fromJson(item.toJson())
+                    : ApprenticeContract.fromJson(item.toJson()),
+              )
+              .toList(),
+        );
         contract.inTStatusId = 1;
       }
 
@@ -479,7 +609,7 @@ class DashboardControllerApporver extends GetxController {
             notApproval,
             "Từ chối phê duyệt",
             userUpdate,
-            null
+            null,
           );
         }
       } else {
