@@ -822,7 +822,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       ),
     );
   }
-  
+
   Widget _buildCustomPaginator() {
     final total = controller.filterdataList.length;
     final start = total == 0 ? 0 : _firstRowIndex + 1;
@@ -1341,17 +1341,26 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _buildCopyCell(String? value) {
+  Widget _buildCopyCell(String? value, {bool highlight = false}) {
     final txt = value ?? '';
     return InkWell(
       onTap: () => _copyToClipboard(txt),
       child: Row(
         children: [
-          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
-          Text(
-            txt,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            overflow: TextOverflow.ellipsis,
+          Icon(
+            Icons.copy,
+            size: 14,
+            color: highlight ? Colors.red[700] : Colors.grey[600],
+          ),
+          Expanded(
+            child: Text(
+              txt,
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: highlight ? Colors.red[900] : null,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -1374,6 +1383,17 @@ class MyData extends DataTableSource {
         data.nvchRApproverDirector,
       ].firstWhere((e) => e != null && e != '', orElse: () => ''),
     );
+    //
+    final bool isReturn =
+        ([
+          data.nvchRApproverChief,
+          data.nvchRApproverManager,
+          data.nvchRApproverDirector,
+        ].firstWhere((e) => e != null && e != '', orElse: () => '') !='');
+    TextStyle cellCenterStyle() => TextStyle(
+      fontSize: Common.sizeColumn,
+      color: isReturn ? Colors.red[900] : null,
+    );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -1395,7 +1415,7 @@ class MyData extends DataTableSource {
           Text(
             (index + 1).toString(),
             style: TextStyle(
-              color: Colors.blue[800],
+              color: isReturn ? Colors.red[900] : Colors.blue[800],
               fontSize: Common.sizeColumn,
             ),
           ),
@@ -1417,28 +1437,28 @@ class MyData extends DataTableSource {
         ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
-        DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        DataCell(_buildCopyCell(data.vchRCodeApprover ?? "", highlight: isReturn)),
         // Copyable vchREmployeeId
-        DataCell(_buildCopyCell(data.vchREmployeeId)),
+        DataCell(_buildCopyCell(data.vchREmployeeId, highlight: isReturn)),
         DataCell(
           Center(
             child: Text(
               data.vchRTyperId ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle()
             ),
           ),
         ),
         // Copyable vchREmployeeName
-        DataCell(_buildCopyCell(data.vchREmployeeName)),
-        DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
+        DataCell(_buildCopyCell(data.vchREmployeeName, highlight: isReturn)),
+        DataCell(_buildCopyCell(data.vchRNameSection ?? "", highlight: isReturn)),
+        DataCell(_buildCopyCell(data.chRCostCenterName ?? "", highlight: isReturn)),
         DataCell(
           Center(
             child: Text(
               data.dtMBrithday != null
                   ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1446,7 +1466,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.chRPosition ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1454,7 +1474,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.chRCodeGrade?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1466,7 +1486,7 @@ class MyData extends DataTableSource {
                       'yyyy-MM-dd',
                     ).format(DateTime.parse(data.dtMJoinDate!))
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1478,7 +1498,7 @@ class MyData extends DataTableSource {
                       'yyyy-MM-dd',
                     ).format(DateTime.parse(data.dtMEndDate!))
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1486,7 +1506,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.fLGoLeaveLate?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1494,7 +1514,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.fLPaidLeave?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1502,7 +1522,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.fLNotPaidLeave?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1510,7 +1530,7 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.fLNotLeaveDay?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1518,14 +1538,14 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.inTViolation?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
         DataCell(
           Text(
             data.nvarchaRViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         //4 thuộc tính đánh giá

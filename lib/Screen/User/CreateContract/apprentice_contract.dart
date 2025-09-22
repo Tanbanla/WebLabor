@@ -1225,17 +1225,22 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _buildCopyCell(String? value) {
+  Widget _buildCopyCell(String? value, {bool highlight = false}) {
     final txt = value ?? '';
     return InkWell(
       onTap: () => _copyToClipboard(txt),
       child: Row(
         children: [
-          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
-          Text(
-            txt,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            overflow: TextOverflow.ellipsis,
+            Icon(Icons.copy, size: 14, color: highlight ? Colors.red[700] : Colors.grey[600]),
+          Expanded(
+            child: Text(
+              txt,
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: highlight ? Colors.red[900] : null,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -1249,10 +1254,19 @@ class MyData extends DataTableSource {
     final reasonController = TextEditingController(
       text: data.nvchRApproverPer ?? '',
     );
+    final bool isRejected = data.biTApproverPer == false;
+
+    TextStyle cellCenterStyle() => TextStyle(
+      fontSize: Common.sizeColumn,
+      color: isRejected ? Colors.red[900] : null,
+    );
     return DataRow2(
-      color: MaterialStateProperty.resolveWith<Color?>((
-        Set<MaterialState> states,
-      ) {
+      color: MaterialStateProperty.resolveWith<Color?>((states) {
+        if (isRejected) {
+          return Colors.red.withOpacity(
+            states.contains(MaterialState.selected) ? 0.35 : 0.18,
+          );
+        }
         if (index.isEven) {
           return Colors.grey[50];
         }
@@ -1270,7 +1284,7 @@ class MyData extends DataTableSource {
           Text(
             (index + 1).toString(),
             style: TextStyle(
-              color: Colors.blue[800],
+              color: isRejected ? Colors.red[900] : Colors.blue[800],
               fontSize: Common.sizeColumn, // Added fontSize 12
             ),
           ),
@@ -1320,27 +1334,27 @@ class MyData extends DataTableSource {
           ),
         ),
         // Copyable vchREmployeeName
-        DataCell(_buildCopyCell(data.vchREmployeeName)),
-        DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
+        DataCell(_buildCopyCell(data.vchREmployeeName, highlight: isRejected)),
+        DataCell(_buildCopyCell(data.vchRNameSection ?? "",highlight: isRejected)),
+        DataCell(_buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected)),
         DataCell(
           Text(
             data.dtMBrithday != null
                 ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
                 : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.chRPosition ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.chRCodeGrade?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
@@ -1350,7 +1364,7 @@ class MyData extends DataTableSource {
                     'yyyy-MM-dd',
                   ).format(DateTime.parse(data.dtMJoinDate!))
                 : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
@@ -1360,31 +1374,31 @@ class MyData extends DataTableSource {
                     'yyyy-MM-dd',
                   ).format(DateTime.parse(data.dtMEndDate!))
                 : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.fLGoLeaveLate?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.fLNotLeaveDay?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.inTViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
           Text(
             data.nvarchaRViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: cellCenterStyle(),
           ),
         ),
         DataCell(
@@ -1426,10 +1440,10 @@ class MyData extends DataTableSource {
             },
             child: TextFormField(
               controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: TextStyle(fontSize: Common.sizeColumn, color: isRejected ? Colors.red[900] : null,),
               decoration: InputDecoration(
                 labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                labelStyle: TextStyle(fontSize: Common.sizeColumn, color: isRejected ? Colors.red[700] : null,),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

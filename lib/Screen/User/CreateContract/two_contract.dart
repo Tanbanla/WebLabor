@@ -447,6 +447,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       ),
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -511,115 +512,115 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                           ),
                           showCheckboxColumn: true,
                           columns: [
-                  DataColumnCustom(
-                    title: tr('stt'),
-                    width: 70,
-                    onSort: controller.sortById,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  // DataColumn2
-                  DataColumnCustom(
-                    title: tr('action'),
-                    width: 100,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('employeeCode'),
-                    width: 100,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('gender'),
-                    width: 60,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('fullName'),
-                    width: 180,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('department'),
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    maxLines: 2,
-                    title: tr('group'),
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('age'),
-                    width: 70,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('position'),
-                    width: 100,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('salaryGrade'),
-                    width: 100,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('contractEffective'),
-                    width: 120,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('contractEndDate'),
-                    width: 120,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('earlyLateCount'),
-                    width: 110,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('paidLeave'),
-                    width: 100,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('unpaidLeave'),
-                    width: 90,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('unreportedLeave'),
-                    width: 90,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('violationCount'),
-                    width: 130,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('reason'),
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('TruongPhong'),
-                    width: 170,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
-                  DataColumnCustom(
-                    title: tr('LydoTuChoi'),
-                    width: 170,
-                    maxLines: 2,
-                    fontSize: Common.sizeColumn,
-                  ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('stt'),
+                              width: 70,
+                              onSort: controller.sortById,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            // DataColumn2
+                            DataColumnCustom(
+                              title: tr('action'),
+                              width: 100,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('employeeCode'),
+                              width: 100,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('gender'),
+                              width: 60,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('fullName'),
+                              width: 180,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('department'),
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              maxLines: 2,
+                              title: tr('group'),
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('age'),
+                              width: 70,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('position'),
+                              width: 100,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('salaryGrade'),
+                              width: 100,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('contractEffective'),
+                              width: 120,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('contractEndDate'),
+                              width: 120,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('earlyLateCount'),
+                              width: 110,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('paidLeave'),
+                              width: 100,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('unpaidLeave'),
+                              width: 90,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('unreportedLeave'),
+                              width: 90,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('violationCount'),
+                              width: 130,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('reason'),
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('TruongPhong'),
+                              width: 170,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            DataColumnCustom(
+                              title: tr('LydoTuChoi'),
+                              width: 170,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
                           ],
                           rows: List.generate(
                             visibleCount,
@@ -799,7 +800,6 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       ),
     );
   }
-
 
   void _showImportDialog() {
     final controller = Get.find<DashboardControllerTwo>();
@@ -1252,17 +1252,22 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _buildCopyCell(String? value) {
+  Widget _buildCopyCell(String? value, {bool highlight = false}) {
     final txt = value ?? '';
     return InkWell(
       onTap: () => _copyToClipboard(txt),
       child: Row(
         children: [
-          Icon(Icons.copy, size: 14, color: Colors.grey[600]),
-          Text(
-            txt,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            overflow: TextOverflow.ellipsis,
+            Icon(Icons.copy, size: 14, color: highlight ? Colors.red[700] : Colors.grey[600]),
+          Expanded(
+            child: Text(
+              txt,
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: highlight ? Colors.red[900] : null,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -1276,16 +1281,25 @@ class MyData extends DataTableSource {
     final reasonController = TextEditingController(
       text: data.nvchRApproverPer ?? '',
     );
+
+    final bool isRejected = data.biTApproverPer == false;
+
+    TextStyle cellCenterStyle() => TextStyle(
+          fontSize: Common.sizeColumn,
+          color: isRejected ? Colors.red[900] : null,
+        );
+
     return DataRow2(
-      color: MaterialStateProperty.resolveWith<Color?>((
-        Set<MaterialState> states,
-      ) {
-        if (index.isEven) {
-          return Colors.grey[50];
+      color: MaterialStateProperty.resolveWith<Color?>((states) {
+        if (isRejected) {
+          return Colors.red.withOpacity(
+            states.contains(MaterialState.selected) ? 0.35 : 0.18,
+          );
         }
+        if (index.isEven) return Colors.grey[50];
         return null;
       }),
-      onTap: () {}, //=> _showDetailDialog(data),
+      onTap: () {},
       selected: controller.selectRows[index],
       onSelectChanged: (value) {
         controller.selectRows[index] = value ?? false;
@@ -1297,19 +1311,19 @@ class MyData extends DataTableSource {
           Text(
             (index + 1).toString(),
             style: TextStyle(
-              color: Colors.blue[800],
+              color: isRejected ? Colors.red[900] : Colors.blue[800],
               fontSize: Common.sizeColumn,
             ),
           ),
         ),
-        //Action
+        // Action
         DataCell(
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildActionButton(
                 icon: Iconsax.edit_2,
-                color: Colors.blue,
+                color: isRejected ? Colors.red : Colors.blue,
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -1330,64 +1344,33 @@ class MyData extends DataTableSource {
                   );
                 },
               ),
-              // const SizedBox(width: 8),
-              // _buildActionButton(
-              //   icon: Iconsax.eye,
-              //   color: Colors.green,
-              //   onPressed: () {}, //=> _showDetailDialog(data),
-              // ),
             ],
           ),
         ),
-        // Copyable vchREmployeeId
-        DataCell(_buildCopyCell(data.vchREmployeeId)),
-        DataCell(
-          Center(
-            child: Text(
-              data.vchRTyperId ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        // Copyable vchREmployeeName
-        DataCell(_buildCopyCell(data.vchREmployeeName)),
-        DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
+        DataCell(_buildCopyCell(data.vchREmployeeId, highlight: isRejected)),
+        DataCell(Center(child: Text(data.vchRTyperId ?? "", style: cellCenterStyle()))),
+        DataCell(_buildCopyCell(data.vchREmployeeName, highlight: isRejected)),
+        DataCell(_buildCopyCell(data.vchRNameSection ?? "", highlight: isRejected)),
+        DataCell(_buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected)),
         DataCell(
           Center(
             child: Text(
               data.dtMBrithday != null
                   ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
-        DataCell(
-          Center(
-            child: Text(
-              data.chRPosition ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-              data.chRCodeGrade?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
+        DataCell(Center(child: Text(data.chRPosition ?? "", style: cellCenterStyle()))),
+        DataCell(Center(child: Text(data.chRCodeGrade?.toString() ?? "", style: cellCenterStyle()))),
         DataCell(
           Center(
             child: Text(
               data.dtMJoinDate != null
-                  ? DateFormat(
-                      'yyyy-MM-dd',
-                    ).format(DateTime.parse(data.dtMJoinDate!))
+                  ? DateFormat('yyyy-MM-dd').format(DateTime.parse(data.dtMJoinDate!))
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
@@ -1395,59 +1378,24 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.dtMEndDate != null
-                  ? DateFormat(
-                      'yyyy-MM-dd',
-                    ).format(DateTime.parse(data.dtMEndDate!))
+                  ? DateFormat('yyyy-MM-dd').format(DateTime.parse(data.dtMEndDate!))
                   : "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: cellCenterStyle(),
             ),
           ),
         ),
-        DataCell(
-          Center(
-            child: Text(
-              data.fLGoLeaveLate?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-              data.fLPaidLeave?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-              data.fLNotPaidLeave?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-              data.fLNotLeaveDay?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-              data.inTViolation?.toString() ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
-            ),
-          ),
-        ),
-        //5 thuộc tính đánh giá
+        DataCell(Center(child: Text(data.fLGoLeaveLate?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(Center(child: Text(data.fLPaidLeave?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(Center(child: Text(data.fLNotPaidLeave?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(Center(child: Text(data.fLNotLeaveDay?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(Center(child: Text(data.inTViolation?.toString() ?? "", style: cellCenterStyle()))),
         DataCell(
           Text(
             data.nvarchaRViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+            style: TextStyle(
+              fontSize: Common.sizeColumn,
+              color: isRejected ? Colors.red[900] : null,
+            ),
           ),
         ),
         DataCell(
@@ -1462,13 +1410,11 @@ class MyData extends DataTableSource {
                 children: [
                   Icon(Icons.cancel, color: Colors.red, size: 16),
                   SizedBox(width: 4),
-                  Text(
-                    'X',
-                    style: TextStyle(
-                      fontSize: Common.sizeColumn,
-                      color: Colors.red,
-                    ),
-                  ),
+                  Text('X',
+                      style: TextStyle(
+                        fontSize: Common.sizeColumn,
+                        color: Colors.red,
+                      )),
                 ],
               );
             } else {
@@ -1480,7 +1426,6 @@ class MyData extends DataTableSource {
           Focus(
             onFocusChange: (hasFocus) {
               if (!hasFocus) {
-                // Chỉ update khi mất focus
                 controller.updateNotRehireReason(
                   data.vchREmployeeId.toString(),
                   reasonController.text,
@@ -1489,10 +1434,16 @@ class MyData extends DataTableSource {
             },
             child: TextFormField(
               controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: isRejected ? Colors.red[900] : null,
+              ),
               decoration: InputDecoration(
                 labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                labelStyle: TextStyle(
+                  fontSize: Common.sizeColumn,
+                  color: isRejected ? Colors.red[700] : null,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -2194,6 +2145,7 @@ class _EditTwoContractDialog extends StatelessWidget {
       onChanged: onChanged,
     );
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
