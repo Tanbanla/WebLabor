@@ -1124,7 +1124,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                   );
                   final url = html.Url.createObjectUrlFromBlob(blob);
-                  final anchor = html.AnchorElement(href: url)
+                  html.AnchorElement(href: url)
                     ..setAttribute('download', fileName)
                     ..click();
                   html.Url.revokeObjectUrl(url);
@@ -2194,13 +2194,6 @@ class _EditTwoContractDialog extends StatelessWidget {
       onChanged: onChanged,
     );
   }
-
-  // so sánh bỏ khoảng trắng
-  String _removeAllSpaces(String? input) {
-    if (input == null) return '';
-    return input.replaceAll(RegExp(r'\s+'), '');
-  }
-
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {

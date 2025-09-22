@@ -918,7 +918,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                   );
                   final url = html.Url.createObjectUrlFromBlob(blob);
-                  final anchor = html.AnchorElement(href: url)
+                  html.AnchorElement(href: url)
                     ..setAttribute('download', fileName)
                     ..click();
                   html.Url.revokeObjectUrl(url);
@@ -1673,26 +1673,6 @@ class MyData extends DataTableSource {
         );
     }
   }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 18, color: color),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-      ),
-    );
-  }
-
   @override
   bool get isRowCountApproximate => false;
 
