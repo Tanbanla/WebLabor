@@ -20,6 +20,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // for platform check
+import 'package:universal_html/html.dart'
+    as html; // to manipulate browser history
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -31,22 +34,62 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   late Widget _currentBody; // Sử dụng late thay vì khởi tạo ngay
   final DashboardControllerPTHC controller = Get.put(DashboardControllerPTHC());
-  
+  final path = Uri.base.path;
   @override
   void initState() {
     super.initState();
-    _currentBody = HomeScreen(
-      onNavigate: _changeBody, 
-    );
+    _currentBody = _getBodyForPath(path);
   }
-  void _changeBody(Widget newBody) {
+
+  Widget _getBodyForPath(String path) {
+    switch (path) {
+      case '/two':
+        return TwoContractScreen();
+      case '/apprentice':
+        return ApprenticeContractScreen();
+      case '/filltwo':
+        return FillTwoScreen();
+      case '/fillapprentice':
+        return FillApprenticeScreen();
+      case '/approvaltwo':
+        return ApprovalTwoScreen();
+      case '/approvaltrial':
+        return ApprovalTrialScreen();
+      case '/approvalpreparation':
+        return ApprovalPrepartionScreen();
+      case '/reporttwo':
+        return ReportTwoScreen();
+      case '/reportapprentice':
+        return ReportApprentice();
+      case '/masteruser':
+        return MasterUser();
+      case '/masterpthc':
+        return MasterPTHC();
+      default:
+        return HomeScreen(onNavigate: _changeBody);
+    }
+  }
+
+  void _changeBody(Widget newBody, {String? newPath}) {
     if (!mounted) return;
     setState(() {
       _currentBody = newBody;
-      if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
-        Navigator.of(context).pop();
+      if (newPath != null) {
+        _resetUrlPath();
       }
     });
+  }
+
+  void _resetUrlPath() {
+    if (!kIsWeb) return;
+    try {
+      // Đưa URL về origin (không path) mà không reload trang
+      final origin = html.window.location.origin;
+      // origin giữ dạng http://localhost:54364 (không thêm path)
+      html.window.history.replaceState(null, '', origin);
+    } catch (_) {
+      // fallback: bỏ qua nếu không chỉnh được history
+    }
   }
 
   //
@@ -54,6 +97,13 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
     controller.fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
+    // Nếu truy cập trực tiếp bằng deep-link (ví dụ /two) sau khi load xong sẽ reset URL về root.
+    // Thực hiện một lần ở frame đầu.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (kIsWeb && Uri.base.path.isNotEmpty && Uri.base.path != '/') {
+        _resetUrlPath();
+      }
+    });
     return ValueListenableBuilder<Locale>(
       valueListenable: LanguageNotifier.notifier,
       builder: (context, locale, child) {
@@ -73,7 +123,6 @@ class _MenuScreenState extends State<MenuScreen> {
       iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
       title: Text(
         tr('appTitle'),
-        //"LABOR CONTRACT EVALUATION",
         style: TextStyle(color: Colors.white),
       ),
       backgroundColor: Common.primaryColor, //.withOpacity(0.6),
@@ -197,7 +246,11 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         return allCdms; // Admin có tất cả quyền
       // Quyen cua PER
       case 'Per':
-        return allCdms.where((cdm) => cdm.title != tr("master") && cdm.title != tr("approval")).toList();
+        return allCdms
+            .where(
+              (cdm) => cdm.title != tr("master") && cdm.title != tr("approval"),
+            )
+            .toList();
       case 'Chief Per':
         return allCdms.where((cdm) => cdm.title != tr("master")).toList();
       // Quyen dien danh gia cua phong ban
@@ -478,9 +531,9 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           } else if (subMenu == preparationApprovalText) {
             widget.changeBody(ApprovalPrepartionScreen());
           } else if (subMenu == homeText) {
-            widget.changeBody(HomeScreen(onNavigate: widget.changeBody, ));
+            widget.changeBody(HomeScreen(onNavigate: widget.changeBody));
           } else {
-            widget.changeBody(HomeScreen(onNavigate: widget.changeBody, ));
+            widget.changeBody(HomeScreen(onNavigate: widget.changeBody));
           }
         }
       },

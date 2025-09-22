@@ -1162,7 +1162,7 @@ class DashboardControllerTwo extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+        if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1207,7 +1207,8 @@ class DashboardControllerTwo extends GetxController {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          return jsonData['data'] as bool;
+          // Employee exists
+          return jsonData['data'] != null;
         } else {
           return false;
         }

@@ -190,6 +190,7 @@ class DashboardControllerApprentice extends GetxController {
 
     filterdataList.value = filteredList;
   }
+
   // Helper method to reset the filtered list to the original data
   void refreshFilteredList() {
     filterdataList.value = List.from(dataList);
@@ -906,21 +907,23 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
-// delete list
+
+  // delete list
   Future<void> deleteListApprenticeContract() async {
     try {
       isLoading(true);
       final contract = getSelectedItems();
-      
+
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
 
       // Lấy danh sách ID từ các item được chọn
       final ids = contract.map((contract) => contract.id).toList();
-      
+
       final endpoint = Common.DeleteApprenticeMultiID;
-      final response = await http.delete( // Thường xóa nhiều item dùng POST hoặc DELETE với body
+      final response = await http.delete(
+        // Thường xóa nhiều item dùng POST hoặc DELETE với body
         Uri.parse('${Common.API}$endpoint'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(ids), // Gửi danh sách ID dưới dạng JSON
@@ -941,6 +944,7 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+
   // import file
   Future<void> importExcelMobileContract(File file, String userUpdate) async {
     try {
@@ -1043,7 +1047,7 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+        if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1178,7 +1182,7 @@ class DashboardControllerApprentice extends GetxController {
           _i++;
           continue; // Skip invalid rows
         }
-        if (await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+        if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1233,6 +1237,7 @@ class DashboardControllerApprentice extends GetxController {
     }
     return null;
   }
+
   // check dữ liệu nhân viên
   Future<bool> checkEmployeeExists(String employeeId) async {
     try {
@@ -1245,7 +1250,7 @@ class DashboardControllerApprentice extends GetxController {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          return jsonData['data'] as bool;
+          return jsonData['data'] != null;
         } else {
           return false;
         }
@@ -1258,6 +1263,7 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+
   // cac thuoc tinh update
   void updateVchrLythuyet(String employeeCode, String diem) {
     final index = dataList.indexWhere(
