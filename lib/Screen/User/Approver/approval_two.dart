@@ -211,6 +211,14 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                         controller.filterByGroup(value);
                       },
                     ),
+                    // reset filter
+                    const SizedBox(width: 8),
+                    buildActionButton(
+                      icon: Iconsax.refresh,
+                      color: Colors.blue,
+                      tooltip: tr('Rfilter'),
+                      onPressed: () => controller.refreshFilteredList(),
+                    ),
                   ],
                 ),
               ),
@@ -653,8 +661,9 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
                 const startRow = 7; // Dòng bắt đầu điền dữ liệu
                 // Xác nhận danh sách xuất dữ liệu
-                List<TwoContract> dataToExport = controller.getSelectedItems().isNotEmpty
-                    ? controller.getSelectedItems() 
+                List<TwoContract> dataToExport =
+                    controller.getSelectedItems().isNotEmpty
+                    ? controller.getSelectedItems()
                     : List.from(controller.filterdataList);
                 // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < dataToExport.length; i++) {

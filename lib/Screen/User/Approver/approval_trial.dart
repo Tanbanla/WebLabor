@@ -160,7 +160,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(tr('searchhint'), style: TextStyle(color: Colors.grey[600], fontSize: 18)),
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 18),
+                    ),
                     const SizedBox(width: 12),
                     _buildFilterFieldWithIcon(
                       width: 240,
@@ -206,6 +209,14 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                         controller.filterByGroup(value);
                       },
                     ),
+                    // reset filter
+                    const SizedBox(width: 8),
+                    buildActionButton(
+                      icon: Iconsax.refresh,
+                      color: Colors.blue,
+                      tooltip: tr('Rfilter'),
+                      onPressed: () => controller.refreshFilteredList(),
+                    ),
                   ],
                 ),
               ),
@@ -224,7 +235,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
               icon: Iconsax.back_square,
               color: Colors.orange,
               tooltip: tr('ReturnS'),
-              onPressed: () => _ReturnSDialog(authState.user!.chRUserid.toString(),),
+              onPressed: () =>
+                  _ReturnSDialog(authState.user!.chRUserid.toString()),
             ),
             const SizedBox(width: 8),
             GestureDetector(
@@ -291,7 +303,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ],
     );
   }
-// Helper method to build filter input fields with icons
+
+  // Helper method to build filter input fields with icons
   Widget _buildFilterFieldWithIcon({
     required double width,
     required String hint,
@@ -330,6 +343,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ),
     );
   }
+
   Widget _buildDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -634,8 +648,9 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
                 const startRow = 8; // Dòng bắt đầu điền dữ liệu
                 // Xác nhận danh sách xuất dữ liệu
-                List<ApprenticeContract> dataToExport = controller.getSelectedItems().isNotEmpty 
-                    ? controller.getSelectedItems() 
+                List<ApprenticeContract> dataToExport =
+                    controller.getSelectedItems().isNotEmpty
+                    ? controller.getSelectedItems()
                     : List.from(controller.filterdataList);
                 // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < dataToExport.length; i++) {
@@ -670,10 +685,20 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   setCellValue('H', item.chRPosition ?? '');
                   setCellValue('I', item.chRCodeGrade ?? '');
                   if (item.dtMJoinDate != null) {
-                  setCellValue('J', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMJoinDate!)));
+                    setCellValue(
+                      'J',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
                   }
                   if (item.dtMEndDate != null) {
-                  setCellValue('K', DateFormat('dd/MM/yyyy').format(DateTime.parse(item.dtMEndDate!)));
+                    setCellValue(
+                      'K',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
                   }
                   setCellValue('L', item.fLGoLeaveLate ?? '0');
                   setCellValue('M', item.fLNotLeaveDay ?? '0');
@@ -688,7 +713,12 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   setCellValue('V', item.vcHNeedViolation ?? '');
                   setCellValue('W', item.vchRReasultsLeader ?? '');
                   setCellValue('X', item.vchRNote ?? '');
-                  setCellValue('Y', item.biTNoReEmployment == null ? "" : (item.biTNoReEmployment ? "" : "X"));
+                  setCellValue(
+                    'Y',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
                   setCellValue('Z', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
                 }
@@ -799,7 +829,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     );
   }
 
-  void _ReturnSDialog(String adid){
+  void _ReturnSDialog(String adid) {
     final controller = Get.find<DashboardControllerApprentice>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -812,9 +842,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: tr('reason'),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
@@ -822,7 +850,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(tr('Cancel')),
           ),
-          
+
           ElevatedButton(
             onPressed: () async {
               try {
@@ -831,13 +859,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   return;
                 }
                 await controller.updateListContractReturnS(
-                  adid,reasonController.text,
+                  adid,
+                  reasonController.text,
                 );
-                controller.changeStatus(
-                    'approval',
-                    null,
-                    adid,
-                  );
+                controller.changeStatus('approval', null, adid);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -862,19 +887,22 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             },
             child: Text(tr('Confirm')),
           ),
-          Obx(() => messageError.value.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
-                  child: Text(
-                    messageError.value,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => messageError.value.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+                    child: Text(
+                      messageError.value,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -925,6 +953,7 @@ class MyData extends DataTableSource {
       ),
     );
   }
+
   @override
   DataRow? getRow(int index) {
     final data = controller.filterdataList[index];
@@ -1294,7 +1323,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text('Per/人事課の中級管理職', style: TextStyle(color: Colors.purple[800])),
+          child: Text(
+            'Per/人事課の中級管理職',
+            style: TextStyle(color: Colors.purple[800]),
+          ),
         );
       case 3:
         return Container(
@@ -1324,7 +1356,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('QLTC/中級管理職', style: TextStyle(color: Colors.yellow[800])),
+          child: Text(
+            'QLTC/中級管理職',
+            style: TextStyle(color: Colors.yellow[800]),
+          ),
         );
       case 7:
         return Container(
@@ -1344,7 +1379,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text('Director/管掌取締役', style: TextStyle(color: Colors.brown[800])),
+          child: Text(
+            'Director/管掌取締役',
+            style: TextStyle(color: Colors.brown[800]),
+          ),
         );
       case 9:
         return Container(
@@ -1434,353 +1472,4 @@ class MyData extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
-}
-
-class _EditContractDialog extends StatelessWidget {
-  final ApprenticeContract contract;
-  final DashboardControllerApprentice controller = Get.find();
-
-  _EditContractDialog({required this.contract});
-
-  @override
-  Widget build(BuildContext context) {
-    final edited = ApprenticeContract.fromJson(contract.toJson());
-    RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
-
-    return AlertDialog(
-      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-      actionsPadding: const EdgeInsets.all(20),
-      title: Row(
-        children: [
-          Icon(Iconsax.lamp1, color: Common.primaryColor),
-          SizedBox(width: 10),
-          Text(
-            '${tr('edit')} ${contract.vchREmployeeName}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Common.primaryColor,
-            ),
-          ),
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: Form(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Tiêu đề phần Information
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tr('Information'),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Common.primaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Dòng 1: Mã phòng ban + Tên phòng ban
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.vchRCodeSection,
-                      label: tr('department'),
-                      onChanged: (value) => edited.vchRCodeSection = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.chRCostCenterName,
-                      label: tr('group'),
-                      onChanged: (value) => edited.chRCostCenterName = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Dòng 2: Mã NV + Giới tính
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.vchREmployeeId,
-                      label: tr('employeeCode'),
-                      onChanged: (value) => edited.vchREmployeeId = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: _buildCompactTextField(
-                      initialValue: contract.vchRTyperId,
-                      label: tr('gender'),
-                      onChanged: (value) => edited.vchRTyperId = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 3: Tên NV + Tuổi
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: _buildCompactTextField(
-                      initialValue: contract.vchREmployeeName,
-                      label: tr('fullName'),
-                      onChanged: (value) => edited.vchREmployeeName = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 80,
-                    child: _buildCompactTextField(
-                      initialValue: getAgeFromBirthday(
-                        contract.dtMBrithday,
-                      ).toString(),
-                      label: tr('age'),
-                      onChanged: (value) => edited.dtMBrithday = value,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10, width: 500),
-
-              // Dòng 4: Vị trí + Bậc lương
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.chRPosition,
-                      label: tr('position'),
-                      onChanged: (value) => edited.chRPosition = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 100,
-                    child: _buildCompactTextField(
-                      initialValue: contract.chRCodeGrade,
-                      label: tr('salaryGrade'),
-                      onChanged: (value) => edited.chRCodeGrade = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 5: Ngày bắt đầu + Ngày kết thúc
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateTime.parse(contract.dtMJoinDate!)),
-                      label: tr('contractEffective'),
-                      onChanged: (value) => edited.dtMJoinDate = value,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateTime.parse(contract.dtMEndDate!)),
-                      label: tr('contractEndDate'),
-                      onChanged: (value) => edited.dtMEndDate = value,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Tiêu đề phần thống kê
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tr('titleEidt1'),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Common.primaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.fLGoLeaveLate?.toString(),
-                      label: tr('earlyLateCount'),
-                      onChanged: (value) =>
-                          edited.fLGoLeaveLate = double.tryParse(value),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.fLNotLeaveDay?.toString(),
-                      label: tr('unreportedLeave'),
-                      onChanged: (value) =>
-                          edited.fLNotLeaveDay = double.tryParse(value),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Dòng 8: Số lần vi phạm + Mã phê duyệt
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactTextField(
-                      initialValue: contract.inTViolation?.toString(),
-                      label: tr('violationCount'),
-                      onChanged: (value) =>
-                          edited.inTViolation = int.tryParse(value),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Lý do vi phạm (chiếm full width)
-              _buildCompactTextField(
-                initialValue: contract.nvarchaRViolation,
-                label: tr('reason'),
-                onChanged: (value) => edited.nvarchaRViolation = value,
-                maxLines: 2,
-              ),
-
-              if (errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    errorMessage.value,
-                    style: const TextStyle(color: Colors.red, fontSize: 14),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey[700],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          ),
-          onPressed: controller.isLoading.value
-              ? null
-              : () => Navigator.of(context).pop(),
-          child: Text(tr('Cancel')),
-        ),
-        Obx(
-          () => ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Common.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: (controller.isLoading.value)
-                ? null
-                : () async {
-                    errorMessage.value = '';
-                    controller.isLoading(false);
-                    try {
-                      await controller.updateApprenticeContract(
-                        edited,
-                        authState.user!.chRUserid.toString(),
-                      );
-                      // String sectionName = authState.user!.chRSecCode
-                      //     .toString()
-                      //     .split(':')[1]
-                      //     .trim();
-                      // phan xem ai dang vao man so sanh
-                      controller.changeStatus(
-                        'approval',
-                        null,
-                        authState.user!.chRUserid.toString(),
-                      );
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    } catch (e) {
-                      errorMessage.value =
-                          '${tr('ErrorUpdate')}${e.toString()}';
-                    }
-                  },
-            child: controller.isLoading.value
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(tr('Save')),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompactTextField({
-    required String? initialValue,
-    required String label,
-    required Function(String) onChanged,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-      ),
-      style: const TextStyle(fontSize: 14),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      onChanged: onChanged,
-    );
-  }
-
-  String getAgeFromBirthday(String? birthday) {
-    if (birthday == null || birthday.isEmpty) return '';
-    try {
-      final birthDate = DateTime.parse(birthday);
-      final now = DateTime.now();
-      int age = now.year - birthDate.year;
-      if (now.month < birthDate.month ||
-          (now.month == birthDate.month && now.day < birthDate.day)) {
-        age--;
-      }
-      return '$age';
-    } catch (e) {
-      return 'Invalid date';
-    }
-  }
 }

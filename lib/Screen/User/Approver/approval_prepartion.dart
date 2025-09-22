@@ -370,6 +370,14 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                     controller.filterByGroup(value);
                   },
                 ),
+                // reset filter
+                const SizedBox(width: 8),
+                buildActionButton(
+                  icon: Iconsax.refresh,
+                  color: Colors.blue,
+                  tooltip: tr('Rfilter'),
+                  onPressed: () => controller.refreshFilteredList(),
+                ),
               ],
             ),
           ),
@@ -388,7 +396,8 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
       ],
     );
   }
-// Helper method to build filter input fields with icons
+
+  // Helper method to build filter input fields with icons
   Widget _buildFilterFieldWithIcon({
     required double width,
     required String hint,
@@ -427,7 +436,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
       ),
     );
   }
-  
+
   void _ReturnSDialog(String adid, String typeContract) {
     final controller = Get.find<DashboardControllerApporver>();
     final reasonController = TextEditingController();

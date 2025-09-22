@@ -349,6 +349,14 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     controller.filterByGroup(value);
                   },
                 ),
+                // reset filter
+                const SizedBox(width: 8),
+                buildActionButton(
+                  icon: Iconsax.refresh,
+                  color: Colors.blue,
+                  tooltip: tr('Rfilter'),
+                  onPressed: () => controller.refreshFilteredList(),
+                ),
               ],
             ),
           ),

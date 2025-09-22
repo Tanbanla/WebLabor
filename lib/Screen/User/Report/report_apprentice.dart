@@ -179,7 +179,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   // Dropdown filter for status instead of text input
                   SizedBox(
                     width: 220,
-                    child: Obx(() { // Thay YourController bằng controller thực tế
+                    child: Obx(() {
+                      // Thay YourController bằng controller thực tế
                       final statusOptions = <Map<String, dynamic>>[
                         {'code': '', 'label': tr('all')},
                         {'code': 'New', 'label': 'New'},
@@ -193,7 +194,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                       ];
 
                       return DropdownButtonFormField<String>(
-                        value: controller.selectedStatus.value.isEmpty ? null : controller.selectedStatus.value,
+                        value: controller.selectedStatus.value.isEmpty
+                            ? null
+                            : controller.selectedStatus.value,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -304,6 +307,14 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     onChanged: (value) {
                       controller.filterByGroup(value);
                     },
+                  ),
+                  // reset filter
+                  const SizedBox(width: 8),
+                  buildActionButton(
+                    icon: Iconsax.refresh,
+                    color: Colors.blue,
+                    tooltip: tr('Rfilter'),
+                    onPressed: () => controller.refreshFilteredList(),
                   ),
                 ],
               ),
@@ -697,8 +708,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
                 const startRow = 15; // Dòng bắt đầu điền dữ liệu
                 // Xác nhận danh sách xuất dữ liệu
-                List<ApprenticeContract> dataToExport = controller.getSelectedItems().isNotEmpty 
-                    ? controller.getSelectedItems() 
+                List<ApprenticeContract> dataToExport =
+                    controller.getSelectedItems().isNotEmpty
+                    ? controller.getSelectedItems()
                     : List.from(controller.filterdataList);
                 // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < dataToExport.length; i++) {

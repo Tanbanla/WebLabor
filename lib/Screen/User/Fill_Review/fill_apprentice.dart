@@ -491,6 +491,14 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     controller.filterByGroup(value);
                   },
                 ),
+                // reset filter
+                const SizedBox(width: 8),
+                buildActionButton(
+                  icon: Iconsax.refresh,
+                  color: Colors.blue,
+                  tooltip: tr('Rfilter'),
+                  onPressed: () => controller.refreshFilteredList(),
+                ),
               ],
             ),
           ),
@@ -855,8 +863,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     excel['Sheet1']; //?? excel[excel.tables.keys.first];
                 const startRow = 8; // Dòng bắt đầu điền dữ liệu
                 // Xác nhận danh sách xuất dữ liệu
-                List<ApprenticeContract> dataToExport = controller.getSelectedItems().isNotEmpty 
-                    ? controller.getSelectedItems() 
+                List<ApprenticeContract> dataToExport =
+                    controller.getSelectedItems().isNotEmpty
+                    ? controller.getSelectedItems()
                     : List.from(controller.filterdataList);
                 // 2. Điền dữ liệu vào các ô
                 for (int i = 0; i < dataToExport.length; i++) {
@@ -2511,6 +2520,7 @@ class MyData extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
+
 // Class tu choi phe duyet
 class _ReturnConApprenticetract extends StatelessWidget {
   final ApprenticeContract contract;

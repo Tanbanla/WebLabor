@@ -225,7 +225,7 @@ class DashboardControllerApporver extends GetxController {
   // so sanh du lieu
   void filterByStatus(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
 
@@ -265,7 +265,7 @@ class DashboardControllerApporver extends GetxController {
   // Filter by approver code (DotDanhGia)
   void filterByApproverCode(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
 
@@ -280,7 +280,7 @@ class DashboardControllerApporver extends GetxController {
   // Filter by employee ID
   void filterByEmployeeId(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
 
@@ -295,7 +295,7 @@ class DashboardControllerApporver extends GetxController {
   // Filter by employee name
   void filterByEmployeeName(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
 
@@ -310,7 +310,7 @@ class DashboardControllerApporver extends GetxController {
   // Filter by department
   void filterByDepartment(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
 
@@ -325,7 +325,7 @@ class DashboardControllerApporver extends GetxController {
   // Filter by group
   void filterByGroup(String query) {
     if (query.isEmpty) {
-      refreshFilteredList();
+      //refreshFilteredList();
       return;
     }
     final filteredList = dataList.where((item) {

@@ -162,6 +162,6 @@
   "TraVePTHC":"Trả về PTHC",
   "TraVeNguoiDanhGia":"Trả về người đánh giá",
   "ResultOk":"Cập nhật thành công",
-  "ReturnS":"Từ chối nhiều"
-
+  "ReturnS":"Từ chối nhiều",
+  "Rfilter":"Reset filter"
 }
