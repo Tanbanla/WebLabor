@@ -304,6 +304,7 @@ class BuildCompactTextField extends StatelessWidget {
       readOnly: readOnly,
       validator: validator,
       inputFormatters: inputFormatters,
+      style: const TextStyle(fontSize: 14)
     );
   }
 }

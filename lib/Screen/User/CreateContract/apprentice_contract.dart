@@ -1565,7 +1565,7 @@ class _EditContractDialog extends StatelessWidget {
                           .map(
                             (section) => DropdownMenuItem(
                               value: section,
-                              child: Text(section),
+                              child: Text(section, style: TextStyle(fontSize: 14),),
                             ),
                           )
                           .toList(),
