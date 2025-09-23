@@ -44,6 +44,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     //   null,
     //   null,
     // )
+    controller.fetchSectionList();
     controller.fetchDummyData();
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -1802,10 +1803,43 @@ class _EditTwoContractDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: BuildCompactTextField(
-                      initialValue: twoContract.vchRCodeSection,
-                      label: tr('department'),
-                      onChanged: (value) => edited.vchRCodeSection = value,
+                    child: DropdownButtonFormField(
+                      value: (() {
+                        final target = (edited.vchRNameSection ?? '')
+                            .replaceAll(RegExp(r'\s+'), '')
+                            .toLowerCase();
+                        for (final s in controller.listSection) {
+                          if (s.replaceAll(RegExp(r'\s+'), '').toLowerCase() ==
+                              target) {
+                            return s; // return original value in listSection
+                          }
+                        }
+                        return null;
+                      })(),
+                      decoration: InputDecoration(
+                        labelText: tr('department'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                      ),
+                      isExpanded: true,
+                      items: controller.listSection
+                          .toSet() // Ensure unique values
+                          .map(
+                            (section) => DropdownMenuItem(
+                              value: section,
+                              child: Text(section),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        edited.vchRNameSection = value;
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),

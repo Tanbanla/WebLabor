@@ -1258,7 +1258,11 @@ class MyData extends DataTableSource {
       onTap: () => _copyToClipboard(txt),
       child: Row(
         children: [
-            Icon(Icons.copy, size: 14, color: highlight ? Colors.red[700] : Colors.grey[600]),
+          Icon(
+            Icons.copy,
+            size: 14,
+            color: highlight ? Colors.red[700] : Colors.grey[600],
+          ),
           Expanded(
             child: Text(
               txt,
@@ -1285,9 +1289,9 @@ class MyData extends DataTableSource {
     final bool isRejected = data.biTApproverPer == false;
 
     TextStyle cellCenterStyle() => TextStyle(
-          fontSize: Common.sizeColumn,
-          color: isRejected ? Colors.red[900] : null,
-        );
+      fontSize: Common.sizeColumn,
+      color: isRejected ? Colors.red[900] : null,
+    );
 
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((states) {
@@ -1348,10 +1352,16 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(_buildCopyCell(data.vchREmployeeId, highlight: isRejected)),
-        DataCell(Center(child: Text(data.vchRTyperId ?? "", style: cellCenterStyle()))),
+        DataCell(
+          Center(child: Text(data.vchRTyperId ?? "", style: cellCenterStyle())),
+        ),
         DataCell(_buildCopyCell(data.vchREmployeeName, highlight: isRejected)),
-        DataCell(_buildCopyCell(data.vchRNameSection ?? "", highlight: isRejected)),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected)),
+        DataCell(
+          _buildCopyCell(data.vchRNameSection ?? "", highlight: isRejected),
+        ),
+        DataCell(
+          _buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected),
+        ),
         DataCell(
           Center(
             child: Text(
@@ -1362,13 +1372,24 @@ class MyData extends DataTableSource {
             ),
           ),
         ),
-        DataCell(Center(child: Text(data.chRPosition ?? "", style: cellCenterStyle()))),
-        DataCell(Center(child: Text(data.chRCodeGrade?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(
+          Center(child: Text(data.chRPosition ?? "", style: cellCenterStyle())),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.chRCodeGrade?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
         DataCell(
           Center(
             child: Text(
               data.dtMJoinDate != null
-                  ? DateFormat('yyyy-MM-dd').format(DateTime.parse(data.dtMJoinDate!))
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMJoinDate!))
                   : "",
               style: cellCenterStyle(),
             ),
@@ -1378,17 +1399,54 @@ class MyData extends DataTableSource {
           Center(
             child: Text(
               data.dtMEndDate != null
-                  ? DateFormat('yyyy-MM-dd').format(DateTime.parse(data.dtMEndDate!))
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMEndDate!))
                   : "",
               style: cellCenterStyle(),
             ),
           ),
         ),
-        DataCell(Center(child: Text(data.fLGoLeaveLate?.toString() ?? "", style: cellCenterStyle()))),
-        DataCell(Center(child: Text(data.fLPaidLeave?.toString() ?? "", style: cellCenterStyle()))),
-        DataCell(Center(child: Text(data.fLNotPaidLeave?.toString() ?? "", style: cellCenterStyle()))),
-        DataCell(Center(child: Text(data.fLNotLeaveDay?.toString() ?? "", style: cellCenterStyle()))),
-        DataCell(Center(child: Text(data.inTViolation?.toString() ?? "", style: cellCenterStyle()))),
+        DataCell(
+          Center(
+            child: Text(
+              data.fLGoLeaveLate?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.fLPaidLeave?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.fLNotPaidLeave?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.fLNotLeaveDay?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.inTViolation?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
+        ),
         DataCell(
           Text(
             data.nvarchaRViolation?.toString() ?? "",
@@ -1410,11 +1468,13 @@ class MyData extends DataTableSource {
                 children: [
                   Icon(Icons.cancel, color: Colors.red, size: 16),
                   SizedBox(width: 4),
-                  Text('X',
-                      style: TextStyle(
-                        fontSize: Common.sizeColumn,
-                        color: Colors.red,
-                      )),
+                  Text(
+                    'X',
+                    style: TextStyle(
+                      fontSize: Common.sizeColumn,
+                      color: Colors.red,
+                    ),
+                  ),
                 ],
               );
             } else {
@@ -1541,12 +1601,18 @@ class _EditTwoContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField(
-                      value:
-                          controller.listSection.contains(
-                            edited.vchRCodeSection,
-                          )
-                          ? edited.vchRCodeSection
-                          : null,
+                      value: (() {
+                        final target = (edited.vchRNameSection ?? '')
+                            .replaceAll(RegExp(r'\s+'), '')
+                            .toLowerCase();
+                        for (final s in controller.listSection) {
+                          if (s.replaceAll(RegExp(r'\s+'), '').toLowerCase() ==
+                              target) {
+                            return s; // return original value in listSection
+                          }
+                        }
+                        return null;
+                      })(),
                       decoration: InputDecoration(
                         labelText: tr('department'),
                         border: OutlineInputBorder(
@@ -1569,7 +1635,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                           )
                           .toList(),
                       onChanged: (value) {
-                        edited.vchRCodeSection = value;
+                        edited.vchRNameSection = value;
                       },
                     ),
                   ),

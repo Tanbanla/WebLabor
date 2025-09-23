@@ -1231,7 +1231,11 @@ class MyData extends DataTableSource {
       onTap: () => _copyToClipboard(txt),
       child: Row(
         children: [
-            Icon(Icons.copy, size: 14, color: highlight ? Colors.red[700] : Colors.grey[600]),
+          Icon(
+            Icons.copy,
+            size: 14,
+            color: highlight ? Colors.red[700] : Colors.grey[600],
+          ),
           Expanded(
             child: Text(
               txt,
@@ -1335,8 +1339,12 @@ class MyData extends DataTableSource {
         ),
         // Copyable vchREmployeeName
         DataCell(_buildCopyCell(data.vchREmployeeName, highlight: isRejected)),
-        DataCell(_buildCopyCell(data.vchRNameSection ?? "",highlight: isRejected)),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected)),
+        DataCell(
+          _buildCopyCell(data.vchRNameSection ?? "", highlight: isRejected),
+        ),
+        DataCell(
+          _buildCopyCell(data.chRCostCenterName ?? "", highlight: isRejected),
+        ),
         DataCell(
           Text(
             data.dtMBrithday != null
@@ -1345,17 +1353,9 @@ class MyData extends DataTableSource {
             style: cellCenterStyle(),
           ),
         ),
+        DataCell(Text(data.chRPosition ?? "", style: cellCenterStyle())),
         DataCell(
-          Text(
-            data.chRPosition ?? "",
-            style: cellCenterStyle(),
-          ),
-        ),
-        DataCell(
-          Text(
-            data.chRCodeGrade?.toString() ?? "",
-            style: cellCenterStyle(),
-          ),
+          Text(data.chRCodeGrade?.toString() ?? "", style: cellCenterStyle()),
         ),
         DataCell(
           Text(
@@ -1378,22 +1378,13 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.fLGoLeaveLate?.toString() ?? "",
-            style: cellCenterStyle(),
-          ),
+          Text(data.fLGoLeaveLate?.toString() ?? "", style: cellCenterStyle()),
         ),
         DataCell(
-          Text(
-            data.fLNotLeaveDay?.toString() ?? "",
-            style: cellCenterStyle(),
-          ),
+          Text(data.fLNotLeaveDay?.toString() ?? "", style: cellCenterStyle()),
         ),
         DataCell(
-          Text(
-            data.inTViolation?.toString() ?? "",
-            style: cellCenterStyle(),
-          ),
+          Text(data.inTViolation?.toString() ?? "", style: cellCenterStyle()),
         ),
         DataCell(
           Text(
@@ -1440,10 +1431,16 @@ class MyData extends DataTableSource {
             },
             child: TextFormField(
               controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn, color: isRejected ? Colors.red[900] : null,),
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: isRejected ? Colors.red[900] : null,
+              ),
               decoration: InputDecoration(
                 labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn, color: isRejected ? Colors.red[700] : null,),
+                labelStyle: TextStyle(
+                  fontSize: Common.sizeColumn,
+                  color: isRejected ? Colors.red[700] : null,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -1539,12 +1536,18 @@ class _EditContractDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField(
-                      value:
-                          controller.listSection.contains(
-                            edited.vchRCodeSection,
-                          )
-                          ? edited.vchRCodeSection
-                          : null,
+                      value: (() {
+                        final target = (edited.vchRNameSection ?? '')
+                            .replaceAll(RegExp(r'\s+'), '')
+                            .toLowerCase();
+                        for (final s in controller.listSection) {
+                          if (s.replaceAll(RegExp(r'\s+'), '').toLowerCase() ==
+                              target) {
+                            return s; // return original value in listSection
+                          }
+                        }
+                        return null;
+                      })(),
                       decoration: InputDecoration(
                         labelText: tr('department'),
                         border: OutlineInputBorder(
@@ -1567,7 +1570,7 @@ class _EditContractDialog extends StatelessWidget {
                           )
                           .toList(),
                       onChanged: (value) {
-                        edited.vchRCodeSection = value;
+                        edited.vchRNameSection = value;
                       },
                     ),
                   ),

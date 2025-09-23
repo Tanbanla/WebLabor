@@ -425,7 +425,7 @@ class DashboardControllerApprentice extends GetxController {
   ) async {
     try {
       contract.vchRUserUpdate = userUpdate;
-      contract.vchRNameSection = contract.vchRCodeSection;
+      contract.vchRCodeSection=contract.vchRNameSection;
       contract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -1644,7 +1644,7 @@ class DashboardControllerApprentice extends GetxController {
   // lay thong tin section
   Future<void> fetchSectionList() async {
     try {
-      isLoading(true);
+      //isLoading(true);
       final response = await http.get(
         Uri.parse(Common.API + Common.UserSection),
         headers: {'Content-Type': 'application/json'},

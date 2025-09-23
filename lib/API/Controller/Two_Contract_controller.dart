@@ -418,7 +418,7 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       twocontract.vchRUserUpdate = userUpdate;
-      twocontract.vchRNameSection = twocontract.vchRCodeSection;
+      twocontract.vchRCodeSection =twocontract.vchRNameSection;
       twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -1532,7 +1532,7 @@ class DashboardControllerTwo extends GetxController {
   // lay thong tin section
   Future<void> fetchSectionList() async {
     try {
-      isLoading(true);
+      //isLoading(true);
       final response = await http.get(
         Uri.parse(Common.API + Common.UserSection),
         headers: {'Content-Type': 'application/json'},
