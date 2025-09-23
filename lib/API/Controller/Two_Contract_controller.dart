@@ -581,7 +581,7 @@ class DashboardControllerTwo extends GetxController {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMail(
-          '2',
+          '4',
           '$userApprover@brothergroup.net',
           '$userApprover@brothergroup.net',
           '$userApprover@brothergroup.net',
@@ -668,7 +668,7 @@ class DashboardControllerTwo extends GetxController {
         //await fetchDataBy();
         final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMail(
-          '2',
+          '4',
           '$userApprover@brothergroup.net',
           '$userApprover@brothergroup.net',
           '$userApprover@brothergroup.net',
@@ -796,7 +796,7 @@ class DashboardControllerTwo extends GetxController {
           // );
           // k mo vi mo se gui cho quan ly cac phong
           controlleruser.SendMail(
-            '2',
+            '6',
             "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
             "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
             "vuduc.hai@brother-bivn.com.vn",

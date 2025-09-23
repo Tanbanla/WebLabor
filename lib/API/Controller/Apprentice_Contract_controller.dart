@@ -834,7 +834,7 @@ class DashboardControllerApprentice extends GetxController {
         if (mailSend != '') {
           //controlleruser.SendMail('2', mailSend, mailSend, mailSend);
           controlleruser.SendMail(
-            '2',
+            '5',
             "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
             "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
             "vuduc.hai@brother-bivn.com.vn",

@@ -117,6 +117,9 @@ class DashboardControllerApporver extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        var typeMail = contractType == 'two'
+            ? '4'
+            : '2';
         await fetchData(
           adid: userUpdate,
           statusId: '2',
@@ -131,7 +134,7 @@ class DashboardControllerApporver extends GetxController {
           );
           for (var item in matchingPthc) {
             controlleruser.SendMail(
-              '2',
+              typeMail,
               item.mailto.toString(),
               item.mailcc.toString(),
               item.mailbcc.toString(),

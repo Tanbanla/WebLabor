@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
-import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
 import 'package:web_labor_contract/class/ChartMonth.dart';
 import 'package:web_labor_contract/main.dart';
 import 'package:web_labor_contract/router.dart';
