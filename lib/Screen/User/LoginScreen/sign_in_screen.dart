@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
-import 'package:web_labor_contract/Screen/User/Home/navigation_drawer.dart';
+import 'package:go_router/go_router.dart';
+import '../../../router.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -26,13 +27,11 @@ class _SignInScreenState extends State<SignInScreen> {
       if (Provider.of<AuthState>(context, listen: false).isAuthenticated) {
         if (!mounted) return;
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MenuScreen()),
-        );
+        context.go(AppRoutes.home);
       }
     });
   }
+
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -51,14 +50,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (response['success'] == true) {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MenuScreen()),
-      );
+      context.go(AppRoutes.home);
     } else {
       setState(() => _errorMessage = response['message']);
     }
   }
+
   @override
   void dispose() {
     _adidController.dispose();
@@ -147,8 +144,10 @@ class _SignInScreenState extends State<SignInScreen> {
                           }
                           return null;
                         },
-                        textInputAction: TextInputAction.done, // Đặt action là "done" cho trường cuối
-                        onFieldSubmitted: (_) => _handleLogin(), // Xử lý login khi nhấn Enter
+                        textInputAction: TextInputAction
+                            .done, // Đặt action là "done" cho trường cuối
+                        onFieldSubmitted: (_) =>
+                            _handleLogin(), // Xử lý login khi nhấn Enter
                       ),
                       const SizedBox(height: 10),
                       Align(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
-import 'package:web_labor_contract/Screen/User/Home/navigation_drawer.dart';
+import 'router.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:web_labor_contract/Screen/User/LoginScreen/sign_in_screen.dart';
 import 'package:get/get.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -30,34 +30,35 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final router = createRouter(context);
+    return MaterialApp.router(
       title: 'Labor Contract Evaluation System',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: Consumer<AuthState>(
-        builder: (context, authState, child) {
-          if (authState.isLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-          return //MenuScreen();
-          authState.isAuthenticated
-              ? const MenuScreen()
-              : const SignInScreen();
-        },
-      ),
+      routerConfig: router,
+      builder: (context, child) {
+        final authState = Provider.of<AuthState>(context, listen: true);
+        if (authState.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }
+
 //
 class LanguageNotifier {
-  static final ValueNotifier<Locale> _notifier = ValueNotifier<Locale>(Locale('vi'));
-  
+  static final ValueNotifier<Locale> _notifier = ValueNotifier<Locale>(
+    Locale('vi'),
+  );
+
   static ValueNotifier<Locale> get notifier => _notifier;
-  
+
   static void changeLanguage(Locale locale) {
     _notifier.value = locale;
   }

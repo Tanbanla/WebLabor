@@ -2,115 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
-import 'package:web_labor_contract/Screen/User/Approver/approval_prepartion.dart';
-import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
-import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
-import 'package:web_labor_contract/Screen/User/CreateContract/apprentice_contract.dart';
-import 'package:web_labor_contract/Screen/User/CreateContract/two_contract.dart';
-import 'package:web_labor_contract/Screen/Admin/Master/master_pthc.dart';
-import 'package:web_labor_contract/Screen/Admin/Master/master_user.dart';
-import 'package:web_labor_contract/Screen/User/Fill_Review/fill_apprentice.dart';
-import 'package:web_labor_contract/Screen/User/Fill_Review/fill_two.dart';
-import 'package:web_labor_contract/Screen/User/Home/home_screen.dart';
-import 'package:web_labor_contract/Screen/User/LoginScreen/sign_in_screen.dart';
-import 'package:web_labor_contract/Screen/User/Report/report_apprentice.dart';
-import 'package:web_labor_contract/Screen/User/Report/report_two.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // for platform check
-import 'package:universal_html/html.dart'
-    as html; // to manipulate browser history
+// Removed kIsWeb and html imports after router refactor
+import 'package:go_router/go_router.dart';
+import '../../../router.dart';
 
-class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+class MenuScreen extends StatelessWidget {
+  final Widget child;
+  const MenuScreen({super.key, required this.child});
 
-  @override
-  State<MenuScreen> createState() => _MenuScreenState();
-}
-
-class _MenuScreenState extends State<MenuScreen> {
-  late Widget _currentBody; // Sử dụng late thay vì khởi tạo ngay
-  final DashboardControllerPTHC controller = Get.put(DashboardControllerPTHC());
-  final path = Uri.base.path;
-  @override
-  void initState() {
-    super.initState();
-    _currentBody = _getBodyForPath(path);
-  }
-
-  Widget _getBodyForPath(String path) {
-    switch (path) {
-      case '/two':
-        return TwoContractScreen();
-      case '/apprentice':
-        return ApprenticeContractScreen();
-      case '/filltwo':
-        return FillTwoScreen();
-      case '/fillapprentice':
-        return FillApprenticeScreen();
-      case '/approvaltwo':
-        return ApprovalTwoScreen();
-      case '/approvaltrial':
-        return ApprovalTrialScreen();
-      case '/approvalpreparation':
-        return ApprovalPrepartionScreen();
-      case '/reporttwo':
-        return ReportTwoScreen();
-      case '/reportapprentice':
-        return ReportApprentice();
-      case '/masteruser':
-        return MasterUser();
-      case '/masterpthc':
-        return MasterPTHC();
-      default:
-        return HomeScreen(onNavigate: _changeBody);
-    }
-  }
-
-  void _changeBody(Widget newBody, {String? newPath}) {
-    if (!mounted) return;
-    setState(() {
-      _currentBody = newBody;
-      if (newPath != null) {
-        _resetUrlPath();
-      }
-    });
-  }
-
-  void _resetUrlPath() {
-    if (!kIsWeb) return;
-    try {
-      // Đưa URL về origin (không path) mà không reload trang
-      final origin = html.window.location.origin;
-      // origin giữ dạng http://localhost:54364 (không thêm path)
-      html.window.history.replaceState(null, '', origin);
-    } catch (_) {
-      // fallback: bỏ qua nếu không chỉnh được history
-    }
-  }
-
-  //
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
-    controller.fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
-    // Nếu truy cập trực tiếp bằng deep-link (ví dụ /two) sau khi load xong sẽ reset URL về root.
-    // Thực hiện một lần ở frame đầu.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (kIsWeb && Uri.base.path.isNotEmpty && Uri.base.path != '/') {
-        _resetUrlPath();
-      }
-    });
+    Get.put(
+      DashboardControllerPTHC(),
+    ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
     return ValueListenableBuilder<Locale>(
       valueListenable: LanguageNotifier.notifier,
-      builder: (context, locale, child) {
+      builder: (context, locale, _) {
         return Scaffold(
-          appBar: appBar(),
-          body: _currentBody,
-          drawer: ComplexDrawer(changeBody: _changeBody, context: context),
+          appBar: appBar(context),
+          body: child,
+          drawer: ComplexDrawer(context: context),
           drawerScrimColor: Colors.transparent,
           backgroundColor: Colors.white,
         );
@@ -118,75 +35,51 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  AppBar appBar() {
-    return AppBar(
-      iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
-      title: Text(
-        tr('appTitle'),
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Common.primaryColor, //.withOpacity(0.6),
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(right: 20),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Button tiếng Anh
-              IconButton(
-                icon: Image.asset(
-                  'assets/img/jp.png',
-                  height: 24, // Giảm kích thước cho phù hợp AppBar
-                  width: 40,
-                  fit: BoxFit.cover,
-                ),
-                onPressed: () {
-                  context.setLocale(Locale('ja'));
-                  LanguageNotifier.changeLanguage(Locale('ja'));
-                },
+  AppBar appBar(BuildContext context) => AppBar(
+    iconTheme: IconTheme.of(context).copyWith(color: Colors.white),
+    title: Text(tr('appTitle'), style: TextStyle(color: Colors.white)),
+    backgroundColor: Common.primaryColor,
+    actions: [
+      Padding(
+        padding: EdgeInsets.only(right: 20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Image.asset(
+                'assets/img/jp.png',
+                height: 24,
+                width: 40,
+                fit: BoxFit.cover,
               ),
-              // Button tiếng Việt
-              IconButton(
-                icon: Image.asset(
-                  'assets/img/vn.jpg',
-                  height: 24, // Giảm kích thước cho phù hợp AppBar
-                  width: 40,
-                  fit: BoxFit.cover,
-                ),
-                onPressed: () {
-                  context.setLocale(Locale('vi'));
-                  LanguageNotifier.changeLanguage(Locale('vi'));
-                },
+              onPressed: () {
+                context.setLocale(Locale('ja'));
+                LanguageNotifier.changeLanguage(Locale('ja'));
+              },
+            ),
+            IconButton(
+              icon: Image.asset(
+                'assets/img/vn.jpg',
+                height: 24,
+                width: 40,
+                fit: BoxFit.cover,
               ),
-            ],
-          ),
+              onPressed: () {
+                context.setLocale(Locale('vi'));
+                LanguageNotifier.changeLanguage(Locale('vi'));
+              },
+            ),
+          ],
         ),
-      ],
-    );
-  }
-
-  Widget body() {
-    return Center(
-      child: Container(
-        foregroundDecoration: BoxDecoration(
-          color: Common.primaryColor,
-          backgroundBlendMode: BlendMode.saturation,
-        ),
-        child: _currentBody,
       ),
-    );
-  }
+    ],
+  );
 }
 
 class ComplexDrawer extends StatefulWidget {
-  final Function(Widget) changeBody; // Callback để thay đổi giao diện
   final BuildContext context;
 
-  const ComplexDrawer({
-    Key? key,
-    required this.changeBody,
-    required this.context,
-  }) : super(key: key);
+  const ComplexDrawer({Key? key, required this.context}) : super(key: key);
 
   @override
   _ComplexDrawerState createState() => _ComplexDrawerState();
@@ -290,8 +183,6 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
   Widget row() {
     return Row(
       children: [
-        // isExpanded ? blackIconTiles()  : blackIconMenu(),
-        // invisibleSubMenus(),
         if (isExpanded) ...[
           blackIconMenu(),
           invisibleSubMenus(),
@@ -505,35 +396,35 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
           final approvalText = currentLang == 'vi' ? 'Phê duyệt' : '承認';
 
           if (subMenu == userManagementText) {
-            widget.changeBody(MasterUser());
+            context.go(AppRoutes.masterUser);
           } else if (subMenu == pthcInfoText) {
-            widget.changeBody(MasterPTHC());
+            context.go(AppRoutes.masterPthc);
           } else if (subMenu == indefiniteContractText) {
             if (title == createEvaluationText) {
-              widget.changeBody(TwoContractScreen());
+              context.go(AppRoutes.twoContract);
             } else if (title == fillEvaluationText) {
-              widget.changeBody(FillTwoScreen());
+              context.go(AppRoutes.fillTwo);
             } else if (title == approvalText) {
-              widget.changeBody(ApprovalTwoScreen());
+              context.go(AppRoutes.approvalTwo);
             } else if (title == reportText) {
-              widget.changeBody(ReportTwoScreen());
+              context.go(AppRoutes.reportTwo);
             }
           } else if (subMenu == trialContractText) {
             if (title == createEvaluationText) {
-              widget.changeBody(ApprenticeContractScreen());
+              context.go(AppRoutes.apprenticeContract);
             } else if (title == fillEvaluationText) {
-              widget.changeBody(FillApprenticeScreen());
+              context.go(AppRoutes.fillApprentice);
             } else if (title == approvalText) {
-              widget.changeBody(ApprovalTrialScreen());
+              context.go(AppRoutes.approvalTrial);
             } else if (title == reportText) {
-              widget.changeBody(ReportApprentice());
+              context.go(AppRoutes.reportApprentice);
             }
           } else if (subMenu == preparationApprovalText) {
-            widget.changeBody(ApprovalPrepartionScreen());
+            context.go(AppRoutes.approvalPreparation);
           } else if (subMenu == homeText) {
-            widget.changeBody(HomeScreen(onNavigate: widget.changeBody));
+            context.go(AppRoutes.home);
           } else {
-            widget.changeBody(HomeScreen(onNavigate: widget.changeBody));
+            context.go(AppRoutes.home);
           }
         }
       },
@@ -617,14 +508,8 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
               if (confirmed == true) {
                 try {
                   await authState.logout();
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SignInScreen(),
-                    ), // Thay SignInScreen() bằng widget màn hình login của bạn
-                    (Route<dynamic> route) =>
-                        false, // Xóa toàn bộ stack navigation
-                  );
+                  if (!mounted) return;
+                  context.go(AppRoutes.signIn);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('LogOut faile: ${e.toString()}')),

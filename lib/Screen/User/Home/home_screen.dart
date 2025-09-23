@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Chart_Controller/chart_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -12,10 +13,11 @@ import 'package:web_labor_contract/Screen/User/Approver/approval_trial.dart';
 import 'package:web_labor_contract/Screen/User/Approver/approval_two.dart';
 import 'package:web_labor_contract/class/ChartMonth.dart';
 import 'package:web_labor_contract/main.dart';
+import 'package:web_labor_contract/router.dart';
 
 class HomeScreen extends StatefulWidget {
-  // const HomeScreen({super.key});
-  final void Function(Widget)? onNavigate;
+  
+  final void Function(String)? onNavigate;
   const HomeScreen({Key? key, this.onNavigate}) : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               .toString(),
                           width: size.width > 600 ? 500 : size.width * 0.75,
                           onTap: () {
-                            widget.onNavigate?.call(ApprovalTrialScreen());
+                            context.go(AppRoutes.approvalTrial);
                           },
                         ),
                         const SizedBox(width: 20),
@@ -133,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               .toString(),
                           width: size.width > 600 ? 500 : size.width * 0.75,
                           onTap: () {
-                            widget.onNavigate?.call(ApprovalTwoScreen());
+                            context.go(AppRoutes.approvalTwo);
                           },
                         ),
                         const SizedBox(width: 20),
@@ -241,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-Widget _buildContractCard({
+  Widget _buildContractCard({
     required IconData icon,
     required Color color,
     required String title,
@@ -286,6 +288,7 @@ Widget _buildContractCard({
       ),
     );
   }
+
   Widget _buildLegend({required Color color, required String text}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
