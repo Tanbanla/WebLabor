@@ -613,7 +613,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                             ? total
                             : (_firstRowIndex + _rowsPerPage);
                         final visibleCount = endIndex - _firstRowIndex;
-                        return DataTable2(
+                        return Obx(
+                          () =>  DataTable2(
                           columnSpacing: 12,
                           minWidth: 2000,
                           horizontalMargin: 12,
@@ -809,7 +810,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                             visibleCount,
                             (i) => dataSource.getRow(_firstRowIndex + i)!,
                           ),
-                        );
+                        ));
                       },
                     ),
                   ),

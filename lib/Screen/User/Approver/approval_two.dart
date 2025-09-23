@@ -408,7 +408,8 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                             ? total
                             : (_firstRowIndex + _rowsPerPage);
                         final visibleCount = endIndex - _firstRowIndex;
-                        return DataTable2(
+                        return Obx(
+                          () =>  DataTable2(
                           columnSpacing: 12,
                           minWidth: 2000,
                           horizontalMargin: 12,
@@ -609,7 +610,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                             visibleCount,
                             (i) => dataSource.getRow(_firstRowIndex + i)!,
                           ),
-                        );
+                        ));
                       },
                     ),
                   ),

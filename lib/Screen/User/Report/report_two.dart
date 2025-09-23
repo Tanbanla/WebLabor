@@ -434,7 +434,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                             ? total
                             : (_firstRowIndex + _rowsPerPage);
                         final visibleCount = endIndex - _firstRowIndex;
-                        return DataTable2(
+                        return Obx(
+                          () => DataTable2(
                           columnSpacing: 12,
                           minWidth: 2000,
                           horizontalMargin: 12,
@@ -652,7 +653,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                             visibleCount,
                             (i) => dataSource.getRow(_firstRowIndex + i)!,
                           ),
-                        );
+                        ));
                       },
                     ),
                   ),
