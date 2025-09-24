@@ -26,6 +26,12 @@ class DashboardControllerTwo extends GetxController {
   var isLoading = false.obs;
   var isLoadingExport = false.obs;
   var pthcList = <PthcGroup>[].obs;
+  // Multi-field query holders (new)
+  final approverCodeQuery = ''.obs;
+  final employeeIdQuery = ''.obs;
+  final employeeNameQuery = ''.obs;
+  final departmentQuery = ''.obs;
+  final groupQuery = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -61,86 +67,6 @@ class DashboardControllerTwo extends GetxController {
     }
     return selectedItems;
   }
-
-  // Filter by approver code (DotDanhGia)
-  void filterByApproverCode(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final code = item.vchRCodeApprover?.toLowerCase() ?? '';
-      return code.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Filter by employee ID
-  void filterByEmployeeId(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final id = item.vchREmployeeId?.toLowerCase() ?? '';
-      return id.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Filter by employee name
-  void filterByEmployeeName(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final name = item.vchREmployeeName?.toLowerCase() ?? '';
-      return name.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Filter by department
-  void filterByDepartment(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final department = item.vchRNameSection?.toLowerCase() ?? '';
-      return department.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Filter by group
-  void filterByGroup(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-    final filteredList = filterdataList.where((item) {
-      final group = item.chRCostCenterName?.toLowerCase() ?? '';
-      return group.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Helper method to reset the filtered list to the original data
-  void refreshFilteredList() {
-    filterdataList.value = List.from(dataList);
-  }
-
   //sap xep du lieu
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
@@ -166,28 +92,93 @@ class DashboardControllerTwo extends GetxController {
     });
   }
 
-  void filterByStatus(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-    if (query == 'Not Done') {
-      filterdataList.value = filterdataList
-          .where((item) => item.inTStatusId != 9)
-          .toList();
-      return;
-    }
-    if (query == 'all') {
-      filterdataList.value = dataList;
-      return;
-    }
-    final filteredList = filterdataList.where((item) {
-      final statusId = item.inTStatusId;
-      final statusText = getStatusText(statusId);
-      return statusText.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+   // ==================== NEW COMBINED FILTER SYSTEM ====================
+  // Public entry points used by the UI. Each update triggers applyFilters().
+  void updateStatus(String? value) {
+    selectedStatus.value = value ?? '';
+    applyFilters();
+  }
 
-    filterdataList.value = filteredList;
+  void updateApproverCode(String v) {
+    approverCodeQuery.value = v.trim();
+    applyFilters();
+  }
+
+  void updateEmployeeId(String v) {
+    employeeIdQuery.value = v.trim();
+    applyFilters();
+  }
+
+  void updateEmployeeName(String v) {
+    employeeNameQuery.value = v.trim();
+    applyFilters();
+  }
+
+  void updateDepartment(String v) {
+    departmentQuery.value = v.trim();
+    applyFilters();
+  }
+
+  void updateGroup(String v) {
+    groupQuery.value = v.trim();
+    applyFilters();
+  }
+
+  // Core filter logic combining ALL active criteria together (AND semantics)
+  void applyFilters() {
+    // Start from the full data set always (so filters are independent)
+    final String statusFilter = selectedStatus.value.toLowerCase();
+    final String approverQ = approverCodeQuery.value.toLowerCase();
+    final String empIdQ = employeeIdQuery.value.toLowerCase();
+    final String empNameQ = employeeNameQuery.value.toLowerCase();
+    final String deptQ = departmentQuery.value.toLowerCase();
+    final String groupQ = groupQuery.value.toLowerCase();
+
+    bool matchesStatus(TwoContract item) {
+      if (statusFilter.isEmpty || statusFilter == 'all') return true;
+      if (statusFilter == 'not done') return item.inTStatusId != 9; // any not Done
+      // Map alternative Vietnamese / shorthand codes to internal status IDs
+      final id = item.inTStatusId;
+      switch (statusFilter) {
+        case 'new':
+          return id == 1;
+        case 'per':
+          return id == 2; // 人事
+        case 'pthc':
+          return id == 3; // or 3? (training section)
+        case 'leader':
+          return id == 4;
+        case 'manager': // English display
+        case 'qltc': // Vietnamese shorthand provided in UI
+          return id == 6;
+        case 'dept':
+        case 'qlcc':
+          return id == 7;
+        case 'director':
+          return id == 8;
+        case 'done':
+          return id == 9;
+        default:
+          // fallback: textual contains check (keeps backward compatibility with old logic)
+          final s = getStatusText(id).toLowerCase();
+            return s.contains(statusFilter);
+      }
+    }
+
+    List<TwoContract> result = [];
+    for (final item in dataList) {
+      if (!matchesStatus(item)) continue;
+      if (approverQ.isNotEmpty && !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ)) continue;
+      if (empIdQ.isNotEmpty && !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ)) continue;
+      if (empNameQ.isNotEmpty && !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ)) continue;
+      if (deptQ.isNotEmpty && !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ)) continue;
+      if (groupQ.isNotEmpty && !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ)) continue;
+      result.add(item);
+    }
+
+    filterdataList.value = result;
+    // Rebuild selection states to align with filtered list length
+    selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
 
   // Helper method to convert status ID to text
@@ -212,6 +203,19 @@ class DashboardControllerTwo extends GetxController {
       default:
         return 'Unknown';
     }
+  }
+
+  // Old individual filter methods removed in favor of applyFilters().
+  // Reset all filters
+  void refreshFilteredList() {
+    approverCodeQuery.value = '';
+    employeeIdQuery.value = '';
+    employeeNameQuery.value = '';
+    departmentQuery.value = '';
+    groupQuery.value = '';
+    selectedStatus.value = '';
+    filterdataList.assignAll(dataList);
+    selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
 
   // so sanh du lieu

@@ -20,7 +20,12 @@ class DashboardControllerApporver extends GetxController {
   var isLoading = false.obs;
   final RxString currentContractType = 'two'.obs;
   var pthcList = <PthcGroup>[].obs;
-
+  // Multi-field query holders (new)
+  final approverCodeQuery = ''.obs;
+  final employeeIdQuery = ''.obs;
+  final employeeNameQuery = ''.obs;
+  final departmentQuery = ''.obs;
+  final groupQuery = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -225,123 +230,68 @@ class DashboardControllerApporver extends GetxController {
     });
   }
 
-  // so sanh du lieu
-  void filterByStatus(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
+   // ==================== NEW COMBINED FILTER SYSTEM ====================
+  // Public entry points used by the UI. Each update triggers applyFilters().
 
-    final filteredList = filterdataList.where((item) {
-      final statusId = item.inTStatusId;
-      final statusText = getStatusText(statusId);
-      return statusText.toLowerCase().contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
+  void updateApproverCode(String v) {
+    approverCodeQuery.value = v.trim();
+    applyFilters();
   }
 
-  // Helper method to convert status ID to text
-  String getStatusText(int? statusId) {
-    switch (statusId) {
-      case 1:
-        return 'New';
-      case 2:
-        return 'Per';
-      case 3:
-        return 'PTHC';
-      case 4:
-        return 'Leader';
-      case 6:
-        return 'Manager';
-      case 7:
-        return 'Dept';
-      case 8:
-        return 'Director';
-      case 9:
-        return 'Done';
-      default:
-        return 'Unknown';
-    }
+  void updateEmployeeId(String v) {
+    employeeIdQuery.value = v.trim();
+    applyFilters();
   }
 
-  // Filter by approver code (DotDanhGia)
-  void filterByApproverCode(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final code = item.vchRCodeApprover?.toLowerCase() ?? '';
-      return code.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
+  void updateEmployeeName(String v) {
+    employeeNameQuery.value = v.trim();
+    applyFilters();
   }
 
-  // Filter by employee ID
-  void filterByEmployeeId(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final id = item.vchREmployeeId?.toLowerCase() ?? '';
-      return id.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
+  void updateDepartment(String v) {
+    departmentQuery.value = v.trim();
+    applyFilters();
   }
 
-  // Filter by employee name
-  void filterByEmployeeName(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-
-    final filteredList = filterdataList.where((item) {
-      final name = item.vchREmployeeName?.toLowerCase() ?? '';
-      return name.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
+  void updateGroup(String v) {
+    groupQuery.value = v.trim();
+    applyFilters();
   }
 
-  // Filter by department
-  void filterByDepartment(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
+  // Core filter logic combining ALL active criteria together (AND semantics)
+  void applyFilters() {
+    // Start from the full data set always (so filters are independent)
+    final String approverQ = approverCodeQuery.value.toLowerCase();
+    final String empIdQ = employeeIdQuery.value.toLowerCase();
+    final String empNameQ = employeeNameQuery.value.toLowerCase();
+    final String deptQ = departmentQuery.value.toLowerCase();
+    final String groupQ = groupQuery.value.toLowerCase();
+
+    List<dynamic> result = [];
+    for (final item in dataList) {
+      if (approverQ.isNotEmpty && !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ)) continue;
+      if (empIdQ.isNotEmpty && !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ)) continue;
+      if (empNameQ.isNotEmpty && !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ)) continue;
+      if (deptQ.isNotEmpty && !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ)) continue;
+      if (groupQ.isNotEmpty && !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ)) continue;
+      result.add(item);
     }
 
-    final filteredList = filterdataList.where((item) {
-      final department = item.vchRNameSection?.toLowerCase() ?? '';
-      return department.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
+    filterdataList.value = result;
+    // Rebuild selection states to align with filtered list length
+    selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
 
-  // Filter by group
-  void filterByGroup(String query) {
-    if (query.isEmpty) {
-      //refreshFilteredList();
-      return;
-    }
-    final filteredList = filterdataList.where((item) {
-      final group = item.chRCostCenterName?.toLowerCase() ?? '';
-      return group.contains(query.toLowerCase());
-    }).toList();
-
-    filterdataList.value = filteredList;
-  }
-
-  // Helper method to reset the filtered list to the original data
+  // Old individual filter methods removed in favor of applyFilters().
+  // Reset all filters
   void refreshFilteredList() {
-    filterdataList.value = List.from(dataList);
+    approverCodeQuery.value = '';
+    employeeIdQuery.value = '';
+    employeeNameQuery.value = '';
+    departmentQuery.value = '';
+    groupQuery.value = '';
+    filterdataList.assignAll(dataList);
+    selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
 
   void searchQuery(String query) {

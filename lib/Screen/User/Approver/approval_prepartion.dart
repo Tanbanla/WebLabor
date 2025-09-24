@@ -334,7 +334,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               width: fw(240),
               hint: tr('DotDanhGia'),
               icon: Iconsax.document_filter,
-              onChanged: (v) => controller.filterByApproverCode(v),
+              onChanged: (v) => controller.updateApproverCode(v),
             ),
           ),
           SizedBox(
@@ -343,7 +343,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               width: fw(140),
               hint: tr('employeeCode'),
               icon: Iconsax.tag,
-              onChanged: (v) => controller.filterByEmployeeId(v),
+              onChanged: (v) => controller.updateEmployeeId(v),
             ),
           ),
           SizedBox(
@@ -352,7 +352,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               width: fw(240),
               hint: tr('fullName'),
               icon: Iconsax.user,
-              onChanged: (v) => controller.filterByEmployeeName(v),
+              onChanged: (v) => controller.updateEmployeeName(v),
             ),
           ),
           SizedBox(
@@ -361,7 +361,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               width: fw(160),
               hint: tr('department'),
               icon: Iconsax.building_3,
-              onChanged: (v) => controller.filterByDepartment(v),
+              onChanged: (v) => controller.updateDepartment(v),
             ),
           ),
           SizedBox(
@@ -370,7 +370,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
               width: fw(140),
               hint: tr('group'),
               icon: Iconsax.people,
-              onChanged: (v) => controller.filterByGroup(v),
+              onChanged: (v) => controller.updateGroup(v),
             ),
           ),
           buildActionButton(

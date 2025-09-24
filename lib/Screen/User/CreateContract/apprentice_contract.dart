@@ -309,7 +309,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
         final filters = <Widget>[
           if (!isXSmall)
             Padding(
-              padding: const EdgeInsets.only(right: 8, top: 4),
+              padding: const EdgeInsets.only(right: 12, top: 6),
               child: Text(
                 tr('searchhint'),
                 style: TextStyle(color: Colors.grey[600], fontSize: 18),
@@ -321,7 +321,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               width: fw(140),
               hint: tr('employeeCode'),
               icon: Iconsax.tag,
-              onChanged: (v) => controller.filterByEmployeeId(v),
+              onChanged: (v) => controller.updateEmployeeId(v),
             ),
           ),
           SizedBox(
@@ -330,7 +330,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               width: fw(240),
               hint: tr('fullName'),
               icon: Iconsax.user,
-              onChanged: (v) => controller.filterByEmployeeName(v),
+              onChanged: (v) => controller.updateEmployeeName(v),
             ),
           ),
           SizedBox(
@@ -339,7 +339,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               width: fw(160),
               hint: tr('department'),
               icon: Iconsax.building_3,
-              onChanged: (v) => controller.filterByDepartment(v),
+              onChanged: (v) => controller.updateDepartment(v),
             ),
           ),
           SizedBox(
@@ -348,7 +348,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               width: fw(140),
               hint: tr('group'),
               icon: Iconsax.people,
-              onChanged: (v) => controller.filterByGroup(v),
+              onChanged: (v) => controller.updateGroup(v),
             ),
           ),
           buildActionButton(
