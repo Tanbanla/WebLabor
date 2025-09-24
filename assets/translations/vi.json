@@ -164,5 +164,7 @@
   "ResultOk":"Cập nhật thành công",
   "ReturnS":"Từ chối nhiều",
   "Rfilter":"Reset filter",
-  "rowsPerPage":"Số hàng mỗi trang"
+  "rowsPerPage":"Số hàng mỗi trang",
+  "CheckTime":"Thời gian kết thúc hợp đồng phải lớn hơn 10 ngày so với ngày hiện tại. Vui lòng kiểm tra lại!",
+  "CheckTime1":"Thời gian kết thúc hợp đồng phải lớn hơn 50 ngày so với ngày hiện tại. Vui lòng kiểm tra lại!"
 }

@@ -365,6 +365,10 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       // bo sung cac truong con thieu
+      final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
+          throw Exception(tr('CheckTime1'));
+      }
       twocontract.id = 0;
       twocontract.vchRUserCreate = userUpdate;
       twocontract.vchRNameSection = twocontract.vchRCodeSection;

@@ -375,6 +375,10 @@ class DashboardControllerApprentice extends GetxController {
     try {
       isLoading(true);
       // bo sung cac truong con thieu
+      final parsedEndDate = parseDateTime(contract.dtMEndDate);
+        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+          throw Exception(tr('CheckTime'));
+      }
       contract.id = 0;
       contract.vchRUserCreate = user;
       contract.vchRNameSection = contract.vchRCodeSection;
