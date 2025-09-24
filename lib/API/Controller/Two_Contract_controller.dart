@@ -68,7 +68,7 @@ class DashboardControllerTwo extends GetxController {
       return;
     }
 
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final code = item.vchRCodeApprover?.toLowerCase() ?? '';
       return code.contains(query.toLowerCase());
     }).toList();
@@ -83,7 +83,7 @@ class DashboardControllerTwo extends GetxController {
       return;
     }
 
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final id = item.vchREmployeeId?.toLowerCase() ?? '';
       return id.contains(query.toLowerCase());
     }).toList();
@@ -98,7 +98,7 @@ class DashboardControllerTwo extends GetxController {
       return;
     }
 
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final name = item.vchREmployeeName?.toLowerCase() ?? '';
       return name.contains(query.toLowerCase());
     }).toList();
@@ -113,7 +113,7 @@ class DashboardControllerTwo extends GetxController {
       return;
     }
 
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final department = item.vchRNameSection?.toLowerCase() ?? '';
       return department.contains(query.toLowerCase());
     }).toList();
@@ -127,7 +127,7 @@ class DashboardControllerTwo extends GetxController {
       //refreshFilteredList();
       return;
     }
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final group = item.chRCostCenterName?.toLowerCase() ?? '';
       return group.contains(query.toLowerCase());
     }).toList();
@@ -168,11 +168,10 @@ class DashboardControllerTwo extends GetxController {
       return;
     }
     if (query == 'Not Done') {
-      final filteredList = dataList.where((item) => item.inTStatusId != 9).toList();
-      filterdataList.value = filteredList;
+      filterdataList.value = filterdataList.where((item) => item.inTStatusId != 9).toList();
       return;
     }
-    final filteredList = dataList.where((item) {
+    final filteredList = filterdataList.where((item) {
       final statusId = item.inTStatusId;
       final statusText = getStatusText(statusId);
       return statusText.toLowerCase().contains(query.toLowerCase());
