@@ -1415,21 +1415,18 @@ class MyData extends DataTableSource {
       ].firstWhere((e) => e != null && e != '', orElse: () => ''),
     );
     //
-    final bool isReturn =
-        ([
-          data.nvchRApproverChief,
-          data.nvchRApproverManager,
-          data.nvchRApproverDirector,
-        ].firstWhere((e) => e != null && e != '', orElse: () => '') !=
-        '');
+    final bool isReturn = (!data.biTNoReEmployment && data.inTStatusId == 3);
     TextStyle cellCenterStyle() => TextStyle(
       fontSize: Common.sizeColumn,
       color: isReturn ? Colors.red[900] : null,
     );
     return DataRow2(
-      color: MaterialStateProperty.resolveWith<Color?>((
-        Set<MaterialState> states,
-      ) {
+      color: MaterialStateProperty.resolveWith<Color?>((states) {
+        if (isReturn) {
+          return Colors.red.withOpacity(
+            states.contains(MaterialState.selected) ? 0.35 : 0.18,
+          );
+        }
         if (index.isEven) {
           return Colors.grey[50];
         }

@@ -1315,7 +1315,7 @@ class MyData extends DataTableSource {
       text: data.nvchRApproverPer ?? '',
     );
 
-    final bool isRejected = data.biTApproverPer == false;
+    final bool isRejected = !data.biTNoReEmployment;
 
     TextStyle cellCenterStyle() => TextStyle(
       fontSize: Common.sizeColumn,

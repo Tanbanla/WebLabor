@@ -61,6 +61,7 @@ class DashboardControllerTwo extends GetxController {
     }
     return selectedItems;
   }
+
   // Filter by approver code (DotDanhGia)
   void filterByApproverCode(String query) {
     if (query.isEmpty) {
@@ -134,10 +135,12 @@ class DashboardControllerTwo extends GetxController {
 
     filterdataList.value = filteredList;
   }
+
   // Helper method to reset the filtered list to the original data
   void refreshFilteredList() {
     filterdataList.value = List.from(dataList);
   }
+
   //sap xep du lieu
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
@@ -162,13 +165,16 @@ class DashboardControllerTwo extends GetxController {
       }
     });
   }
+
   void filterByStatus(String query) {
     if (query.isEmpty) {
       //refreshFilteredList();
       return;
     }
     if (query == 'Not Done') {
-      filterdataList.value = filterdataList.where((item) => item.inTStatusId != 9).toList();
+      filterdataList.value = filterdataList
+          .where((item) => item.inTStatusId != 9)
+          .toList();
       return;
     }
     final filteredList = filterdataList.where((item) {
@@ -176,7 +182,6 @@ class DashboardControllerTwo extends GetxController {
       final statusText = getStatusText(statusId);
       return statusText.toLowerCase().contains(query.toLowerCase());
     }).toList();
-
 
     filterdataList.value = filteredList;
   }
@@ -204,6 +209,7 @@ class DashboardControllerTwo extends GetxController {
         return 'Unknown';
     }
   }
+
   // so sanh du lieu
   void searchQuery(String query) {
     final lowerQuery = query.toLowerCase();
@@ -370,8 +376,9 @@ class DashboardControllerTwo extends GetxController {
     try {
       // bo sung cac truong con thieu
       final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
-        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
-          throw Exception(tr('CheckTime1'));
+      if (parsedEndDate != null &&
+          parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
+        throw Exception(tr('CheckTime1'));
       }
       twocontract.id = 0;
       twocontract.vchRUserCreate = userUpdate;
@@ -426,7 +433,7 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       twocontract.vchRUserUpdate = userUpdate;
-      twocontract.vchRCodeSection =twocontract.vchRNameSection;
+      twocontract.vchRCodeSection = twocontract.vchRNameSection;
       twocontract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -506,7 +513,7 @@ class DashboardControllerTwo extends GetxController {
       final contractCopy = TwoContract.fromJson(json);
 
       notApproval.add(contractCopy);
-
+      contract.biTNoReEmployment = false;
       if (contract.inTStatusId == 3) {
         contract.inTStatusId = 1;
       } else if (contract.inTStatusId == 4) {
@@ -568,15 +575,19 @@ class DashboardControllerTwo extends GetxController {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((twocontract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
           // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere((d) =>
-              (twocontract[i].id != null && d.id == twocontract[i].id) ||
-              (d.vchREmployeeId == twocontract[i].vchREmployeeId));
+          final originalIndex = dataList.indexWhere(
+            (d) =>
+                (twocontract[i].id != null && d.id == twocontract[i].id) ||
+                (d.vchREmployeeId == twocontract[i].vchREmployeeId),
+          );
           if (originalIndex != -1) {
             final original = dataList[originalIndex];
-              final bool changed = original != twocontract[i];
+            final bool changed = original != twocontract[i];
             if (!changed) {
               // Không có thay đổi thực sự
-              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
+              throw Exception(
+                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
+              );
             }
           }
         }
@@ -639,15 +650,19 @@ class DashboardControllerTwo extends GetxController {
             (twocontract[i].nvchRApproverManager?.isNotEmpty ?? false) ||
             (twocontract[i].nvchRApproverDirector?.isNotEmpty ?? false)) {
           // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere((d) =>
-              (twocontract[i].id != null && d.id == twocontract[i].id) ||
-              (d.vchREmployeeId == twocontract[i].vchREmployeeId));
+          final originalIndex = dataList.indexWhere(
+            (d) =>
+                (twocontract[i].id != null && d.id == twocontract[i].id) ||
+                (d.vchREmployeeId == twocontract[i].vchREmployeeId),
+          );
           if (originalIndex != -1) {
             final original = dataList[originalIndex];
-              final bool changed = original != twocontract[i];
+            final bool changed = original != twocontract[i];
             if (!changed) {
               // Không có thay đổi thực sự
-              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
+              throw Exception(
+                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
+              );
             }
           }
         }
@@ -669,6 +684,7 @@ class DashboardControllerTwo extends GetxController {
             twocontract[i].inTStatusId = 4;
             twocontract[i].nvchRPthcSection = userUpdate;
             twocontract[i].vchRLeaderEvalution = userApprover;
+            twocontract[i].biTNoReEmployment = true;
           case 4:
             if (twocontract[i].nvchROther != 'OK' &&
                 (twocontract[i].vchRNote == null ||
@@ -940,21 +956,23 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   // delete list
   Future<void> deleteListTwoContract() async {
     try {
       isLoading(true);
       final twocontract = getSelectedItems();
-      
+
       if (twocontract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
 
       // Lấy danh sách ID từ các item được chọn
       final ids = twocontract.map((contract) => contract.id).toList();
-      
+
       final endpoint = Common.DeleteTwoMultiID;
-      final response = await http.delete( // Thường xóa nhiều item dùng POST hoặc DELETE với body
+      final response = await http.delete(
+        // Thường xóa nhiều item dùng POST hoặc DELETE với body
         Uri.parse('${Common.API}$endpoint'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(ids), // Gửi danh sách ID dưới dạng JSON
@@ -975,6 +993,7 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   // xuat file
   Future<void> exportToExcelTwoContract() async {
     try {
@@ -1110,7 +1129,8 @@ class DashboardControllerTwo extends GetxController {
           continue; // Skip invalid rows
         }
         final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
-        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
+        if (parsedEndDate != null &&
+            parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1250,8 +1270,8 @@ class DashboardControllerTwo extends GetxController {
           continue; // Skip invalid rows
         }
         final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
-        if (
-            parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
+        if (parsedEndDate != null &&
+            parsedEndDate.difference(DateTime.now()).inDays.abs() <= 50) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1284,7 +1304,8 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
-    // ham format String to date
+
+  // ham format String to date
   DateTime? parseDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) return null;
     final formats = [
@@ -1301,6 +1322,7 @@ class DashboardControllerTwo extends GetxController {
     }
     return null;
   }
+
   // check dữ liệu nhân viên
   Future<bool> checkEmployeeExists(String employeeId) async {
     try {
@@ -1328,6 +1350,7 @@ class DashboardControllerTwo extends GetxController {
       isLoading(false);
     }
   }
+
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

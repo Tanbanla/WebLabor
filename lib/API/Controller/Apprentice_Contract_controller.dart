@@ -470,7 +470,7 @@ class DashboardControllerApprentice extends GetxController {
       final contractCopy = ApprenticeContract.fromJson(json);
 
       notApproval.add(contractCopy);
-
+      contract.biTNoReEmployment = false;
       if (contract.inTStatusId == 3) {
         contract.inTStatusId = 1;
       } else if (contract.inTStatusId == 4) {
@@ -674,6 +674,7 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].inTStatusId = 4;
             contract[i].nvchRPthcSection = userUpdate;
             contract[i].vchRLeaderEvalution = userApprover;
+            contract[i].biTNoReEmployment = true;
           case 4:
             if (contract[i].vchRReasultsLeader != 'OK' &&
                 (contract[i].vchRLyThuyet == 'OK' &&
