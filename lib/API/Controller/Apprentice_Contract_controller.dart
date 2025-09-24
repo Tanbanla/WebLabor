@@ -120,7 +120,7 @@ class DashboardControllerApprentice extends GetxController {
   // Core filter logic combining ALL active criteria together (AND semantics)
   void applyFilters() {
     // Start from the full data set always (so filters are independent)
-    final String statusFilter = selectedStatus.value.toLowerCase();
+    final String statusFilter = selectedStatus.value;
     final String approverQ = approverCodeQuery.value.toLowerCase();
     final String empIdQ = employeeIdQuery.value.toLowerCase();
     final String empNameQ = employeeNameQuery.value.toLowerCase();
@@ -129,32 +129,28 @@ class DashboardControllerApprentice extends GetxController {
 
     bool matchesStatus(ApprenticeContract item) {
       if (statusFilter.isEmpty || statusFilter == 'all') return true;
-      if (statusFilter == 'not done') return item.inTStatusId != 9; // any not Done
-      // Map alternative Vietnamese / shorthand codes to internal status IDs
+      if (statusFilter == 'Not Done') return item.inTStatusId != 9; // any not Done
+
       final id = item.inTStatusId;
       switch (statusFilter) {
-        case 'new':
+        case 'New':
           return id == 1;
-        case 'per':
-          return id == 2; // 人事
-        case 'pthc':
-          return id == 3; // or 3? (training section)
-        case 'leader':
+        case 'Per':
+          return id == 2; 
+        case 'PTHC':
+          return id == 3; 
+        case 'Leader':
           return id == 4;
-        case 'manager': // English display
-        case 'qltc': // Vietnamese shorthand provided in UI
+        case 'Manager': 
           return id == 6;
-        case 'dept':
-        case 'qlcc':
+        case 'Dept':
           return id == 7;
-        case 'director':
+        case 'Director':
           return id == 8;
-        case 'done':
+        case 'Done':
           return id == 9;
         default:
-          // fallback: textual contains check (keeps backward compatibility with old logic)
-          final s = getStatusText(id).toLowerCase();
-            return s.contains(statusFilter);
+          return false;
       }
     }
 
@@ -172,30 +168,6 @@ class DashboardControllerApprentice extends GetxController {
     filterdataList.value = result;
     // Rebuild selection states to align with filtered list length
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
-  }
-
-  // Helper method to convert status ID to text
-  String getStatusText(int? statusId) {
-    switch (statusId) {
-      case 1:
-        return 'New';
-      case 2:
-        return 'Per';
-      case 3:
-        return 'PTHC';
-      case 4:
-        return 'Leader';
-      case 6:
-        return 'Manager';
-      case 7:
-        return 'Dept';
-      case 8:
-        return 'Director';
-      case 9:
-        return 'Done';
-      default:
-        return 'Unknown';
-    }
   }
 
   // Old individual filter methods removed in favor of applyFilters().
