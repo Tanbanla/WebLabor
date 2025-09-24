@@ -191,7 +191,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         }
 
         final statusOptions = <Map<String, dynamic>>[
-          {'code': '', 'label': tr('all')},
+          {'code': 'all', 'label': 'all'},
           {'code': 'New', 'label': 'New'},
           {'code': 'Per', 'label': 'Per/人事課の中級管理職'},
           {'code': 'PTHC', 'label': 'PTHC'},

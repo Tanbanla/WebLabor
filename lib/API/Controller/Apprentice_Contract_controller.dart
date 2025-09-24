@@ -85,7 +85,13 @@ class DashboardControllerApprentice extends GetxController {
       return;
     }
     if (query == 'Not Done') {
-      filterdataList.value = filterdataList.where((item) => item.inTStatusId != 9).toList();
+      filterdataList.value = filterdataList
+          .where((item) => item.inTStatusId != 9)
+          .toList();
+      return;
+    }
+    if (query == 'all') {
+      filterdataList.value = dataList;
       return;
     }
     final filteredList = filterdataList.where((item) {
@@ -379,8 +385,9 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(true);
       // bo sung cac truong con thieu
       final parsedEndDate = parseDateTime(contract.dtMEndDate);
-        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
-          throw Exception(tr('CheckTime'));
+      if (parsedEndDate != null &&
+          parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+        throw Exception(tr('CheckTime'));
       }
       contract.id = 0;
       contract.vchRUserCreate = user;
@@ -432,7 +439,7 @@ class DashboardControllerApprentice extends GetxController {
   ) async {
     try {
       contract.vchRUserUpdate = userUpdate;
-      contract.vchRCodeSection=contract.vchRNameSection;
+      contract.vchRCodeSection = contract.vchRNameSection;
       contract.dtMUpdate = formatDateTime(DateTime.now());
 
       isLoading(true);
@@ -572,12 +579,14 @@ class DashboardControllerApprentice extends GetxController {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((contract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
           // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere((d) =>
-              (contract[i].id != null && d.id == contract[i].id) ||
-              (d.vchREmployeeId == contract[i].vchREmployeeId));
+          final originalIndex = dataList.indexWhere(
+            (d) =>
+                (contract[i].id != null && d.id == contract[i].id) ||
+                (d.vchREmployeeId == contract[i].vchREmployeeId),
+          );
           if (originalIndex != -1) {
             final original = dataList[originalIndex];
-              final bool changed = original != contract[i];
+            final bool changed = original != contract[i];
             if (!changed) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
@@ -646,12 +655,14 @@ class DashboardControllerApprentice extends GetxController {
         if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
             (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
           // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere((d) =>
-              (contract[i].id != null && d.id == contract[i].id) ||
-              (d.vchREmployeeId == contract[i].vchREmployeeId));
+          final originalIndex = dataList.indexWhere(
+            (d) =>
+                (contract[i].id != null && d.id == contract[i].id) ||
+                (d.vchREmployeeId == contract[i].vchREmployeeId),
+          );
           if (originalIndex != -1) {
             final original = dataList[originalIndex];
-              final bool changed = original != contract[i];
+            final bool changed = original != contract[i];
             if (!changed) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
@@ -1092,7 +1103,8 @@ class DashboardControllerApprentice extends GetxController {
           continue; // Skip invalid rows
         }
         final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
-        if  (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+        if (parsedEndDate != null &&
+            parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1232,7 +1244,8 @@ class DashboardControllerApprentice extends GetxController {
           continue; // Skip invalid rows
         }
         final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
-        if (parsedEndDate != null && parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+        if (parsedEndDate != null &&
+            parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
           _i++;
           continue; // Skip invalid rows
         }
@@ -1263,6 +1276,7 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+
   // ham format String to date
   DateTime? parseDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) return null;
@@ -1280,6 +1294,7 @@ class DashboardControllerApprentice extends GetxController {
     }
     return null;
   }
+
   String? formatDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value.toIso8601String();

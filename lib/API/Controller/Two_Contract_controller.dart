@@ -177,6 +177,10 @@ class DashboardControllerTwo extends GetxController {
           .toList();
       return;
     }
+    if (query == 'all') {
+      filterdataList.value = dataList;
+      return;
+    }
     final filteredList = filterdataList.where((item) {
       final statusId = item.inTStatusId;
       final statusText = getStatusText(statusId);
