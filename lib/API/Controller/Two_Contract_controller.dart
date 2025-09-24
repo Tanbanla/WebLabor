@@ -217,7 +217,14 @@ class DashboardControllerTwo extends GetxController {
     filterdataList.assignAll(dataList);
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
-
+  void refreshSearch() {
+    approverCodeQuery.value = '';
+    employeeIdQuery.value = '';
+    employeeNameQuery.value = '';
+    departmentQuery.value = '';
+    groupQuery.value = '';
+    selectedStatus.value = '';
+  }
   // so sanh du lieu
   void searchQuery(String query) {
     final lowerQuery = query.toLowerCase();

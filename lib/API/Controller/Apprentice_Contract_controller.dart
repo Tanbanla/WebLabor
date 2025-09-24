@@ -210,7 +210,14 @@ class DashboardControllerApprentice extends GetxController {
     filterdataList.assignAll(dataList);
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
-
+  void refreshSearch() {
+    approverCodeQuery.value = '';
+    employeeIdQuery.value = '';
+    employeeNameQuery.value = '';
+    departmentQuery.value = '';
+    groupQuery.value = '';
+    selectedStatus.value = '';
+  }
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);

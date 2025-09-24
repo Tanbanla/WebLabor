@@ -40,6 +40,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final authState = Provider.of<AuthState>(context, listen: true);
     // phan xem ai dang vao man so sanh
     controller.fetchPTHCData();
+    controller.refreshSearch();
     controller.changeStatus(
       'approval',
       null,

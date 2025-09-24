@@ -40,6 +40,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   void initState() {
     super.initState();
     // Load initial data once
+    controller.refreshSearch();
     controller.fetchSectionList();
     controller.fetchDummyData();
   }

@@ -48,6 +48,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .toString()
         .split(':')[1]
         .trim();
+    controller.refreshSearch();
     controller.fetchPTHCData();
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||

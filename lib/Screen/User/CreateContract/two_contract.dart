@@ -39,6 +39,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
   @override
   Widget build(BuildContext context) {
+    controller.refreshSearch();
     controller.changeStatus('1', null, null);
     controller.fetchSectionList();
     return Scaffold(

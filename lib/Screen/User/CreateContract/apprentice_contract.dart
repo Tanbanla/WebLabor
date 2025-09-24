@@ -40,6 +40,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
   @override
   Widget build(BuildContext context) {
+    controller.refreshSearch();
     controller.fetchSectionList();
     controller.changeStatus('1', null, null);
     return Scaffold(

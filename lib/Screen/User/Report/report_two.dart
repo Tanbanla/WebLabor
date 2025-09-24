@@ -39,6 +39,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   void initState() {
     super.initState();
     // Load initial data once
+    controller.refreshSearch();
     controller.fetchSectionList();
     controller.fetchDummyData();
   }

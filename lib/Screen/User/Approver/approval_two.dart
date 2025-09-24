@@ -41,6 +41,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     //     .split(':')[1]
     //     .trim();
     // phan xem ai dang vao man so sanh
+    controller.refreshSearch();
     controller.fetchPTHCData();
     controller.changeStatus(
       'approval',
