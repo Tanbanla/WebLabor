@@ -141,184 +141,199 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     final DashboardControllerTwo controller =
         Get.find<DashboardControllerTwo>();
 
-    // Extract section name safely
-    // String sectionName =
-    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr('searchhint'),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                    ),
-                    const SizedBox(width: 12),
-                    _buildFilterFieldWithIcon(
-                      width: 240,
-                      hint: tr('DotDanhGia'),
-                      icon: Iconsax.document_filter,
-                      onChanged: (value) {
-                        controller.filterByApproverCode(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 140,
-                      hint: tr('employeeCode'),
-                      icon: Iconsax.tag,
-                      onChanged: (value) {
-                        controller.filterByEmployeeId(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 240,
-                      hint: tr('fullName'),
-                      icon: Iconsax.user,
-                      onChanged: (value) {
-                        controller.filterByEmployeeName(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 160,
-                      hint: tr('department'),
-                      icon: Iconsax.building_3,
-                      onChanged: (value) {
-                        controller.filterByDepartment(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 140,
-                      hint: tr('group'),
-                      icon: Iconsax.people,
-                      onChanged: (value) {
-                        controller.filterByGroup(value);
-                      },
-                    ),
-                    // reset filter
-                    const SizedBox(width: 8),
-                    buildActionButton(
-                      icon: Iconsax.refresh,
-                      color: Colors.blue,
-                      tooltip: tr('Rfilter'),
-                      onPressed: () => controller.refreshFilteredList(),
-                    ),
-                  ],
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // tablet / small desktop
+        final bool isXSmall = maxW < 600; // narrow mobile
+
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40; // almost full width
+          if (isSmall) return desired.clamp(110, 240);
+          return desired;
+        }
+
+        final items = <Widget>[
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, top: 4),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
               ),
             ),
-            // Action Buttons
-            const SizedBox(width: 8),
-            buildActionButton(
-              icon: Iconsax.export,
-              color: Colors.green,
-              tooltip: tr('export'),
-              onPressed: () => _showExportDialog(),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('DotDanhGia'),
+              icon: Iconsax.document_filter,
+              onChanged: (v) => controller.filterByApproverCode(v),
             ),
-            // từ chối nhiều
-            const SizedBox(width: 8),
-            buildActionButton(
-              icon: Iconsax.back_square,
-              color: Colors.orange,
-              tooltip: tr('ReturnS'),
-              onPressed: () =>
-                  _ReturnSDialog(authState.user!.chRUserid.toString()),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
             ),
-            // action send
-            const SizedBox(width: 20),
-            // Send button
-            GestureDetector(
-              onTap: () async {
-                try {
-                  await controller.updateListTwoContractApproval(
-                    authState.user!.chRUserid.toString(),
-                  );
-                  // phan xem ai dang vao man so sanh
-                  controller.changeStatus(
-                    'approval',
-                    null,
-                    authState.user!.chRUserid.toString(),
-                  );
-
-                  if (context.mounted) {
-                    // Hiển thị thông báo thành công
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(tr('DaGui')),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                } catch (e) {
+          ),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.back_square,
+            color: Colors.orange,
+            tooltip: tr('ReturnS'),
+            onPressed: () =>
+                _ReturnSDialog(authState.user!.chRUserid.toString()),
+          ),
+          GestureDetector(
+            onTap: () async {
+              try {
+                await controller.updateListTwoContractApproval(
+                  authState.user!.chRUserid.toString(),
+                );
+                controller.changeStatus(
+                  'approval',
+                  null,
+                  authState.user!.chRUserid.toString(),
+                );
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
-                      ),
-                      backgroundColor: Colors.red,
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
                     ),
                   );
                 }
-              },
-              child: Obx(
-                () => Container(
-                  width: 130,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: controller.isLoading.value
-                        ? Colors.grey
-                        : Common.primaryColor,
-                    borderRadius: BorderRadius.circular(10),
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                    ),
+                    backgroundColor: Colors.red,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  child: Center(
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            tr('Confirm'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                );
+              }
+            },
+            child: Obx(
+              () => Container(
+                width: 130,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: controller.isLoading.value
+                      ? Colors.grey
+                      : Common.primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
-                  ),
+                        )
+                      : Text(
+                          tr('Confirm'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...items.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: items,
+                ),
+        );
+      },
     );
   }
 
@@ -409,208 +424,209 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                             : (_firstRowIndex + _rowsPerPage);
                         final visibleCount = endIndex - _firstRowIndex;
                         return Obx(
-                          () =>  DataTable2(
-                          columnSpacing: 12,
-                          minWidth: 2000,
-                          horizontalMargin: 12,
-                          dataRowHeight: 56,
-                          headingRowHeight: 66,
-                          headingTextStyle: TextStyle(
-                            color: Colors.blue[800],
-                            fontWeight: FontWeight.bold,
-                          ),
-                          headingRowDecoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
+                          () => DataTable2(
+                            columnSpacing: 12,
+                            minWidth: 2000,
+                            horizontalMargin: 12,
+                            dataRowHeight: 56,
+                            headingRowHeight: 66,
+                            headingTextStyle: TextStyle(
+                              color: Colors.blue[800],
+                              fontWeight: FontWeight.bold,
                             ),
-                            color: Colors.blue[50],
+                            headingRowDecoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              color: Colors.blue[50],
+                            ),
+                            showCheckboxColumn: true,
+                            columns: [
+                              DataColumnCustom(
+                                title: tr('stt'),
+                                width: 70,
+                                onSort: controller.sortById,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // DataColumn2
+                              // DataColumnCustom(
+                              //   title: tr('action'),
+                              //   width: 100,
+                              //   fontSize: Common.sizeColumn,
+                              // ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('Hientrang'),
+                                width: 130,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('DotDanhGia'),
+                                width: 180,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('employeeCode'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('gender'),
+                                width: 60,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('fullName'),
+                                width: 180,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('department'),
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('group'),
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('age'),
+                                width: 70,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('position'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('salaryGrade'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('contractEffective'),
+                                width: 120,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('contractEndDate'),
+                                width: 120,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('earlyLateCount'),
+                                width: 110,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('paidLeave'),
+                                width: 100,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('unpaidLeave'),
+                                width: 90,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('unreportedLeave'),
+                                width: 90,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('violationCount'),
+                                width: 130,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('reason'),
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // DataColumnCustom(
+                              //   title: tr('healthCheckResult'),
+                              //   width: 170,
+                              //   maxLines: 2,
+                              //   fontSize: Common.sizeColumn,
+                              // ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('congviec'),
+                                width: 150,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('tinhthan'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('khac'),
+                                width: 150,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('note'),
+                                width: 150,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              //
+                              DataColumnCustom(
+                                title: tr('evaluationResult'),
+                                width: 150,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // đề xuất của phòng ban
+                              DataColumnCustom(
+                                title: tr('notRehirable'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              //
+                              DataColumnCustom(
+                                title: tr('notRehirableReason'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // nguoi de xuat cua phong ban
+                              DataColumnCustom(
+                                title: tr('DeXuat'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('Apporval'), //tr('notRehirable'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('LydoTuChoi'), //tr('notRehirable'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                            ],
+                            rows: List.generate(
+                              visibleCount,
+                              (i) => dataSource.getRow(_firstRowIndex + i)!,
+                            ),
                           ),
-                          showCheckboxColumn: true,
-                          columns: [
-                            DataColumnCustom(
-                              title: tr('stt'),
-                              width: 70,
-                              onSort: controller.sortById,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            // DataColumn2
-                            // DataColumnCustom(
-                            //   title: tr('action'),
-                            //   width: 100,
-                            //   fontSize: Common.sizeColumn,
-                            // ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('Hientrang'),
-                              width: 130,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('DotDanhGia'),
-                              width: 180,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('employeeCode'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('gender'),
-                              width: 60,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('fullName'),
-                              width: 180,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('department'),
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('group'),
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('age'),
-                              width: 70,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('position'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('salaryGrade'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('contractEffective'),
-                              width: 120,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('contractEndDate'),
-                              width: 120,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('earlyLateCount'),
-                              width: 110,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('paidLeave'),
-                              width: 100,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('unpaidLeave'),
-                              width: 90,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('unreportedLeave'),
-                              width: 90,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('violationCount'),
-                              width: 130,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('reason'),
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            // DataColumnCustom(
-                            //   title: tr('healthCheckResult'),
-                            //   width: 170,
-                            //   maxLines: 2,
-                            //   fontSize: Common.sizeColumn,
-                            // ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('congviec'),
-                              width: 150,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('tinhthan'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('khac'),
-                              width: 150,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('note'),
-                              width: 150,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            //
-                            DataColumnCustom(
-                              title: tr('evaluationResult'),
-                              width: 150,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            // đề xuất của phòng ban
-                            DataColumnCustom(
-                              title: tr('notRehirable'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            //
-                            DataColumnCustom(
-                              title: tr('notRehirableReason'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            // nguoi de xuat cua phong ban
-                            DataColumnCustom(
-                              title: tr('DeXuat'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('Apporval'), //tr('notRehirable'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('LydoTuChoi'), //tr('notRehirable'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                          ],
-                          rows: List.generate(
-                            visibleCount,
-                            (i) => dataSource.getRow(_firstRowIndex + i)!,
-                          ),
-                        ));
+                        );
                       },
                     ),
                   ),
@@ -1674,6 +1690,7 @@ class MyData extends DataTableSource {
         );
     }
   }
+
   @override
   bool get isRowCountApproximate => false;
 

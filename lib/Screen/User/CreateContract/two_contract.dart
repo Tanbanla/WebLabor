@@ -293,118 +293,145 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   }
 
   Widget _buildSearchAndActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // tablet / small desktop
+        final bool isXSmall = maxW < 600; // mobile narrow
+
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40; // full width for mobile
+          if (isSmall) return desired.clamp(110, 220);
+          return desired; // keep original on large screens
+        }
+
+        final filters = <Widget>[
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, top: 4),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  tr('searchhint'),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('employeeCode'),
-                  icon: Iconsax.tag,
-                  onChanged: (value) {
-                    controller.filterByEmployeeId(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 240,
-                  hint: tr('fullName'),
-                  icon: Iconsax.user,
-                  onChanged: (value) {
-                    controller.filterByEmployeeName(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 160,
-                  hint: tr('department'),
-                  icon: Iconsax.building_3,
-                  onChanged: (value) {
-                    controller.filterByDepartment(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('group'),
-                  icon: Iconsax.people,
-                  onChanged: (value) {
-                    controller.filterByGroup(value);
-                  },
-                ),
-                // reset filter
-                const SizedBox(width: 8),
-                buildActionButton(
-                  icon: Iconsax.refresh,
-                  color: Colors.blue,
-                  tooltip: tr('Rfilter'),
-                  onPressed: () => controller.refreshFilteredList(),
-                ),
-              ],
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        // Action Buttons
-        buildActionButton(
-          icon: Iconsax.import,
-          color: Colors.blue,
-          tooltip: tr('import'),
-          onPressed: () => _showImportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.export,
-          color: Colors.green,
-          tooltip: tr('export'),
-          onPressed: () => _showExportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.add,
-          color: Colors.orange,
-          tooltip: tr('add'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => _showAddDialog(),
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.trash,
-          color: Colors.red,
-          tooltip: tr('delete'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => _DeleteListContractDialog(),
-            );
-          },
-        ),
-      ],
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.import,
+            color: Colors.blue,
+            tooltip: tr('import'),
+            onPressed: () => _showImportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.add,
+            color: Colors.orange,
+            tooltip: tr('add'),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _showAddDialog(),
+              );
+            },
+          ),
+          buildActionButton(
+            icon: Iconsax.trash,
+            color: Colors.red,
+            tooltip: tr('delete'),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _DeleteListContractDialog(),
+              );
+            },
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...filters.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: filters,
+                ),
+        );
+      },
     );
   }
 
@@ -495,139 +522,140 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                             : (_firstRowIndex + _rowsPerPage);
                         final visibleCount = endIndex - _firstRowIndex;
                         return Obx(
-                          () =>  DataTable2(
-                          columnSpacing: 12,
-                          minWidth: 2000,
-                          horizontalMargin: 12,
-                          dataRowHeight: 56,
-                          headingRowHeight: 66,
-                          headingTextStyle: TextStyle(
-                            color: Colors.blue[800],
-                            fontWeight: FontWeight.bold,
-                          ),
-                          headingRowDecoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
+                          () => DataTable2(
+                            columnSpacing: 12,
+                            minWidth: 2000,
+                            horizontalMargin: 12,
+                            dataRowHeight: 56,
+                            headingRowHeight: 66,
+                            headingTextStyle: TextStyle(
+                              color: Colors.blue[800],
+                              fontWeight: FontWeight.bold,
                             ),
-                            color: Colors.blue[50],
+                            headingRowDecoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              color: Colors.blue[50],
+                            ),
+                            showCheckboxColumn: true,
+                            columns: [
+                              DataColumnCustom(
+                                title: tr('stt'),
+                                width: 70,
+                                onSort: controller.sortById,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // DataColumn2
+                              DataColumnCustom(
+                                title: tr('action'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('employeeCode'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('gender'),
+                                width: 60,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('fullName'),
+                                width: 180,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('department'),
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                maxLines: 2,
+                                title: tr('group'),
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('age'),
+                                width: 70,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('position'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('salaryGrade'),
+                                width: 100,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('contractEffective'),
+                                width: 120,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('contractEndDate'),
+                                width: 120,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('earlyLateCount'),
+                                width: 110,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('paidLeave'),
+                                width: 100,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('unpaidLeave'),
+                                width: 90,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('unreportedLeave'),
+                                width: 90,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('violationCount'),
+                                width: 130,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('reason'),
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('TruongPhong'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              DataColumnCustom(
+                                title: tr('LydoTuChoi'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                            ],
+                            rows: List.generate(
+                              visibleCount,
+                              (i) => dataSource.getRow(_firstRowIndex + i)!,
+                            ),
                           ),
-                          showCheckboxColumn: true,
-                          columns: [
-                            DataColumnCustom(
-                              title: tr('stt'),
-                              width: 70,
-                              onSort: controller.sortById,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            // DataColumn2
-                            DataColumnCustom(
-                              title: tr('action'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('employeeCode'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('gender'),
-                              width: 60,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('fullName'),
-                              width: 180,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('department'),
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              maxLines: 2,
-                              title: tr('group'),
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('age'),
-                              width: 70,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('position'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('salaryGrade'),
-                              width: 100,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('contractEffective'),
-                              width: 120,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('contractEndDate'),
-                              width: 120,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('earlyLateCount'),
-                              width: 110,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('paidLeave'),
-                              width: 100,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('unpaidLeave'),
-                              width: 90,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('unreportedLeave'),
-                              width: 90,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('violationCount'),
-                              width: 130,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('reason'),
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('TruongPhong'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                            DataColumnCustom(
-                              title: tr('LydoTuChoi'),
-                              width: 170,
-                              maxLines: 2,
-                              fontSize: Common.sizeColumn,
-                            ).toDataColumn2(),
-                          ],
-                          rows: List.generate(
-                            visibleCount,
-                            (i) => dataSource.getRow(_firstRowIndex + i)!,
-                          ),
-                        ));
+                        );
                       },
                     ),
                   ),
@@ -1631,7 +1659,10 @@ class _EditTwoContractDialog extends StatelessWidget {
                           .map(
                             (section) => DropdownMenuItem(
                               value: section,
-                              child: Text(section, style: TextStyle(fontSize: 14),),
+                              child: Text(
+                                section,
+                                style: TextStyle(fontSize: 14),
+                              ),
                             ),
                           )
                           .toList(),

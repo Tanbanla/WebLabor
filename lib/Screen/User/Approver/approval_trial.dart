@@ -133,180 +133,379 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ],
     );
   }
-
   Widget _buildSearchAndActions() {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    final DashboardControllerApprentice controller = Get.put(
-      DashboardControllerApprentice(),
-    );
-    // Extract section name safely
-    // String sectionName =
-    //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr('searchhint'),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                    ),
-                    const SizedBox(width: 12),
-                    _buildFilterFieldWithIcon(
-                      width: 240,
-                      hint: tr('DotDanhGia'),
-                      icon: Iconsax.document_filter,
-                      onChanged: (value) {
-                        controller.filterByApproverCode(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 140,
-                      hint: tr('employeeCode'),
-                      icon: Iconsax.tag,
-                      onChanged: (value) {
-                        controller.filterByEmployeeId(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 240,
-                      hint: tr('fullName'),
-                      icon: Iconsax.user,
-                      onChanged: (value) {
-                        controller.filterByEmployeeName(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 160,
-                      hint: tr('department'),
-                      icon: Iconsax.building_3,
-                      onChanged: (value) {
-                        controller.filterByDepartment(value);
-                      },
-                    ),
-                    const SizedBox(width: 6),
-                    _buildFilterFieldWithIcon(
-                      width: 140,
-                      hint: tr('group'),
-                      icon: Iconsax.people,
-                      onChanged: (value) {
-                        controller.filterByGroup(value);
-                      },
-                    ),
-                    // reset filter
-                    const SizedBox(width: 8),
-                    buildActionButton(
-                      icon: Iconsax.refresh,
-                      color: Colors.blue,
-                      tooltip: tr('Rfilter'),
-                      onPressed: () => controller.refreshFilteredList(),
-                    ),
-                  ],
-                ),
+    final authState = Provider.of<AuthState>(context, listen: false);
+    final DashboardControllerApprentice controller =
+        Get.find<DashboardControllerApprentice>();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // tablet / small desktop
+        final bool isXSmall = maxW < 600; // narrow mobile
+
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40; // almost full width
+          if (isSmall) return desired.clamp(110, 240);
+          return desired;
+        }
+
+        final items = <Widget>[
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, top: 4),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
               ),
             ),
-            // Action Buttons
-            const SizedBox(width: 8),
-            buildActionButton(
-              icon: Iconsax.export,
-              color: Colors.green,
-              tooltip: tr('export'),
-              onPressed: () => _showExportDialog(),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('DotDanhGia'),
+              icon: Iconsax.document_filter,
+              onChanged: (v) => controller.filterByApproverCode(v),
             ),
-            // từ chối nhiều
-            const SizedBox(width: 8),
-            buildActionButton(
-              icon: Iconsax.back_square,
-              color: Colors.orange,
-              tooltip: tr('ReturnS'),
-              onPressed: () =>
-                  _ReturnSDialog(authState.user!.chRUserid.toString()),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
             ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () async {
-                try {
-                  await controller.updateListApprenticeContractApproval(
-                    authState.user!.chRUserid.toString(),
-                  );
-                  // phan xem ai dang vao man so sanh
-                  controller.changeStatus(
-                    'approval',
-                    null,
-                    authState.user!.chRUserid.toString(),
-                  );
-                } catch (e) {
+          ),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.back_square,
+            color: Colors.orange,
+            tooltip: tr('ReturnS'),
+            onPressed: () =>
+                _ReturnSDialog(authState.user!.chRUserid.toString()),
+          ),
+          GestureDetector(
+            onTap: () async {
+              try {
+                await controller.updateListApprenticeContractApproval(
+                  authState.user!.chRUserid.toString(),
+                );
+                controller.changeStatus(
+                  'approval',
+                  null,
+                  authState.user!.chRUserid.toString(),
+                );
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
-                      ),
-                      backgroundColor: Colors.red,
+                      content: Text(tr('DaGui')),
+                      backgroundColor: Colors.green,
                     ),
                   );
                 }
-              },
-              child: Obx(
-                () => Container(
-                  width: 130,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: controller.isLoading.value
-                        ? Colors.grey
-                        : Common.primaryColor,
-                    borderRadius: BorderRadius.circular(10),
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+                    ),
+                    backgroundColor: Colors.red,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  child: Center(
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            tr('Confirm'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                );
+              }
+            },
+            child: Obx(
+              () => Container(
+                width: 130,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: controller.isLoading.value
+                      ? Colors.grey
+                      : Common.primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Center(
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
-                  ),
+                        )
+                      : Text(
+                          tr('Confirm'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...items.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: items,
+                ),
+        );
+      },
     );
   }
+  // Widget _buildSearchAndActions() {
+  //   final authState = Provider.of<AuthState>(context, listen: true);
+  //   final DashboardControllerApprentice controller = Get.put(
+  //     DashboardControllerApprentice(),
+  //   );
+  //   // Extract section name safely
+  //   // String sectionName =
+  //   //     authState.user?.chRSecCode?.toString().split(':').last.trim() ?? '';
+  //   return Column(
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: Container(
+  //               padding: const EdgeInsets.all(16),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white,
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.grey.withOpacity(0.1),
+  //                     spreadRadius: 2,
+  //                     blurRadius: 8,
+  //                     offset: const Offset(0, 4),
+  //                   ),
+  //                 ],
+  //               ),
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     tr('searchhint'),
+  //                     style: TextStyle(color: Colors.grey[600], fontSize: 18),
+  //                   ),
+  //                   const SizedBox(width: 12),
+  //                   _buildFilterFieldWithIcon(
+  //                     width: 240,
+  //                     hint: tr('DotDanhGia'),
+  //                     icon: Iconsax.document_filter,
+  //                     onChanged: (value) {
+  //                       controller.filterByApproverCode(value);
+  //                     },
+  //                   ),
+  //                   const SizedBox(width: 6),
+  //                   _buildFilterFieldWithIcon(
+  //                     width: 140,
+  //                     hint: tr('employeeCode'),
+  //                     icon: Iconsax.tag,
+  //                     onChanged: (value) {
+  //                       controller.filterByEmployeeId(value);
+  //                     },
+  //                   ),
+  //                   const SizedBox(width: 6),
+  //                   _buildFilterFieldWithIcon(
+  //                     width: 240,
+  //                     hint: tr('fullName'),
+  //                     icon: Iconsax.user,
+  //                     onChanged: (value) {
+  //                       controller.filterByEmployeeName(value);
+  //                     },
+  //                   ),
+  //                   const SizedBox(width: 6),
+  //                   _buildFilterFieldWithIcon(
+  //                     width: 160,
+  //                     hint: tr('department'),
+  //                     icon: Iconsax.building_3,
+  //                     onChanged: (value) {
+  //                       controller.filterByDepartment(value);
+  //                     },
+  //                   ),
+  //                   const SizedBox(width: 6),
+  //                   _buildFilterFieldWithIcon(
+  //                     width: 140,
+  //                     hint: tr('group'),
+  //                     icon: Iconsax.people,
+  //                     onChanged: (value) {
+  //                       controller.filterByGroup(value);
+  //                     },
+  //                   ),
+  //                   // reset filter
+  //                   const SizedBox(width: 8),
+  //                   buildActionButton(
+  //                     icon: Iconsax.refresh,
+  //                     color: Colors.blue,
+  //                     tooltip: tr('Rfilter'),
+  //                     onPressed: () => controller.refreshFilteredList(),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //           // Action Buttons
+  //           const SizedBox(width: 8),
+  //           buildActionButton(
+  //             icon: Iconsax.export,
+  //             color: Colors.green,
+  //             tooltip: tr('export'),
+  //             onPressed: () => _showExportDialog(),
+  //           ),
+  //           // từ chối nhiều
+  //           const SizedBox(width: 8),
+  //           buildActionButton(
+  //             icon: Iconsax.back_square,
+  //             color: Colors.orange,
+  //             tooltip: tr('ReturnS'),
+  //             onPressed: () =>
+  //                 _ReturnSDialog(authState.user!.chRUserid.toString()),
+  //           ),
+  //           const SizedBox(width: 8),
+  //           GestureDetector(
+  //             onTap: () async {
+  //               try {
+  //                 await controller.updateListApprenticeContractApproval(
+  //                   authState.user!.chRUserid.toString(),
+  //                 );
+  //                 // phan xem ai dang vao man so sanh
+  //                 controller.changeStatus(
+  //                   'approval',
+  //                   null,
+  //                   authState.user!.chRUserid.toString(),
+  //                 );
+  //               } catch (e) {
+  //                 ScaffoldMessenger.of(context).showSnackBar(
+  //                   SnackBar(
+  //                     content: Text(
+  //                       '${tr('sendFailed')} ${e.toString().replaceAll('', '')}',
+  //                     ),
+  //                     backgroundColor: Colors.red,
+  //                   ),
+  //                 );
+  //               }
+  //             },
+  //             child: Obx(
+  //               () => Container(
+  //                 width: 130,
+  //                 height: 36,
+  //                 decoration: BoxDecoration(
+  //                   color: controller.isLoading.value
+  //                       ? Colors.grey
+  //                       : Common.primaryColor,
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 padding: const EdgeInsets.symmetric(
+  //                   horizontal: 10,
+  //                   vertical: 8,
+  //                 ),
+  //                 child: Center(
+  //                   child: controller.isLoading.value
+  //                       ? const SizedBox(
+  //                           width: 20,
+  //                           height: 20,
+  //                           child: CircularProgressIndicator(
+  //                             color: Colors.white,
+  //                             strokeWidth: 2,
+  //                           ),
+  //                         )
+  //                       : Text(
+  //                           tr('Confirm'),
+  //                           style: TextStyle(
+  //                             color: Colors.white,
+  //                             fontSize: 16,
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                         ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // Helper method to build filter input fields with icons
   Widget _buildFilterFieldWithIcon({

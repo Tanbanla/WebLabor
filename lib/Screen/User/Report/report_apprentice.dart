@@ -142,199 +142,208 @@ class _ReportApprenticeState extends State<ReportApprentice> {
 
   Widget _buildSearchAndActions() {
     final DashboardControllerApprentice controller = Get.find();
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width - 120,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    tr('searchhint'),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildFilterFieldWithIcon(
-                    width: 240,
-                    hint: tr('DotDanhGia'),
-                    icon: Iconsax.document_filter,
-                    onChanged: (value) {
-                      controller.filterByApproverCode(value);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  // Dropdown filter for status instead of text input
-                  SizedBox(
-                    width: 220,
-                    child: Obx(() {
-                      // Thay YourController bằng controller thực tế
-                      final statusOptions = <Map<String, dynamic>>[
-                        {'code': '', 'label': tr('all')},
-                        {'code': 'New', 'label': 'New'},
-                        {'code': 'Per', 'label': 'Per/人事課の中級管理職'},
-                        {'code': 'PTHC', 'label': 'PTHC'},
-                        {'code': 'Leader', 'label': 'Leader'},
-                        {'code': 'QLTC', 'label': 'QLTC/中級管理職'},
-                        {'code': 'QLCC', 'label': 'QLCC/上級管理職'},
-                        {'code': 'Director', 'label': 'Director/管掌取締役'},
-                        {'code': 'Done', 'label': 'Done'},
-                      ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // tablet / small desktop
+        final bool isXSmall = maxW < 600; // mobile width
 
-                      return DropdownButtonFormField<String>(
-                        value: controller.selectedStatus.value.isEmpty
-                            ? null
-                            : controller.selectedStatus.value,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                          hintText: tr('status'),
-                          hintStyle: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey[500],
-                          ),
-                          prefixIcon: Icon(
-                            Iconsax.activity,
-                            size: 20,
-                            color: Colors.grey[600],
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: Colors.black54,
-                              width: 0.5,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.blue[300]!,
-                              width: 1.5,
-                            ),
-                          ),
-                          isDense: true,
-                        ),
-                        isExpanded: true,
-                        hint: Text(
-                          tr('status'),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        items: statusOptions.map((option) {
-                          return DropdownMenuItem<String>(
-                            value: option['code'] as String,
-                            child: Text(
-                              option['label'] as String,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          controller.selectedStatus.value = value ?? '';
-                          controller.filterByStatus(value ?? '');
-                        },
-                        dropdownColor: Colors.white,
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.grey[600],
-                          size: 24,
-                        ),
-                        iconSize: 16,
-                        elevation: 2,
-                        borderRadius: BorderRadius.circular(8),
-                        menuMaxHeight: 300,
-                      );
-                    }),
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40; // full width minus padding
+          if (isSmall) return desired.clamp(120, 220);
+          return desired; // large screen keep original
+        }
+
+        final statusOptions = <Map<String, dynamic>>[
+          {'code': '', 'label': tr('all')},
+          {'code': 'New', 'label': 'New'},
+          {'code': 'Per', 'label': 'Per/人事課の中級管理職'},
+          {'code': 'PTHC', 'label': 'PTHC'},
+          {'code': 'Leader', 'label': 'Leader'},
+          {'code': 'QLTC', 'label': 'QLTC/中級管理職'},
+          {'code': 'QLCC', 'label': 'QLCC/上級管理職'},
+          {'code': 'Director', 'label': 'Director/管掌取締役'},
+          {'code': 'Done', 'label': 'Done'},
+        ];
+
+        Widget statusDropdown = SizedBox(
+          width: fw(220),
+          child: Obx(
+            () => DropdownButtonFormField<String>(
+              value: controller.selectedStatus.value.isEmpty
+                  ? null
+                  : controller.selectedStatus.value,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                hintText: tr('status'),
+                hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+                prefixIcon: Icon(
+                  Iconsax.activity,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: Colors.black54,
+                    width: .5,
                   ),
-                  const SizedBox(width: 6),
-                  _buildFilterFieldWithIcon(
-                    width: 140,
-                    hint: tr('employeeCode'),
-                    icon: Iconsax.tag,
-                    onChanged: (value) {
-                      controller.filterByEmployeeId(value);
-                    },
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+                ),
+                isDense: true,
+              ),
+              isExpanded: true,
+              hint: Text(
+                tr('status'),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              items: statusOptions.map((option) {
+                return DropdownMenuItem<String>(
+                  value: option['code'] as String,
+                  child: Text(
+                    option['label'] as String,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 14),
                   ),
-                  const SizedBox(width: 6),
-                  _buildFilterFieldWithIcon(
-                    width: 240,
-                    hint: tr('fullName'),
-                    icon: Iconsax.user,
-                    onChanged: (value) {
-                      controller.filterByEmployeeName(value);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  _buildFilterFieldWithIcon(
-                    width: 160,
-                    hint: tr('department'),
-                    icon: Iconsax.building_3,
-                    onChanged: (value) {
-                      controller.filterByDepartment(value);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  _buildFilterFieldWithIcon(
-                    width: 140,
-                    hint: tr('group'),
-                    icon: Iconsax.people,
-                    onChanged: (value) {
-                      controller.filterByGroup(value);
-                    },
-                  ),
-                  // reset filter
-                  const SizedBox(width: 8),
-                  buildActionButton(
-                    icon: Iconsax.refresh,
-                    color: Colors.blue,
-                    tooltip: tr('Rfilter'),
-                    onPressed: () => controller.refreshFilteredList(),
-                  ),
-                ],
+                );
+              }).toList(),
+              onChanged: (value) {
+                controller.selectedStatus.value = value ?? '';
+                controller.filterByStatus(value ?? '');
+              },
+              dropdownColor: Colors.white,
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey[600],
+                size: 20,
+              ),
+              menuMaxHeight: 320,
+            ),
+          ),
+        );
+
+        final filters = <Widget>[
+          // Tiêu đề (ẩn trên màn nhỏ để tiết kiệm không gian)
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 12, top: 6),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
               ),
             ),
-            const SizedBox(width: 12),
-            buildActionButton(
-              icon: Iconsax.export,
-              color: Colors.green,
-              tooltip: tr('export'),
-              onPressed: () => _showExportDialog(),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('DotDanhGia'),
+              icon: Iconsax.document_filter,
+              onChanged: (v) => controller.filterByApproverCode(v),
             ),
-          ],
-        ),
-      ),
+          ),
+          statusDropdown,
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                spreadRadius: 1,
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...filters.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: filters,
+                ),
+        );
+      },
     );
   }
 

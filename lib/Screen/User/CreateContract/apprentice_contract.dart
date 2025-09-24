@@ -294,119 +294,145 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   }
 
   Widget _buildSearchAndActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // tablet / small desktop
+        final bool isXSmall = maxW < 600; // mobile narrow
+
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40; // full width for mobile
+          if (isSmall) return desired.clamp(110, 220);
+          return desired; // keep original on large screens
+        }
+
+        final filters = <Widget>[
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, top: 4),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  tr('searchhint'),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('employeeCode'),
-                  icon: Iconsax.tag,
-                  onChanged: (value) {
-                    controller.filterByEmployeeId(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 240,
-                  hint: tr('fullName'),
-                  icon: Iconsax.user,
-                  onChanged: (value) {
-                    controller.filterByEmployeeName(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 160,
-                  hint: tr('department'),
-                  icon: Iconsax.building_3,
-                  onChanged: (value) {
-                    controller.filterByDepartment(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('group'),
-                  icon: Iconsax.people,
-                  onChanged: (value) {
-                    controller.filterByGroup(value);
-                  },
-                ),
-                // reset filter
-                const SizedBox(width: 8),
-                buildActionButton(
-                  icon: Iconsax.refresh,
-                  color: Colors.blue,
-                  tooltip: tr('Rfilter'),
-                  onPressed: () => controller.refreshFilteredList(),
-                ),
-              ],
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.import,
+            color: Colors.blue,
+            tooltip: tr('import'),
+            onPressed: () => _showImportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.add,
+            color: Colors.orange,
+            tooltip: tr('add'),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _showAddDialog(),
+              );
+            },
+          ),
+          buildActionButton(
+            icon: Iconsax.trash,
+            color: Colors.red,
+            tooltip: tr('delete'),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _DeleteListContractDialog(),
+              );
+            },
+          ),
+        ];
 
-        // Action Buttons
-        buildActionButton(
-          icon: Iconsax.import,
-          color: Colors.blue,
-          tooltip: tr('import'),
-          onPressed: () => _showImportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.export,
-          color: Colors.green,
-          tooltip: tr('export'),
-          onPressed: () => _showExportDialog(),
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.add,
-          color: Colors.orange,
-          tooltip: tr('add'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => _showAddDialog(),
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.trash,
-          color: Colors.red,
-          tooltip: tr('delete'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => _DeleteListContractDialog(),
-            );
-          },
-        ),
-      ],
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...filters.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: filters,
+                ),
+        );
+      },
     );
   }
 

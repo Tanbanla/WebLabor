@@ -420,117 +420,255 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     );
   }
 
+  // Widget _buildSearchAndActions() {
+  //   final authState = Provider.of<AuthState>(context, listen: true);
+  //   String sectionName = authState.user!.chRSecCode
+  //       .toString()
+  //       .split(':')[1]
+  //       .trim();
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: Container(
+  //           padding: const EdgeInsets.all(16),
+  //           decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             borderRadius: BorderRadius.circular(12),
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: Colors.grey.withOpacity(0.1),
+  //                 spreadRadius: 2,
+  //                 blurRadius: 8,
+  //                 offset: const Offset(0, 4),
+  //               ),
+  //             ],
+  //           ),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 tr('searchhint'),
+  //                 style: TextStyle(color: Colors.grey[600], fontSize: 18),
+  //               ),
+  //               const SizedBox(width: 12),
+  //               _buildFilterFieldWithIcon(
+  //                 width: 240,
+  //                 hint: tr('DotDanhGia'),
+  //                 icon: Iconsax.document_filter,
+  //                 onChanged: (value) {
+  //                   controller.filterByApproverCode(value);
+  //                 },
+  //               ),
+  //               const SizedBox(width: 6),
+  //               _buildFilterFieldWithIcon(
+  //                 width: 140,
+  //                 hint: tr('employeeCode'),
+  //                 icon: Iconsax.tag,
+  //                 onChanged: (value) {
+  //                   controller.filterByEmployeeId(value);
+  //                 },
+  //               ),
+  //               const SizedBox(width: 6),
+  //               _buildFilterFieldWithIcon(
+  //                 width: 240,
+  //                 hint: tr('fullName'),
+  //                 icon: Iconsax.user,
+  //                 onChanged: (value) {
+  //                   controller.filterByEmployeeName(value);
+  //                 },
+  //               ),
+  //               const SizedBox(width: 6),
+  //               _buildFilterFieldWithIcon(
+  //                 width: 160,
+  //                 hint: tr('department'),
+  //                 icon: Iconsax.building_3,
+  //                 onChanged: (value) {
+  //                   controller.filterByDepartment(value);
+  //                 },
+  //               ),
+  //               const SizedBox(width: 6),
+  //               _buildFilterFieldWithIcon(
+  //                 width: 140,
+  //                 hint: tr('group'),
+  //                 icon: Iconsax.people,
+  //                 onChanged: (value) {
+  //                   controller.filterByGroup(value);
+  //                 },
+  //               ),
+  //               // reset filter
+  //               const SizedBox(width: 8),
+  //               buildActionButton(
+  //                 icon: Iconsax.refresh,
+  //                 color: Colors.blue,
+  //                 tooltip: tr('Rfilter'),
+  //                 onPressed: () => controller.refreshFilteredList(),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       // Action Buttons
+  //       const SizedBox(width: 8),
+  //       buildActionButton(
+  //         icon: Iconsax.export,
+  //         color: Colors.green,
+  //         tooltip: tr('export'),
+  //         onPressed: () => _showExportDialog(),
+  //       ),
+  //       // từ chối nhiều
+  //       const SizedBox(width: 8),
+  //       buildActionButton(
+  //         icon: Iconsax.back_square,
+  //         color: Colors.orange,
+  //         tooltip: tr('ReturnS'),
+  //         onPressed: () => _ReturnSDialog(
+  //           authState.user!.chRUserid.toString(),
+  //           sectionName,
+  //           authState.user!.chRGroup.toString(),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
     String sectionName = authState.user!.chRSecCode
         .toString()
         .split(':')[1]
         .trim();
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxW = constraints.maxWidth;
+        final bool isSmall = maxW < 900; // small desktop / tablet
+        final bool isXSmall = maxW < 600; // mobile
+
+        double fw(double desired) {
+          if (isXSmall) return maxW - 40;
+          // On very narrow screens reduce to a range
+          if (isSmall) return desired.clamp(110, 220);
+          return desired; // large keep original
+        }
+
+        final List<Widget> filters = [
+          if (!isXSmall)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, top: 4),
+              child: Text(
+                tr('searchhint'),
+                style: TextStyle(color: Colors.grey[600], fontSize: 18),
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  tr('searchhint'),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                ),
-                const SizedBox(width: 12),
-                _buildFilterFieldWithIcon(
-                  width: 240,
-                  hint: tr('DotDanhGia'),
-                  icon: Iconsax.document_filter,
-                  onChanged: (value) {
-                    controller.filterByApproverCode(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('employeeCode'),
-                  icon: Iconsax.tag,
-                  onChanged: (value) {
-                    controller.filterByEmployeeId(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 240,
-                  hint: tr('fullName'),
-                  icon: Iconsax.user,
-                  onChanged: (value) {
-                    controller.filterByEmployeeName(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 160,
-                  hint: tr('department'),
-                  icon: Iconsax.building_3,
-                  onChanged: (value) {
-                    controller.filterByDepartment(value);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _buildFilterFieldWithIcon(
-                  width: 140,
-                  hint: tr('group'),
-                  icon: Iconsax.people,
-                  onChanged: (value) {
-                    controller.filterByGroup(value);
-                  },
-                ),
-                // reset filter
-                const SizedBox(width: 8),
-                buildActionButton(
-                  icon: Iconsax.refresh,
-                  color: Colors.blue,
-                  tooltip: tr('Rfilter'),
-                  onPressed: () => controller.refreshFilteredList(),
-                ),
-              ],
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('DotDanhGia'),
+              icon: Iconsax.document_filter,
+              onChanged: (v) => controller.filterByApproverCode(v),
             ),
           ),
-        ),
-        // Action Buttons
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.export,
-          color: Colors.green,
-          tooltip: tr('export'),
-          onPressed: () => _showExportDialog(),
-        ),
-        // từ chối nhiều
-        const SizedBox(width: 8),
-        buildActionButton(
-          icon: Iconsax.back_square,
-          color: Colors.orange,
-          tooltip: tr('ReturnS'),
-          onPressed: () => _ReturnSDialog(
-            authState.user!.chRUserid.toString(),
-            sectionName,
-            authState.user!.chRGroup.toString(),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('employeeCode'),
+              icon: Iconsax.tag,
+              onChanged: (v) => controller.filterByEmployeeId(v),
+            ),
           ),
-        ),
-      ],
+          SizedBox(
+            width: fw(240),
+            child: _buildFilterFieldWithIcon(
+              width: fw(240),
+              hint: tr('fullName'),
+              icon: Iconsax.user,
+              onChanged: (v) => controller.filterByEmployeeName(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(160),
+            child: _buildFilterFieldWithIcon(
+              width: fw(160),
+              hint: tr('department'),
+              icon: Iconsax.building_3,
+              onChanged: (v) => controller.filterByDepartment(v),
+            ),
+          ),
+          SizedBox(
+            width: fw(140),
+            child: _buildFilterFieldWithIcon(
+              width: fw(140),
+              hint: tr('group'),
+              icon: Iconsax.people,
+              onChanged: (v) => controller.filterByGroup(v),
+            ),
+          ),
+          buildActionButton(
+            icon: Iconsax.refresh,
+            color: Colors.blue,
+            tooltip: tr('Rfilter'),
+            onPressed: () => controller.refreshFilteredList(),
+          ),
+          buildActionButton(
+            icon: Iconsax.export,
+            color: Colors.green,
+            tooltip: tr('export'),
+            onPressed: () => _showExportDialog(),
+          ),
+          buildActionButton(
+            icon: Iconsax.back_square,
+            color: Colors.orange,
+            tooltip: tr('ReturnS'),
+            onPressed: () => _ReturnSDialog(
+              authState.user!.chRUserid.toString(),
+              sectionName,
+              authState.user!.chRGroup.toString(),
+            ),
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isXSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr('searchhint'),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...filters.map(
+                      (w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: w,
+                      ),
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: filters,
+                ),
+        );
+      },
     );
   }
-
   // Helper method to build filter input fields with icons
   Widget _buildFilterFieldWithIcon({
     required double width,
