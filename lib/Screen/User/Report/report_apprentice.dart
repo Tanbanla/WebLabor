@@ -36,17 +36,17 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   int _rowsPerPage = 50;
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Load initial data once
-  //   controller.fetchSectionList();
-  //   controller.fetchDummyData();
-  // }
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    // Load initial data once
     controller.fetchSectionList();
     controller.fetchDummyData();
+  }
+  @override
+  Widget build(BuildContext context) {
+    // controller.fetchSectionList();
+    // controller.fetchDummyData();
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
