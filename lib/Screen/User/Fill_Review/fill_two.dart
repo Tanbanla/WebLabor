@@ -629,7 +629,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: 4420, //2570,
+                    width: 3820, //2570,
                     child: Builder(
                       builder: (context) {
                         final dataSource = MyData(context);
