@@ -167,12 +167,17 @@ class DashboardControllerTwo extends GetxController {
       //refreshFilteredList();
       return;
     }
-
+    if (query == 'Not Done') {
+      final filteredList = dataList.where((item) => item.inTStatusId != 9).toList();
+      filterdataList.value = filteredList;
+      return;
+    }
     final filteredList = dataList.where((item) {
       final statusId = item.inTStatusId;
       final statusText = getStatusText(statusId);
       return statusText.toLowerCase().contains(query.toLowerCase());
     }).toList();
+
 
     filterdataList.value = filteredList;
   }
@@ -561,6 +566,21 @@ class DashboardControllerTwo extends GetxController {
         throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < twocontract.length; i++) {
+        // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
+        if ((twocontract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
+          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
+          final originalIndex = dataList.indexWhere((d) =>
+              (twocontract[i].id != null && d.id == twocontract[i].id) ||
+              (d.vchREmployeeId == twocontract[i].vchREmployeeId));
+          if (originalIndex != -1) {
+            final original = dataList[originalIndex];
+              final bool changed = original != twocontract[i];
+            if (!changed) {
+              // Không có thay đổi thực sự
+              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
+            }
+          }
+        }
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].inTStatusId = 2;
@@ -615,6 +635,23 @@ class DashboardControllerTwo extends GetxController {
         throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < twocontract.length; i++) {
+        // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
+        if ((twocontract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
+            (twocontract[i].nvchRApproverManager?.isNotEmpty ?? false) ||
+            (twocontract[i].nvchRApproverDirector?.isNotEmpty ?? false)) {
+          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
+          final originalIndex = dataList.indexWhere((d) =>
+              (twocontract[i].id != null && d.id == twocontract[i].id) ||
+              (d.vchREmployeeId == twocontract[i].vchREmployeeId));
+          if (originalIndex != -1) {
+            final original = dataList[originalIndex];
+              final bool changed = original != twocontract[i];
+            if (!changed) {
+              // Không có thay đổi thực sự
+              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
+            }
+          }
+        }
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].biTApproverChief = true;

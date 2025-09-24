@@ -164,6 +164,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
           {'code': 'QLCC', 'label': 'QLCC/上級管理職'},
           {'code': 'Director', 'label': 'Director/管掌取締役'},
           {'code': 'Done', 'label': 'Done'},
+          {'code': 'Not Done', 'label': 'Not Done'},
         ];
 
         Widget statusDropdown = SizedBox(
