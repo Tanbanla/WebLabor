@@ -17,6 +17,7 @@ import 'package:web_labor_contract/class/User_Approver.dart';
 class DashboardControllerApprentice extends GetxController {
   var dataList = <ApprenticeContract>[].obs;
   var filterdataList = <ApprenticeContract>[].obs;
+  var originalList = <ApprenticeContract>[].obs;
   var listSection = <String>[].obs;
   var selectedStatus = ''.obs;
   // Multi-field query holders (new)
@@ -42,10 +43,9 @@ class DashboardControllerApprentice extends GetxController {
     //fetchDataBy(statusId: currentStatusId.value);
   }
 
-  // Helper: find contract by employee code in main list
   ApprenticeContract? _byEmp(String employeeCode) {
     try {
-      return dataList.firstWhere((e) => e.vchREmployeeId == employeeCode);
+      return filterdataList.firstWhere((e) => e.vchREmployeeId == employeeCode);
     } catch (_) {
       return null;
     }
@@ -365,6 +365,12 @@ class DashboardControllerApprentice extends GetxController {
           );
 
           filterdataList.assignAll(dataList);
+          // dữ liệu gốc
+          originalList.assignAll(
+            data
+                .map((contract) => ApprenticeContract.fromJson(contract))
+                .toList(),
+          );
           selectRows.assignAll(
             List.generate(dataList.length, (index) => false),
           );
@@ -584,16 +590,16 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((contract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
-          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere(
+          // Tìm bản ghi gốc trong originalList (ưu tiên so sánh theo id, fallback theo mã NV)
+          final originalIndex = originalList.indexWhere(
             (d) =>
                 (contract[i].id != null && d.id == contract[i].id) ||
                 (d.vchREmployeeId == contract[i].vchREmployeeId),
           );
           if (originalIndex != -1) {
-            final original = dataList[originalIndex];
+            final original = originalList[originalIndex];
             final bool changed = original != contract[i];
-            if (!changed) {
+            if (changed) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
             }
@@ -657,23 +663,23 @@ class DashboardControllerApprentice extends GetxController {
         throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < contract.length; i++) {
-        // if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
-        //     (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
-        //   // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-        //   final originalIndex = dataList.indexWhere(
-        //     (d) =>
-        //         (contract[i].id != null && d.id == contract[i].id) ||
-        //         (d.vchREmployeeId == contract[i].vchREmployeeId),
-        //   );
-        //   if (originalIndex != -1) {
-        //     final original = dataList[originalIndex];
-        //     final bool changed = original != contract[i];
-        //     if (!changed) {
-        //       // Không có thay đổi thực sự
-        //       throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
-        //     }
-        //   }
-        // }
+        if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
+            (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
+          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
+          final originalIndex = originalList.indexWhere(
+            (d) =>
+                (contract[i].id != null && d.id == contract[i].id) ||
+                (d.vchREmployeeId == contract[i].vchREmployeeId),
+          );
+          if (originalIndex != -1) {
+            final original = originalList[originalIndex];
+            final bool changed = original != contract[i];
+            if (changed) {
+              // Không có thay đổi thực sự
+              throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
+            }
+          }
+        }
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].biTApproverChief = true;
