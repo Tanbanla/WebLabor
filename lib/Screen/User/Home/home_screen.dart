@@ -14,7 +14,6 @@ import 'package:web_labor_contract/main.dart';
 import 'package:web_labor_contract/router.dart';
 
 class HomeScreen extends StatefulWidget {
-  
   final void Function(String)? onNavigate;
   const HomeScreen({Key? key, this.onNavigate}) : super(key: key);
   @override
@@ -112,29 +111,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildContractCard(
-                          icon: Iconsax.document1,
-                          color: Colors.red,
-                          title: tr('HDHN'),
-                          value: contractStats.totalApprenticeWaitingApprove
-                              .toString(),
-                          width: size.width > 600 ? 500 : size.width * 0.75,
-                          onTap: () {
-                            context.go(AppRoutes.approvalTrial);
-                          },
+                        Column(
+                          children: [
+                            _buildContractCard(
+                              icon: Iconsax.document1,
+                              color: Colors.brown,
+                              title: tr('HDHN'),
+                              value: contractStats.totalApprenticeWaitingApprove
+                                  .toString(),
+                              width: size.width > 600 ? 500 : size.width * 0.75,
+                              onTap: () {
+                                context.go(AppRoutes.approvalTrial);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            _buildContractCard(
+                              icon: Iconsax.document_cloud,
+                              color: Colors.blue,
+                              title: tr('HDHVCanDuyet'),
+                              value: contractStats.totalApprenticeStatus34
+                                  .toString(),
+                              width: size.width > 600 ? 500 : size.width * 0.75,
+                              onTap: () {
+                                context.go(AppRoutes.fillApprentice);
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(width: 20),
-                        _buildContractCard(
-                          icon: Iconsax.document_copy,
-                          color: Colors.orange,
-                          title: tr('HD2N'),
-                          value: contractStats.totalTwoYearWaitingApprove
-                              .toString(),
-                          width: size.width > 600 ? 500 : size.width * 0.75,
-                          onTap: () {
-                            context.go(AppRoutes.approvalTwo);
-                          },
+                        Column(
+                          children: [
+                            _buildContractCard(
+                              icon: Iconsax.document_copy,
+                              color: Colors.orange,
+                              title: tr('HD2N'),
+                              value: contractStats.totalTwoYearWaitingApprove
+                                  .toString(),
+                              width: size.width > 600 ? 500 : size.width * 0.75,
+                              onTap: () {
+                                context.go(AppRoutes.approvalTwo);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            _buildContractCard(
+                              icon: Iconsax.document_copy,
+                              color: Colors.purple,
+                              title: tr('HDXDCCanDuyet'),
+                              value: contractStats.totalTwoYearStatus34
+                                  .toString(),
+                              width: size.width > 600 ? 500 : size.width * 0.75,
+                              onTap: () {
+                                context.go(AppRoutes.fillTwo);
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(width: 20),
                         _buildContractCard(
@@ -261,7 +294,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 42),
+            // Icon(icon, color: color, size: 42),
+            const SizedBox(height: 42),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
