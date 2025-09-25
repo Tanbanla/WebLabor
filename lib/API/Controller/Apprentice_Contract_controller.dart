@@ -42,6 +42,15 @@ class DashboardControllerApprentice extends GetxController {
     //fetchDataBy(statusId: currentStatusId.value);
   }
 
+  // Helper: find contract by employee code in main list
+  ApprenticeContract? _byEmp(String employeeCode) {
+    try {
+      return dataList.firstWhere((e) => e.vchREmployeeId == employeeCode);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // Hàm helper để thay đổi status và load lại dữ liệu
   Future<void> changeStatus(
     String newStatusId,
@@ -129,19 +138,20 @@ class DashboardControllerApprentice extends GetxController {
 
     bool matchesStatus(ApprenticeContract item) {
       if (statusFilter.isEmpty || statusFilter == 'all') return true;
-      if (statusFilter == 'Not Done') return item.inTStatusId != 9; // any not Done
+      if (statusFilter == 'Not Done')
+        return item.inTStatusId != 9; // any not Done
 
       final id = item.inTStatusId;
       switch (statusFilter) {
         case 'New':
           return id == 1;
         case 'Per':
-          return id == 2; 
+          return id == 2;
         case 'PTHC':
-          return id == 3; 
+          return id == 3;
         case 'Leader':
           return id == 4;
-        case 'Manager': 
+        case 'Manager':
           return id == 6;
         case 'Dept':
           return id == 7;
@@ -157,11 +167,21 @@ class DashboardControllerApprentice extends GetxController {
     List<ApprenticeContract> result = [];
     for (final item in dataList) {
       if (!matchesStatus(item)) continue;
-      if (approverQ.isNotEmpty && !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ)) continue;
-      if (empIdQ.isNotEmpty && !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ)) continue;
-      if (empNameQ.isNotEmpty && !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ)) continue;
-      if (deptQ.isNotEmpty && !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ)) continue;
-      if (groupQ.isNotEmpty && !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ)) continue;
+      if (approverQ.isNotEmpty &&
+          !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ))
+        continue;
+      if (empIdQ.isNotEmpty &&
+          !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ))
+        continue;
+      if (empNameQ.isNotEmpty &&
+          !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ))
+        continue;
+      if (deptQ.isNotEmpty &&
+          !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ))
+        continue;
+      if (groupQ.isNotEmpty &&
+          !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ))
+        continue;
       result.add(item);
     }
 
@@ -182,6 +202,7 @@ class DashboardControllerApprentice extends GetxController {
     filterdataList.assignAll(dataList);
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
+
   void refreshSearch() {
     approverCodeQuery.value = '';
     employeeIdQuery.value = '';
@@ -190,6 +211,7 @@ class DashboardControllerApprentice extends GetxController {
     groupQuery.value = '';
     selectedStatus.value = '';
   }
+
   void searchQuery(String query) {
     if (query.isEmpty) {
       filterdataList.assignAll(dataList);
@@ -635,24 +657,23 @@ class DashboardControllerApprentice extends GetxController {
         throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < contract.length; i++) {
-        // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
-        if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
-            (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
-          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere(
-            (d) =>
-                (contract[i].id != null && d.id == contract[i].id) ||
-                (d.vchREmployeeId == contract[i].vchREmployeeId),
-          );
-          if (originalIndex != -1) {
-            final original = dataList[originalIndex];
-            final bool changed = original != contract[i];
-            if (!changed) {
-              // Không có thay đổi thực sự
-              throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
-            }
-          }
-        }
+        // if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
+        //     (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
+        //   // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
+        //   final originalIndex = dataList.indexWhere(
+        //     (d) =>
+        //         (contract[i].id != null && d.id == contract[i].id) ||
+        //         (d.vchREmployeeId == contract[i].vchREmployeeId),
+        //   );
+        //   if (originalIndex != -1) {
+        //     final original = dataList[originalIndex];
+        //     final bool changed = original != contract[i];
+        //     if (!changed) {
+        //       // Không có thay đổi thực sự
+        //       throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
+        //     }
+        //   }
+        // }
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
         contract[i].biTApproverChief = true;
@@ -1330,247 +1351,185 @@ class DashboardControllerApprentice extends GetxController {
 
   // cac thuoc tinh update
   void updateVchrLythuyet(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRLyThuyet = diem;
-      filterdataList[index].vchRLyThuyet = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRThucHanh == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRLyThuyet = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateThucHanh(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRThucHanh = diem;
-      filterdataList[index].vchRThucHanh = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRThucHanh = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateCompleteWork(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRCompleteWork = diem;
-      filterdataList[index].vchRCompleteWork = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRThucHanh == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRCompleteWork = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateStudyWork(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRLearnWork = diem;
-      filterdataList[index].vchRLearnWork = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRThucHanh == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRLearnWork = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateThichNghi(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRThichNghi = diem;
-      filterdataList[index].vchRThichNghi = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThucHanh == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRThichNghi = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateUseful(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRUseful = diem;
-      filterdataList[index].vchRUseful = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRThucHanh == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRUseful = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateContact(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vcHNeedViolation == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vchRContact = diem;
-      filterdataList[index].vchRContact = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRThucHanh == 'OK' &&
+        item.vcHNeedViolation == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vchRContact = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateNoiQuy(String employeeCode, String diem) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!diem.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].vchRLyThuyet == 'OK' &&
-          dataList[index].vchRThichNghi == 'OK' &&
-          dataList[index].vchRCompleteWork == 'OK' &&
-          dataList[index].vchRLearnWork == 'OK' &&
-          dataList[index].vchRContact == 'OK' &&
-          dataList[index].vchRThucHanh == 'OK' &&
-          dataList[index].vchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].vcHNeedViolation = diem;
-      filterdataList[index].vcHNeedViolation = diem;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!diem.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.vchRLyThuyet == 'OK' &&
+        item.vchRThichNghi == 'OK' &&
+        item.vchRCompleteWork == 'OK' &&
+        item.vchRLearnWork == 'OK' &&
+        item.vchRContact == 'OK' &&
+        item.vchRThucHanh == 'OK' &&
+        item.vchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.vcHNeedViolation = diem;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateCuoicung(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].vchRReasultsLeader = reason;
-      filterdataList[index].vchRReasultsLeader = reason;
-      if (reason == 'OK') {
-        dataList[index].vchRNote = '';
-        filterdataList[index].vchRNote = '';
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.vchRReasultsLeader = reason;
+    if (reason == 'OK') {
+      item.vchRNote = '';
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateRehireStatus(String employeeCode, bool value) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].biTNoReEmployment = value;
-      filterdataList[index].biTNoReEmployment = value;
-      if (value == true) {
-        dataList[index].nvchRNoReEmpoyment = "";
-        filterdataList[index].nvchRNoReEmpoyment = "";
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.biTNoReEmployment = value;
+    if (value == true) {
+      item.nvchRNoReEmpoyment = "";
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateNotRehireReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].nvchRNoReEmpoyment = reason;
-      filterdataList[index].nvchRNoReEmpoyment = reason;
-      dataList.refresh();
-      filterdataList.refresh();
-    }
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.nvchRNoReEmpoyment = reason;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateNote(String employeeCode, String reason) {
@@ -1591,21 +1550,20 @@ class DashboardControllerApprentice extends GetxController {
     String reason,
     int? statusId,
   ) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      switch (statusId) {
-        case 6:
-          dataList[index].nvchRApproverChief = reason;
-          filterdataList[index].nvchRApproverChief = reason;
-        case 7:
-          dataList[index].nvchRApproverManager = reason;
-          filterdataList[index].nvchRApproverManager = reason;
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    switch (statusId) {
+      case 6:
+        item.nvchRApproverChief = reason;
+        break;
+      case 7:
+        item.nvchRApproverManager = reason;
+        break;
+      default:
+        break;
     }
+    //dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateRehireStatusApprovel(
@@ -1613,21 +1571,20 @@ class DashboardControllerApprentice extends GetxController {
     bool value,
     int? statusId,
   ) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      switch (statusId) {
-        case 6:
-          dataList[index].biTApproverChief = value;
-          filterdataList[index].biTApproverChief = value;
-        case 7:
-          dataList[index].biTApproverSectionManager = value;
-          filterdataList[index].biTApproverSectionManager = value;
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    switch (statusId) {
+      case 6:
+        item.biTApproverChief = value;
+        break;
+      case 7:
+        item.biTApproverSectionManager = value;
+        break;
+      default:
+        break;
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý

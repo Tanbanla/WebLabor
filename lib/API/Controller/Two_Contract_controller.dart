@@ -39,6 +39,15 @@ class DashboardControllerTwo extends GetxController {
     //fetchDataBy(statusId: currentStatusId.value);
   }
 
+  // Helper: locate contract by employee code safely
+  TwoContract? _byEmp(String employeeCode) {
+    try {
+      return dataList.firstWhere((e) => e.vchREmployeeId == employeeCode);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // Hàm helper để thay đổi status và load lại dữ liệu
   Future<void> changeStatus(
     String newStatusId,
@@ -67,6 +76,7 @@ class DashboardControllerTwo extends GetxController {
     }
     return selectedItems;
   }
+
   //sap xep du lieu
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
@@ -92,7 +102,7 @@ class DashboardControllerTwo extends GetxController {
     });
   }
 
-   // ==================== NEW COMBINED FILTER SYSTEM ====================
+  // ==================== NEW COMBINED FILTER SYSTEM ====================
   // Public entry points used by the UI. Each update triggers applyFilters().
   void updateStatus(String? value) {
     selectedStatus.value = value ?? '';
@@ -136,19 +146,20 @@ class DashboardControllerTwo extends GetxController {
 
     bool matchesStatus(TwoContract item) {
       if (statusFilter.isEmpty || statusFilter == 'all') return true;
-      if (statusFilter == 'Not Done') return item.inTStatusId != 9; // any not Done
+      if (statusFilter == 'Not Done')
+        return item.inTStatusId != 9; // any not Done
 
       final id = item.inTStatusId;
       switch (statusFilter) {
         case 'New':
           return id == 1;
         case 'Per':
-          return id == 2; 
+          return id == 2;
         case 'PTHC':
-          return id == 3; 
+          return id == 3;
         case 'Leader':
           return id == 4;
-        case 'Manager': 
+        case 'Manager':
           return id == 6;
         case 'Dept':
           return id == 7;
@@ -164,11 +175,21 @@ class DashboardControllerTwo extends GetxController {
     List<TwoContract> result = [];
     for (final item in dataList) {
       if (!matchesStatus(item)) continue;
-      if (approverQ.isNotEmpty && !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ)) continue;
-      if (empIdQ.isNotEmpty && !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ)) continue;
-      if (empNameQ.isNotEmpty && !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ)) continue;
-      if (deptQ.isNotEmpty && !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ)) continue;
-      if (groupQ.isNotEmpty && !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ)) continue;
+      if (approverQ.isNotEmpty &&
+          !(item.vchRCodeApprover ?? '').toLowerCase().contains(approverQ))
+        continue;
+      if (empIdQ.isNotEmpty &&
+          !(item.vchREmployeeId ?? '').toLowerCase().contains(empIdQ))
+        continue;
+      if (empNameQ.isNotEmpty &&
+          !(item.vchREmployeeName ?? '').toLowerCase().contains(empNameQ))
+        continue;
+      if (deptQ.isNotEmpty &&
+          !(item.vchRNameSection ?? '').toLowerCase().contains(deptQ))
+        continue;
+      if (groupQ.isNotEmpty &&
+          !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ))
+        continue;
       result.add(item);
     }
 
@@ -213,6 +234,7 @@ class DashboardControllerTwo extends GetxController {
     filterdataList.assignAll(dataList);
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
+
   void refreshSearch() {
     approverCodeQuery.value = '';
     employeeIdQuery.value = '';
@@ -221,6 +243,7 @@ class DashboardControllerTwo extends GetxController {
     groupQuery.value = '';
     selectedStatus.value = '';
   }
+
   // so sanh du lieu
   void searchQuery(String query) {
     final lowerQuery = query.toLowerCase();
@@ -583,25 +606,25 @@ class DashboardControllerTwo extends GetxController {
         throw Exception(tr('LoiGui'));
       }
       for (int i = 0; i < twocontract.length; i++) {
-        // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
-        if ((twocontract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
-          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = dataList.indexWhere(
-            (d) =>
-                (twocontract[i].id != null && d.id == twocontract[i].id) ||
-                (d.vchREmployeeId == twocontract[i].vchREmployeeId),
-          );
-          if (originalIndex != -1) {
-            final original = dataList[originalIndex];
-            final bool changed = original != twocontract[i];
-            if (!changed) {
-              // Không có thay đổi thực sự
-              throw Exception(
-                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
-              );
-            }
-          }
-        }
+        // // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
+        // if ((twocontract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
+        //   // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
+        //   final originalIndex = dataList.indexWhere(
+        //     (d) =>
+        //         (twocontract[i].id != null && d.id == twocontract[i].id) ||
+        //         (d.vchREmployeeId == twocontract[i].vchREmployeeId),
+        //   );
+        //   if (originalIndex != -1) {
+        //     final original = dataList[originalIndex];
+        //     final bool changed = original != twocontract[i];
+        //     if (!changed) {
+        //       // Không có thay đổi thực sự
+        //       throw Exception(
+        //         '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
+        //       );
+        //     }
+        //   }
+        // }
         twocontract[i].vchRUserUpdate = userUpdate;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
         twocontract[i].inTStatusId = 2;
@@ -1387,120 +1410,81 @@ class DashboardControllerTwo extends GetxController {
 
   // dien danh gia
   void updateOther(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!status.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].nvchRCompleteWork == 'OK' &&
-          dataList[index].nvchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].nvchROther = status;
-      filterdataList[index].nvchROther = status;
-      if (status == 'OK') {
-        dataList[index].vchRNote = '';
-        filterdataList[index].vchRNote = '';
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!status.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.nvchRCompleteWork == 'OK' && item.nvchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.nvchROther = status;
+    if (status == 'OK') {
+      item.vchRNote = '';
+    }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   // ghi chu
   void updateNote(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].vchRNote = status;
-      filterdataList[index].vchRNote = status;
-      dataList.refresh();
-      filterdataList.refresh();
-    }
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.vchRNote = status;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateEvaluationStatus(String employeeCode, String status) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].vchRReasultsLeader = status;
-      filterdataList[index].vchRReasultsLeader = status;
-      dataList.refresh();
-      filterdataList.refresh();
-    }
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.vchRReasultsLeader = status;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateRehireStatus(String employeeCode, bool value) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].biTNoReEmployment = value;
-      filterdataList[index].biTNoReEmployment = value;
-      if (value == true) {
-        dataList[index].nvchRNoReEmpoyment = '';
-        filterdataList[index].nvchRNoReEmpoyment = '';
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.biTNoReEmployment = value;
+    if (value == true) {
+      item.nvchRNoReEmpoyment = '';
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateNotRehireReason(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      dataList[index].nvchRNoReEmpoyment = reason;
-      filterdataList[index].nvchRNoReEmpoyment = reason;
-      dataList.refresh();
-      filterdataList.refresh();
-    }
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    item.nvchRNoReEmpoyment = reason;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateCongViec(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!reason.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].nvchROther == 'OK' &&
-          dataList[index].nvchRUseful == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].nvchRCompleteWork = reason;
-      filterdataList[index].nvchRCompleteWork = reason;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!reason.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.nvchROther == 'OK' && item.nvchRUseful == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.nvchRCompleteWork = reason;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateUserFull(String employeeCode, String reason) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      if (!reason.contains('OK')) {
-        dataList[index].vchRReasultsLeader = 'NG';
-        filterdataList[index].vchRReasultsLeader = 'NG';
-      } else if (dataList[index].nvchRCompleteWork == 'OK' &&
-          dataList[index].nvchROther == 'OK') {
-        dataList[index].vchRReasultsLeader = 'OK';
-        filterdataList[index].vchRReasultsLeader = 'OK';
-      }
-      dataList[index].nvchRUseful = reason;
-      filterdataList[index].nvchRUseful = reason;
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    if (!reason.contains('OK')) {
+      item.vchRReasultsLeader = 'NG';
+    } else if (item.nvchRCompleteWork == 'OK' && item.nvchROther == 'OK') {
+      item.vchRReasultsLeader = 'OK';
     }
+    item.nvchRUseful = reason;
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   // Các thông tin lưu ở Phê duyệt
@@ -1509,24 +1493,23 @@ class DashboardControllerTwo extends GetxController {
     String reason,
     int? statusId,
   ) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      switch (statusId) {
-        case 6:
-          dataList[index].nvchRApproverChief = reason;
-          filterdataList[index].nvchRApproverChief = reason;
-        case 7:
-          dataList[index].nvchRApproverManager = reason;
-          filterdataList[index].nvchRApproverManager = reason;
-        case 8:
-          dataList[index].nvchRApproverDirector = reason;
-          filterdataList[index].nvchRApproverDirector = reason;
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    switch (statusId) {
+      case 6:
+        item.nvchRApproverChief = reason;
+        break;
+      case 7:
+        item.nvchRApproverManager = reason;
+        break;
+      case 8:
+        item.nvchRApproverDirector = reason;
+        break;
+      default:
+        break;
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   void updateRehireStatusApprovel(
@@ -1534,24 +1517,23 @@ class DashboardControllerTwo extends GetxController {
     bool value,
     int? statusId,
   ) {
-    final index = dataList.indexWhere(
-      (item) => item.vchREmployeeId == employeeCode,
-    );
-    if (index != -1) {
-      switch (statusId) {
-        case 6:
-          dataList[index].biTApproverChief = value;
-          filterdataList[index].biTApproverChief = value;
-        case 7:
-          dataList[index].biTApproverSectionManager = value;
-          filterdataList[index].biTApproverSectionManager = value;
-        case 8:
-          dataList[index].biTApproverDirector = value;
-          filterdataList[index].biTApproverDirector = value;
-      }
-      dataList.refresh();
-      filterdataList.refresh();
+    final item = _byEmp(employeeCode);
+    if (item == null) return;
+    switch (statusId) {
+      case 6:
+        item.biTApproverChief = value;
+        break;
+      case 7:
+        item.biTApproverSectionManager = value;
+        break;
+      case 8:
+        item.biTApproverDirector = value;
+        break;
+      default:
+        break;
     }
+    dataList.refresh();
+    filterdataList.refresh();
   }
 
   // lấy mail trưởng phòng, giám đốc, quản lý
