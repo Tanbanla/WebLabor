@@ -59,10 +59,18 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         if (controllerPTHC.listPTHCsection.isNotEmpty) {
           sectionName =
               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+        }else{
+          sectionName = authState.user!.chRSecCode
+        .toString()
+        .split(':')[1]
+        .trim();
         }
+        // truong hop PTHC phong ban
+        controller.changeStatus('PTHC', sectionName, null);
+      }else{
+        // truong hop khác
+        controller.changeStatus('PTHC', null, null);
       }
-      // truong hop PTHC phong ban
-      controller.changeStatus("PTHC", sectionName, null);
     } else {
       // truong hop leader
       controller.changeStatus(
