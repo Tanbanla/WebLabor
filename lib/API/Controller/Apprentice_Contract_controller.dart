@@ -599,7 +599,7 @@ class DashboardControllerApprentice extends GetxController {
           if (originalIndex != -1) {
             final original = originalList[originalIndex];
             final bool changed = original != contract[i];
-            if (changed) {
+            if (!changed) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
             }
@@ -662,6 +662,32 @@ class DashboardControllerApprentice extends GetxController {
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
+      bool _hasMeaningfulChanges(
+        ApprenticeContract original,
+        ApprenticeContract edited,
+      ) {
+        bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
+        bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
+
+        return
+        // Điểm đánh giá/Leader
+        diffStr(original.vchRLyThuyet, edited.vchRLyThuyet) ||
+            diffStr(original.vchRThucHanh, edited.vchRThucHanh) ||
+            diffStr(original.vchRCompleteWork, edited.vchRCompleteWork) ||
+            diffStr(original.vchRLearnWork, edited.vchRLearnWork) ||
+            diffStr(original.vchRThichNghi, edited.vchRThichNghi) ||
+            diffStr(original.vchRUseful, edited.vchRUseful) ||
+            diffStr(original.vchRContact, edited.vchRContact) ||
+            diffStr(original.vcHNeedViolation, edited.vcHNeedViolation) ||
+            diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
+            // Tái tuyển dụng và lý do
+            diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
+            diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
+            // Ghi chú
+            diffStr(original.vchRNote, edited.vchRNote);
+      }
+
       for (int i = 0; i < contract.length; i++) {
         if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
             (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
@@ -673,8 +699,11 @@ class DashboardControllerApprentice extends GetxController {
           );
           if (originalIndex != -1) {
             final original = originalList[originalIndex];
-            final bool changed = original != contract[i];
-            if (changed) {
+            final bool hasChanges = _hasMeaningfulChanges(
+              original,
+              contract[i],
+            );
+            if (!hasChanges) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
             }

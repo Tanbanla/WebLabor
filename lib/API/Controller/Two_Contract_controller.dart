@@ -619,7 +619,7 @@ class DashboardControllerTwo extends GetxController {
           if (originalIndex != -1) {
             final original = originalList[originalIndex];
             final bool changed = original != twocontract[i];
-            if (changed) {
+            if (!changed) {
               // Không có thay đổi thực sự
               throw Exception(
                 '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
@@ -680,6 +680,26 @@ class DashboardControllerTwo extends GetxController {
       if (twocontract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+            // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
+      bool _hasMeaningfulChanges(
+        TwoContract original,
+        TwoContract edited,
+      ) {
+        bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
+        bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
+
+        return
+        // Điểm đánh giá/Leader
+        diffStr(original.nvchRCompleteWork, edited.nvchRCompleteWork) ||
+            diffStr(original.nvchRUseful, edited.nvchRUseful) ||
+            diffStr(original.vchRNote, edited.vchRNote) ||
+            diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
+            // Tái tuyển dụng và lý do
+            diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
+            diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
+            // Ghi chú
+            diffStr(original.vchRNote, edited.vchRNote);
+      }
       for (int i = 0; i < twocontract.length; i++) {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((twocontract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
@@ -693,12 +713,13 @@ class DashboardControllerTwo extends GetxController {
           );
           if (originalIndex != -1) {
             final original = originalList[originalIndex];
-            final bool changed = original != twocontract[i];
-            if (changed) {
+            final bool hasChanges = _hasMeaningfulChanges(
+              original,
+              twocontract[i],
+            );
+            if (!hasChanges) {
               // Không có thay đổi thực sự
-              throw Exception(
-                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
-              );
+              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
             }
           }
         }
