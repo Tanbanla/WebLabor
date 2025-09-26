@@ -30,6 +30,7 @@ class _MasterUserState extends State<MasterUser> {
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchSectionList();
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -812,13 +813,59 @@ class _EditUserDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
-                initialValue: user.chRSecCode,
-                decoration: const InputDecoration(
-                  labelText: 'Phòng ban',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) => editedUser.chRSecCode = value,
+              // TextFormField(
+              //   initialValue: user.chRSecCode,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Phòng ban',
+              //     border: OutlineInputBorder(),
+              //   ),Fue,
+              // ),
+              Row(
+                children: [
+                  Expanded(
+                        child: DropdownButtonFormField(
+                          value: (() {
+                            final target = (editedUser.chRSecCode ?? '')
+                                .replaceAll(RegExp(r'\s+'), '')
+                                .toLowerCase();
+                            for (final s in controller.listSection) {
+                              if (s.replaceAll(RegExp(r'\s+'), '').toLowerCase() ==
+                                  target) {
+                                return s; // return original value in listSection
+                              }
+                            }
+                            return null;
+                          })(),
+                          decoration: InputDecoration(
+                            labelText: 'Phòng ban',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                          ),
+                          isExpanded: true,
+                          items: controller.listSection
+                              .toSet() // Ensure unique values
+                              .map(
+                                (section) => DropdownMenuItem(
+                                  value: section,
+                                  child: Text(
+                                    section,
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            editedUser.chRSecCode = value;
+                          },
+                        ),
+                      ),
+                ],
               ),
               const SizedBox(height: 12),
               TextFormField(

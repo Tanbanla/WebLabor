@@ -13,6 +13,7 @@ import 'package:web_labor_contract/class/User.dart';
 class DashboardControllerUser extends GetxController {
   var userList = <User>[].obs;
   var filteredUserList = <User>[].obs;
+  var listSection = <String>[].obs;
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortColumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -197,6 +198,34 @@ class DashboardControllerUser extends GetxController {
       showError('Export failed: $e');
     } finally {
       isLoadingExport(false);
+    }
+  }
+
+  // lay thong tin section
+  Future<void> fetchSectionList() async {
+    try {
+      //isLoading(true);
+      final response = await http.get(
+        Uri.parse(Common.API + Common.UserSection),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final List<dynamic> data = jsonData['data'];
+          listSection.assignAll(data.map((item) => item.toString()).toList());
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch section data: $e');
+      rethrow;
+    } finally {
+      isLoading(false);
     }
   }
 
