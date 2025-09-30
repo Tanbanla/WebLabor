@@ -852,6 +852,7 @@ class DashboardControllerApprentice extends GetxController {
       List<dynamic> notApproval = [];
       String mailSend = "";
       String sectionAp = "";
+      String PheDuyetMail = "";
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
@@ -892,7 +893,7 @@ class DashboardControllerApprentice extends GetxController {
             }
           case 7:
             //xu ly khi xong
-            mailSend = "k";
+            //mailSend = "k";
             //
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
@@ -908,6 +909,18 @@ class DashboardControllerApprentice extends GetxController {
               final contractCopy = ApprenticeContract.fromJson(json);
               notApproval.add(contractCopy);
               contract[i].inTStatusId = 4;
+              // Thêm email của quản lý phòng ban vào danh sách phê duyệt
+              final chief = contract[i].useRApproverChief;
+              if (chief != null && chief.isNotEmpty) {
+                final email = '$chief@brothergroup.net';
+                final existing = PheDuyetMail.split(';')
+                    .where((e) => e.trim().isNotEmpty)
+                    .map((e) => e.toLowerCase())
+                    .toList();
+                if (!existing.contains(email.toLowerCase())) {
+                  PheDuyetMail += '$email;';
+                }
+              }
             }
         }
       }
@@ -922,13 +935,13 @@ class DashboardControllerApprentice extends GetxController {
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
-          //controlleruser.SendMail('2', mailSend, mailSend, mailSend);
-          controlleruser.SendMail(
-            '5',
-            "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
-            "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
-            "vuduc.hai@brother-bivn.com.vn",
-          );
+          controlleruser.SendMail('5', mailSend, mailSend, mailSend);
+          // controlleruser.SendMail(
+          //   '5',
+          //   "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
+          //   "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
+          //   "vuduc.hai@brother-bivn.com.vn",
+          // );
         }
         // mail canh bao
         //Special case for section "1120-1 : ADM-PER"
@@ -953,7 +966,7 @@ class DashboardControllerApprentice extends GetxController {
           ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            ccEmails,
+            '$ccEmails;$PheDuyetMail',
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",

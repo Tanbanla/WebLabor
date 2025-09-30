@@ -680,11 +680,8 @@ class DashboardControllerTwo extends GetxController {
       if (twocontract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
-            // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
-      bool _hasMeaningfulChanges(
-        TwoContract original,
-        TwoContract edited,
-      ) {
+      // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
+      bool _hasMeaningfulChanges(TwoContract original, TwoContract edited) {
         bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
         bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
 
@@ -700,6 +697,7 @@ class DashboardControllerTwo extends GetxController {
             // Ghi chú
             diffStr(original.vchRNote, edited.vchRNote);
       }
+
       for (int i = 0; i < twocontract.length; i++) {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((twocontract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
@@ -719,7 +717,9 @@ class DashboardControllerTwo extends GetxController {
             );
             if (!hasChanges) {
               // Không có thay đổi thực sự
-              throw Exception('${tr('CapNhat')} ${twocontract[i].vchREmployeeId}');
+              throw Exception(
+                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
+              );
             }
           }
         }
@@ -809,6 +809,7 @@ class DashboardControllerTwo extends GetxController {
       List<dynamic> notApproval = [];
       String mailSend = "";
       String sectionAp = "";
+      String PheDuyetMail = "";
       if (twocontract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
@@ -867,13 +868,25 @@ class DashboardControllerTwo extends GetxController {
               final contractCopy = TwoContract.fromJson(json);
               notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
+              // Thêm email của quản lý phòng ban vào danh sách phê duyệt
+              final chief = twocontract[i].useRApproverChief;
+              if (chief != null && chief.isNotEmpty) {
+                final email = '$chief@brothergroup.net';
+                final existing = PheDuyetMail.split(';')
+                    .where((e) => e.trim().isNotEmpty)
+                    .map((e) => e.toLowerCase())
+                    .toList();
+                if (!existing.contains(email.toLowerCase())) {
+                  PheDuyetMail += '$email;';
+                }
+              }
             }
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
 
             //xu ly khi xong
-            mailSend = "k";
+            // mailSend = "k";
             //
             if (twocontract[i].biTApproverDirector == true) {
               twocontract[i].inTStatusId = 9;
@@ -887,6 +900,25 @@ class DashboardControllerTwo extends GetxController {
               final contractCopy = TwoContract.fromJson(json);
               notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
+              // Thêm email của quản lý phòng ban vào danh sách phê duyệt
+              {
+                final existingEmails = PheDuyetMail.split(';')
+                    .map((e) => e.trim().toLowerCase())
+                    .where((e) => e.isNotEmpty)
+                    .toSet();
+
+                void appendIfNotExists(String? user) {
+                  if (user == null || user.trim().isEmpty) return;
+                  final email = '${user.trim()}@brothergroup.net';
+                  if (!existingEmails.contains(email.toLowerCase())) {
+                    PheDuyetMail += '$email;';
+                    existingEmails.add(email.toLowerCase());
+                  }
+                }
+
+                appendIfNotExists(twocontract[i].useRApproverSectionManager);
+                appendIfNotExists(twocontract[i].useRApproverChief);
+              }
             }
         }
       }
@@ -901,19 +933,19 @@ class DashboardControllerTwo extends GetxController {
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
-          // controlleruser.SendMail(
-          //   '2',
-          //   mailSend,
-          //   mailSend,
-          //   mailSend,
-          // );
-          // k mo vi mo se gui cho quan ly cac phong
           controlleruser.SendMail(
             '6',
-            "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
-            "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
-            "vuduc.hai@brother-bivn.com.vn",
+            mailSend,
+            mailSend,
+            mailSend,
           );
+          // k mo vi mo se gui cho quan ly cac phong
+          // controlleruser.SendMail(
+          //   '6',
+          //   "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
+          //   "nguyenduy.khanh@brother-bivn.com.vn;hoangviet.dung@brother-bivn.com.vn",
+          //   "vuduc.hai@brother-bivn.com.vn",
+          // );
         }
         // mail canh bao
         //Special case for section "1120-1 : ADM-PER"
@@ -938,7 +970,7 @@ class DashboardControllerTwo extends GetxController {
           ].join(';');
           controlleruser.SendMailCustom(
             specialSection.mailto.toString(),
-            ccEmails,
+            '$ccEmails;$PheDuyetMail',
             specialSection.mailbcc.toString(),
             notApproval,
             "Từ chối phê duyệt",
