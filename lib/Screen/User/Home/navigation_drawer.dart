@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart'
+    show rootBundle; // For loading asset bytes
+// Conditional import: real implementation on web, stub elsewhere
+import 'package:web_labor_contract/util/download_manual_stub.dart'
+    if (dart.library.html) 'package:web_labor_contract/util/download_manual_web.dart';
 import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -40,6 +46,19 @@ class MenuScreen extends StatelessWidget {
     title: Text(tr('appTitle'), style: TextStyle(color: Colors.white)),
     backgroundColor: Common.primaryColor,
     actions: [
+      // Manual (LCE.pptx) download button
+      TextButton.icon(
+        onPressed: () => _downloadManual(context),
+        icon: Icon(Icons.download, color: Colors.white, size: 20),
+        label: const Text(
+          'Manual',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+        ),
+      ),
       Padding(
         padding: EdgeInsets.only(right: 20),
         child: Row(
@@ -74,6 +93,33 @@ class MenuScreen extends StatelessWidget {
       ),
     ],
   );
+}
+
+// Helper method added to MenuScreen (outside class scope previously) moved inside extension-like pattern
+extension _ManualDownload on MenuScreen {
+  Future<void> _downloadManual(BuildContext context) async {
+    const assetPath = 'assets/templates/LCE.pptx';
+    const downloadName = 'LCE_Manual.pptx';
+    try {
+      final data = await rootBundle.load(assetPath);
+      final bytes = data.buffer.asUint8List();
+      if (kIsWeb) {
+        await saveFileWeb(bytes, downloadName);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr('Download') + ' OK: $downloadName')),
+        );
+      } else {
+        // Non-web platforms: not yet implemented fully
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download chỉ hỗ trợ trên Web hiện tại.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Download lỗi: $e')));
+    }
+  }
 }
 
 class ComplexDrawer extends StatefulWidget {
