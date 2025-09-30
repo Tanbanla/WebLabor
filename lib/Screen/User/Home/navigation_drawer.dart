@@ -50,8 +50,8 @@ class MenuScreen extends StatelessWidget {
       TextButton.icon(
         onPressed: () => _downloadManual(context),
         icon: Icon(Icons.download, color: Colors.white, size: 20),
-        label: const Text(
-          'Manual',
+        label: Text(
+          tr('Manual'),
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         style: TextButton.styleFrom(

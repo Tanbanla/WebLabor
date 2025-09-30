@@ -169,5 +169,6 @@
   "CheckTime1":"Thời gian kết thúc hợp đồng phải lớn hơn 50 ngày so với ngày hiện tại. Vui lòng kiểm tra lại!",
   "CapNhat":"Yêu cầu cập nhật thông tin cho nhân viên bị trả về đánh giá",
   "HDHVCanDuyet":"Số công việc cần thực hiện với hợp đồng học nghề, thử việc",
-  "HDXDCCanDuyet":"Số công việc cần thực hiện với hợp đồng xác định thời    hạn"
+  "HDXDCCanDuyet":"Số công việc cần thực hiện với hợp đồng xác định thời    hạn",
+  "Manual":"Hướng dẫn sử dụng"
 }
