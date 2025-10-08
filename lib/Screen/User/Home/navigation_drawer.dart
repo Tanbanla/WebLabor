@@ -98,8 +98,8 @@ class MenuScreen extends StatelessWidget {
 // Helper method added to MenuScreen (outside class scope previously) moved inside extension-like pattern
 extension _ManualDownload on MenuScreen {
   Future<void> _downloadManual(BuildContext context) async {
-    const assetPath = 'assets/templates/LCE.pptx';
-    const downloadName = 'LCE_Manual.pptx';
+    const assetPath = 'assets/templates/LCES.pptx';
+    const downloadName = 'LCES - hướng dẫn sử dụng hệ thống.pptx';
     try {
       final data = await rootBundle.load(assetPath);
       final bytes = data.buffer.asUint8List();

@@ -79,7 +79,7 @@ flutter:
     - assets/templates/HDTV.xlsx
     - assets/templates/Mau2N.xlsx
     - assets/templates/MauTV.xlsx
-    - assets/templates/LCE.pptx
+    - assets/templates/LCES.pptx
     - assets/icons/
     # - assets/icons/
   #   - images/a_dot_ham.jpeg
