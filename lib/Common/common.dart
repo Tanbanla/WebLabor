@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class Common {
-  //color https://eduadmin-template.multipurposethemes.com/   http://172.26.248.62:8501/api/User/get-employee-by-staffid?staffId=M0105581
+  //color https://eduadmin-template.multipurposethemes.com/   https://172.26.248.62:44351/api/User/get-employee-by-staffid?staffId=M0105581
   static var primaryColor = const Color(0xff296e48);
   static var blackColor = Colors.black54;
   static var greenColor = const Color.fromARGB(255, 156, 179, 131);
   static var grayColor = Colors.grey;
   //API
-  static const String API = "http://172.26.248.62:8501/api/";
+  static const String API = "https://172.26.248.62:44351/api/";
   //Login
   static const String loginEndpoint = "Account/validate-credentials";
   static const String AccountLogin = "Account/login";
@@ -20,7 +20,8 @@ class Common {
   static const String UserGetByCount = "User/get-count-by-condition";
   static const String UserSreachBy = "User/search-by-condition";
   // Lấy thongo thông tin nhân viên theo mã nhân viên từ Agent
-  static const String GetEmployeeByStaffID = "User/get-employee-by-staffid?staffId=";
+  static const String GetEmployeeByStaffID =
+      "User/get-employee-by-staffid?staffId=";
   // POST
   static const String AddUser = "User/add";
   static const String AddListUser = "User/add-multi";
@@ -45,7 +46,8 @@ class Common {
   static const String PTHCGetByCount = "PthcSection/get-count-by-condition";
   static const String PTHCSreachBy = "PthcSection/search-by-condition";
   // lấy thông tin phòng
-  static const String GetSection = "PthcSection/get-list-picsection-by-employeeadid?adid=";
+  static const String GetSection =
+      "PthcSection/get-list-picsection-by-employeeadid?adid=";
   // POST
   static const String AddPTHC = "PthcSection/add";
   static const String AddListPTHC = "PthcSection/add-multi";
@@ -112,9 +114,10 @@ class Common {
       "Report/get-quantity-total-contract-statistic/";
 
   // Send mail
-  static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
+  static const String SendMail =
+      "https://172.26.248.62:44351/send-email-notify";
   static const String SendMailCustom =
-      "http://172.26.248.62:8501/send-email-notify-custom";
+      "https://172.26.248.62:44351/send-email-notify-custom";
 
   // font size
   static double sizeColumn = 12;
@@ -144,7 +147,7 @@ class Common {
           case 4:
             rejectionReason = reson ?? 'Không có lý do';
             break;
-          case 6: 
+          case 6:
             rejectionReason = request.nvchRApproverChief ?? 'Không có lý do';
             break;
           case 7:
@@ -170,6 +173,7 @@ class Common {
 
     return """---------------------------<br/>Hello,<br/><br/>The system informs you that <span style='color: red; font-weight: bold;'>${rejectedRequests.length} evaluation requests have been REJECTED</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Evaluation Type</th><th>Release Code</th><th>Employee Code</th><th>Rejection Reason</th><th>Rejection Person</th><th>Rejection Type</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Please click the link below to reconfirm:<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※This is an automated email from the LCES system. Please do not reply to this email.<br/>Please contact the responsible person to confirm the current status.<br/>--------------------------------------<br/><br/>Kính gửi: Quản lý phòng ban<br/><br/>Hệ thống thông báo có <span style='color: red; font-weight: bold;'>${rejectedRequests.length} yêu cầu đánh giá BỊ TỪ CHỐI</span>.<br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Lý do từ chối</th><th>Người từ chối</th><th>Loại từ chối</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.""";
   }
+
   // thông báo sửa kết quả đánh giá
   static String getKetQuaEmailBody({
     required String confirmLink,
