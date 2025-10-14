@@ -158,12 +158,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus(
-        'ADM-PER',
+        sectionName,
         'Leader,Supervisor,Staff,Section Manager,Expert',
       );
     } else {
       // truong hop leader
-      controller.changeStatus('ADM-PER', 'Section Manager');
+      controller.changeStatus(sectionName, 'Section Manager');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);

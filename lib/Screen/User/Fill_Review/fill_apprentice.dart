@@ -59,15 +59,15 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         if (controllerPTHC.listPTHCsection.isNotEmpty) {
           sectionName =
               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        }else{
+        } else {
           sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+              .toString()
+              .split(':')[1]
+              .trim();
         }
         // truong hop PTHC phong ban
         controller.changeStatus('PTHC', sectionName, null);
-      }else{
+      } else {
         // truong hop khác
         controller.changeStatus('PTHC', null, null);
       }
@@ -163,12 +163,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
       controller.changeStatus(
-        'ADM-PER',
+        sectionName,
         'Leader,Supervisor,Staff,Section Manager,Expert',
       );
     } else {
       // truong hop leader
-      controller.changeStatus('ADM-PER', 'Section Manager');
+      controller.changeStatus(sectionName, 'Section Manager');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -407,6 +407,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       },
     );
   }
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,7 +450,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
         final List<Widget> filters = [
           if (!isXSmall)
-                        Padding(
+            Padding(
               padding: const EdgeInsets.only(right: 12, top: 6),
               child: Text(
                 tr('searchhint'),

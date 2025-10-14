@@ -580,9 +580,9 @@ class DashboardControllerApprentice extends GetxController {
   ) async {
     try {
       //sau test delete
-      if (userApprover == "fujiokmi") {
-        userApprover = 'vanug';
-      }
+      // if (userApprover == "fujiokmi") {
+      //   userApprover = 'vanug';
+      // }
       final contract = getSelectedItems();
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));

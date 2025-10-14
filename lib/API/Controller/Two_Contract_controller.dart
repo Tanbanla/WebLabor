@@ -600,9 +600,9 @@ class DashboardControllerTwo extends GetxController {
   ) async {
     try {
       //sau test delete
-      if (userApprover == "fujiokmi") {
-        userApprover = 'vanug';
-      }
+      // if (userApprover == "fujiokmi") {
+      //   userApprover = 'vanug';
+      // }
       // List<TwoContract> twocontract,
       final twocontract = getSelectedItems();
       if (twocontract.isEmpty) {
