@@ -285,14 +285,14 @@ class DashboardControllerPTHC extends GetxController {
           ..vchRNameSection = row[0]?.value?.toString()
           ..vchREmployeeId = row[1]?.value?.toString()
           ..nvchREmployeeName = row[2]?.value?.toString()
-          ..vchREmployeeAdid
-          ..vchRMail = row[3]?.value?.toString()
+          ..vchREmployeeAdid = row[3]?.value?.toString()
+          ..vchRMail = row[4]?.value?.toString()
           ..vchRUserCreate = userUpdate
           ..dtMCreate = formatDateTime(DateTime.now())
           ..vchRUserUpdate = userUpdate
           ..dtMUpdate = formatDateTime(DateTime.now())
           ..inTStatusId = 0
-          ..vchRNote = row[4]?.value?.toString();
+          ..vchRNote = row[5]?.value?.toString();
 
         // Validate required fields
         if (pthc.vchREmployeeAdid?.isEmpty == true ||

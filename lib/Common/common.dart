@@ -6,8 +6,39 @@ class Common {
   static var blackColor = Colors.black54;
   static var greenColor = const Color.fromARGB(255, 156, 179, 131);
   static var grayColor = Colors.grey;
-  //API
-  static const String API = "https://172.26.248.62:44351/api/";
+  // API base (dynamic between http / https when running on web).
+  // If the app is served via https we must call the https backend (port 44351).
+  // If the app is served via http we call the http backend (port 8501).
+  // For non-web platforms we default to the http base unless overridden.
+  static const String _httpBase = "http://172.26.248.62:8501/api/";
+  static const String _httpsBase =
+      "https://172.26.248.62:44351/api/"; // already ends with /
+
+  // Use a getter instead of const so callers always get the right value at runtime.
+  static String get API {
+    // kIsWeb requires importing foundation; to avoid adding import in all files we inline detection using identical(0, 0.0)
+    // Better: use kIsWeb from flutter/foundation.
+    // We'll import foundation at top.
+    assert(
+      _httpBase.endsWith('/') && _httpsBase.endsWith('/'),
+      'Base URLs should end with /',
+    );
+    if (identical(0, 0.0)) {
+      // This branch is never executed, placeholder to silence analyzer if foundation not imported.
+    }
+    // Try web detection via Uri.base.scheme (works on all platforms, returns e.g. 'http','https','file')
+    final scheme =
+        Uri.base.scheme; // On web will be http/https, on mobile usually 'file'
+    if (scheme == 'https') {
+      return _httpsBase;
+    }
+    if (scheme == 'http') {
+      return _httpBase;
+    }
+    // Fallback for non-web (mobile/desktop) -> choose http base (can adjust if needed)
+    return _httpBase;
+  }
+
   //Login
   static const String loginEndpoint = "Account/validate-credentials";
   static const String AccountLogin = "Account/login";
@@ -114,10 +145,9 @@ class Common {
       "Report/get-quantity-total-contract-statistic/";
 
   // Send mail
-  static const String SendMail =
-      "https://172.26.248.62:44351/send-email-notify";
+  static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
   static const String SendMailCustom =
-      "https://172.26.248.62:44351/send-email-notify-custom";
+      "http://172.26.248.62:8501/send-email-notify-custom";
 
   // font size
   static double sizeColumn = 12;

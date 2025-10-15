@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_labor_contract/class/User.dart';
 
 class AuthService {
-  static const String _baseUrl = Common.API;
+  static String _baseUrl = Common.API;
   static const String _loginEndpoint = Common.AccountLogin; //loginEndpoint;
   static const int _timeoutSeconds = 10;
   static Future<Map<String, dynamic>> login({
