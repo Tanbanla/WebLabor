@@ -59,15 +59,15 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         if (controllerPTHC.listPTHCsection.isNotEmpty) {
           sectionName =
               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        }else{
+        } else {
           sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+              .toString()
+              .split(':')[1]
+              .trim();
         }
         // truong hop PTHC phong ban
         controller.changeStatus('PTHC', sectionName, null);
-      }else{
+      } else {
         // truong hop khác
         controller.changeStatus('PTHC', null, null);
       }
@@ -157,10 +157,28 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
-      controller.changeStatus(
-        sectionName,
-        'Leader,Supervisor,Staff,Section Manager,Expert',
-      );
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        sectionName = '';
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+        } else {
+          sectionName = authState.user!.chRSecCode
+              .toString()
+              .split(':')[1]
+              .trim();
+        }
+        // truong hop PTHC phong ban
+        controller.changeStatus(
+          sectionName,
+          'Leader,Supervisor,Staff,Section Manager,Expert',
+        );
+      } else {
+        controller.changeStatus(
+          sectionName,
+          'Leader,Supervisor,Staff,Section Manager,Expert',
+        );
+      }
     } else {
       // truong hop leader
       controller.changeStatus(sectionName, 'Section Manager');

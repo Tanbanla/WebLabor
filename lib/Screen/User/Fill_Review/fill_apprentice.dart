@@ -162,10 +162,28 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         authState.user!.chRGroup.toString() == "Per" ||
         authState.user!.chRGroup.toString() == "Admin") {
       // truong hop PTHC phong ban
-      controller.changeStatus(
-        sectionName,
-        'Leader,Supervisor,Staff,Section Manager,Expert',
-      );
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        sectionName = '';
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+        } else {
+          sectionName = authState.user!.chRSecCode
+              .toString()
+              .split(':')[1]
+              .trim();
+        }
+        // truong hop PTHC phong ban
+        controller.changeStatus(
+          sectionName,
+          'Leader,Supervisor,Staff,Section Manager,Expert',
+        );
+      } else {
+        controller.changeStatus(
+          sectionName,
+          'Leader,Supervisor,Staff,Section Manager,Expert',
+        );
+      }
     } else {
       // truong hop leader
       controller.changeStatus(sectionName, 'Section Manager');
