@@ -344,7 +344,7 @@ class DashboardControllerTwo extends GetxController {
         else if (statusId == 'PTHC')
           {
             "field": "INT_STATUS_ID",
-            "value": ["3", "4"],
+            "value": ["3", "4", "5"],
             "operator": "IN",
             "logicType": "AND",
           }
