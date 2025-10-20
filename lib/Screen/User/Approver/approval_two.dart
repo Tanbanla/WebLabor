@@ -411,7 +411,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: 4000, //2570,
+                    width: 4170, //2570,
                     child: Builder(
                       builder: (context) {
                         final dataSource = MyData(context);
@@ -605,6 +605,13 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                               // nguoi de xuat cua phong ban
                               DataColumnCustom(
                                 title: tr('DeXuat'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // chief xác nhận kết quả
+                              DataColumnCustom(
+                                title: tr('ChiefApproval'),
                                 width: 170,
                                 maxLines: 2,
                                 fontSize: Common.sizeColumn,
@@ -1426,6 +1433,13 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
+        // chief xác nhận kết quả
+        DataCell(
+          Text(
+            data.useRApproverChief ?? '',
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         // phe duyet
         DataCell(
           Obx(() {
@@ -1437,11 +1451,11 @@ class MyData extends DataTableSource {
               if (controller.filterdataList.length > index) {
                 return switch (data.inTStatusId) {
                   6 =>
-                    controller.filterdataList[index].biTApproverChief ?? true,
+                    controller.filterdataList[index].biTApproverSectionManager ?? true,
                   7 =>
                     controller
                             .filterdataList[index]
-                            .biTApproverSectionManager ??
+                            .bitApproverDeft ??
                         true,
                   8 =>
                     controller.filterdataList[index].biTApproverDirector ??

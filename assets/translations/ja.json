@@ -170,5 +170,6 @@
   "CapNhat":"従業員の評価のために返却された情報の更新を要求します。",
   "HDHVCanDuyet":"職業訓練契約、試用契約に必要な作業数",
   "HDXDCCanDuyet":"定期契約に必要な作業数",
-  "Manual":"ユーザーマニュアル"
+  "Manual":"ユーザーマニュアル",
+  "ChiefApproval":"Chief 確認"
 }

@@ -421,7 +421,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: 4700, //2570,
+                    width: 4870, //2570,
                     child: Builder(
                       builder: (context) {
                         final dataSource = MyData(context);
@@ -631,6 +631,13 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                                 maxLines: 2,
                                 fontSize: Common.sizeColumn,
                               ).toDataColumn2(),
+                              // chief xác nhận kết quả
+                              DataColumnCustom(
+                                title: tr('ChiefApproval'),
+                                width: 170,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
                               DataColumnCustom(
                                 title: tr('TruongPhong'),
                                 width: 150,
@@ -836,6 +843,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
           return 'PTHC';
         case 4:
           return 'Leader';
+        case 5:
+          return 'Chief';
         case 6:
           return 'QLTC/中級管理職';
         case 7:
@@ -1506,7 +1515,13 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-            data.useRApproverSectionManager?.toString() ?? "",
+            data.useRApproverSectionManager ?? '',
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.userApproverDeft?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),

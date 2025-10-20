@@ -558,6 +558,8 @@ class DashboardControllerTwo extends GetxController {
         contract.inTStatusId = 1;
       } else if (contract.inTStatusId == 4) {
         contract.inTStatusId = 3;
+      }else if (contract.inTStatusId == 5) {
+        contract.inTStatusId = 4;
       }
       if (notApproval.isNotEmpty) {
         final specialSection = pthcList.firstWhere(
@@ -1535,11 +1537,14 @@ class DashboardControllerTwo extends GetxController {
     final item = _byEmp(employeeCode);
     if (item == null) return;
     switch (statusId) {
+      case 5:
+        item.nvchRApproverChief  = reason;
+        break;
       case 6:
-        item.nvchRApproverChief = reason;
+        item.nvchRApproverManager = reason;
         break;
       case 7:
-        item.nvchRApproverManager = reason;
+        item.nvchrApproverDeft = reason;
         break;
       case 8:
         item.nvchRApproverDirector = reason;
@@ -1559,11 +1564,14 @@ class DashboardControllerTwo extends GetxController {
     final item = _byEmp(employeeCode);
     if (item == null) return;
     switch (statusId) {
-      case 6:
+      case 5:
         item.biTApproverChief = value;
         break;
-      case 7:
+      case 6:
         item.biTApproverSectionManager = value;
+        break;
+      case 7:
+        item.bitApproverDeft= value;
         break;
       case 8:
         item.biTApproverDirector = value;
@@ -1671,19 +1679,19 @@ class DashboardControllerTwo extends GetxController {
         sectionAp = twocontract[i].vchRCodeSection.toString();
         switch (twocontract[i].inTStatusId) {
           case 6:
-            twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
-            twocontract[i].useRApproverChief = userApprover;
-            twocontract[i].nvchRApproverChief = reson;
-            twocontract[i].biTApproverChief = false;
+            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverSectionManager = userApprover;
+            twocontract[i].nvchRApproverManager = reson;
+            twocontract[i].biTApproverSectionManager = false;
             final json = twocontract[i].toJson();
             final contractCopy = TwoContract.fromJson(json);
             notApproval.add(contractCopy);
             twocontract[i].inTStatusId = 4;
           case 7:
-            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
-            twocontract[i].useRApproverSectionManager = userApprover;
-            twocontract[i].nvchRApproverManager = reson;
-            twocontract[i].biTApproverSectionManager = false;
+            twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
+            twocontract[i].userApproverDeft = userApprover;
+            twocontract[i].nvchrApproverDeft= reson;
+            twocontract[i].bitApproverDeft = false;
             final json = twocontract[i].toJson();
             final contractCopy = TwoContract.fromJson(json);
             notApproval.add(contractCopy);
@@ -1777,6 +1785,8 @@ class DashboardControllerTwo extends GetxController {
           twocontract[i].inTStatusId = 1;
         } else if (twocontract[i].inTStatusId == 4) {
           twocontract[i].inTStatusId = 3;
+        }else if (twocontract[i].inTStatusId == 5) {
+          twocontract[i].inTStatusId = 4;
         }
       }
       isLoading(true);

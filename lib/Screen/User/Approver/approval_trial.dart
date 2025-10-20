@@ -408,7 +408,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: 4310, //2570,
+                    width: 4480, //2570,
                     child: Builder(
                       builder: (context) {
                         final dataSource = MyData(context);
@@ -604,6 +604,13 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                             // nguoi de xuat cua phong ban
                             DataColumnCustom(
                               title: tr('DeXuat'),
+                              width: 170,
+                              maxLines: 2,
+                              fontSize: Common.sizeColumn,
+                            ).toDataColumn2(),
+                            // chief xác nhận kết quả
+                            DataColumnCustom(
+                              title: tr('ChiefApproval'),
                               width: 170,
                               maxLines: 2,
                               fontSize: Common.sizeColumn,
@@ -1160,8 +1167,9 @@ class MyData extends DataTableSource {
     final data = controller.filterdataList[index];
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
-        6 => data.nvchRApproverChief ?? '',
-        7 => data.nvchRApproverManager ?? '',
+        5=> data.nvchRApproverChief ?? '',
+        6 => data.nvchRApproverManager?? '',
+        7 => data.nvchrApproverDeft?? '',
         _ => '', // Giá trị mặc định cho các trường hợp khác
       },
     );
@@ -1394,6 +1402,13 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
+        // chief xác nhận kết quả
+        DataCell(
+          Text(
+            data.useRApproverChief ?? '',
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
         // phe duyet
         DataCell(
           Obx(() {
@@ -1405,12 +1420,11 @@ class MyData extends DataTableSource {
               if (controller.filterdataList.length > index) {
                 return switch (data.inTStatusId) {
                   6 =>
-                    controller.filterdataList[index].biTApproverChief ?? true,
+                    controller.filterdataList[index].biTApproverSectionManager ?? true,
                   7 =>
                     controller
                             .filterdataList[index]
-                            .biTApproverSectionManager ??
-                        true,
+                            .bitApproverDeft ?? true,
                   _ => true,
                 };
               }

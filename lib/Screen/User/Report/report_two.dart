@@ -418,7 +418,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: 4420, //2570,
+                    width: 4590, //2570,
                     child: Builder(
                       builder: (context) {
                         final dataSource = MyData(context);
@@ -624,6 +624,13 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                               DataColumnCustom(
                                 title: tr('NguoiDanhgia'),
                                 width: 150,
+                                maxLines: 2,
+                                fontSize: Common.sizeColumn,
+                              ).toDataColumn2(),
+                              // chief xác nhận kết quả
+                              DataColumnCustom(
+                                title: tr('ChiefApproval'),
+                                width: 170,
                                 maxLines: 2,
                                 fontSize: Common.sizeColumn,
                               ).toDataColumn2(),
@@ -838,6 +845,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
           return 'PTHC';
         case 4:
           return 'Leader';
+        case 5:
+          return 'Chief';
         case 6:
           return 'QLTC/中級管理職';
         case 7:
@@ -1156,8 +1165,9 @@ class MyData extends DataTableSource {
     final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
-        6 => data.nvchRApproverChief ?? '',
-        7 => data.nvchRApproverManager ?? '',
+        5 => data.nvchRApproverChief ?? '',
+        6 => data.nvchRApproverManager ?? '',
+        7 => data.nvchrApproverDeft ?? '',
         8 => data.nvchRApproverDirector ?? '',
         _ => '', // Giá trị mặc định cho các trường hợp khác
       },
@@ -1534,6 +1544,7 @@ class MyData extends DataTableSource {
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),
+        // chief xác nhận kết quả
         DataCell(
           Text(
             data.useRApproverChief?.toString() ?? "",
@@ -1542,7 +1553,13 @@ class MyData extends DataTableSource {
         ),
         DataCell(
           Text(
-            data.useRApproverSectionManager?.toString() ?? "",
+            data.useRApproverSectionManager ?? '',
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+        ),
+        DataCell(
+          Text(
+            data.userApproverDeft?.toString() ?? "",
             style: TextStyle(fontSize: Common.sizeColumn),
           ),
         ),

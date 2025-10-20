@@ -294,10 +294,10 @@ class TwoContract {
     _data["useR_APPROVER_SECTION_MANAGER"] = useRApproverSectionManager;
     _data["useR_APPROVER_DIRECTOR"] = useRApproverDirector;
     _data["dtM_DUE_DATE"] = dtMDueDate;
-    _data["DTM_APPROVER_DEFT"] = dtmApproverDeft;
-    _data["USER_APPROVER_DEFT"] = userApproverDeft;
-    _data["BIT_APRROVER_DEFT"] = bitApproverDeft;
-    _data["NVCHR_APROVER_DEFT"] = nvchrApproverDeft;
+    _data["dtM_APPROVER_DEFT"] = dtmApproverDeft;
+    _data["useR_APPROVER_DEFT"] = userApproverDeft;
+    _data["biT_APRROVER_DEFT"] = bitApproverDeft;
+    _data["nvchR_APROVER_DEFT"] = nvchrApproverDeft;
     return _data;
   }
 }

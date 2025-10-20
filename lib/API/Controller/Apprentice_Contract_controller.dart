@@ -1618,11 +1618,14 @@ class DashboardControllerApprentice extends GetxController {
     final item = _byEmp(employeeCode);
     if (item == null) return;
     switch (statusId) {
-      case 6:
+      case 5:
         item.nvchRApproverChief = reason;
         break;
-      case 7:
+      case 6:
         item.nvchRApproverManager = reason;
+        break;
+      case 7:
+        item.nvchrApproverDeft = reason;
         break;
       default:
         break;
@@ -1639,11 +1642,14 @@ class DashboardControllerApprentice extends GetxController {
     final item = _byEmp(employeeCode);
     if (item == null) return;
     switch (statusId) {
-      case 6:
+      case 5:
         item.biTApproverChief = value;
         break;
+      case 6:
+        item.biTApproverSectionManager= value;
+        break;
       case 7:
-        item.biTApproverSectionManager = value;
+        item.bitApproverDeft = value;
         break;
       default:
         break;
