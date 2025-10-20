@@ -50,65 +50,125 @@ class TwoContract {
   dynamic useRApproverSectionManager;
   dynamic useRApproverDirector;
   String? dtMDueDate;
+  String? dtmApproverDeft;
+  String? userApproverDeft;
+  bool? bitApproverDeft;
+  String? nvchrApproverDeft;
 
-  TwoContract ({this.id, this.vchRCodeApprover, this.vchRCodeSection, this.vchRNameSection, this.vchREmployeeId, this.vchRTyperId, this.vchREmployeeName, this.dtMBrithday, this.chRPosition, this.chRCodeGrade, this.chRCostCenterName, this.dtMJoinDate, this.dtMEndDate, this.fLGoLeaveLate, this.fLPaidLeave, this.fLNotPaidLeave, this.fLNotLeaveDay, this.inTViolation, this.nvarchaRViolation, this.nvchRCompleteWork, this.nvchRUseful, this.nvchROther, this.vchRReasultsLeader, this.biTNoReEmployment, this.nvchRNoReEmpoyment, this.nvchRPthcSection, this.vchRLeaderEvalution, this.dtMLeadaerEvalution, this.biTApproverPer, this.nvchRApproverPer, this.dtMApproverPer, this.biTApproverChief, this.nvchRApproverChief, this.dtMApproverChief, this.biTApproverSectionManager, this.nvchRApproverManager, this.dtMApproverManager, this.biTApproverDirector, this.nvchRApproverDirector, this.dtMApproverDirector, this.vchRUserCreate, this.dtMCreate, this.vchRUserUpdate, this.dtMUpdate, this.inTStatusId, this.vchRNote, this.useRApproverPer, this.useRApproverChief, this.useRApproverSectionManager, this.useRApproverDirector, this.dtMDueDate});
+  TwoContract({
+    this.id,
+    this.vchRCodeApprover,
+    this.vchRCodeSection,
+    this.vchRNameSection,
+    this.vchREmployeeId,
+    this.vchRTyperId,
+    this.vchREmployeeName,
+    this.dtMBrithday,
+    this.chRPosition,
+    this.chRCodeGrade,
+    this.chRCostCenterName,
+    this.dtMJoinDate,
+    this.dtMEndDate,
+    this.fLGoLeaveLate,
+    this.fLPaidLeave,
+    this.fLNotPaidLeave,
+    this.fLNotLeaveDay,
+    this.inTViolation,
+    this.nvarchaRViolation,
+    this.nvchRCompleteWork,
+    this.nvchRUseful,
+    this.nvchROther,
+    this.vchRReasultsLeader,
+    this.biTNoReEmployment,
+    this.nvchRNoReEmpoyment,
+    this.nvchRPthcSection,
+    this.vchRLeaderEvalution,
+    this.dtMLeadaerEvalution,
+    this.biTApproverPer,
+    this.nvchRApproverPer,
+    this.dtMApproverPer,
+    this.biTApproverChief,
+    this.nvchRApproverChief,
+    this.dtMApproverChief,
+    this.biTApproverSectionManager,
+    this.nvchRApproverManager,
+    this.dtMApproverManager,
+    this.biTApproverDirector,
+    this.nvchRApproverDirector,
+    this.dtMApproverDirector,
+    this.vchRUserCreate,
+    this.dtMCreate,
+    this.vchRUserUpdate,
+    this.dtMUpdate,
+    this.inTStatusId,
+    this.vchRNote,
+    this.useRApproverPer,
+    this.useRApproverChief,
+    this.useRApproverSectionManager,
+    this.useRApproverDirector,
+    this.dtMDueDate,
+    this.dtmApproverDeft,
+    this.userApproverDeft,
+    this.bitApproverDeft,
+    this.nvchrApproverDeft,
+  });
 
-  TwoContract .fromJson(Map<String, dynamic> json) {
-    if(json["id"] is int) {
+  TwoContract.fromJson(Map<String, dynamic> json) {
+    if (json["id"] is int) {
       id = json["id"];
     }
-    if(json["vchR_CODE_APPROVER"] is String) {
+    if (json["vchR_CODE_APPROVER"] is String) {
       vchRCodeApprover = json["vchR_CODE_APPROVER"];
     }
-    if(json["vchR_CODE_SECTION"] is String) {
+    if (json["vchR_CODE_SECTION"] is String) {
       vchRCodeSection = json["vchR_CODE_SECTION"];
     }
-    if(json["vchR_NAME_SECTION"] is String) {
+    if (json["vchR_NAME_SECTION"] is String) {
       vchRNameSection = json["vchR_NAME_SECTION"];
     }
-    if(json["vchR_EMPLOYEE_ID"] is String) {
+    if (json["vchR_EMPLOYEE_ID"] is String) {
       vchREmployeeId = json["vchR_EMPLOYEE_ID"];
     }
-    if(json["vchR_TYPER_ID"] is String) {
+    if (json["vchR_TYPER_ID"] is String) {
       vchRTyperId = json["vchR_TYPER_ID"];
     }
-    if(json["vchR_EMPLOYEE_NAME"] is String) {
+    if (json["vchR_EMPLOYEE_NAME"] is String) {
       vchREmployeeName = json["vchR_EMPLOYEE_NAME"];
     }
-    if(json["dtM_BRITHDAY"] is String) {
+    if (json["dtM_BRITHDAY"] is String) {
       dtMBrithday = json["dtM_BRITHDAY"];
     }
-    if(json["chR_POSITION"] is String) {
+    if (json["chR_POSITION"] is String) {
       chRPosition = json["chR_POSITION"];
     }
-    if(json["chR_CODE_GRADE"] is String) {
+    if (json["chR_CODE_GRADE"] is String) {
       chRCodeGrade = json["chR_CODE_GRADE"];
     }
-    if(json["chR_COST_CENTER_NAME"] is String) {
+    if (json["chR_COST_CENTER_NAME"] is String) {
       chRCostCenterName = json["chR_COST_CENTER_NAME"];
     }
-    if(json["dtM_JOIN_DATE"] is String) {
+    if (json["dtM_JOIN_DATE"] is String) {
       dtMJoinDate = json["dtM_JOIN_DATE"];
     }
-    if(json["dtM_END_DATE"] is String) {
+    if (json["dtM_END_DATE"] is String) {
       dtMEndDate = json["dtM_END_DATE"];
     }
-    if(json["fL_GO_LEAVE_LATE"] is int) {
+    if (json["fL_GO_LEAVE_LATE"] is int) {
       fLGoLeaveLate = json["fL_GO_LEAVE_LATE"];
     }
-    if(json["fL_PAID_LEAVE"] is double) {
+    if (json["fL_PAID_LEAVE"] is double) {
       fLPaidLeave = json["fL_PAID_LEAVE"];
     }
-    if(json["fL_NOT_PAID_LEAVE"] is double) {
+    if (json["fL_NOT_PAID_LEAVE"] is double) {
       fLNotPaidLeave = json["fL_NOT_PAID_LEAVE"];
     }
-    if(json["fL_NOT_LEAVE_DAY"] is int) {
+    if (json["fL_NOT_LEAVE_DAY"] is int) {
       fLNotLeaveDay = json["fL_NOT_LEAVE_DAY"];
     }
-    if(json["inT_VIOLATION"] is int) {
+    if (json["inT_VIOLATION"] is int) {
       inTViolation = json["inT_VIOLATION"];
     }
-    if(json["nvarchaR_VIOLATION"] is String) {
+    if (json["nvarchaR_VIOLATION"] is String) {
       nvarchaRViolation = json["nvarchaR_VIOLATION"];
     }
     nvchRCompleteWork = json["nvchR_COMPLETE_WORK"];
@@ -120,13 +180,13 @@ class TwoContract {
     nvchRPthcSection = json["nvchR_PTHC_SECTION"];
     vchRLeaderEvalution = json["vchR_LEADER_EVALUTION"];
     dtMLeadaerEvalution = json["dtM_LEADAER_EVALUTION"];
-    if(json["biT_APPROVER_PER"] is bool) {
+    if (json["biT_APPROVER_PER"] is bool) {
       biTApproverPer = json["biT_APPROVER_PER"];
     }
-    if(json["nvchR_APPROVER_PER"] is String) {
+    if (json["nvchR_APPROVER_PER"] is String) {
       nvchRApproverPer = json["nvchR_APPROVER_PER"];
     }
-    if(json["dtM_APPROVER_PER"] is String) {
+    if (json["dtM_APPROVER_PER"] is String) {
       dtMApproverPer = json["dtM_APPROVER_PER"];
     }
     biTApproverChief = json["biT_APPROVER_CHIEF"];
@@ -138,23 +198,23 @@ class TwoContract {
     biTApproverDirector = json["biT_APPROVER_DIRECTOR"];
     nvchRApproverDirector = json["nvchR_APPROVER_DIRECTOR"];
     dtMApproverDirector = json["dtM_APPROVER_DIRECTOR"];
-    if(json["vchR_USER_CREATE"] is String) {
+    if (json["vchR_USER_CREATE"] is String) {
       vchRUserCreate = json["vchR_USER_CREATE"];
     }
-    if(json["dtM_CREATE"] is String) {
+    if (json["dtM_CREATE"] is String) {
       dtMCreate = json["dtM_CREATE"];
     }
-    if(json["vchR_USER_UPDATE"] is String) {
+    if (json["vchR_USER_UPDATE"] is String) {
       vchRUserUpdate = json["vchR_USER_UPDATE"];
     }
-    if(json["dtM_UPDATE"] is String) {
+    if (json["dtM_UPDATE"] is String) {
       dtMUpdate = json["dtM_UPDATE"];
     }
-    if(json["inT_STATUS_ID"] is int) {
+    if (json["inT_STATUS_ID"] is int) {
       inTStatusId = json["inT_STATUS_ID"];
     }
     vchRNote = json["vchR_NOTE"];
-    if(json["useR_APPROVER_PER"] is String) {
+    if (json["useR_APPROVER_PER"] is String) {
       useRApproverPer = json["useR_APPROVER_PER"];
     }
     useRApproverChief = json["useR_APPROVER_CHIEF"];
@@ -163,10 +223,22 @@ class TwoContract {
     if (json["dtM_DUE_DATE"] is String) {
       dtMDueDate = json["dtM_DUE_DATE"];
     }
+    if (json["DTM_APPROVER_DEFT"] is String) {
+      dtmApproverDeft = json["DTM_APPROVER_DEFT"];
+    }
+    if (json["USER_APPROVER_DEFT"] is String) {
+      userApproverDeft = json["USER_APPROVER_DEFT"];
+    }
+    if (json["BIT_APRROVER_DEFT"] is bool) {
+      bitApproverDeft = json["BIT_APRROVER_DEFT"];
+    }
+    if (json["NVCHR_APROVER_DEFT"] is String) {
+      nvchrApproverDeft = json["NVCHR_APROVER_DEFT"];
+    }
   }
 
-  static List<TwoContract > fromList(List<Map<String, dynamic>> list) {
-    return list.map(TwoContract .fromJson).toList();
+  static List<TwoContract> fromList(List<Map<String, dynamic>> list) {
+    return list.map(TwoContract.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -222,6 +294,10 @@ class TwoContract {
     _data["useR_APPROVER_SECTION_MANAGER"] = useRApproverSectionManager;
     _data["useR_APPROVER_DIRECTOR"] = useRApproverDirector;
     _data["dtM_DUE_DATE"] = dtMDueDate;
+    _data["DTM_APPROVER_DEFT"] = dtmApproverDeft;
+    _data["USER_APPROVER_DEFT"] = userApproverDeft;
+    _data["BIT_APRROVER_DEFT"] = bitApproverDeft;
+    _data["NVCHR_APROVER_DEFT"] = nvchrApproverDeft;
     return _data;
   }
 }

@@ -297,11 +297,14 @@ class DashboardControllerApprentice extends GetxController {
         case "4":
           cloumn = "VCHR_LEADER_EVALUTION";
           break;
-        case "6":
+        case "5":
           cloumn = "USER_APPROVER_CHIEF";
           break;
-        case "7":
+        case "6":
           cloumn = "USER_APPROVER_SECTION_MANAGER";
+          break;
+        case "7":
+          cloumn = "USER_APPROVER_DEFT";
           break;
         case "8":
           cloumn = "USER_APPROVER_DIRECTOR";
@@ -749,10 +752,14 @@ class DashboardControllerApprentice extends GetxController {
                 '${tr('InputError')} ${contract[i].vchREmployeeId}',
               );
             }
-            contract[i].inTStatusId = 6;
+            contract[i].inTStatusId = 5;
             contract[i].vchRLeaderEvalution = userUpdate;
             contract[i].useRApproverChief = userApprover;
             contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+          case 5:
+            contract[i].inTStatusId = 6;
+            contract[i].useRApproverSectionManager = userApprover;
+            contract[i].dtMApproverChief = formatDateTime(DateTime.now());
         }
       }
       isLoading(true);
@@ -1143,7 +1150,12 @@ class DashboardControllerApprentice extends GetxController {
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
-          ..useRApproverDirector;
+          ..useRApproverDirector
+          ..dtmApproverDeft
+          ..userApproverDeft
+          ..bitApproverDeft
+          ..nvchrApproverDeft
+          ;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||
@@ -1284,7 +1296,12 @@ class DashboardControllerApprentice extends GetxController {
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
-          ..useRApproverDirector;
+          ..useRApproverDirector
+          ..dtmApproverDeft
+          ..userApproverDeft
+          ..bitApproverDeft
+          ..nvchrApproverDeft
+          ;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||

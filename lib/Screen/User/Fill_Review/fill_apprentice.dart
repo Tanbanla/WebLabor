@@ -184,9 +184,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           'Leader,Supervisor,Staff,Section Manager,Expert',
         );
       }
+    } else if (authState.user!.chRGroup.toString() == "Chief") {
+      controller.changeStatus(sectionName, 'Section Manager');
     } else {
       // truong hop leader
-      controller.changeStatus(sectionName, 'Section Manager');
+      controller.changeStatus(sectionName, 'Chief');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -2640,6 +2642,16 @@ class MyData extends DataTableSource {
             border: Border.all(color: Colors.blue[100]!),
           ),
           child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+        );
+      case 5:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.deepPurple[100]!),
+          ),
+          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
         );
       case 6:
         return Container(

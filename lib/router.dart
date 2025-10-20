@@ -48,6 +48,8 @@ GoRouter createRouter(BuildContext context) {
         'Per',
         'Chief Per',
         'PTHC',
+        'Chief',
+        'Expert',
         'Technician',
         'Staff',
         'Operator',
@@ -57,6 +59,8 @@ GoRouter createRouter(BuildContext context) {
       AppRoutes.fillApprentice: [
         'Admin',
         'Per',
+        'Chief',
+        'Expert',
         'Chief Per',
         'PTHC',
         'Technician',

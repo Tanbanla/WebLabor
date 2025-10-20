@@ -71,6 +71,13 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         // truong hop khác
         controller.changeStatus('PTHC', null, null);
       }
+    } else if (authState.user!.chRGroup.toString() == "Chief" ||
+        authState.user!.chRGroup.toString() == "Staff") {
+      controller.changeStatus(
+        '5',
+        sectionName,
+        authState.user!.chRUserid.toString(),
+      );
     } else {
       // truong hop leader
       controller.changeStatus(
@@ -171,17 +178,20 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         // truong hop PTHC phong ban
         controller.changeStatus(
           sectionName,
-          'Leader,Supervisor,Staff,Section Manager,Expert',
+          'Leader,Supervisor,Staff,Section Manager,Expert,Chief',
         );
       } else {
         controller.changeStatus(
           sectionName,
-          'Leader,Supervisor,Staff,Section Manager,Expert',
+          'Leader,Supervisor,Staff,Section Manager,Expert,Chief',
         );
       }
+    } else if (authState.user!.chRGroup.toString() == "Chief" ||
+        authState.user!.chRGroup.toString() == "Staff") {
+      controller.changeStatus(sectionName, 'Section Manager');
     } else {
       // truong hop leader
-      controller.changeStatus(sectionName, 'Section Manager');
+      controller.changeStatus(sectionName, 'Chief');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -279,6 +289,13 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   await controllerTwo.changeStatus('PTHC', sectionName, null);
+                } else if (authState.user!.chRGroup.toString() == "Chief" ||
+                    authState.user!.chRGroup.toString() == "Staff") {
+                  await controllerTwo.changeStatus(
+                    '5',
+                    sectionName,
+                    authState.user!.chRUserid.toString(),
+                  );
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
@@ -1320,6 +1337,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
                   await controller.changeStatus('PTHC', sectionName, null);
+                } else if (group == "Chief" || group == "Staff") {
+                  await controller.changeStatus('5', sectionName, adid);
                 } else {
                   // truong hop leader
                   await controller.changeStatus('4', sectionName, adid);
@@ -2209,6 +2228,16 @@ class MyData extends DataTableSource {
           ),
           child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
         );
+      case 5:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.deepPurple[100]!),
+          ),
+          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+        );
       case 6:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -2460,6 +2489,14 @@ class _ReturnTwoContract extends StatelessWidget {
                           'PTHC',
                           sectionName,
                           null,
+                        );
+                      } else if (authState.user!.chRGroup.toString() ==
+                              "Chief" ||
+                          authState.user!.chRGroup.toString() == "Staff") {
+                        await controller.changeStatus(
+                          '5',
+                          sectionName,
+                          authState.user!.chRUserid.toString(),
                         );
                       } else {
                         // truong hop leader

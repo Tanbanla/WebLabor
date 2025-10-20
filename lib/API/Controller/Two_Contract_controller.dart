@@ -319,11 +319,14 @@ class DashboardControllerTwo extends GetxController {
         case "4":
           cloumn = "VCHR_LEADER_EVALUTION";
           break;
-        case "6":
+        case "5":
           cloumn = "USER_APPROVER_CHIEF";
           break;
-        case "7":
+        case "6":
           cloumn = "USER_APPROVER_SECTION_MANAGER";
+          break;
+        case "7":
+          cloumn = "USER_APPROVER_DEFT";
           break;
         case "8":
           cloumn = "USER_APPROVER_DIRECTOR";
@@ -765,10 +768,14 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            twocontract[i].inTStatusId = 6;
+            twocontract[i].inTStatusId = 5;
             twocontract[i].vchRLeaderEvalution = userUpdate;
             twocontract[i].useRApproverChief = userApprover;
             twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+          case 5:
+            twocontract[i].inTStatusId = 6;
+            twocontract[i].useRApproverSectionManager = userApprover;
+            twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
         }
       }
       isLoading(true);
@@ -827,35 +834,13 @@ class DashboardControllerTwo extends GetxController {
         sectionAp = twocontract[i].vchRCodeSection.toString();
         switch (twocontract[i].inTStatusId) {
           case 6:
-            twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
-            twocontract[i].useRApproverChief = userApprover;
-            if (twocontract[i].biTApproverChief == true ||
-                twocontract[i].biTApproverChief) {
+            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
+            twocontract[i].useRApproverSectionManager = userApprover;
+            if (twocontract[i].biTApproverSectionManager == true) {
               twocontract[i].inTStatusId = 7;
               mailSend = await NextApprovel(
                 section: twocontract[i].vchRCodeSection,
                 chucVu: "Dept Manager",
-                dept: dept,
-              );
-            } else {
-              if ((twocontract[i].nvchRApproverChief?.isEmpty ?? true)) {
-                throw Exception(
-                  '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
-                );
-              }
-              final json = twocontract[i].toJson();
-              final contractCopy = TwoContract.fromJson(json);
-              notApproval.add(contractCopy);
-              twocontract[i].inTStatusId = 4;
-            }
-          case 7:
-            twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
-            twocontract[i].useRApproverSectionManager = userApprover;
-            if (twocontract[i].biTApproverSectionManager == true) {
-              twocontract[i].inTStatusId = 8;
-              mailSend = await NextApprovel(
-                section: twocontract[i].vchRCodeSection,
-                chucVu: "Director",
                 dept: dept,
               );
             } else {
@@ -868,10 +853,34 @@ class DashboardControllerTwo extends GetxController {
               final contractCopy = TwoContract.fromJson(json);
               notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
+            }
+          case 7:
+            twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
+            twocontract[i].userApproverDeft = userApprover;
+            if (twocontract[i].bitApproverDeft == true) {
+              twocontract[i].inTStatusId = 8;
+              mailSend = await NextApprovel(
+                section: twocontract[i].vchRCodeSection,
+                chucVu: "Director",
+                dept: dept,
+              );
+            } else {
+              if ((twocontract[i].nvchrApproverDeft?.isEmpty ?? true)) {
+                throw Exception(
+                  '${tr('NotApproval')} ${twocontract[i].vchREmployeeName}',
+                );
+              }
+              final json = twocontract[i].toJson();
+              final contractCopy = TwoContract.fromJson(json);
+              notApproval.add(contractCopy);
+              twocontract[i].inTStatusId = 4;
               // Thêm email của quản lý phòng ban vào danh sách phê duyệt
               final chief = twocontract[i].useRApproverChief;
+              final manager = twocontract[i].useRApproverSectionManager;
+              // Thêm email của quản lý phòng ban vào danh sách phê duyệt
               if (chief != null && chief.isNotEmpty) {
-                final email = '$chief@brothergroup.net';
+                final email =
+                    '$chief@brothergroup.net;$manager@brothergroup.net';
                 final existing = PheDuyetMail.split(';')
                     .where((e) => e.trim().isNotEmpty)
                     .map((e) => e.toLowerCase())
@@ -884,10 +893,6 @@ class DashboardControllerTwo extends GetxController {
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
-
-            //xu ly khi xong
-            // mailSend = "k";
-            //
             if (twocontract[i].biTApproverDirector == true) {
               twocontract[i].inTStatusId = 9;
             } else {
@@ -918,6 +923,7 @@ class DashboardControllerTwo extends GetxController {
 
                 appendIfNotExists(twocontract[i].useRApproverSectionManager);
                 appendIfNotExists(twocontract[i].useRApproverChief);
+                appendIfNotExists(twocontract[i].userApproverDeft);
               }
             }
         }
@@ -933,12 +939,7 @@ class DashboardControllerTwo extends GetxController {
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
-          controlleruser.SendMail(
-            '6',
-            mailSend,
-            mailSend,
-            mailSend,
-          );
+          controlleruser.SendMail('6', mailSend, mailSend, mailSend);
           // k mo vi mo se gui cho quan ly cac phong
           // controlleruser.SendMail(
           //   '6',
@@ -1083,31 +1084,6 @@ class DashboardControllerTwo extends GetxController {
     }
   }
 
-  // xuat file
-  Future<void> exportToExcelTwoContract() async {
-    try {
-      isLoadingExport(true);
-      final response = await http.get(
-        Uri.parse('${Common.API}${Common.TwoGetAll}'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        // Xử lý file Excel
-        Get.snackbar(
-          'Success',
-          'Exported successfully',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } catch (e) {
-      showError('Export failed: $e');
-      rethrow;
-    } finally {
-      isLoadingExport(false);
-    }
-  }
-
   // import file
   Future<void> importExcelMobileTwoContract(
     File file,
@@ -1205,7 +1181,11 @@ class DashboardControllerTwo extends GetxController {
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
-          ..useRApproverDirector;
+          ..useRApproverDirector
+          ..dtmApproverDeft
+          ..userApproverDeft
+          ..bitApproverDeft
+          ..nvchrApproverDeft;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||
@@ -1346,7 +1326,11 @@ class DashboardControllerTwo extends GetxController {
           ..useRApproverPer
           ..useRApproverChief
           ..useRApproverSectionManager
-          ..useRApproverDirector;
+          ..useRApproverDirector
+          ..dtmApproverDeft
+          ..userApproverDeft
+          ..bitApproverDeft
+          ..nvchrApproverDeft;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||

@@ -53,6 +53,10 @@ class ApprenticeContract {
   String? useRApproverSectionManager;
   String? useRApproverDirector;
   String? dtMDueDate;
+  String? dtmApproverDeft;
+  String? userApproverDeft;
+  bool? bitApproverDeft;
+  String? nvchrApproverDeft;
 
   ApprenticeContract({
     this.id,
@@ -109,6 +113,10 @@ class ApprenticeContract {
     this.useRApproverSectionManager,
     this.useRApproverDirector,
     this.dtMDueDate,
+    this.dtmApproverDeft,
+    this.userApproverDeft,
+    this.bitApproverDeft,
+    this.nvchrApproverDeft,
   });
 
   ApprenticeContract.fromJson(Map<String, dynamic> json) {
@@ -274,6 +282,18 @@ class ApprenticeContract {
     if (json["dtM_DUE_DATE"] is String) {
       dtMDueDate = json["dtM_DUE_DATE"];
     }
+    if (json["DTM_APPROVER_DEFT"] is String) {
+      dtmApproverDeft = json["DTM_APPROVER_DEFT"];
+    }
+    if (json["USER_APPROVER_DEFT"] is String) {
+      userApproverDeft = json["USER_APPROVER_DEFT"];
+    }
+    if (json["BIT_APRROVER_DEFT"] is bool) {
+      bitApproverDeft = json["BIT_APRROVER_DEFT"];
+    }
+    if (json["NVCHR_APROVER_DEFT"] is String) {
+      nvchrApproverDeft = json["NVCHR_APROVER_DEFT"];
+    }
   }
 
   static List<ApprenticeContract> fromList(List<Map<String, dynamic>> list) {
@@ -336,6 +356,10 @@ class ApprenticeContract {
     _data["useR_APPROVER_SECTION_MANAGER"] = useRApproverSectionManager;
     _data["useR_APPROVER_DIRECTOR"] = useRApproverDirector;
     _data["dtM_DUE_DATE"] = dtMDueDate;
+    _data["DTM_APPROVER_DEFT"] = dtmApproverDeft;
+    _data["USER_APPROVER_DEFT"] = userApproverDeft;
+    _data["BIT_APRROVER_DEFT"] = bitApproverDeft;
+    _data["NVCHR_APROVER_DEFT"] = nvchrApproverDeft;
     return _data;
   }
 }
