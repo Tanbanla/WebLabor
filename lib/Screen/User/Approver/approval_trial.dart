@@ -927,6 +927,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   );
                   setCellValue('Z', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('AA', item.vchRLeaderEvalution ?? '');
+                  setCellValue(
+                    'AB',
+                    item.useRApproverChief ?? '',
+                  );
                 }
 
                 // 3. Xuất file

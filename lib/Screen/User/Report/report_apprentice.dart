@@ -40,23 +40,31 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   int _rowsPerPage = 50;
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
   void initState() {
     super.initState();
     // Load initial data once
-    controller.refreshSearch();
-    controller.fetchSectionList();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authState = Provider.of<AuthState>(context, listen: false);
+      // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
+      controller.refreshSearch();
+      controller.fetchSectionList();
+      await _prepareStatus(authState);
+    });
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    controllerPTHC.fetchPTHCSectionList(
-      authState.user!.chREmployeeId.toString(),
-    );
-    String sectionName = '';
+  Future <void> _prepareStatus(AuthState authState) async {
+    if (_statusInitialized) return;
+    try {
+      // Bắt buộc phải tải listPTHCsection trước khi so sánh
+      await controllerPTHC.fetchPTHCSectionList(
+        authState.user!.chREmployeeId.toString(),
+      );
+      String sectionName = authState.user!.chRSecCode
+          .toString()
+          .split(':')[1]
+          .trim();
     if (authState.user!.chRGroup.toString() == "PTHC") {
-      sectionName = '';
       if (controllerPTHC.listPTHCsection.isNotEmpty) {
         sectionName =
             '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
@@ -71,6 +79,14 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     } else {
       controller.fetchDummyData(null);
     }
+      _statusInitialized = true;
+    } catch (e) {
+      // Có thể log hoặc hiển thị lỗi nếu cần
+      debugPrint('Prepare status error: $e');
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -184,6 +200,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
           {'code': 'Per', 'label': 'Per/人事課の中級管理職'},
           {'code': 'PTHC', 'label': 'PTHC'},
           {'code': 'Leader', 'label': 'Leader'},
+          {'code': 'Chief', 'label': 'Chief'},
           {'code': 'QLTC', 'label': 'QLTC/中級管理職'},
           {'code': 'QLCC', 'label': 'QLCC/上級管理職'},
           {'code': 'Director', 'label': 'Director/管掌取締役'},
@@ -1042,6 +1059,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   setCellValue('AE', item.vchRLeaderEvalution ?? '');
                   setCellValue('AF', item.useRApproverChief ?? '');
                   setCellValue('AG', item.useRApproverSectionManager ?? '');
+                  setCellValue('AH', item.userApproverDeft ?? '');
                 }
 
                 // 3. Xuất file

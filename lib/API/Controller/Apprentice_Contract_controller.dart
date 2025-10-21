@@ -151,6 +151,8 @@ class DashboardControllerApprentice extends GetxController {
           return id == 3;
         case 'Leader':
           return id == 4;
+        case 'Chief':
+          return id == 5;
         case 'Manager':
           return id == 6;
         case 'Dept':
@@ -692,6 +694,7 @@ class DashboardControllerApprentice extends GetxController {
   Future<void> updateListApprenticeContractFill(
     String userApprover,
     String userUpdate,
+    String chucVu,
   ) async {
     try {
       final contract = getSelectedItems();
@@ -783,12 +786,22 @@ class DashboardControllerApprentice extends GetxController {
                 '${tr('InputError')} ${contract[i].vchREmployeeId}',
               );
             }
-            contract[i].inTStatusId = 5;
-            contract[i].vchRLeaderEvalution = userUpdate;
-            contract[i].useRApproverChief = userApprover;
-            contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-            contract[i].biTApproverChief = true;
-            contract[i].nvchRApproverChief = '';
+            if(chucVu == "Chief"){
+              contract[i].inTStatusId = 6;
+              contract[i].vchRLeaderEvalution = userUpdate;
+              contract[i].useRApproverChief = userUpdate;
+              contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              contract[i].biTApproverChief = true;
+              contract[i].nvchRApproverChief = '';
+              contract[i].useRApproverSectionManager = userApprover;
+            }else{
+              contract[i].inTStatusId = 5;
+              contract[i].vchRLeaderEvalution = userUpdate;
+              contract[i].useRApproverChief = userApprover;
+              contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              contract[i].biTApproverChief = true;
+              contract[i].nvchRApproverChief = '';
+            }
           case 5:
             if (contract[i].biTApproverChief != true &&
                 (contract[i].nvchRApproverChief == null ||

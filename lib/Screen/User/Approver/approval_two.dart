@@ -928,6 +928,10 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('Y', item.vchRLeaderEvalution ?? '');
+                  setCellValue(
+                    'Z',
+                    item.useRApproverChief ?? '',
+                  );
                 }
 
                 // 3. Xuất file

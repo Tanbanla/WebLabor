@@ -159,6 +159,8 @@ class DashboardControllerTwo extends GetxController {
           return id == 3;
         case 'Leader':
           return id == 4;
+        case 'Chief':
+          return id == 5;
         case 'Manager':
           return id == 6;
         case 'Dept':
@@ -197,31 +199,7 @@ class DashboardControllerTwo extends GetxController {
     // Rebuild selection states to align with filtered list length
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
-
-  // Helper method to convert status ID to text
-  String getStatusText(int? statusId) {
-    switch (statusId) {
-      case 1:
-        return 'New';
-      case 2:
-        return 'Per';
-      case 3:
-        return 'PTHC';
-      case 4:
-        return 'Leader';
-      case 6:
-        return 'Manager';
-      case 7:
-        return 'Dept';
-      case 8:
-        return 'Director';
-      case 9:
-        return 'Done';
-      default:
-        return 'Unknown';
-    }
-  }
-
+  
   // Old individual filter methods removed in favor of applyFilters().
   // Reset all filters
   void refreshFilteredList() {
@@ -708,6 +686,7 @@ class DashboardControllerTwo extends GetxController {
   Future<void> updateListTwoContractFill(
     String userApprover,
     String userUpdate,
+    String chucVu,
   ) async {
     try {
       final twocontract = getSelectedItems();
@@ -798,12 +777,22 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            twocontract[i].inTStatusId = 5;
-            twocontract[i].vchRLeaderEvalution = userUpdate;
-            twocontract[i].useRApproverChief = userApprover;
-            twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-            twocontract[i].biTApproverChief = true;
-            twocontract[i].nvchRApproverChief = '';
+            if(chucVu == "Chief"){
+              twocontract[i].inTStatusId = 6;
+              twocontract[i].vchRLeaderEvalution = userUpdate;
+              twocontract[i].useRApproverChief = userUpdate;
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              twocontract[i].biTApproverChief = true;
+              twocontract[i].nvchRApproverChief = '';
+              twocontract[i].useRApproverSectionManager = userApprover;
+            }else{
+              twocontract[i].inTStatusId = 5;
+              twocontract[i].vchRLeaderEvalution = userUpdate;
+              twocontract[i].useRApproverChief = userApprover;
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              twocontract[i].biTApproverChief = true;
+              twocontract[i].nvchRApproverChief = '';
+            }
           case 5:
             if (twocontract[i].biTApproverChief != true &&
                 (twocontract[i].nvchRApproverChief == null ||

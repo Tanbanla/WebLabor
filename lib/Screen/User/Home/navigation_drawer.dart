@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart'
-    show rootBundle; // For loading asset bytes
-import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
+show rootBundle; // For loading asset bytes
 // Conditional import: real implementation on web, stub elsewhere
 import 'package:web_labor_contract/util/download_manual_stub.dart'
     if (dart.library.html) 'package:web_labor_contract/util/download_manual_web.dart';
@@ -12,7 +11,6 @@ import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
-import 'package:get/get.dart';
 // Removed kIsWeb and html imports after router refactor
 import 'package:go_router/go_router.dart';
 import '../../../router.dart';

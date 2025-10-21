@@ -41,47 +41,70 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   int _rowsPerPage = 50;
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  bool _statusInitialized = false; // tránh gọi lại nhiều lần
+
+  @override
+  void initState() {
+    super.initState();
+    // Di chuyển các lời gọi mạng khỏi build để tránh lặp lại không cần thiết
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authState = Provider.of<AuthState>(context, listen: false);
+      // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
+      controller.refreshSearch();
+      controller.fetchPTHCData();
+      await _prepareStatus(authState);
+    });
+  }
+
+  Future<void> _prepareStatus(AuthState authState) async {
+    if (_statusInitialized) return;
+    try {
+      // Bắt buộc phải tải listPTHCsection trước khi so sánh
+      await controllerPTHC.fetchPTHCSectionList(
+        authState.user!.chREmployeeId.toString(),
+      );
+
+      String sectionName = authState.user!.chRSecCode
+          .toString()
+          .split(':')[1]
+          .trim();
+
+      if (authState.user!.chRGroup.toString() == "PTHC" ||
+          authState.user!.chRGroup.toString() == "Per" ||
+          authState.user!.chRGroup.toString() == "Admin") {
+        if (authState.user!.chRGroup.toString() == "PTHC") {
+          sectionName = '';
+          if (controllerPTHC.listPTHCsection.isNotEmpty) {
+            sectionName =
+                '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+          } else {
+            sectionName = authState.user!.chRSecCode
+                .toString()
+                .split(':')[1]
+                .trim();
+          }
+          // truong hop PTHC phong ban
+          controller.changeStatus('PTHC', sectionName, null);
+        } else {
+          // truong hop khác
+            controller.changeStatus('PTHC', null, null);
+        }
+      } else {
+        // truong hop leader
+        controller.changeStatus(
+          '4',
+          sectionName,
+          authState.user!.chRUserid.toString(),
+        );
+      }
+      _statusInitialized = true;
+    } catch (e) {
+      // Có thể log hoặc hiển thị lỗi nếu cần
+      debugPrint('Prepare status error: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
-    controller.refreshSearch();
-    controller.fetchPTHCData();
-    Get.put(
-      DashboardControllerPTHC(),
-    ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
-    // phan xem ai dang vao man so sanh
-    if (authState.user!.chRGroup.toString() == "PTHC" ||
-        authState.user!.chRGroup.toString() == "Per" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      if (authState.user!.chRGroup.toString() == "PTHC") {
-        sectionName = '';
-        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName =
-              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        } else {
-          sectionName = authState.user!.chRSecCode
-              .toString()
-              .split(':')[1]
-              .trim();
-        }
-        // truong hop PTHC phong ban
-        controller.changeStatus('PTHC', sectionName, null);
-      } else {
-        // truong hop khác
-        controller.changeStatus('PTHC', null, null);
-      }
-    } else {
-      // truong hop leader
-      controller.changeStatus(
-        '4',
-        sectionName,
-        authState.user!.chRUserid.toString(),
-      );
-    }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -278,6 +301,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 await controllerTwo.updateListApprenticeContractFill(
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
+                  authState.user!.chRGroup.toString(),
                 );
                 if (authState.user!.chRGroup.toString() == "PTHC" ||
                     authState.user!.chRGroup.toString() == "Per" ||
