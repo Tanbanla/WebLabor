@@ -171,5 +171,6 @@
   "HDHVCanDuyet":"職業訓練契約、試用契約に必要な作業数",
   "HDXDCCanDuyet":"定期契約に必要な作業数",
   "Manual":"ユーザーマニュアル",
-  "ChiefApproval":"Chief 確認"
+  "ChiefApproval":"Chief 確認",
+  "TuChoiPheDuyet":"従業員の承認拒否理由を入力してください"
 }

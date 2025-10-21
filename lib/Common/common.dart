@@ -177,11 +177,14 @@ class Common {
           case 4:
             rejectionReason = reson ?? 'Không có lý do';
             break;
-          case 6:
+          case 5:
             rejectionReason = request.nvchRApproverChief ?? 'Không có lý do';
             break;
-          case 7:
+          case 6:
             rejectionReason = request.nvchRApproverManager ?? 'Không có lý do';
+            break;
+          case 7:
+            rejectionReason = request.nvchrApproverDeft ?? 'Không có lý do';
             break;
           case 8:
             rejectionReason = request.nvchRApproverDirector ?? 'Không có lý do';

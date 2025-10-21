@@ -50,6 +50,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         .trim();
     controller.refreshSearch();
     controller.fetchPTHCData();
+    Get.put(
+      DashboardControllerPTHC(),
+    ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Per" ||
@@ -188,7 +191,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       controller.changeStatus(sectionName, 'Section Manager');
     } else {
       // truong hop leader
-      controller.changeStatus(sectionName, 'Chief');
+      controller.changeStatus(sectionName, 'Chief,Expert');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -266,7 +269,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           // Send button
           GestureDetector(
             onTap: () async {
-              if (selectedConfirmer.value == null) {
+              if (selectedConfirmer.value == null &&
+                  authState.user!.chRGroup.toString() != "Chief") {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(tr('pleasecomfirm')),
@@ -287,6 +291,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   // truong hop PTHC phong ban
 
                   await controllerTwo.changeStatus('PTHC', sectionName, null);
+                } else if (authState.user!.chRGroup.toString() == "Chief") {
+                  await controllerTwo.changeStatus(
+                    '5',
+                    sectionName,
+                    authState.user!.chRUserid.toString(),
+                  );
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
@@ -1351,6 +1361,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   // truong hop PTHC phong ban
 
                   await controller.changeStatus('PTHC', sectionName, null);
+                } else if (group == "Chief") {
+                  await controller.changeStatus(
+                    '5',
+                    sectionName,
+                    adid.toString(),
+                  );
                 } else {
                   // truong hop leader
                   await controller.changeStatus('4', sectionName, adid);
@@ -1594,6 +1610,11 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRLyThuyet ?? 'OK',
+              );
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1685,6 +1706,11 @@ class MyData extends DataTableSource {
             // Hiển thị trống nếu IntStatus = 3
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
+            }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRThucHanh ?? 'OK',
+              );
             }
             Visibility(
               visible: false,
@@ -1778,6 +1804,11 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRCompleteWork ?? 'OK',
+              );
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -1869,6 +1900,11 @@ class MyData extends DataTableSource {
             // Hiển thị trống nếu IntStatus = 3
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
+            }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRLearnWork ?? 'OK',
+              );
             }
             Visibility(
               visible: false,
@@ -1962,6 +1998,11 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRThichNghi ?? 'OK',
+              );
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -2053,6 +2094,11 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRUseful ?? 'OK',
+              );
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -2143,6 +2189,11 @@ class MyData extends DataTableSource {
             // Hiển thị trống nếu IntStatus = 3
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
+            }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRContact ?? 'OK',
+              );
             }
             Visibility(
               visible: false,
@@ -2236,6 +2287,11 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vcHNeedViolation ?? 'OK',
+              );
+            }
             Visibility(
               visible: false,
               child: Text(controller.filterdataList[index].toString()),
@@ -2327,6 +2383,11 @@ class MyData extends DataTableSource {
             // Hiển thị trống nếu IntStatus = 3
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
+            }
+            if (intStatus == 5) {
+              return _getDanhGiaView(
+                controller.filterdataList[index].vchRReasultsLeader ?? 'OK',
+              );
             }
             Visibility(
               visible: false,
@@ -2441,161 +2502,347 @@ class MyData extends DataTableSource {
         ),
         // Truong hop tuyen dung lai hay khong
         DataCell(
-          (data.inTStatusId ?? 0) == 3
-              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
-              : Obx(() {
-                  Visibility(
-                    visible: false,
-                    child: Text(controller.filterdataList[index].toString()),
-                  );
-                  final rawStatus =
-                      controller.filterdataList[index].biTNoReEmployment ??
-                      true;
-                  final status = rawStatus ? 'OK' : 'NG';
-                  return DropdownButton<String>(
-                    value: status,
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        controller.updateRehireStatus(
-                          data.vchREmployeeId.toString(),
-                          newValue == 'OK',
-                        );
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        value: 'OK',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                              size: 16,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'O',
-                              style: TextStyle(
-                                fontSize: Common.sizeColumn,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
+          Builder(
+            builder: (_) {
+              final intStatus = data.inTStatusId ?? 0;
+              if (intStatus == 3) {
+                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+              }
+              // Chỉ wrap phần thật sự phụ thuộc vào observable bằng Obx
+              return Obx(() {
+                final list = controller.filterdataList; // observable read
+                if (index >= list.length) {
+                  return const SizedBox.shrink();
+                }
+                final raw = list[index].biTNoReEmployment ?? true;
+                if (intStatus == 5) {
+                  return Row(
+                    children: [
+                      Icon(
+                        raw ? Icons.check_circle : Icons.cancel,
+                        color: raw ? Colors.green : Colors.red,
+                        size: 16,
                       ),
-                      DropdownMenuItem(
-                        value: 'NG',
-                        child: Row(
-                          children: [
-                            Icon(Icons.cancel, color: Colors.red, size: 16),
-                            SizedBox(width: 4),
-                            Text(
-                              'X',
-                              style: TextStyle(
-                                fontSize: Common.sizeColumn,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(width: 4),
+                      Text(
+                        raw ? 'O' : 'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: raw ? Colors.green : Colors.red,
                         ),
                       ),
                     ],
                   );
-                }),
-        ),
-        // Lý do không tuyển lại
-        DataCell(
-          (data.inTStatusId ?? 0) == 3
-              ? Text('', style: TextStyle(fontSize: Common.sizeColumn))
-              : Focus(
-                  onFocusChange: (hasFocus) {
-                    if (!hasFocus) {
-                      // Chỉ update khi mất focus
-                      controller.updateNotRehireReason(
+                }
+                return DropdownButton<String>(
+                  value: raw ? 'OK' : 'NG',
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      controller.updateRehireStatus(
                         data.vchREmployeeId.toString(),
-                        reasonController.text,
+                        newValue == 'OK',
                       );
                     }
                   },
-                  child: TextFormField(
-                    controller: reasonController,
-                    style: TextStyle(fontSize: Common.sizeColumn),
-                    decoration: InputDecoration(
-                      labelText: tr('reason'),
-                      labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  items: [
+                    DropdownMenuItem(
+                      value: 'OK',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'O',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    DropdownMenuItem(
+                      value: 'NG',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.cancel, color: Colors.red, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            'X',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              });
+            },
+          ),
+        ),
+        // Lý do không tuyển lại
+        DataCell(
+          (() {
+            final intStatus = data.inTStatusId ?? 0;
+            if (intStatus == 3) {
+              return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+            }
+            if (intStatus == 5) {
+              // Read-only hiển thị lý do không tuyển lại
+              return Text(
+                reasonController.text,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              );
+            }
+            return Focus(
+              onFocusChange: (hasFocus) {
+                if (!hasFocus) {
+                  controller.updateNotRehireReason(
+                    data.vchREmployeeId.toString(),
+                    reasonController.text,
+                  );
+                }
+              },
+              child: TextFormField(
+                controller: reasonController,
+                style: TextStyle(fontSize: Common.sizeColumn),
+                decoration: InputDecoration(
+                  labelText: tr('reason'),
+                  labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+              ),
+            );
+          })(),
         ),
 
         /// phần từ chối phê duyệt
         // thuộc tính approver
-        DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus = [
-              data.nvchRNoReEmpoyment,
-              data.nvchRApproverChief,
-              data.nvchRApproverManager,
-              data.nvchRApproverDirector,
-            ].firstWhere((e) => e != null && e != '', orElse: () => '');
-            if (rawStatus == '') {
-              return Text('', style: TextStyle(fontSize: Common.sizeColumn));
-            } else {
-              return Row(
-                children: [
-                  Icon(Icons.cancel, color: Colors.red, size: 16),
-                  SizedBox(width: 4),
-                  Text(
-                    'X',
-                    style: TextStyle(
-                      fontSize: Common.sizeColumn,
-                      color: Colors.red,
+        if (data.inTStatusId == 5)
+          DataCell(
+            Obx(() {
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
+              );
+              final rawStatus = () {
+                if (controller.filterdataList.length > index) {
+                  return switch (data.inTStatusId) {
+                    5 =>
+                      controller.filterdataList[index].biTApproverChief ?? true,
+                    _ => true,
+                  };
+                }
+                return true;
+              }();
+              final status = rawStatus ? 'OK' : 'NG';
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateRehireStatusApprovel(
+                      data.vchREmployeeId.toString(),
+                      newValue == 'OK',
+                      data.inTStatusId,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'O',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'X',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               );
-            }
-          }),
-        ),
-        DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // // Chỉ update khi mất focus
-                // controller.updateNoteApprovel(
-                //   data.vchREmployeeId.toString(),
-                //   reasonController.text,
-                // );
+            }),
+          )
+        else
+          DataCell(
+            Obx(() {
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
+              );
+              final rawStatus = [
+                data.nvchRNoReEmpoyment,
+                data.nvchRApproverChief,
+                data.nvchRApproverManager,
+                data.nvchrApproverDeft,
+                data.nvchRApproverDirector,
+              ].firstWhere((e) => e != null && e != '', orElse: () => '');
+              if (rawStatus == '') {
+                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+              } else {
+                return Row(
+                  children: [
+                    Icon(Icons.cancel, color: Colors.red, size: 16),
+                    SizedBox(width: 4),
+                    Text(
+                      'X',
+                      style: TextStyle(
+                        fontSize: Common.sizeColumn,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                );
               }
-            },
-            child: TextFormField(
-              controller: returnController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+            }),
+          ),
+        // ly do tu choi phe duyet
+        if (data.inTStatusId == 5)
+          DataCell(
+            Focus(
+              onFocusChange: (hasFocus) {
+                if (!hasFocus) {
+                  // Chỉ update khi mất focus
+                  controller.updateNotRehireReasonApprovel(
+                    data.vchREmployeeId.toString(),
+                    returnController.text,
+                    data.inTStatusId,
+                  );
+                }
+              },
+              child: TextFormField(
+                controller: returnController,
+                style: TextStyle(fontSize: Common.sizeColumn),
+                decoration: InputDecoration(
+                  labelText: tr('reason'),
+                  labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-              // onChanged: (value) {
-              //   controller.updateNoteApprovel(
-              //     data.vchREmployeeId.toString(),
-              //     value,
-              //   );
-              // },
+            ),
+          )
+        else
+          DataCell(
+            Focus(
+              onFocusChange: (hasFocus) {
+                if (!hasFocus) {
+                  // // Chỉ update khi mất focus
+                  // controller.updateNoteApprovel(
+                  //   data.vchREmployeeId.toString(),
+                  //   reasonController.text,
+                  // );
+                }
+              },
+              child: TextFormField(
+                controller: returnController,
+                style: TextStyle(fontSize: Common.sizeColumn),
+                decoration: InputDecoration(
+                  labelText: tr('reason'),
+                  labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                // onChanged: (value) {
+                //   controller.updateNoteApprovel(
+                //     data.vchREmployeeId.toString(),
+                //     value,
+                //   );
+                // },
+              ),
             ),
           ),
-        ),
       ],
     );
+  }
+
+  Widget _getDanhGiaView(String? status) {
+    switch (status) {
+      case 'OK':
+        return Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'OK',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        );
+      case 'NG':
+        return Row(
+          children: [
+            Icon(Icons.cancel, color: Colors.red, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'NG',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.red),
+            ),
+          ],
+        );
+      case 'Stop Working':
+        return Row(
+          children: [
+            Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Stop Working',
+              style: TextStyle(
+                fontSize: Common.sizeColumn,
+                color: Colors.orange,
+              ),
+            ),
+          ],
+        );
+      case 'Finish L/C':
+        return Row(
+          children: [
+            Icon(Icons.done_all, color: Colors.blue, size: 16),
+            SizedBox(width: 4),
+            Text(
+              'Finish L/C',
+              style: TextStyle(fontSize: Common.sizeColumn, color: Colors.blue),
+            ),
+          ],
+        );
+      default:
+        return Row();
+    }
   }
 
   Widget _getHienTrangColor(int? IntStatus) {
@@ -2651,7 +2898,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.deepPurple[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+          child: Text(
+            'Chief',
+            style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+          ),
         );
       case 6:
         return Container(
@@ -2888,6 +3138,13 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           'PTHC',
                           sectionName,
                           null,
+                        );
+                      } else if (authState.user!.chRGroup.toString() ==
+                          "Chief") {
+                        await controller.changeStatus(
+                          '5',
+                          sectionName,
+                          authState.user!.chRUserid.toString(),
                         );
                       } else {
                         // truong hop leader

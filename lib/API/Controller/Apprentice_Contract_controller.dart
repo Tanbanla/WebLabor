@@ -322,7 +322,7 @@ class DashboardControllerApprentice extends GetxController {
         else if (statusId == 'PTHC')
           {
             "field": "INT_STATUS_ID",
-            "value": ["3", "4","5"],
+            "value": ["3", "4", "5"],
             "operator": "IN",
             "logicType": "AND",
           }
@@ -497,6 +497,8 @@ class DashboardControllerApprentice extends GetxController {
         contract.inTStatusId = 1;
       } else if (contract.inTStatusId == 4) {
         contract.inTStatusId = 3;
+      } else if (contract.inTStatusId == 5) {
+        contract.inTStatusId = 4;
       }
       if (notApproval.isNotEmpty) {
         final specialSection = pthcList.firstWhere(
@@ -692,7 +694,7 @@ class DashboardControllerApprentice extends GetxController {
       }
 
       for (int i = 0; i < contract.length; i++) {
-        if ((contract[i].nvchRApproverChief?.isNotEmpty ?? false) ||
+        if ((contract[i].nvchrApproverDeft?.isNotEmpty ?? false) ||
             (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
           // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
           final originalIndex = originalList.indexWhere(
@@ -714,21 +716,19 @@ class DashboardControllerApprentice extends GetxController {
         }
         contract[i].vchRUserUpdate = userUpdate;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
-        contract[i].biTApproverChief = true;
-        contract[i].biTApproverSectionManager = true;
         // cập nhật lại các lý do từ chối
-        contract[i].nvchRApproverChief = '';
         contract[i].nvchRApproverManager = '';
-        contract[i].nvchRApproverDirector = '';
-        contract[i].biTApproverChief = true;
+        contract[i].nvchrApproverDeft = '';
         contract[i].biTApproverSectionManager = true;
-        contract[i].biTApproverDirector = true;
+        contract[i].bitApproverDeft = true;
         switch (contract[i].inTStatusId) {
           case 3:
             contract[i].inTStatusId = 4;
             contract[i].nvchRPthcSection = userUpdate;
             contract[i].vchRLeaderEvalution = userApprover;
             contract[i].biTNoReEmployment = true;
+            contract[i].biTApproverChief = true;
+            contract[i].nvchRApproverChief = '';
           case 4:
             if (contract[i].vchRReasultsLeader != 'OK' &&
                 (contract[i].vchRLyThuyet == 'OK' &&
@@ -756,10 +756,26 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].vchRLeaderEvalution = userUpdate;
             contract[i].useRApproverChief = userApprover;
             contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+            contract[i].biTApproverChief = true;
+            contract[i].nvchRApproverChief = '';
           case 5:
-            contract[i].inTStatusId = 6;
-            contract[i].useRApproverSectionManager = userApprover;
-            contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            if (contract[i].biTApproverChief != true &&
+                (contract[i].nvchRApproverChief == null ||
+                    contract[i].nvchRApproverChief == "")) {
+              throw Exception(
+                '${tr('TuChoiPheDuyet')} ${contract[i].vchREmployeeId}',
+              );
+            }
+            if(contract[i].biTApproverChief == false && contract[i].nvchRApproverChief != ""){
+              contract[i].inTStatusId = 4;
+              contract[i].useRApproverChief = userUpdate;
+              contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            }else{
+              contract[i].inTStatusId = 6;
+              contract[i].useRApproverChief = userUpdate;
+              contract[i].useRApproverSectionManager = userApprover;
+              contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+            }
         }
       }
       isLoading(true);
@@ -900,8 +916,6 @@ class DashboardControllerApprentice extends GetxController {
             }
           case 7:
             //xu ly khi xong
-            //mailSend = "k";
-            //
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
             if (contract[i].biTApproverSectionManager == true) {
@@ -1154,8 +1168,7 @@ class DashboardControllerApprentice extends GetxController {
           ..dtmApproverDeft
           ..userApproverDeft
           ..bitApproverDeft
-          ..nvchrApproverDeft
-          ;
+          ..nvchrApproverDeft;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||
@@ -1300,8 +1313,7 @@ class DashboardControllerApprentice extends GetxController {
           ..dtmApproverDeft
           ..userApproverDeft
           ..bitApproverDeft
-          ..nvchrApproverDeft
-          ;
+          ..nvchrApproverDeft;
         // Validate required fields
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||
@@ -1646,7 +1658,7 @@ class DashboardControllerApprentice extends GetxController {
         item.biTApproverChief = value;
         break;
       case 6:
-        item.biTApproverSectionManager= value;
+        item.biTApproverSectionManager = value;
         break;
       case 7:
         item.bitApproverDeft = value;

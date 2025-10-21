@@ -991,7 +991,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     'Y',
                     item.biTNoReEmployment == null
                         ? ""
-                        : (item.biTNoReEmployment ? "" : "X"),
+                        : (item.biTNoReEmployment == true ? "" : "X"),
                   );
                   setCellValue('Z', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('AA', item.vchRUserCreate ?? '');
@@ -1451,7 +1451,7 @@ class MyData extends DataTableSource {
             //   }
             //   return true;
             // }();
-            final status = rawStatus ? 'OK' : 'NG';
+            final status = rawStatus == true ? 'OK' : 'NG';
             return DropdownButton<String>(
               value: status,
               onChanged: (newValue) {

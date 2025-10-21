@@ -22,7 +22,7 @@ class TwoContract {
   String? nvchRUseful;
   String? nvchROther;
   String? vchRReasultsLeader;
-  dynamic biTNoReEmployment;
+  bool? biTNoReEmployment;
   dynamic nvchRNoReEmpoyment;
   dynamic nvchRPthcSection;
   dynamic vchRLeaderEvalution;

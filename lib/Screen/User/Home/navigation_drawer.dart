@@ -5,14 +5,12 @@ import 'package:flutter/services.dart'
 // Conditional import: real implementation on web, stub elsewhere
 import 'package:web_labor_contract/util/download_manual_stub.dart'
     if (dart.library.html) 'package:web_labor_contract/util/download_manual_web.dart';
-import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
-import 'package:get/get.dart';
 // Removed kIsWeb and html imports after router refactor
 import 'package:go_router/go_router.dart';
 import '../../../router.dart';
@@ -23,10 +21,7 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    Get.put(
-      DashboardControllerPTHC(),
-    ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
+    //final authState = Provider.of<AuthState>(context, listen: true);
     return ValueListenableBuilder<Locale>(
       valueListenable: LanguageNotifier.notifier,
       builder: (context, locale, _) {

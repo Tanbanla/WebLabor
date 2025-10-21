@@ -50,6 +50,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         .trim();
     controller.refreshSearch();
     controller.fetchPTHCData();
+    Get.put(
+      DashboardControllerPTHC(),
+    ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
     // phan xem ai dang vao man so sanh
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Per" ||
@@ -71,8 +74,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         // truong hop khác
         controller.changeStatus('PTHC', null, null);
       }
-    } else if (authState.user!.chRGroup.toString() == "Chief" ||
-        authState.user!.chRGroup.toString() == "Staff") {
+    } else if (authState.user!.chRGroup.toString() == "Chief") {
       controller.changeStatus(
         '5',
         sectionName,
@@ -186,12 +188,11 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           'Leader,Supervisor,Staff,Section Manager,Expert,Chief',
         );
       }
-    } else if (authState.user!.chRGroup.toString() == "Chief" ||
-        authState.user!.chRGroup.toString() == "Staff") {
+    } else if (authState.user!.chRGroup.toString() == "Chief") {
       controller.changeStatus(sectionName, 'Section Manager');
     } else {
       // truong hop leader
-      controller.changeStatus(sectionName, 'Chief');
+      controller.changeStatus(sectionName, 'Chief,Expert');
     }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
@@ -269,7 +270,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           // Send button
           GestureDetector(
             onTap: () async {
-              if (selectedConfirmer.value == null) {
+              if (selectedConfirmer.value == null && authState.user!.chRGroup.toString() != "Chief") {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(tr('pleasecomfirm')),
@@ -289,8 +290,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   await controllerTwo.changeStatus('PTHC', sectionName, null);
-                } else if (authState.user!.chRGroup.toString() == "Chief" ||
-                    authState.user!.chRGroup.toString() == "Staff") {
+                } else if (authState.user!.chRGroup.toString() == "Chief") {
                   await controllerTwo.changeStatus(
                     '5',
                     sectionName,
@@ -1191,7 +1191,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     'W',
                     item.biTNoReEmployment == null
                         ? ""
-                        : (item.biTNoReEmployment ? "" : "X"),
+                        : (item.biTNoReEmployment == true ? "" : "X"),
                   );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
@@ -1337,7 +1337,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
                   await controller.changeStatus('PTHC', sectionName, null);
-                } else if (group == "Chief" || group == "Staff") {
+                } else if (group == "Chief") {
                   await controller.changeStatus('5', sectionName, adid);
                 } else {
                   // truong hop leader
@@ -1462,7 +1462,8 @@ class MyData extends DataTableSource {
       ].firstWhere((e) => e != null && e != '', orElse: () => ''),
     );
     //
-    final bool isReturn = (!data.biTNoReEmployment && data.inTStatusId == 3);
+    final bool isReturn =
+        (data.biTNoReEmployment == null && data.inTStatusId == 3);
     TextStyle cellCenterStyle() => TextStyle(
       fontSize: Common.sizeColumn,
       color: isReturn ? Colors.red[900] : null,
@@ -1631,8 +1632,8 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
-            if(intStatus == 5){
-              return  _getDanhGiaView(
+            if (intStatus == 5) {
+              return _getDanhGiaView(
                 controller.filterdataList[index].nvchRCompleteWork ?? 'OK',
               );
             }
@@ -1728,8 +1729,8 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
-            if(intStatus == 5){
-              return  _getDanhGiaView(
+            if (intStatus == 5) {
+              return _getDanhGiaView(
                 controller.filterdataList[index].nvchRUseful ?? 'OK',
               );
             }
@@ -1825,8 +1826,8 @@ class MyData extends DataTableSource {
             if (intStatus == 3) {
               return Text(''); // hoặc SizedBox.shrink()
             }
-            if(intStatus == 5){
-              return  _getDanhGiaView(
+            if (intStatus == 5) {
+              return _getDanhGiaView(
                 controller.filterdataList[index].nvchROther ?? 'OK',
               );
             }
@@ -1957,7 +1958,8 @@ class MyData extends DataTableSource {
         DataCell(
           Obx(() {
             final intStatus = data.inTStatusId ?? 0;
-            final status = controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
+            final status =
+                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
             if (intStatus == 3) {
               return Text('', style: TextStyle(fontSize: Common.sizeColumn));
             }
@@ -2050,83 +2052,90 @@ class MyData extends DataTableSource {
         ),
         // Truong hop tuyen dung lai hay khong
         DataCell(
-          Obx(() {
-            final intStatus = data.inTStatusId ?? 0;
-            if (intStatus == 3) {
-              return Text('', style: TextStyle(fontSize: Common.sizeColumn));
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus = controller.filterdataList[index].biTNoReEmployment ?? true;
-            final status = rawStatus ? 'OK' : 'NG';
-            if (intStatus == 5) {
-              // Read-only hiển thị icon + ký hiệu
-              return Row(
-                children: [
-                  Icon(
-                    rawStatus ? Icons.check_circle : Icons.cancel,
-                    color: rawStatus ? Colors.green : Colors.red,
-                    size: 16,
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    rawStatus ? 'O' : 'X',
-                    style: TextStyle(
-                      fontSize: Common.sizeColumn,
-                      color: rawStatus ? Colors.green : Colors.red,
-                    ),
-                  ),
-                ],
-              );
-            }
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatus(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
+          Builder(
+            builder: (_) {
+              final intStatus = data.inTStatusId ?? 0;
+              if (intStatus == 3) {
+                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+              }
+              // Chỉ wrap phần thật sự phụ thuộc vào observable bằng Obx
+              return Obx(() {
+                final list = controller.filterdataList; // observable read
+                if (index >= list.length) {
+                  return const SizedBox.shrink();
+                }
+                final raw = list[index].biTNoReEmployment ?? true;
+                if (intStatus == 5) {
+                  return Row(
+                    children: [
+                      Icon(
+                        raw ? Icons.check_circle : Icons.cancel,
+                        color: raw ? Colors.green : Colors.red,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        raw ? 'O' : 'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: raw ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
                   );
                 }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
-                        ),
+                return DropdownButton<String>(
+                  value: raw ? 'OK' : 'NG',
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      controller.updateRehireStatus(
+                        data.vchREmployeeId.toString(),
+                        newValue == 'OK',
+                      );
+                    }
+                  },
+                  items: [
+                    DropdownMenuItem(
+                      value: 'OK',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'O',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
-                        ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'NG',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.cancel, color: Colors.red, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            'X',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+                    ),
+                  ],
+                );
+              });
+            },
+          ),
         ),
         // Lý do không tuyển lại
         DataCell(
@@ -2167,7 +2176,7 @@ class MyData extends DataTableSource {
         ),
 
         // thuộc tính approver
-        if (data.inTStatusId == 5) 
+        if (data.inTStatusId == 5)
           DataCell(
             Obx(() {
               Visibility(
@@ -2267,7 +2276,7 @@ class MyData extends DataTableSource {
             }),
           ),
 
-        // ly do tu choi phe duyet  
+        // ly do tu choi phe duyet
         if (data.inTStatusId == 5)
           DataCell(
             Focus(
@@ -2276,13 +2285,13 @@ class MyData extends DataTableSource {
                   // Chỉ update khi mất focus
                   controller.updateNotRehireReasonApprovel(
                     data.vchREmployeeId.toString(),
-                    reasonController.text,
+                    returnController.text,
                     data.inTStatusId,
                   );
                 }
               },
               child: TextFormField(
-                controller: reasonController,
+                controller: returnController,
                 style: TextStyle(fontSize: Common.sizeColumn),
                 decoration: InputDecoration(
                   labelText: tr('reason'),
@@ -2328,6 +2337,7 @@ class MyData extends DataTableSource {
       ],
     );
   }
+
   Widget _getDanhGiaView(String? status) {
     switch (status) {
       case 'OK':
@@ -2384,6 +2394,7 @@ class MyData extends DataTableSource {
         return Row();
     }
   }
+
   Widget _getHienTrangColor(int? IntStatus) {
     switch (IntStatus) {
       case 1:
@@ -2437,7 +2448,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.deepPurple[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+          child: Text(
+            'Chief',
+            style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+          ),
         );
       case 6:
         return Container(
@@ -2692,8 +2706,7 @@ class _ReturnTwoContract extends StatelessWidget {
                           null,
                         );
                       } else if (authState.user!.chRGroup.toString() ==
-                              "Chief" ||
-                          authState.user!.chRGroup.toString() == "Staff") {
+                          "Chief") {
                         await controller.changeStatus(
                           '5',
                           sectionName,

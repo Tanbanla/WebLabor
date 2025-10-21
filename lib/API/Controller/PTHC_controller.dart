@@ -449,7 +449,8 @@ class DashboardControllerPTHC extends GetxController {
       isLoading(false);
     }
   }
-    // lay thong tin PTHC
+
+  // lay thong tin PTHC
   Future<void> fetchPTHCSectionList(String manv) async {
     try {
       isLoading(true);
@@ -463,9 +464,20 @@ class DashboardControllerPTHC extends GetxController {
         if (jsonData['success'] == true) {
           // Sửa chỗ này - cần chuyển đổi dữ liệu từ API thành List<String>
           final List<dynamic> data = jsonData['data'];
-          listPTHCsection.assignAll(
-            data.map((item) => item.toString()).toList(),
-          );
+          // Dữ liệu dạng: '2100 : PR1-PR1', '2200 : PR2-PR2', '2310-1 : R&D-PE'
+          // Yêu cầu: chỉ lấy phần tên sau dấu ':' => 'PR1-PR1','PR2-PR2','R&D-PE'
+          final sections = data
+              .map((item) => item.toString())
+              .map((raw) {
+                final parts = raw.split(':');
+                if (parts.length >= 2) {
+                  return parts.sublist(1).join(':').trim();
+                }
+                return raw.trim();
+              })
+              .where((e) => e.isNotEmpty)
+              .toList();
+          listPTHCsection.assignAll(sections);
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to load data');
         }

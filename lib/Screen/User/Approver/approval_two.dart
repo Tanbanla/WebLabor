@@ -924,7 +924,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     'W',
                     item.biTNoReEmployment == null
                         ? ""
-                        : (item.biTNoReEmployment ? "" : "X"),
+                        : (item.biTNoReEmployment == true ? "" : "X"),
                   );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                   setCellValue('Y', item.vchRLeaderEvalution ?? '');
@@ -1168,12 +1168,11 @@ class MyData extends DataTableSource {
     final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
-        6 => data.nvchRApproverChief ?? '',
-        7 => data.nvchRApproverManager ?? '',
+        6 => data.nvchRApproverManager ?? '',
+        7 => data.nvchrApproverDeft ?? '',
         8 => data.nvchRApproverDirector ?? '',
         _ => '', // Giá trị mặc định cho các trường hợp khác
       },
-      //text: (''),
     );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
@@ -1451,12 +1450,11 @@ class MyData extends DataTableSource {
               if (controller.filterdataList.length > index) {
                 return switch (data.inTStatusId) {
                   6 =>
-                    controller.filterdataList[index].biTApproverSectionManager ?? true,
-                  7 =>
                     controller
                             .filterdataList[index]
-                            .bitApproverDeft ??
+                            .biTApproverSectionManager ??
                         true,
+                  7 => controller.filterdataList[index].bitApproverDeft ?? true,
                   8 =>
                     controller.filterdataList[index].biTApproverDirector ??
                         true,
@@ -1655,7 +1653,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.deepPurple[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+          child: Text(
+            'Chief',
+            style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+          ),
         );
       case 6:
         return Container(

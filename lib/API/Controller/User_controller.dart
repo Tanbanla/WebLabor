@@ -530,14 +530,7 @@ class DashboardControllerUser extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          // final List<dynamic> data = jsonData['data'];
-          // userList.assignAll(data.map((user) => User.fromJson(user)).toList());
-          // filteredUserList.assignAll(userList);
-          // selectRows.assignAll(
-          //   List.generate(userList.length, (index) => false),
-          // );
-        }
+        if (jsonData['success'] == true) {}
       } else {
         throw Exception('Failed to load users');
       }
@@ -582,14 +575,7 @@ class DashboardControllerUser extends GetxController {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          // final List<dynamic> data = jsonData['data'];
-          // userList.assignAll(data.map((user) => User.fromJson(user)).toList());
-          // filteredUserList.assignAll(userList);
-          // selectRows.assignAll(
-          //   List.generate(userList.length, (index) => false),
-          // );
-        }
+        if (jsonData['success'] == true) {}
       } else {
         throw Exception('Failed to load users');
       }

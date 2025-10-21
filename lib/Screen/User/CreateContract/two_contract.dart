@@ -1136,7 +1136,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                     'W',
                     item.biTNoReEmployment == null
                         ? ""
-                        : (item.biTNoReEmployment ? "" : "X"),
+                        : (item.biTNoReEmployment == true ? "" : "X"),
                   );
                   setCellValue('X', item.nvchRNoReEmpoyment ?? '');
                 }
