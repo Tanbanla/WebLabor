@@ -266,30 +266,59 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // lay du lieu
-  Future<void> fetchDummyData() async {
+  Future<void> fetchDummyData(String? section) async {
     try {
       isLoading(true);
-      final response = await http.get(
-        Uri.parse(Common.API + Common.TwoGetAll),
-        headers: {'Content-Type': 'application/json'},
-      );
+      http.Response response;
+      if (section == null || section.trim().isEmpty) {
+        // Lấy toàn bộ danh sách (không lọc theo section)
+        response = await http.get(
+          Uri.parse(Common.API + Common.TwoGetAll),
+          headers: {'Content-Type': 'application/json'},
+        );
+      } else {
+        // Lọc theo section thông qua search API
+        final filters = [
+          {
+            "field": "VCHR_CODE_SECTION",
+            "value": section.trim(),
+            "operator": "LIKE",
+            "logicType": "AND",
+          },
+        ];
+        final requestBody = {
+          "pageNumber": -1,
+          "pageSize": 10,
+          "filters": filters,
+        };
+        response = await http.post(
+          Uri.parse(Common.API + Common.TwoSreachBy),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(requestBody),
+        );
+      }
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          final List<dynamic> data = jsonData['data'];
-          dataList.assignAll(
-            data
-                .map((twocontract) => TwoContract.fromJson(twocontract))
-                .toList(),
-          );
+          // Một số API trả trực tiếp List, một số có dạng { data: { data: [...] }}
+          final dynamic raw = jsonData['data'];
+          List<dynamic> data;
+          if (raw is Map && raw.containsKey('data')) {
+            data = raw['data'] ?? [];
+          } else if (raw is List) {
+            data = raw;
+          } else {
+            data = [];
+          }
+          dataList.assignAll(data.map((e) => TwoContract.fromJson(e)).toList());
           filterdataList.assignAll(dataList);
-          selectRows.assignAll(
-            List.generate(dataList.length, (index) => false),
-          );
+          selectRows.assignAll(List.generate(dataList.length, (_) => false));
+        } else {
+          throw Exception(jsonData['message'] ?? 'Failed to load data');
         }
       } else {
-        throw Exception('Failed to load Two contract');
+        throw Exception('Failed to load data (status ${response.statusCode})');
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch data: $e');

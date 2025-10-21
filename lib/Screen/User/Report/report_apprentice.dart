@@ -3,6 +3,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -30,6 +31,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
+  final DashboardControllerPTHC controllerPTHC = Get.put(
+    DashboardControllerPTHC(),
+  );
   final ScrollController _scrollController = ScrollController();
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -42,12 +46,31 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     // Load initial data once
     controller.refreshSearch();
     controller.fetchSectionList();
-    controller.fetchDummyData();
   }
+
   @override
   Widget build(BuildContext context) {
-    // controller.fetchSectionList();
-    // controller.fetchDummyData();
+    final authState = Provider.of<AuthState>(context, listen: true);
+    controllerPTHC.fetchPTHCSectionList(
+      authState.user!.chREmployeeId.toString(),
+    );
+    String sectionName = '';
+    if (authState.user!.chRGroup.toString() == "PTHC") {
+      sectionName = '';
+      if (controllerPTHC.listPTHCsection.isNotEmpty) {
+        sectionName =
+            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+      } else {
+        sectionName = authState.user!.chRSecCode
+            .toString()
+            .split(':')[1]
+            .trim();
+      }
+      // truong hop PTHC phong ban
+      controller.fetchDummyData(sectionName);
+    } else {
+      controller.fetchDummyData(null);
+    }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -389,6 +412,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   }
 
   Widget _buildDataTable() {
+    final authState = Provider.of<AuthState>(context, listen: true);
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -460,11 +484,12 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                                 fontSize: Common.sizeColumn,
                               ).toDataColumn2(),
                               // DataColumn2
-                              DataColumnCustom(
-                                title: tr('action'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
+                              if (authState.user?.chRGroup != 'PTHC')
+                                DataColumnCustom(
+                                  title: tr('action'),
+                                  width: 100,
+                                  fontSize: Common.sizeColumn,
+                                ).toDataColumn2(),
                               DataColumnCustom(
                                 title: tr('Hientrang'),
                                 width: 130,
@@ -1213,73 +1238,75 @@ class MyData extends DataTableSource {
           ),
         ),
         // Action
-        DataCell(
-          Center(
-            child: Row(
-              children: [
-                _buildActionButton(
-                  icon: Iconsax.edit_2,
-                  color: Colors.blue,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => _EditContractDialog(contract: data),
-                    );
-                  },
-                ),
-                SizedBox(width: 3),
-                _buildActionButton(
-                  icon: Iconsax.clock,
-                  color: Colors.orangeAccent,
-                  onPressed: () {
-                    if (data.dtMDueDate != null) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => _UpdateDtmDue(contract: data),
-                      );
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DialogNotification(
-                          message: tr('TimeDueError'),
-                          title: tr('Loi'),
-                          color: Colors.red,
-                          icon: Icons.error,
-                        ),
-                      );
-                    }
-                  },
-                ),
-                SizedBox(width: 3),
-                if (authState.user?.chRGroup == 'Admin' ||
-                    authState.user?.chRGroup == 'Chief Per')
+        if (authState.user?.chRGroup != 'PTHC')
+          DataCell(
+            Center(
+              child: Row(
+                children: [
                   _buildActionButton(
-                    icon: Iconsax.ram,
-                    color: Colors.brown,
+                    icon: Iconsax.edit_2,
+                    color: Colors.blue,
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) => _UpdateKetQua(contract: data),
+                        builder: (context) =>
+                            _EditContractDialog(contract: data),
                       );
                     },
                   ),
-                const SizedBox(width: 3),
-                if (authState.user?.chRGroup == 'Admin' ||
-                    authState.user?.chRGroup == 'Chief Per')
+                  SizedBox(width: 3),
                   _buildActionButton(
-                    icon: Iconsax.back_square,
-                    color: Colors.red,
+                    icon: Iconsax.clock,
+                    color: Colors.orangeAccent,
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => _ReturnContract(contract: data),
-                      );
+                      if (data.dtMDueDate != null) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _UpdateDtmDue(contract: data),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DialogNotification(
+                            message: tr('TimeDueError'),
+                            title: tr('Loi'),
+                            color: Colors.red,
+                            icon: Icons.error,
+                          ),
+                        );
+                      }
                     },
                   ),
-              ],
+                  SizedBox(width: 3),
+                  if (authState.user?.chRGroup == 'Admin' ||
+                      authState.user?.chRGroup == 'Chief Per')
+                    _buildActionButton(
+                      icon: Iconsax.ram,
+                      color: Colors.brown,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _UpdateKetQua(contract: data),
+                        );
+                      },
+                    ),
+                  const SizedBox(width: 3),
+                  if (authState.user?.chRGroup == 'Admin' ||
+                      authState.user?.chRGroup == 'Chief Per')
+                    _buildActionButton(
+                      icon: Iconsax.back_square,
+                      color: Colors.red,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _ReturnContract(contract: data),
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
@@ -1636,7 +1663,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.deepPurple[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+          child: Text(
+            'Chief',
+            style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+          ),
         );
       case 6:
         return Container(
@@ -1724,6 +1754,7 @@ class MyData extends DataTableSource {
 class _EditContractDialog extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
+  final DashboardControllerPTHC controllerPTHC = Get.find();
 
   _EditContractDialog({required this.contract});
 
@@ -2138,7 +2169,23 @@ class _EditContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      controller.fetchDummyData();
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        controller.fetchDummyData(null);
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
@@ -2222,6 +2269,7 @@ class _EditContractDialog extends StatelessWidget {
 class _UpdateDtmDue extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
+  final DashboardControllerPTHC controllerPTHC = Get.find();
 
   _UpdateDtmDue({required this.contract});
 
@@ -2352,9 +2400,24 @@ class _UpdateDtmDue extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                       );
 
-                      // Refresh dữ liệu
-                      await controller.fetchDummyData();
-
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        await controller.fetchDummyData(null);
+                      }
+                      // await controller.fetchDummyData();
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -2465,6 +2528,7 @@ class _UpdateDtmDue extends StatelessWidget {
 class _UpdateKetQua extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
+  final DashboardControllerPTHC controllerPTHC = Get.find();
 
   _UpdateKetQua({required this.contract});
 
@@ -2691,8 +2755,22 @@ class _UpdateKetQua extends StatelessWidget {
                       );
 
                       // Refresh dữ liệu
-                      await controller.fetchDummyData();
-
+                      String sectionName = '';
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        await controller.fetchDummyData(null);
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -2772,7 +2850,7 @@ class _UpdateKetQua extends StatelessWidget {
 class _ReturnContract extends StatelessWidget {
   final ApprenticeContract contract;
   final DashboardControllerApprentice controller = Get.find();
-
+  final DashboardControllerPTHC controllerPTHC = Get.find();
   _ReturnContract({required this.contract});
 
   @override
@@ -2913,8 +2991,23 @@ class _ReturnContract extends StatelessWidget {
                         "Trả về từ báo cáo của nhân sự",
                       );
                       // Refresh dữ liệu
-                      await controller.fetchDummyData();
-
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        await controller.fetchDummyData(null);
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công

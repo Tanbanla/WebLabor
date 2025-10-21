@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart'
     show rootBundle; // For loading asset bytes
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 // Conditional import: real implementation on web, stub elsewhere
 import 'package:web_labor_contract/util/download_manual_stub.dart'
     if (dart.library.html) 'package:web_labor_contract/util/download_manual_web.dart';
@@ -11,6 +12,7 @@ import 'package:web_labor_contract/class/CMD.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:web_labor_contract/main.dart';
+import 'package:get/get.dart';
 // Removed kIsWeb and html imports after router refactor
 import 'package:go_router/go_router.dart';
 import '../../../router.dart';
@@ -22,6 +24,10 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //final authState = Provider.of<AuthState>(context, listen: true);
+    // final authState = Provider.of<AuthState>(context, listen: true);
+    // Get.put(
+    //   DashboardControllerPTHC(),
+    // ).fetchPTHCSectionList(authState.user!.chREmployeeId.toString());
     return ValueListenableBuilder<Locale>(
       valueListenable: LanguageNotifier.notifier,
       builder: (context, locale, _) {
@@ -189,6 +195,12 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
         return allCdms.where((cdm) => cdm.title != tr("master")).toList();
       // Quyen dien danh gia cua phong ban
       case 'PTHC':
+        return allCdms
+            .where(
+              (cdm) =>
+                  cdm.title == tr("fillEvaluation") || cdm.title == tr('home') || cdm.title == tr("report"),
+            )
+            .toList();
       case 'Technician':
       case 'Staff':
       case 'Operator':

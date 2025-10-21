@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
@@ -29,6 +30,9 @@ class ReportTwoScreen extends StatefulWidget {
 class _ReportTwoScreenState extends State<ReportTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
   final ScrollController _scrollController = ScrollController();
+  final DashboardControllerPTHC controllerPTHC = Get.put(
+    DashboardControllerPTHC(),
+  );
   // Pagination customization
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -41,13 +45,30 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     // Load initial data once
     controller.refreshSearch();
     controller.fetchSectionList();
-    controller.fetchDummyData();
   }
   @override
   Widget build(BuildContext context) {
-    // phan xem ai dang vao man so sanh
-    // controller.fetchSectionList();
-    // controller.fetchDummyData();
+    final authState = Provider.of<AuthState>(context, listen: true);
+    controllerPTHC.fetchPTHCSectionList(
+      authState.user!.chREmployeeId.toString(),
+    );
+    String sectionName = '';
+    if (authState.user!.chRGroup.toString() == "PTHC") {
+      sectionName = '';
+      if (controllerPTHC.listPTHCsection.isNotEmpty) {
+        sectionName =
+            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+      } else {
+        sectionName = authState.user!.chRSecCode
+            .toString()
+            .split(':')[1]
+            .trim();
+      }
+      // truong hop PTHC phong ban
+      controller.fetchDummyData(sectionName);
+    } else {
+      controller.fetchDummyData(null);
+    }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -386,6 +407,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   }
 
   Widget _buildDataTable() {
+    final authState = Provider.of<AuthState>(context, listen: true);
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -457,6 +479,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                                 fontSize: Common.sizeColumn,
                               ).toDataColumn2(),
                               // DataColumn2
+                            if (authState.user?.chRGroup != 'PTHC')
                               DataColumnCustom(
                                 title: tr('action'),
                                 width: 100,
@@ -1200,6 +1223,7 @@ class MyData extends DataTableSource {
           ),
         ),
         //Action
+      if (authState.user?.chRGroup != 'PTHC')
         DataCell(
           Center(
             child: Row(
@@ -1776,6 +1800,7 @@ class MyData extends DataTableSource {
 class _EditTwoContractDialog extends StatelessWidget {
   final TwoContract twoContract;
   final DashboardControllerTwo controller = Get.find();
+  final DashboardControllerPTHC controllerPTHC = Get.find();
 
   _EditTwoContractDialog({required this.twoContract});
 
@@ -2224,72 +2249,6 @@ class _EditTwoContractDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              // Dòng 6: Đi muộn/về sớm + Nghỉ có lương
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: BuildCompactTextField(
-              //         initialValue: twoContract.fLGoLeaveLate?.toString(),
-              //         label: tr('earlyLateCount'),
-              //         onChanged: (value) =>
-              //             edited.fLGoLeaveLate = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 10),
-              //     Expanded(
-              //       child: BuildCompactTextField(
-              //         initialValue: twoContract.fLPaidLeave?.toString(),
-              //         label: tr('paidLeave'),
-              //         onChanged: (value) =>
-              //             edited.fLPaidLeave = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 10),
-
-              // // Dòng 7: Nghỉ không lương + Không báo cáo
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: BuildCompactTextField(
-              //         initialValue: twoContract.fLNotPaidLeave?.toString(),
-              //         label: tr('unpaidLeave'),
-              //         onChanged: (value) =>
-              //             edited.fLNotPaidLeave = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 10),
-              //     Expanded(
-              //       child: BuildCompactTextField(
-              //         initialValue: twoContract.fLNotLeaveDay?.toString(),
-              //         label: tr('unreportedLeave'),
-              //         onChanged: (value) =>
-              //             edited.fLNotLeaveDay = double.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 10),
-
-              // // Dòng 8: Số lần vi phạm + Mã phê duyệt
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: BuildCompactTextField(
-              //         initialValue: twoContract.inTViolation?.toString(),
-              //         label: tr('violationCount'),
-              //         onChanged: (value) =>
-              //             edited.inTViolation = int.tryParse(value),
-              //         keyboardType: TextInputType.number,
-              //       ),
-              //     ),
-              //   ],
-              // ),
               const SizedBox(height: 12),
 
               // Lý do vi phạm (chiếm full width)
@@ -2343,7 +2302,23 @@ class _EditTwoContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      controller.fetchDummyData();
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        controller.fetchDummyData(null);
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
@@ -2427,7 +2402,7 @@ class _EditTwoContractDialog extends StatelessWidget {
 class _UpdateDtmDue extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
-
+  final DashboardControllerPTHC controllerPTHC = Get.find();
   _UpdateDtmDue({required this.contract});
 
   @override
@@ -2557,8 +2532,23 @@ class _UpdateDtmDue extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                       );
 
-                      // Refresh dữ liệu
-                      await controller.fetchDummyData();
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        controller.fetchDummyData(null);
+                      }
 
                       if (context.mounted) {
                         Navigator.of(context).pop();
@@ -2670,7 +2660,7 @@ class _UpdateDtmDue extends StatelessWidget {
 class _UpdateKetQua extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
-
+  final DashboardControllerPTHC controllerPTHC = Get.find();
   _UpdateKetQua({required this.contract});
 
   @override
@@ -2895,8 +2885,23 @@ class _UpdateKetQua extends StatelessWidget {
                         ketquaOld.value,
                       );
 
-                      // Refresh dữ liệu
-                      await controller.fetchDummyData();
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        controller.fetchDummyData(null);
+                      }
 
                       if (context.mounted) {
                         Navigator.of(context).pop();
@@ -2977,7 +2982,7 @@ class _UpdateKetQua extends StatelessWidget {
 class _ReturnContract extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
-
+  final DashboardControllerPTHC controllerPTHC = Get.find();
   _ReturnContract({required this.contract});
 
   @override
@@ -3117,8 +3122,23 @@ class _ReturnContract extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                         "Trả về từ báo cáo của nhân sự",
                       );
-                      // Refresh dữ liệu
-                      await controller.fetchDummyData();
+                      String sectionName = '';
+                      // reset du lieu
+                      if (authState.user!.chRGroup.toString() == "PTHC") {
+                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                          sectionName =
+                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+                        } else {
+                          sectionName = authState.user!.chRSecCode
+                              .toString()
+                              .split(':')[1]
+                              .trim();
+                        }
+                        // truong hop PTHC phong ban
+                        controller.fetchDummyData(sectionName);
+                      } else {
+                        controller.fetchDummyData(null);
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công

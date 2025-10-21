@@ -89,8 +89,8 @@ GoRouter createRouter(BuildContext context) {
       ],
       // thuộc createEvaluation
       // report
-      AppRoutes.reportTwo: ['Admin', 'Per', 'Chief Per'],
-      AppRoutes.reportApprentice: ['Admin', 'Per', 'Chief Per'],
+      AppRoutes.reportTwo: ['Admin', 'Per', 'Chief Per','PTHC'],
+      AppRoutes.reportApprentice: ['Admin', 'Per', 'Chief Per','PTHC'],
     };
     if (!allowed.containsKey(routePath)) return true; // home & login
     return allowed[routePath]!.contains(group);

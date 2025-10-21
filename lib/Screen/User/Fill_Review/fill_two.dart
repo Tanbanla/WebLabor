@@ -9,7 +9,7 @@ import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dar
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
-import 'package:excel/excel.dart' hide Border;
+import 'package:excel/excel.dart' hide Border, TextSpan;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -95,14 +95,14 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Section
-            _buildHeader(),
-            const SizedBox(height: 10),
+            // // Header Section
+            // _buildHeader(),
+            // const SizedBox(height: 10),
 
-            // Search and Action Buttons
-            _buildSearchAndActions(),
-            const SizedBox(height: 10),
-
+            // // Search and Action Buttons
+            // _buildSearchAndActions(),
+            // const SizedBox(height: 10),
+            _buildHeaderSearchWithNote(),
             // User approver
             _buildApproverPer(),
             const SizedBox(height: 10),
@@ -154,7 +154,172 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       ),
     );
   }
+// Combined layout for header, search, and evaluation note side-by-side (wide screens)
+  Widget _buildHeaderSearchWithNote() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isWide =
+            constraints.maxWidth > 1000; // breakpoint for row layout
+        if (!isWide) {
+          // Fallback stacked layout for narrow screens
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 10),
+              _buildSearchAndActions(),
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 10),
+                  _buildSearchAndActions(),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(flex: 4, child: _buildEvaluationNoteStandalone()),
+          ],
+        );
+      },
+    );
+  }
 
+  Widget _buildEvaluationNoteStandalone() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+              const SizedBox(width: 6),
+              Text(
+                'Ghi chú / 備考',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildNoteLine(
+            'Cột kết quả lựa chọn trong các kết quả sau / 下記の評価結果を選抜してから記入下さい:',
+          ),
+          _buildStatusLine(
+            'NG',
+            'Không đạt. Không ký tiếp / 不合格。更新なし',
+            Colors.red,
+          ),
+          _buildNoteLine(
+            '※ Kết quả chung là NG nếu có ít nhất một mục NG / 一項目でもNGなら最終評価はNG',
+            leading: '※',
+          ),
+          _buildStatusLine(
+            'OK',
+            'Đạt. Ký tiếp hợp đồng / 合格。契約更新',
+            Colors.green,
+          ),
+          _buildStatusLine(
+            'Finish L/C',
+            'CNV không muốn ký tiếp hợp đồng/ 従業者が契約を続けたくない',
+            Colors.blue,
+          ),
+          _buildStatusLine(
+            'Stop Working',
+            'CNV đã viết đơn nghỉ / 退職届け提出済み',
+            Colors.orange,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoteLine(String text, {String? leading}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (leading != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4, top: 2),
+              child: Text(
+                leading,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[700],
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusLine(String code, String desc, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                margin: const EdgeInsets.only(right: 6, bottom: 2),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: color.withOpacity(0.6), width: 0.8),
+                ),
+                child: Text(
+                  code,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: color.darken(),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ),
+            TextSpan(text: desc),
+          ],
+        ),
+      ),
+    );
+  }
   Widget _buildApproverPer() {
     final authState = Provider.of<AuthState>(context, listen: true);
     String sectionName = authState.user!.chRSecCode
@@ -2556,6 +2721,15 @@ class MyData extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
+// Extension method to slightly darken a Color
+extension _ColorShade on Color {
+  Color darken([double amount = .15]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
+  }
+}
 // Class tu choi phe duyet
 class _ReturnTwoContract extends StatelessWidget {
   final TwoContract twoContract;
