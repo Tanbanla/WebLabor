@@ -671,16 +671,16 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           ),
           _buildStatusLine(
             'NG',
-            'Không đạt. Không ký tiếp / 不合格。更新なし',
+            'Không đạt. Công ty không ký tiếp hợp đồng /不合格。会社は契約を更新されない。',
             Colors.red,
           ),
           _buildNoteLine(
-            '※ Kết quả chung là NG nếu có ít nhất một mục NG / 一項目でもNGなら最終評価はNG',
+            '※ Kết quả chung là NG khi có ít nhất một hạng mục bị đánh giá là NG /評価案内：一般評価には一項がNGであれば、評価がNGとなる',
             leading: '※',
           ),
           _buildStatusLine(
             'OK',
-            'Đạt. Ký tiếp hợp đồng / 合格。契約更新',
+            'Đạt. Công ty sẽ tiếp tục ký Hợp đồng không xác định thời hạn /合格。引き続き2年間の契約を更新します。',
             Colors.green,
           ),
           _buildStatusLine(
@@ -690,7 +690,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           ),
           _buildStatusLine(
             'Stop Working',
-            'CNV đã viết đơn nghỉ / 退職届け提出済み',
+            'CNV đã viết đơn nghỉ việc/ 従業者が退職書を書きました',
             Colors.orange,
           ),
         ],
