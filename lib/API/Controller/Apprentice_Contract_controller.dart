@@ -667,17 +667,42 @@ class DashboardControllerApprentice extends GetxController {
       if (contract.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+
+      // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
+      // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
+      final Map<String, ApprenticeContract> originalMap = {};
+      
+      // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
+      for (final original in originalList) {
+        // Ưu tiên theo ID nếu có
+        if (original.id != null) {
+          originalMap['id_${original.id}'] = original;
+        }
+        // Fallback theo Employee ID
+        if (original.vchREmployeeId?.isNotEmpty == true) {
+          originalMap['emp_${original.vchREmployeeId}'] = original;
+        }
+      }
+
       for (int i = 0; i < contract.length; i++) {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((contract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
-          // Tìm bản ghi gốc trong originalList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = originalList.indexWhere(
-            (d) =>
-                (contract[i].id != null && d.id == contract[i].id) ||
-                (d.vchREmployeeId == contract[i].vchREmployeeId),
-          );
-          if (originalIndex != -1) {
-            final original = originalList[originalIndex];
+          
+          // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
+          ApprenticeContract? original;
+          
+          // Tìm theo ID trước (ưu tiên)
+          if (contract[i].id != null) {
+            original = originalMap['id_${contract[i].id}'];
+          }
+          
+          // Nếu không tìm thấy theo ID, tìm theo Employee ID
+          if (original == null && contract[i].vchREmployeeId?.isNotEmpty == true) {
+            original = originalMap['emp_${contract[i].vchREmployeeId}'];
+          }
+          
+          // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
+          if (original != null) {
             final bool changed = original != contract[i];
             if (!changed) {
               // Không có thay đổi thực sự
@@ -773,21 +798,42 @@ class DashboardControllerApprentice extends GetxController {
             diffStr(original.vchRNote, edited.vchRNote);
       }
 
+      // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
+      // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
+      final Map<String, ApprenticeContract> originalMap = {};
+      
+      // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
+      for (final original in originalList) {
+        // Ưu tiên theo ID nếu có
+        if (original.id != null) {
+          originalMap['id_${original.id}'] = original;
+        }
+        // Fallback theo Employee ID
+        if (original.vchREmployeeId?.isNotEmpty == true) {
+          originalMap['emp_${original.vchREmployeeId}'] = original;
+        }
+      }
+
       for (int i = 0; i < contract.length; i++) {
         if ((contract[i].nvchrApproverDeft?.isNotEmpty ?? false) ||
             (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
-          // Tìm bản ghi gốc trong dataList (ưu tiên so sánh theo id, fallback theo mã NV)
-          final originalIndex = originalList.indexWhere(
-            (d) =>
-                (contract[i].id != null && d.id == contract[i].id) ||
-                (d.vchREmployeeId == contract[i].vchREmployeeId),
-          );
-          if (originalIndex != -1) {
-            final original = originalList[originalIndex];
-            final bool hasChanges = _hasMeaningfulChanges(
-              original,
-              contract[i],
-            );
+          
+          // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
+          ApprenticeContract? original;
+          
+          // Tìm theo ID trước (ưu tiên)
+          if (contract[i].id != null) {
+            original = originalMap['id_${contract[i].id}'];
+          }
+          
+          // Nếu không tìm thấy theo ID, tìm theo Employee ID
+          if (original == null && contract[i].vchREmployeeId?.isNotEmpty == true) {
+            original = originalMap['emp_${contract[i].vchREmployeeId}'];
+          }
+          
+          // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
+          if (original != null) {
+            final bool hasChanges = _hasMeaningfulChanges(original, contract[i]);
             if (!hasChanges) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
