@@ -472,7 +472,7 @@ class DashboardControllerPTHC extends GetxController {
                 final parts = raw.split(':');
                 if (parts.length >= 2) {
                   // Giữ nguyên dấu hai chấm và chỉ trim khoảng trắng thừa
-                  return '${parts[0].trim()} : ${parts.sublist(1).join(':').trim()}';
+                  return '${parts[0].trim()}: ${parts.sublist(1).join(':').trim()}';
                 }
                 return raw.trim();
               })

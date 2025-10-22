@@ -35,6 +35,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   final DashboardControllerPTHC controllerPTHC = Get.put(
     DashboardControllerPTHC(),
   );
+  final DashboardControllerUserApprover controllerUserApprover = Get.put(
+    DashboardControllerUserApprover(),
+  );
   final ScrollController _scrollController = ScrollController();
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -66,7 +69,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
       final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
       String sectionName = parts.length >= 2
-          ? '${parts[0].trim()} : ${parts[1].trim()}'
+          ? '${parts[0].trim()}: ${parts[1].trim()}'
           : parts.firstOrNull?.trim() ?? '';
       if (authState.user!.chRGroup.toString() == "PTHC" ||
           authState.user!.chRGroup.toString() == "Per" ||
@@ -78,7 +81,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
           } else {
             sectionName = parts.length >= 2
-                ? '${parts[0].trim()} : ${parts[1].trim()}'
+                ? '${parts[0].trim()}: ${parts[1].trim()}'
                 : parts.firstOrNull?.trim() ?? '';
           }
           // truong hop PTHC phong ban
@@ -87,12 +90,31 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           // truong hop khác
           controller.changeStatus('PTHC', null, null);
         }
+        controllerUserApprover.changeStatus(
+          '${parts[0].trim()} : ${parts[1].trim()}',
+          'Leader,Supervisor,Staff,Section Manager,Expert',
+        );
+      } else if (authState.user!.chRGroup.toString() == "Chief") {
+        controller.changeStatus(
+          '5',
+          sectionName,
+          authState.user!.chRUserid.toString(),
+        );
+        controllerUserApprover.changeStatus(
+          '${parts[0].trim()} : ${parts[1].trim()}',
+          'Section Manager',
+        );
       } else {
         // truong hop leader
         controller.changeStatus(
           '4',
           sectionName,
           authState.user!.chRUserid.toString(),
+        );
+        // truong hop leader
+        controllerUserApprover.changeStatus(
+          '${parts[0].trim()} : ${parts[1].trim()}',
+          'Chief',
         );
       }
       _statusInitialized = true;
@@ -174,40 +196,40 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     final authState = Provider.of<AuthState>(context, listen: true);
     final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
     String sectionName = parts.length >= 2
-        ? '${parts[0].trim()} : ${parts[1].trim()}'
+        ? '${parts[0].trim()}: ${parts[1].trim()}'
         : parts.firstOrNull?.trim() ?? '';
     final controller = Get.put(DashboardControllerUserApprover());
-    if (authState.user!.chRGroup.toString() == "PTHC" ||
-        authState.user!.chRGroup.toString() == "Per" ||
-        authState.user!.chRGroup.toString() == "Admin") {
-      // truong hop PTHC phong ban
-      if (authState.user!.chRGroup.toString() == "PTHC") {
-        sectionName = '';
-        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName =
-              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        } else {
-          sectionName = parts.length >= 2
-              ? '${parts[0].trim()} : ${parts[1].trim()}'
-              : parts.firstOrNull?.trim() ?? '';
-        }
-        // truong hop PTHC phong ban
-        controller.changeStatus(
-          sectionName,
-          'Leader,Supervisor,Staff,Section Manager,Expert',
-        );
-      } else {
-        controller.changeStatus(
-          sectionName,
-          'Leader,Supervisor,Staff,Section Manager,Expert',
-        );
-      }
-    } else if (authState.user!.chRGroup.toString() == "Chief") {
-      controller.changeStatus(sectionName, 'Section Manager');
-    } else {
-      // truong hop leader
-      controller.changeStatus(sectionName, 'Chief,Expert');
-    }
+    // if (authState.user!.chRGroup.toString() == "PTHC" ||
+    //     authState.user!.chRGroup.toString() == "Per" ||
+    //     authState.user!.chRGroup.toString() == "Admin") {
+    //   // truong hop PTHC phong ban
+    //   if (authState.user!.chRGroup.toString() == "PTHC") {
+    //     sectionName = '';
+    //     if (controllerPTHC.listPTHCsection.isNotEmpty) {
+    //       sectionName =
+    //           '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+    //     } else {
+    //       sectionName = parts.length >= 2
+    //           ? '${parts[0].trim()}: ${parts[1].trim()}'
+    //           : parts.firstOrNull?.trim() ?? '';
+    //     }
+    //     // truong hop PTHC phong ban
+    //     controller.changeStatus(
+    //       sectionName,
+    //       'Leader,Supervisor,Staff,Section Manager,Expert',
+    //     );
+    //   } else {
+    //     controller.changeStatus(
+    //       sectionName,
+    //       'Leader,Supervisor,Staff,Section Manager,Expert',
+    //     );
+    //   }
+    // } else if (authState.user!.chRGroup.toString() == "Chief") {
+    //   controller.changeStatus(sectionName, 'Section Manager');
+    // } else {
+    //   // truong hop leader
+    //   controller.changeStatus(sectionName, 'Chief,Expert');
+    // }
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
 
@@ -702,7 +724,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           ),
           _buildStatusLine(
             'OK',
-            'Đạt. Công ty sẽ tiếp tục ký Hợp đồng không xác định thời hạn /合格。引き続き2年間の契約を更新します。',
+            'Đạt. Công ty sẽ tiếp tục ký Hợp đồng 2 năm /合格。引き続き2年間の契約を更新します',
             Colors.green,
           ),
           _buildStatusLine(
@@ -3363,7 +3385,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           authState.user!.chRSecCode?.toString().split(':') ??
                           [];
                       String sectionName = parts.length >= 2
-                          ? '${parts[0].trim()} : ${parts[1].trim()}'
+                          ? '${parts[0].trim()}: ${parts[1].trim()}'
                           : parts.firstOrNull?.trim() ?? '';
                       // phan xem ai dang vao man so sanh
                       if (authState.user!.chRGroup.toString() == "PTHC" ||

@@ -69,7 +69,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
         } else {
           final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
           sectionName = parts.length >= 2
-              ? '${parts[0].trim()} : ${parts[1].trim()}'
+              ? '${parts[0].trim()}: ${parts[1].trim()}'
               : parts.firstOrNull?.trim() ?? '';
         }
         // truong hop PTHC phong ban
@@ -2199,7 +2199,7 @@ class _EditContractDialog extends StatelessWidget {
                               ) ??
                               [];
                           sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              ? '${parts[0].trim()}: ${parts[1].trim()}'
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
@@ -2434,7 +2434,7 @@ class _UpdateDtmDue extends StatelessWidget {
                               ) ??
                               [];
                           sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              ? '${parts[0].trim()}: ${parts[1].trim()}'
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
@@ -2792,7 +2792,7 @@ class _UpdateKetQua extends StatelessWidget {
                               ) ??
                               [];
                           sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              ? '${parts[0].trim()}: ${parts[1].trim()}'
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
@@ -3033,7 +3033,7 @@ class _ReturnContract extends StatelessWidget {
                               ) ??
                               [];
                           sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              ? '${parts[0].trim()}: ${parts[1].trim()}'
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban

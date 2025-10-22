@@ -38,7 +38,8 @@ class DashboardControllerUserApprover extends GetxController {
   }) async {
     try {
       isLoading(true);
-      final Uri uri = Uri.parse('${Common.API}${Common.UserApprover}').replace(
+      final Uri uri = Uri.parse('${Common.API}${Common.UserApprover}')
+      .replace(
         queryParameters: {
           'section': section,
           'positionGroups': chucVu,

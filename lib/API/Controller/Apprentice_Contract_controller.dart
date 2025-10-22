@@ -290,9 +290,9 @@ class DashboardControllerApprentice extends GetxController {
           "pageSize": 10,
           "filters": filters,
         };
-        // // Debug log (có thể bỏ nếu không cần)
-        // // ignore: avoid_print
-        // print('fetchDummyData request: ${json.encode(requestBody)}');
+        // Debug log (có thể bỏ nếu không cần)
+        // ignore: avoid_print
+        print('fetchDummyData request: ${json.encode(requestBody)}');
         response = await http.post(
           Uri.parse(Common.API + Common.ApprenticeSreachBy),
           headers: {'Content-Type': 'application/json'},
