@@ -731,10 +731,15 @@ class DashboardControllerTwo extends GetxController {
     String chucVu,
   ) async {
     try {
-      final twocontract = getSelectedItems();
-      if (twocontract.isEmpty) {
+      List<dynamic> twocontract= [];
+      final twocontractOld = getSelectedItems();
+      if (twocontractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      // lấy dữ liệu gốc để thực hiện
+      twocontract = twocontractOld
+          .map((item) => TwoContract.fromJson(item.toJson()))
+          .toList();
       // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
       bool _hasMeaningfulChanges(TwoContract original, TwoContract edited) {
         bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
@@ -796,6 +801,7 @@ class DashboardControllerTwo extends GetxController {
             twocontract[i].biTNoReEmployment = true;
             twocontract[i].biTApproverChief = true;
             twocontract[i].nvchRApproverChief = '';
+            break;
           case 4:
             if (twocontract[i].nvchROther != 'OK' &&
                 (twocontract[i].vchRNote == null ||
@@ -839,6 +845,7 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].biTApproverChief = true;
               twocontract[i].nvchRApproverChief = '';
             }
+            break;
           case 5:
             if (twocontract[i].biTApproverChief != true &&
                 (twocontract[i].nvchRApproverChief == null ||
@@ -858,6 +865,7 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].useRApproverSectionManager = userApprover;
               twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
             }
+            break;
         }
       }
       isLoading(true);
@@ -894,14 +902,19 @@ class DashboardControllerTwo extends GetxController {
     try {
       // List<TwoContract> twocontract,
       //fetchPTHCData();
-      final twocontract = getSelectedItems();
+      final twocontractOld = getSelectedItems();
       List<dynamic> notApproval = [];
+      List<dynamic> twocontract = [];
       String mailSend = "";
       String sectionAp = "";
       String PheDuyetMail = "";
-      if (twocontract.isEmpty) {
+      if (twocontractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+            // lấy dữ liệu gốc để thực hiện
+      twocontract = twocontractOld
+          .map((item) => TwoContract.fromJson(item.toJson()))
+          .toList();
       for (int i = 0; i < twocontract.length; i++) {
         twocontract[i].vchRUserUpdate = userApprover;
         twocontract[i].dtMUpdate = formatDateTime(DateTime.now());
@@ -936,6 +949,7 @@ class DashboardControllerTwo extends GetxController {
               notApproval.add(contractCopy);
               twocontract[i].inTStatusId = 4;
             }
+            break;
           case 7:
             twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             twocontract[i].userApproverDeft = userApprover;
@@ -972,6 +986,7 @@ class DashboardControllerTwo extends GetxController {
                 }
               }
             }
+            break;
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
@@ -1008,6 +1023,7 @@ class DashboardControllerTwo extends GetxController {
                 appendIfNotExists(twocontract[i].userApproverDeft);
               }
             }
+            break;
         }
       }
       isLoading(true);
@@ -1767,6 +1783,7 @@ class DashboardControllerTwo extends GetxController {
             final contractCopy = TwoContract.fromJson(json);
             notApproval.add(contractCopy);
             twocontract[i].inTStatusId = 4;
+            break;
           case 7:
             twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             twocontract[i].userApproverDeft = userApprover;
@@ -1776,6 +1793,7 @@ class DashboardControllerTwo extends GetxController {
             final contractCopy = TwoContract.fromJson(json);
             notApproval.add(contractCopy);
             twocontract[i].inTStatusId = 4;
+            break;
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
@@ -1785,6 +1803,7 @@ class DashboardControllerTwo extends GetxController {
             final contractCopy = TwoContract.fromJson(json);
             notApproval.add(contractCopy);
             twocontract[i].inTStatusId = 4;
+            break;
         }
       }
       isLoading(true);

@@ -739,10 +739,15 @@ class DashboardControllerApprentice extends GetxController {
     String chucVu,
   ) async {
     try {
-      final contract = getSelectedItems();
-      if (contract.isEmpty) {
+      List<dynamic> contract= [];
+      final contractOld= getSelectedItems();
+      if (contractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      // lấy dữ liệu gốc để thực hiện
+      contract = contractOld
+          .map((item) => ApprenticeContract.fromJson(item.toJson()))
+          .toList();
       // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
       bool _hasMeaningfulChanges(
         ApprenticeContract original,
@@ -750,7 +755,6 @@ class DashboardControllerApprentice extends GetxController {
       ) {
         bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
         bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
-
         return
         // Điểm đánh giá/Leader
         diffStr(original.vchRLyThuyet, edited.vchRLyThuyet) ||
@@ -805,6 +809,7 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].biTNoReEmployment = true;
             contract[i].biTApproverChief = true;
             contract[i].nvchRApproverChief = '';
+            break;
           case 4:
             if (contract[i].vchRReasultsLeader != 'OK' &&
                 (contract[i].vchRLyThuyet == 'OK' &&
@@ -844,6 +849,7 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].biTApproverChief = true;
               contract[i].nvchRApproverChief = '';
             }
+            break;
           case 5:
             if (contract[i].biTApproverChief != true &&
                 (contract[i].nvchRApproverChief == null ||
@@ -863,6 +869,7 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].useRApproverSectionManager = userApprover;
               contract[i].dtMApproverChief = formatDateTime(DateTime.now());
             }
+            break;
         }
       }
       isLoading(true);
@@ -957,15 +964,20 @@ class DashboardControllerApprentice extends GetxController {
   // update thong tin phe duyet
   Future<void> updateListApprenticeContractApproval(String userApprover) async {
     try {
-      final contract = getSelectedItems();
+      final contractOld = getSelectedItems();
       //fetchPTHCData();
       List<dynamic> notApproval = [];
+      List<dynamic> contract= [];
       String mailSend = "";
       String sectionAp = "";
       String PheDuyetMail = "";
-      if (contract.isEmpty) {
+      if (contractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
+      // lấy dữ liệu gốc để thực hiện
+      contract = contractOld
+          .map((item) => ApprenticeContract.fromJson(item.toJson()))
+          .toList();
       for (int i = 0; i < contract.length; i++) {
         contract[i].vchRUserUpdate = userApprover;
         contract[i].dtMUpdate = formatDateTime(DateTime.now());
@@ -1001,6 +1013,7 @@ class DashboardControllerApprentice extends GetxController {
               notApproval.add(contractCopy);
               contract[i].inTStatusId = 4;
             }
+            break;
           case 7:
             //xu ly khi xong
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
@@ -1030,6 +1043,7 @@ class DashboardControllerApprentice extends GetxController {
                 }
               }
             }
+            break;
         }
       }
       isLoading(true);
@@ -1864,6 +1878,7 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].biTApproverChief = false;
 
             contract[i].inTStatusId = 4;
+            break;
           case 7:
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
@@ -1873,6 +1888,7 @@ class DashboardControllerApprentice extends GetxController {
             final contractCopy = ApprenticeContract.fromJson(json);
             notApproval.add(contractCopy);
             contract[i].inTStatusId = 4;
+            break;
         }
       }
       isLoading(true);
@@ -1953,6 +1969,8 @@ class DashboardControllerApprentice extends GetxController {
           contract[i].inTStatusId = 1;
         } else if (contract[i].inTStatusId == 4) {
           contract[i].inTStatusId = 3;
+        } else if (contract[i].inTStatusId == 5) {
+          contract[i].inTStatusId = 4;
         }
       }
       isLoading(true);
