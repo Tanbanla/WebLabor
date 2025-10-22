@@ -53,38 +53,37 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       await _prepareStatus(authState);
     });
   }
-  Future <void> _prepareStatus(AuthState authState) async {
+
+  Future<void> _prepareStatus(AuthState authState) async {
     if (_statusInitialized) return;
     try {
       // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
         authState.user!.chREmployeeId.toString(),
       );
-      String sectionName = authState.user!.chRSecCode
-          .toString()
-          .split(':')[1]
-          .trim();
-    if (authState.user!.chRGroup.toString() == "PTHC") {
-      if (controllerPTHC.listPTHCsection.isNotEmpty) {
-        sectionName =
-            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+      String sectionName = '';
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+        } else {
+          final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+          sectionName = parts.length >= 2
+              ? '${parts[0].trim()} : ${parts[1].trim()}'
+              : parts.firstOrNull?.trim() ?? '';
+        }
+        // truong hop PTHC phong ban
+        controller.fetchDummyData(sectionName);
       } else {
-        sectionName = authState.user!.chRSecCode
-            .toString()
-            .split(':')[1]
-            .trim();
+        controller.fetchDummyData(null);
       }
-      // truong hop PTHC phong ban
-      controller.fetchDummyData(sectionName);
-    } else {
-      controller.fetchDummyData(null);
-    }
       _statusInitialized = true;
     } catch (e) {
       // Có thể log hoặc hiển thị lỗi nếu cần
       debugPrint('Prepare status error: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2194,10 +2193,14 @@ class _EditContractDialog extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -2425,10 +2428,14 @@ class _UpdateDtmDue extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -2779,10 +2786,14 @@ class _UpdateKetQua extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -3016,10 +3027,14 @@ class _ReturnContract extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);

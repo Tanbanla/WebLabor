@@ -64,11 +64,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         authState.user!.chREmployeeId.toString(),
       );
 
-      String sectionName = authState.user!.chRSecCode
-          .toString()
-          .split(':')[1]
-          .trim();
-
+      final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+      String sectionName = parts.length >= 2
+          ? '${parts[0].trim()} : ${parts[1].trim()}'
+          : parts.firstOrNull?.trim() ?? '';
       if (authState.user!.chRGroup.toString() == "PTHC" ||
           authState.user!.chRGroup.toString() == "Per" ||
           authState.user!.chRGroup.toString() == "Admin") {
@@ -78,16 +77,15 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             sectionName =
                 '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
           } else {
-            sectionName = authState.user!.chRSecCode
-                .toString()
-                .split(':')[1]
-                .trim();
+            sectionName = parts.length >= 2
+                ? '${parts[0].trim()} : ${parts[1].trim()}'
+                : parts.firstOrNull?.trim() ?? '';
           }
           // truong hop PTHC phong ban
           controller.changeStatus('PTHC', sectionName, null);
         } else {
           // truong hop khác
-            controller.changeStatus('PTHC', null, null);
+          controller.changeStatus('PTHC', null, null);
         }
       } else {
         // truong hop leader
@@ -103,6 +101,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       debugPrint('Prepare status error: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -173,10 +172,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
   Widget _buildApproverPer() {
     final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+    final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+    String sectionName = parts.length >= 2
+        ? '${parts[0].trim()} : ${parts[1].trim()}'
+        : parts.firstOrNull?.trim() ?? '';
     final controller = Get.put(DashboardControllerUserApprover());
     if (authState.user!.chRGroup.toString() == "PTHC" ||
         authState.user!.chRGroup.toString() == "Per" ||
@@ -188,10 +187,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           sectionName =
               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
         } else {
-          sectionName = authState.user!.chRSecCode
-              .toString()
-              .split(':')[1]
-              .trim();
+          sectionName = parts.length >= 2
+              ? '${parts[0].trim()} : ${parts[1].trim()}'
+              : parts.firstOrNull?.trim() ?? '';
         }
         // truong hop PTHC phong ban
         controller.changeStatus(
@@ -3361,10 +3359,12 @@ class _ReturnConApprenticetract extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = authState.user!.chRSecCode
-                          .toString()
-                          .split(':')[1]
-                          .trim();
+                      final parts =
+                          authState.user!.chRSecCode?.toString().split(':') ??
+                          [];
+                      String sectionName = parts.length >= 2
+                          ? '${parts[0].trim()} : ${parts[1].trim()}'
+                          : parts.firstOrNull?.trim() ?? '';
                       // phan xem ai dang vao man so sanh
                       if (authState.user!.chRGroup.toString() == "PTHC" ||
                           authState.user!.chRGroup.toString() == "Per" ||

@@ -52,38 +52,37 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       await _prepareStatus(authState);
     });
   }
-  Future <void> _prepareStatus(AuthState authState) async {
+
+  Future<void> _prepareStatus(AuthState authState) async {
     if (_statusInitialized) return;
     try {
       // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
         authState.user!.chREmployeeId.toString(),
       );
-      String sectionName = authState.user!.chRSecCode
-          .toString()
-          .split(':')[1]
-          .trim();
-    if (authState.user!.chRGroup.toString() == "PTHC") {
-      if (controllerPTHC.listPTHCsection.isNotEmpty) {
-        sectionName =
-            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+      String sectionName = '';
+      if (authState.user!.chRGroup.toString() == "PTHC") {
+        if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          sectionName =
+              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+        } else {
+          final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+          sectionName = parts.length >= 2
+              ? '${parts[0].trim()} : ${parts[1].trim()}'
+              : parts.firstOrNull?.trim() ?? '';
+        }
+        // truong hop PTHC phong ban
+        controller.fetchDummyData(sectionName);
       } else {
-        sectionName = authState.user!.chRSecCode
-            .toString()
-            .split(':')[1]
-            .trim();
+        controller.fetchDummyData(null);
       }
-      // truong hop PTHC phong ban
-      controller.fetchDummyData(sectionName);
-    } else {
-      controller.fetchDummyData(null);
-    }
       _statusInitialized = true;
     } catch (e) {
       // Có thể log hoặc hiển thị lỗi nếu cần
       debugPrint('Prepare status error: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -497,12 +496,12 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                                 fontSize: Common.sizeColumn,
                               ).toDataColumn2(),
                               // DataColumn2
-                            if (authState.user?.chRGroup != 'PTHC')
-                              DataColumnCustom(
-                                title: tr('action'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
+                              if (authState.user?.chRGroup != 'PTHC')
+                                DataColumnCustom(
+                                  title: tr('action'),
+                                  width: 100,
+                                  fontSize: Common.sizeColumn,
+                                ).toDataColumn2(),
                               DataColumnCustom(
                                 title: tr('Hientrang'),
                                 width: 130,
@@ -1242,75 +1241,75 @@ class MyData extends DataTableSource {
           ),
         ),
         //Action
-      if (authState.user?.chRGroup != 'PTHC')
-        DataCell(
-          Center(
-            child: Row(
-              children: [
-                _buildActionButton(
-                  icon: Iconsax.edit_2,
-                  color: Colors.blue,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          _EditTwoContractDialog(twoContract: data),
-                    );
-                  },
-                ),
-                SizedBox(width: 3),
-                _buildActionButton(
-                  icon: Iconsax.clock,
-                  color: Colors.orangeAccent,
-                  onPressed: () {
-                    if (data.dtMDueDate != null) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => _UpdateDtmDue(contract: data),
-                      );
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DialogNotification(
-                          message: tr('TimeDueError'),
-                          title: tr('Loi'),
-                          color: Colors.red,
-                          icon: Icons.error,
-                        ),
-                      );
-                    }
-                  },
-                ),
-                SizedBox(width: 3),
-                if (authState.user?.chRGroup == 'Admin' ||
-                    authState.user?.chRGroup == 'Chief Per')
+        if (authState.user?.chRGroup != 'PTHC')
+          DataCell(
+            Center(
+              child: Row(
+                children: [
                   _buildActionButton(
-                    icon: Iconsax.ram,
-                    color: Colors.brown,
+                    icon: Iconsax.edit_2,
+                    color: Colors.blue,
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) => _UpdateKetQua(contract: data),
+                        builder: (context) =>
+                            _EditTwoContractDialog(twoContract: data),
                       );
                     },
                   ),
-                const SizedBox(width: 3),
-                if (authState.user?.chRGroup == 'Admin' ||
-                    authState.user?.chRGroup == 'Chief Per')
+                  SizedBox(width: 3),
                   _buildActionButton(
-                    icon: Iconsax.back_square,
-                    color: Colors.red,
+                    icon: Iconsax.clock,
+                    color: Colors.orangeAccent,
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => _ReturnContract(contract: data),
-                      );
+                      if (data.dtMDueDate != null) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _UpdateDtmDue(contract: data),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DialogNotification(
+                            message: tr('TimeDueError'),
+                            title: tr('Loi'),
+                            color: Colors.red,
+                            icon: Icons.error,
+                          ),
+                        );
+                      }
                     },
                   ),
-              ],
+                  SizedBox(width: 3),
+                  if (authState.user?.chRGroup == 'Admin' ||
+                      authState.user?.chRGroup == 'Chief Per')
+                    _buildActionButton(
+                      icon: Iconsax.ram,
+                      color: Colors.brown,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _UpdateKetQua(contract: data),
+                        );
+                      },
+                    ),
+                  const SizedBox(width: 3),
+                  if (authState.user?.chRGroup == 'Admin' ||
+                      authState.user?.chRGroup == 'Chief Per')
+                    _buildActionButton(
+                      icon: Iconsax.back_square,
+                      color: Colors.red,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => _ReturnContract(contract: data),
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
@@ -1726,7 +1725,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.deepPurple[100]!),
           ),
-          child: Text('Chief', style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192))),
+          child: Text(
+            'Chief',
+            style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+          ),
         );
       case 6:
         return Container(
@@ -2328,10 +2330,14 @@ class _EditTwoContractDialog extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -2558,10 +2564,14 @@ class _UpdateDtmDue extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -2911,10 +2921,14 @@ class _UpdateKetQua extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);
@@ -3148,10 +3162,14 @@ class _ReturnContract extends StatelessWidget {
                           sectionName =
                               '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                         } else {
-                          sectionName = authState.user!.chRSecCode
-                              .toString()
-                              .split(':')[1]
-                              .trim();
+                          final parts =
+                              authState.user!.chRSecCode?.toString().split(
+                                ':',
+                              ) ??
+                              [];
+                          sectionName = parts.length >= 2
+                              ? '${parts[0].trim()} : ${parts[1].trim()}'
+                              : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
                         controller.fetchDummyData(sectionName);

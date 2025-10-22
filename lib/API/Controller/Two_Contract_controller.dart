@@ -199,7 +199,7 @@ class DashboardControllerTwo extends GetxController {
     // Rebuild selection states to align with filtered list length
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
   }
-  
+
   // Old individual filter methods removed in favor of applyFilters().
   // Reset all filters
   void refreshFilteredList() {
@@ -256,11 +256,30 @@ class DashboardControllerTwo extends GetxController {
         );
       } else {
         // Lọc theo section thông qua search API
+        // Có 2 trường hợp đầu vào:
+        // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
+        // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+        List<String> sectionValues;
+        final trimmed = section.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          try {
+            final decoded = json.decode(trimmed);
+            if (decoded is List) {
+              sectionValues = decoded.map((e) => e.toString().trim()).toList();
+            } else {
+              sectionValues = [trimmed];
+            }
+          } catch (_) {
+            sectionValues = [trimmed];
+          }
+        } else {
+          sectionValues = [trimmed];
+        }
         final filters = [
           {
             "field": "VCHR_CODE_SECTION",
-            "value": section.trim(),
-            "operator": "LIKE",
+            "value": sectionValues,
+            "operator": "IN",
             "logicType": "AND",
           },
         ];
@@ -274,6 +293,9 @@ class DashboardControllerTwo extends GetxController {
           headers: {'Content-Type': 'application/json'},
           body: json.encode(requestBody),
         );
+        // Debug log (có thể bỏ nếu không cần)
+        // ignore: avoid_print
+        print('fetchDummyData request: ${json.encode(requestBody)}');
       }
 
       if (response.statusCode == 200) {
@@ -339,6 +361,26 @@ class DashboardControllerTwo extends GetxController {
           cloumn = "USER_APPROVER_DIRECTOR";
           break;
       }
+      // Lọc theo section thông qua search API
+      // Có 2 trường hợp đầu vào:
+      // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
+      // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+      List<String> sectionValues;
+      final trimmed = section == null ? "" : section.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          final decoded = json.decode(trimmed);
+          if (decoded is List) {
+            sectionValues = decoded.map((e) => e.toString().trim()).toList();
+          } else {
+            sectionValues = [trimmed];
+          }
+        } catch (_) {
+          sectionValues = [trimmed];
+        }
+      } else {
+        sectionValues = [trimmed];
+      }
       // Build request body
       final filters = [
         if (statusId == 'approval')
@@ -365,8 +407,8 @@ class DashboardControllerTwo extends GetxController {
         if (section != null && section.isNotEmpty)
           {
             "field": "VCHR_CODE_SECTION",
-            "value": section,
-            "operator": "LIKE",
+            "value": sectionValues,
+            "operator": "IN",
             "logicType": "AND",
           },
         if (adid != null && adid.isNotEmpty && statusId != 'approval')
@@ -777,19 +819,23 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            if(chucVu == "Chief"){
+            if (chucVu == "Chief") {
               twocontract[i].inTStatusId = 6;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userUpdate;
-              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(
+                DateTime.now(),
+              );
               twocontract[i].biTApproverChief = true;
               twocontract[i].nvchRApproverChief = '';
               twocontract[i].useRApproverSectionManager = userApprover;
-            }else{
+            } else {
               twocontract[i].inTStatusId = 5;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userApprover;
-              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(
+                DateTime.now(),
+              );
               twocontract[i].biTApproverChief = true;
               twocontract[i].nvchRApproverChief = '';
             }
