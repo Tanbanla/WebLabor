@@ -124,7 +124,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .toString(),
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
-                                context.go(AppRoutes.approvalTrial);
+                                if (authState.user!.chRGroup.toString() ==
+                                    'Chief') {
+                                  context.go(AppRoutes.fillApprentice);
+                                } else if (authState.user!.chRGroup
+                                            .toString() ==
+                                        'Chief Per' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Admin') {
+                                  context.go(AppRoutes.approvalPreparation);
+                                } else {
+                                  context.go(AppRoutes.approvalTrial);
+                                }
+                                //context.go(AppRoutes.approvalTrial);
                               },
                             ),
                             const SizedBox(height: 10),
@@ -152,7 +164,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .toString(),
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
-                                context.go(AppRoutes.approvalTwo);
+                                if (authState.user!.chRGroup.toString() ==
+                                    'Chief') {
+                                  context.go(AppRoutes.fillTwo);
+                                } else if (authState.user!.chRGroup
+                                            .toString() ==
+                                        'Chief Per' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Admin') {
+                                  context.go(AppRoutes.approvalPreparation);
+                                } else {
+                                  context.go(AppRoutes.approvalTwo);
+                                }
                               },
                             ),
                             const SizedBox(height: 10),
