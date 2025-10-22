@@ -1194,8 +1194,8 @@ class DashboardControllerTwo extends GetxController {
         final twocontract = TwoContract()
           ..id = 0
           ..vchRCodeApprover
-          ..vchRCodeSection = row[4]?.value?.toString()
-          ..vchRNameSection = row[4]?.value?.toString()
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
@@ -1339,8 +1339,8 @@ class DashboardControllerTwo extends GetxController {
         final twocontract = TwoContract()
           ..id = 0
           ..vchRCodeApprover
-          ..vchRCodeSection = row[4]?.value?.toString()
-          ..vchRNameSection = row[4]?.value?.toString()
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()

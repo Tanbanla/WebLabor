@@ -1183,8 +1183,9 @@ class DashboardControllerApprentice extends GetxController {
           ..id = 0
           ..vchRCodeApprover
           //'HD2N' + formatDateTime(DateTime.now()).toString()
-          ..vchRCodeSection = row[4]?.value?.toString()
-          ..vchRNameSection = row[4]?.value?.toString()
+          //..vchRCodeSection = row[4]?.value?.toString()
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
@@ -1327,8 +1328,8 @@ class DashboardControllerApprentice extends GetxController {
           ..id = 0
           ..vchRCodeApprover //=
           //'HD2N' + formatDateTime(DateTime.now()).toString()
-          ..vchRCodeSection = row[4]?.value?.toString()
-          ..vchRNameSection = row[4]?.value?.toString()
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()

@@ -464,15 +464,13 @@ class DashboardControllerPTHC extends GetxController {
         if (jsonData['success'] == true) {
           // Sửa chỗ này - cần chuyển đổi dữ liệu từ API thành List<String>
           final List<dynamic> data = jsonData['data'];
-          // Dữ liệu dạng: '2100 : PR1-PR1', '2200 : PR2-PR2', '2310-1 : R&D-PE'
-          // Yêu cầu: chỉ lấy phần tên sau dấu ':' => 'PR1-PR1','PR2-PR2','R&D-PE'
           final sections = data
               .map((item) => item.toString())
               .map((raw) {
                 final parts = raw.split(':');
                 if (parts.length >= 2) {
                   // Giữ nguyên dấu hai chấm và chỉ trim khoảng trắng thừa
-                  return '${parts[0].trim()}: ${parts.sublist(1).join(':').trim()}';
+                  return '${parts[0].trim()} : ${parts.sublist(1).join(':').trim()}';
                 }
                 return raw.trim();
               })
