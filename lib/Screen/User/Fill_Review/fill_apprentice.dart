@@ -92,7 +92,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         }
         controllerUserApprover.changeStatus(
           sectionName,
-          'Leader,Supervisor,Operator,Staff,Section Manager,Expert',
+          'Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
         );
       } else if (authState.user!.chRGroup.toString() == "Chief") {
         controller.changeStatus(

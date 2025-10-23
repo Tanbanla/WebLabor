@@ -15,12 +15,11 @@ class DashboardControllerUserApprover extends GetxController {
     super.onInit();
     //fetchDummyData();
   }
-  Future<void> changeStatus(
-    String newSection,
-    String newChuVu,
-  ) async {
+
+  Future<void> changeStatus(String newSection, String newChuVu) async {
     await fetchDummyData(section: newSection, chucVu: newChuVu);
   }
+
   void showError(String message) {
     Get.snackbar(
       'Error',
@@ -32,19 +31,39 @@ class DashboardControllerUserApprover extends GetxController {
   }
 
   // lay du lieu
-  Future<void> fetchDummyData({
-    String? section,
-    String? chucVu,
-  }) async {
+  Future<void> fetchDummyData({String? section, String? chucVu}) async {
     try {
       isLoading(true);
-      final Uri uri = Uri.parse('${Common.API}${Common.UserApprover}')
-      .replace(
-        queryParameters: {
-          'section': section,
-          'positionGroups': chucVu,
-        },
-      );
+      // Format section: if it is a JSON array string => convert to comma separated
+      String? formattedSection;
+      if (section != null && section.trim().isNotEmpty) {
+        final s = section.trim();
+        if (s.startsWith('[') && s.endsWith(']')) {
+          try {
+            final decoded = json.decode(s);
+            if (decoded is List) {
+              formattedSection = decoded
+                  .map((e) => e.toString().trim())
+                  .join(',');
+            } else {
+              formattedSection = s; // fallback
+            }
+          } catch (_) {
+            formattedSection = s; // invalid JSON fallback
+          }
+        } else {
+          formattedSection = s; // already plain
+        }
+      }
+
+      final qp = <String, String>{};
+      if (formattedSection != null) qp['section'] = formattedSection;
+      if (chucVu != null && chucVu.trim().isNotEmpty)
+        qp['positionGroups'] = chucVu.trim();
+
+      final Uri uri = Uri.parse(
+        '${Common.API}${Common.UserApprover}',
+      ).replace(queryParameters: qp);
 
       final response = await http.get(
         uri,
@@ -58,7 +77,11 @@ class DashboardControllerUserApprover extends GetxController {
           dataList.assignAll(
             data
                 .map((twocontract) => ApproverUser.fromJson(twocontract))
-                .where((users) => users.chREmployeeAdid != null && users.chREmployeeAdid !='')
+                .where(
+                  (users) =>
+                      users.chREmployeeAdid != null &&
+                      users.chREmployeeAdid != '',
+                )
                 .toList(),
           );
           filterdataList.assignAll(dataList);
