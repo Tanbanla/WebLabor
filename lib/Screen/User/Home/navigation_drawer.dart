@@ -186,7 +186,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       case 'Per':
         return allCdms
             .where(
-              (cdm) => cdm.title != tr("master") && cdm.title != tr("approval"),
+              (cdm) => cdm.title != tr("approval"),
             )
             .toList();
       case 'Chief Per':
@@ -201,6 +201,8 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             .toList();
       case 'Technician':
       case 'Staff':
+      case 'Chief':
+      case 'Expert':
       case 'Operator':
       case 'Supervisor':
       case 'Leader':

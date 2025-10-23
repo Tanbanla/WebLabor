@@ -39,7 +39,7 @@ GoRouter createRouter(BuildContext context) {
     final group = auth.user?.chRGroup ?? '';
     final Map<String, List<String>> allowed = {
       AppRoutes.masterUser: ['Admin'],
-      AppRoutes.masterPthc: ['Admin'],
+      AppRoutes.masterPthc: ['Admin', 'Per'],
       AppRoutes.twoContract: ['Admin', 'Per', 'Chief Per'],
       AppRoutes.apprenticeContract: ['Admin', 'Per', 'Chief Per'],
       AppRoutes.approvalPreparation: ['Admin', 'Per', 'Chief Per'],

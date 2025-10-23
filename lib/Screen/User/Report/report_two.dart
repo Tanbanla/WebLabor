@@ -1295,7 +1295,8 @@ class MyData extends DataTableSource {
                     ),
                   const SizedBox(width: 3),
                   if (authState.user?.chRGroup == 'Admin' ||
-                      authState.user?.chRGroup == 'Chief Per')
+                      authState.user?.chRGroup == 'Chief Per' ||
+                      authState.user?.chRGroup == 'Per')
                     _buildActionButton(
                       icon: Iconsax.back_square,
                       color: Colors.red,

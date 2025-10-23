@@ -666,7 +666,7 @@ class DashboardControllerTwo extends GetxController {
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
       final Map<String, TwoContract> originalMap = {};
-      
+
       // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
       for (final original in originalList) {
         // Ưu tiên theo ID nếu có
@@ -681,20 +681,20 @@ class DashboardControllerTwo extends GetxController {
 
       for (int i = 0; i < twocontract.length; i++) {
         if ((twocontract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
-          
           // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
           TwoContract? original;
-          
+
           // Tìm theo ID trước (ưu tiên)
           if (twocontract[i].id != null) {
             original = originalMap['id_${twocontract[i].id}'];
           }
-          
+
           // Nếu không tìm thấy theo ID, tìm theo Employee ID
-          if (original == null && twocontract[i].vchREmployeeId?.isNotEmpty == true) {
+          if (original == null &&
+              twocontract[i].vchREmployeeId?.isNotEmpty == true) {
             original = originalMap['emp_${twocontract[i].vchREmployeeId}'];
           }
-          
+
           // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
           if (original != null) {
             final bool changed = original != twocontract[i];
@@ -756,7 +756,7 @@ class DashboardControllerTwo extends GetxController {
     String chucVu,
   ) async {
     try {
-      List<dynamic> twocontract= [];
+      List<dynamic> twocontract = [];
       final twocontractOld = getSelectedItems();
       if (twocontractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
@@ -786,7 +786,7 @@ class DashboardControllerTwo extends GetxController {
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
       final Map<String, TwoContract> originalMap = {};
-      
+
       // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
       for (final original in originalList) {
         // Ưu tiên theo ID nếu có
@@ -804,23 +804,26 @@ class DashboardControllerTwo extends GetxController {
         if ((twocontract[i].nvchrApproverDeft?.isNotEmpty ?? false) ||
             (twocontract[i].nvchRApproverManager?.isNotEmpty ?? false) ||
             (twocontract[i].nvchRApproverDirector?.isNotEmpty ?? false)) {
-          
           // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
           TwoContract? original;
-          
+
           // Tìm theo ID trước (ưu tiên)
           if (twocontract[i].id != null) {
             original = originalMap['id_${twocontract[i].id}'];
           }
-          
+
           // Nếu không tìm thấy theo ID, tìm theo Employee ID
-          if (original == null && twocontract[i].vchREmployeeId?.isNotEmpty == true) {
+          if (original == null &&
+              twocontract[i].vchREmployeeId?.isNotEmpty == true) {
             original = originalMap['emp_${twocontract[i].vchREmployeeId}'];
           }
-          
+
           // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
           if (original != null) {
-            final bool hasChanges = _hasMeaningfulChanges(original, twocontract[i]);
+            final bool hasChanges = _hasMeaningfulChanges(
+              original,
+              twocontract[i],
+            );
             if (!hasChanges) {
               // Không có thay đổi thực sự
               throw Exception(
@@ -922,13 +925,15 @@ class DashboardControllerTwo extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
-        final controlleruser = Get.put(DashboardControllerUser());
-        controlleruser.SendMail(
-          '4',
-          '$userApprover@brothergroup.net',
-          '$userApprover@brothergroup.net',
-          '$userApprover@brothergroup.net',
-        );
+        if (chucVu == "PTHC") {
+          final controlleruser = Get.put(DashboardControllerUser());
+          controlleruser.SendMail(
+            '4',
+            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net',
+          );
+        }
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -957,7 +962,7 @@ class DashboardControllerTwo extends GetxController {
       if (twocontractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
-            // lấy dữ liệu gốc để thực hiện
+      // lấy dữ liệu gốc để thực hiện
       twocontract = twocontractOld
           .map((item) => TwoContract.fromJson(item.toJson()))
           .toList();
@@ -1083,7 +1088,7 @@ class DashboardControllerTwo extends GetxController {
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
-          controlleruser.SendMail('6', mailSend, mailSend, mailSend);
+          //controlleruser.SendMail('6', mailSend, mailSend, mailSend);
           // k mo vi mo se gui cho quan ly cac phong
           // controlleruser.SendMail(
           //   '6',
@@ -1256,8 +1261,14 @@ class DashboardControllerTwo extends GetxController {
         final twocontract = TwoContract()
           ..id = 0
           ..vchRCodeApprover
-          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
-          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
@@ -1401,8 +1412,14 @@ class DashboardControllerTwo extends GetxController {
         final twocontract = TwoContract()
           ..id = 0
           ..vchRCodeApprover
-          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
-          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()

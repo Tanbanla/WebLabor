@@ -671,7 +671,7 @@ class DashboardControllerApprentice extends GetxController {
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
       final Map<String, ApprenticeContract> originalMap = {};
-      
+
       // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
       for (final original in originalList) {
         // Ưu tiên theo ID nếu có
@@ -687,20 +687,20 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         // Nếu có nhập lý do (ít nhất 1 trong 3) thì kiểm tra xem có thay đổi gì so với dữ liệu gốc không
         if ((contract[i].nvchRApproverPer?.isNotEmpty ?? false)) {
-          
           // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
           ApprenticeContract? original;
-          
+
           // Tìm theo ID trước (ưu tiên)
           if (contract[i].id != null) {
             original = originalMap['id_${contract[i].id}'];
           }
-          
+
           // Nếu không tìm thấy theo ID, tìm theo Employee ID
-          if (original == null && contract[i].vchREmployeeId?.isNotEmpty == true) {
+          if (original == null &&
+              contract[i].vchREmployeeId?.isNotEmpty == true) {
             original = originalMap['emp_${contract[i].vchREmployeeId}'];
           }
-          
+
           // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
           if (original != null) {
             final bool changed = original != contract[i];
@@ -764,8 +764,8 @@ class DashboardControllerApprentice extends GetxController {
     String chucVu,
   ) async {
     try {
-      List<dynamic> contract= [];
-      final contractOld= getSelectedItems();
+      List<dynamic> contract = [];
+      final contractOld = getSelectedItems();
       if (contractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
       }
@@ -801,7 +801,7 @@ class DashboardControllerApprentice extends GetxController {
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
       final Map<String, ApprenticeContract> originalMap = {};
-      
+
       // Xây dựng Map với keys phù hợp để tìm kiếm nhanh
       for (final original in originalList) {
         // Ưu tiên theo ID nếu có
@@ -817,23 +817,26 @@ class DashboardControllerApprentice extends GetxController {
       for (int i = 0; i < contract.length; i++) {
         if ((contract[i].nvchrApproverDeft?.isNotEmpty ?? false) ||
             (contract[i].nvchRApproverManager?.isNotEmpty ?? false)) {
-          
           // 🚀 Tìm kiếm O(1) thay vì O(n) với indexWhere
           ApprenticeContract? original;
-          
+
           // Tìm theo ID trước (ưu tiên)
           if (contract[i].id != null) {
             original = originalMap['id_${contract[i].id}'];
           }
-          
+
           // Nếu không tìm thấy theo ID, tìm theo Employee ID
-          if (original == null && contract[i].vchREmployeeId?.isNotEmpty == true) {
+          if (original == null &&
+              contract[i].vchREmployeeId?.isNotEmpty == true) {
             original = originalMap['emp_${contract[i].vchREmployeeId}'];
           }
-          
+
           // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
           if (original != null) {
-            final bool hasChanges = _hasMeaningfulChanges(original, contract[i]);
+            final bool hasChanges = _hasMeaningfulChanges(
+              original,
+              contract[i],
+            );
             if (!hasChanges) {
               // Không có thay đổi thực sự
               throw Exception('${tr('CapNhat')} ${contract[i].vchREmployeeId}');
@@ -926,13 +929,16 @@ class DashboardControllerApprentice extends GetxController {
       );
       if (response.statusCode == 200) {
         //await fetchDataBy();
-        final controlleruser = Get.put(DashboardControllerUser());
-        controlleruser.SendMail(
-          '2',
-          '$userApprover@brothergroup.net',
-          '$userApprover@brothergroup.net',
-          '$userApprover@brothergroup.net',
-        );
+        // điều kiện
+        if (chucVu == "PTHC") {
+          final controlleruser = Get.put(DashboardControllerUser());
+          controlleruser.SendMail(
+            '2',
+            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net',
+          );
+        }
       } else {
         final error = json.decode(response.body);
         throw Exception(
@@ -1013,7 +1019,7 @@ class DashboardControllerApprentice extends GetxController {
       final contractOld = getSelectedItems();
       //fetchPTHCData();
       List<dynamic> notApproval = [];
-      List<dynamic> contract= [];
+      List<dynamic> contract = [];
       String mailSend = "";
       String sectionAp = "";
       String PheDuyetMail = "";
@@ -1103,7 +1109,8 @@ class DashboardControllerApprentice extends GetxController {
         final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
-          controlleruser.SendMail('5', mailSend, mailSend, mailSend);
+          //controlleruser.SendMail('5', mailSend, mailSend, mailSend);
+          
           // controlleruser.SendMail(
           //   '5',
           //   "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
@@ -1244,8 +1251,14 @@ class DashboardControllerApprentice extends GetxController {
           ..vchRCodeApprover
           //'HD2N' + formatDateTime(DateTime.now()).toString()
           //..vchRCodeSection = row[4]?.value?.toString()
-          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
-          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
@@ -1388,8 +1401,14 @@ class DashboardControllerApprentice extends GetxController {
           ..id = 0
           ..vchRCodeApprover //=
           //'HD2N' + formatDateTime(DateTime.now()).toString()
-          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
-          ..vchRNameSection = row[4]?.value?.toString().replaceAll(RegExp(r'\s*:\s*'), ' : ')
+          ..vchRCodeSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
+          ..vchRNameSection = row[4]?.value?.toString().replaceAll(
+            RegExp(r'\s*:\s*'),
+            ' : ',
+          )
           ..vchREmployeeId = row[1]?.value?.toString()
           ..vchRTyperId = row[2]?.value?.toString()
           ..vchREmployeeName = row[3]?.value?.toString()
