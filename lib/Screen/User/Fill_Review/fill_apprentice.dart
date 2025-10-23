@@ -91,8 +91,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           controller.changeStatus('PTHC', null, null);
         }
         controllerUserApprover.changeStatus(
-          '${parts[0].trim()} : ${parts[1].trim()}',
-          'Leader,Supervisor,Staff,Section Manager,Expert',
+          sectionName,
+          'Leader,Supervisor,Operator,Staff,Section Manager,Expert',
         );
       } else if (authState.user!.chRGroup.toString() == "Chief") {
         controller.changeStatus(
@@ -101,7 +101,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           authState.user!.chRUserid.toString(),
         );
         controllerUserApprover.changeStatus(
-          '${parts[0].trim()} : ${parts[1].trim()}',
+          sectionName,
           'Section Manager',
         );
       } else {
@@ -113,7 +113,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         );
         // truong hop leader
         controllerUserApprover.changeStatus(
-          '${parts[0].trim()} : ${parts[1].trim()}',
+          sectionName,
           'Chief',
         );
       }
