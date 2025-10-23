@@ -33,6 +33,39 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <script>
+    // Simple client-side cleanup for cookies/localStorage older than TTL.
+    (function(){
+      const TTL_MS = 2 * 60 * 60 * 1000; // 2h
+      const now = Date.now();
+      try {
+        // localStorage items with companion timestamp key: key + '_ts'
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          const tsKey = k + '_ts';
+          const tsVal = localStorage.getItem(tsKey);
+          if (tsVal) {
+            const ts = parseInt(tsVal, 10);
+            if (!isNaN(ts) && (now - ts) > TTL_MS) {
+              localStorage.removeItem(k);
+              localStorage.removeItem(tsKey);
+            }
+          }
+        }
+        // Basic cookie expiry cleanup (assumes cookie values store ts=millis)
+        document.cookie.split(';').forEach(c => {
+          const parts = c.split('=');
+          if (parts.length >= 2) {
+            const name = parts[0].trim();
+            // Optional: implement specific cookie names
+          }
+        });
+      } catch(e){
+        console.warn('TTL cleanup error', e);
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
