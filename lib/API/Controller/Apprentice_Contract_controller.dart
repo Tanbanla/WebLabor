@@ -153,9 +153,9 @@ class DashboardControllerApprentice extends GetxController {
           return id == 4;
         case 'Chief':
           return id == 5;
-        case 'Manager':
+        case 'QLTC':
           return id == 6;
-        case 'Dept':
+        case 'QLCC':
           return id == 7;
         case 'Director':
           return id == 8;

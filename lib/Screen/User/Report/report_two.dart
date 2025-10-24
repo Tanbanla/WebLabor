@@ -1182,18 +1182,35 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _buildCopyCell(String? value) {
+  Widget _buildCopyCell(String? value, {bool wrap = false, int? maxLines}) {
     final txt = value ?? '';
+    final lines = maxLines ?? (wrap ? 3 : 2);
     return InkWell(
       onTap: () => _copyToClipboard(txt),
       child: Row(
+        crossAxisAlignment: wrap
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           Icon(Icons.copy, size: 14, color: Colors.grey[600]),
-          Text(
-            txt,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            overflow: TextOverflow.ellipsis,
-          ),
+          const SizedBox(width: 4),
+          if (wrap)
+            Expanded(
+              child: Text(
+                txt,
+                style: TextStyle(fontSize: Common.sizeColumn),
+                softWrap: true,
+                maxLines: lines,
+                overflow: TextOverflow.visible,
+              ),
+            )
+          else
+            Text(
+              txt,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              overflow: TextOverflow.ellipsis,
+              maxLines: lines,
+            ),
         ],
       ),
     );
@@ -1327,7 +1344,10 @@ class MyData extends DataTableSource {
         // Copyable vchREmployeeName
         DataCell(_buildCopyCell(data.vchREmployeeName)),
         DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
+        // Group column with wrapping support for long text
+        DataCell(
+          _buildCopyCell(data.chRCostCenterName ?? "", wrap: true, maxLines: 3),
+        ),
         DataCell(
           Center(
             child: Text(

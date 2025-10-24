@@ -1201,18 +1201,35 @@ class MyData extends DataTableSource {
     );
   }
 
-  Widget _buildCopyCell(String? value) {
+  Widget _buildCopyCell(String? value, {bool wrap = false, int? maxLines}) {
     final txt = value ?? '';
+    final lines = maxLines ?? (wrap ? 3 : 2);
     return InkWell(
       onTap: () => _copyToClipboard(txt),
       child: Row(
+        crossAxisAlignment: wrap
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           Icon(Icons.copy, size: 14, color: Colors.grey[600]),
-          Text(
-            txt,
-            style: TextStyle(fontSize: Common.sizeColumn),
-            overflow: TextOverflow.ellipsis,
-          ),
+          const SizedBox(width: 4),
+          if (wrap)
+            Expanded(
+              child: Text(
+                txt,
+                style: TextStyle(fontSize: Common.sizeColumn),
+                softWrap: true,
+                maxLines: lines,
+                overflow: TextOverflow.visible,
+              ),
+            )
+          else
+            Text(
+              txt,
+              style: TextStyle(fontSize: Common.sizeColumn),
+              overflow: TextOverflow.ellipsis,
+              maxLines: lines,
+            ),
         ],
       ),
     );
@@ -1296,8 +1313,7 @@ class MyData extends DataTableSource {
                   ),
                   SizedBox(width: 3),
                   if (authState.user?.chRGroup == 'Admin' ||
-                      authState.user?.chRGroup == 'Chief Per'
-                      )
+                      authState.user?.chRGroup == 'Chief Per')
                     _buildActionButton(
                       icon: Iconsax.ram,
                       color: Colors.brown,
@@ -1310,9 +1326,8 @@ class MyData extends DataTableSource {
                     ),
                   const SizedBox(width: 3),
                   if (authState.user?.chRGroup == 'Admin' ||
-                      authState.user?.chRGroup == 'Chief Per'
-                      ||authState.user?.chRGroup == 'Per'
-                      )
+                      authState.user?.chRGroup == 'Chief Per' ||
+                      authState.user?.chRGroup == 'Per')
                     _buildActionButton(
                       icon: Iconsax.back_square,
                       color: Colors.red,
@@ -1341,7 +1356,10 @@ class MyData extends DataTableSource {
         // Copyable vchREmployeeName
         DataCell(_buildCopyCell(data.vchREmployeeName)),
         DataCell(_buildCopyCell(data.vchRNameSection ?? "")),
-        DataCell(_buildCopyCell(data.chRCostCenterName ?? "")),
+        // Group column with wrapping support for long text
+        DataCell(
+          _buildCopyCell(data.chRCostCenterName ?? "", wrap: true, maxLines: 3),
+        ),
         DataCell(
           Text(
             data.dtMBrithday != null
@@ -1653,7 +1671,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.purple[100]!),
           ),
-          child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+          child: Text(
+            'Per/人事課の中級管理職',
+            style: TextStyle(color: Colors.purple[800]),
+          ),
         );
       case 3:
         return Container(
@@ -1696,7 +1717,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.yellow[100]!),
           ),
-          child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+          child: Text(
+            'QLTC/中級管理職',
+            style: TextStyle(color: Colors.yellow[800]),
+          ),
         );
       case 7:
         return Container(
@@ -1706,7 +1730,7 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.teal[100]!),
           ),
-          child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+          child: Text('QLCC/上級管理職', style: TextStyle(color: Colors.teal[800])),
         );
       case 8:
         return Container(
@@ -1716,7 +1740,10 @@ class MyData extends DataTableSource {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.brown[100]!),
           ),
-          child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+          child: Text(
+            'Director/管掌取締役',
+            style: TextStyle(color: Colors.brown[800]),
+          ),
         );
       case 9:
         return Container(
@@ -1740,6 +1767,113 @@ class MyData extends DataTableSource {
         );
     }
   }
+  // Widget _getHienTrangColor(int? IntStatus) {
+  //   switch (IntStatus) {
+  //     case 1:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.grey[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.blueGrey[100]!),
+  //         ),
+  //         child: Text('New', style: TextStyle(color: Colors.grey[800])),
+  //       );
+  //     case 2:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.purple[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.purple[100]!),
+  //         ),
+  //         child: Text('Per', style: TextStyle(color: Colors.purple[800])),
+  //       );
+  //     case 3:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.orange[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.orange[100]!),
+  //         ),
+  //         child: Text('PTHC', style: TextStyle(color: Colors.orange[800])),
+  //       );
+  //     case 4:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.blue[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.blue[100]!),
+  //         ),
+  //         child: Text('Leader', style: TextStyle(color: Colors.blue[800])),
+  //       );
+  //     case 5:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.deepPurple[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.deepPurple[100]!),
+  //         ),
+  //         child: Text(
+  //           'Chief',
+  //           style: TextStyle(color: const Color.fromARGB(255, 192, 21, 192)),
+  //         ),
+  //       );
+  //     case 6:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.yellow[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.yellow[100]!),
+  //         ),
+  //         child: Text('Manager', style: TextStyle(color: Colors.yellow[800])),
+  //       );
+  //     case 7:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.teal[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.teal[100]!),
+  //         ),
+  //         child: Text('Dept', style: TextStyle(color: Colors.teal[800])),
+  //       );
+  //     case 8:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.brown[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.brown[100]!),
+  //         ),
+  //         child: Text('Director', style: TextStyle(color: Colors.brown[800])),
+  //       );
+  //     case 9:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.green[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.green[100]!),
+  //         ),
+  //         child: Text('Done', style: TextStyle(color: Colors.green[800])),
+  //       );
+  //     default:
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Colors.red[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(color: Colors.red[100]!),
+  //         ),
+  //         child: Text('Not Error', style: TextStyle(color: Colors.red[800])),
+  //       );
+  //   }
+  // }
 
   Widget _buildActionButton({
     required IconData icon,
