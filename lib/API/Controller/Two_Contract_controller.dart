@@ -864,7 +864,7 @@ class DashboardControllerTwo extends GetxController {
                     twocontract[i].nvchRUseful == 'OK' &&
                     twocontract[i].nvchROther == 'OK')) {
               throw Exception(
-                '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
+                '${tr('InputError2')} ${twocontract[i].vchREmployeeId}',
               );
             }
             if (twocontract[i].biTNoReEmployment == false &&

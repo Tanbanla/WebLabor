@@ -868,13 +868,13 @@ class DashboardControllerApprentice extends GetxController {
                     contract[i].vchRThichNghi == 'OK' &&
                     contract[i].vchRUseful == 'OK' &&
                     contract[i].vchRContact == 'OK' &&
-                    contract[i].vcHNeedViolation == 'OK' &&
-                    (contract[i].vchRNote == '' ||
-                        contract[i].vchRNote == null))) {
+                    contract[i].vcHNeedViolation == 'OK')) {
               throw Exception(
-                '${tr('InputError1')} ${contract[i].vchREmployeeId}',
+                '${tr('InputError2')} ${contract[i].vchREmployeeId}',
               );
             }
+            // &&(contract[i].vchRNote == '' ||
+            //       contract[i].vchRNote == null)
             if (contract[i].biTNoReEmployment == false &&
                 (contract[i].nvchRNoReEmpoyment == null ||
                     contract[i].nvchRNoReEmpoyment == "")) {
@@ -1110,7 +1110,7 @@ class DashboardControllerApprentice extends GetxController {
         //mail phe duyet
         if (mailSend != '') {
           //controlleruser.SendMail('5', mailSend, mailSend, mailSend);
-          
+
           // controlleruser.SendMail(
           //   '5',
           //   "vietdo@brothergroup.net,vanug@brothergroup.net,tuanho@brothergroup.net,huyenvg@brothergroup.net, hoaiph@brothergroup.net",
