@@ -91,7 +91,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         }
         controllerUserApprover.changeStatus(
           sectionName,
-          'Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+          'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
         );
       } else if (authState.user!.chRGroup.toString() == "Chief") {
         controller.changeStatus(
