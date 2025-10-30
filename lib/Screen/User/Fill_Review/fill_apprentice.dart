@@ -85,7 +85,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 : parts.firstOrNull?.trim() ?? '';
           }
           // truong hop PTHC phong ban
-          controller.changeStatus('PTHC', sectionName, null);
+          controller.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
         } else {
           // truong hop khác
           controller.changeStatus('PTHC', null, null);
@@ -297,7 +297,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
 
-                  await controllerTwo.changeStatus('PTHC', sectionName, null);
+                  await controllerTwo.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
                 } else if (authState.user!.chRGroup.toString() == "Chief") {
                   await controllerTwo.changeStatus(
                     '5',
@@ -1535,7 +1535,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
 
-                  await controller.changeStatus('PTHC', sectionName, null);
+                  await controller.changeStatus('PTHC', sectionName, adid);
                 } else if (group == "Chief") {
                   await controller.changeStatus(
                     '5',
@@ -3364,7 +3364,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                         await controller.changeStatus(
                           'PTHC',
                           sectionName,
-                          null,
+                          authState.user!.chRUserid.toString(),
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                           "Chief") {

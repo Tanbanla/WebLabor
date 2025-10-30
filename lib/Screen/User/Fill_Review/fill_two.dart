@@ -85,7 +85,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 ? '${parts[0].trim()} : ${parts[1].trim()}'
                 : parts.firstOrNull?.trim() ?? '';
           }
-          controller.changeStatus('PTHC', sectionName, null);
+          controller.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
         } else {
           controller.changeStatus('PTHC', null, null);
         }
@@ -456,7 +456,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     authState.user!.chRGroup.toString() == "Per" ||
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
-                  await controllerTwo.changeStatus('PTHC', sectionName, null);
+                  await controllerTwo.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
                 } else if (authState.user!.chRGroup.toString() == "Chief") {
                   await controllerTwo.changeStatus(
                     '5',
@@ -1503,7 +1503,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 );
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
-                  await controller.changeStatus('PTHC', sectionName, null);
+                  await controller.changeStatus('PTHC', sectionName, adid);
                 } else if (group == "Chief") {
                   await controller.changeStatus('5', sectionName, adid);
                 } else {
@@ -2882,7 +2882,7 @@ class _ReturnTwoContract extends StatelessWidget {
                         await controller.changeStatus(
                           'PTHC',
                           sectionName,
-                          null,
+                          authState.user!.chRUserid.toString(),
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                           "Chief") {

@@ -26,18 +26,20 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   final ScrollController _scrollController = ScrollController();
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
-  int _rowsPerPage = 50;
+  int _rowsPerPage = 100;
   int _firstRowIndex = 0; // track first row of current page
-  final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  final List<int> _availableRowsPerPage = const [100, 150, 200, 250];
   //RxString selectedContractType  = RxString('');
   String get _indefiniteContractText => tr('indefiniteContract');
   String get _trialContractText => tr('trialContract');
-  String TypeValue = tr('indefiniteContract');
+  // Mặc định chuyển sang trialContract
+  String TypeValue = tr('trialContract');
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
+    // Lấy dữ liệu mặc định theo trialContract (apprentice)
     controller.fetchData(
-      contractType: 'two',
+      contractType: 'apprentice',
       statusId: '2',
       section: null,
       adid: authState.user?.chRUserid ?? '',
@@ -126,7 +128,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
           ? _indefiniteContractText
           : controller.currentContractType.value == 'apprentice'
           ? _trialContractText
-          : _indefiniteContractText; // Giá trị mặc định
+          : _trialContractText; // Giá trị mặc định sửa thành trial
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -217,7 +219,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                 await controller.updateListContractApproval(
                   authState.user!.chRUserid.toString(),
                   authState.user!.chRUserid.toString(),
-                  controller.currentContractType.toString(),
+                  controller.currentContractType.value,
                 );
                 if (context.mounted) {
                   // Hiển thị thông báo thành công
@@ -507,7 +509,7 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
                   typeContract,
                 );
                 controller.fetchData(
-                  contractType: 'two',
+                  contractType: typeContract,
                   statusId: '2',
                   section: null,
                   adid: adid,

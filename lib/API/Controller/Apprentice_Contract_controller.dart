@@ -397,7 +397,7 @@ class DashboardControllerApprentice extends GetxController {
         else if (statusId == 'PTHC')
           {
             "field": "INT_STATUS_ID",
-            "value": ["3", "4", "5"],
+            "value": ["3", "4"],
             "operator": "IN",
             "logicType": "AND",
           }
@@ -415,7 +415,9 @@ class DashboardControllerApprentice extends GetxController {
             "operator": "in",
             "logicType": "AND",
           },
-        if (adid != null && adid.isNotEmpty && statusId != 'approval')
+        if (adid != null &&
+            adid.isNotEmpty &&
+            statusId != 'PTHC') //&& statusId == 'approval'
           {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
       ];
 
@@ -435,20 +437,44 @@ class DashboardControllerApprentice extends GetxController {
         if (jsonData['success'] == true) {
           // Lấy dữ liệu từ phần data.data (theo cấu trúc response)
           final List<dynamic> data = jsonData['data']['data'] ?? [];
-
-          dataList.assignAll(
-            data
-                .map((contract) => ApprenticeContract.fromJson(contract))
-                .toList(),
-          );
-
+          if (statusId == 'PTHC') {
+            dataList.assignAll(
+              data
+                  .where(
+                    (a) =>
+                        (a['vchR_LEADER_EVALUTION'] == adid &&
+                            a['inT_STATUS_ID'] == 4) ||
+                        (a['inT_STATUS_ID'] == 3),
+                  )
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+            // dữ liệu gốc
+            originalList.assignAll(
+              data
+                  .where(
+                    (a) =>
+                        (a['vchR_LEADER_EVALUTION'] == adid &&
+                            a['inT_STATUS_ID'] == 4) ||
+                        (a['inT_STATUS_ID'] == 3),
+                  )
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+          } else {
+            dataList.assignAll(
+              data
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+            // dữ liệu gốc
+            originalList.assignAll(
+              data
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+          }
           filterdataList.assignAll(dataList);
-          // dữ liệu gốc
-          originalList.assignAll(
-            data
-                .map((contract) => ApprenticeContract.fromJson(contract))
-                .toList(),
-          );
           selectRows.assignAll(
             List.generate(dataList.length, (index) => false),
           );
@@ -860,7 +886,7 @@ class DashboardControllerApprentice extends GetxController {
             contract[i].nvchRApproverChief = '';
             break;
           case 4:
-            if (contract[i].vchRReasultsLeader != 'OK' &&
+            if (contract[i].vchRReasultsLeader == 'NG' &&
                 (contract[i].vchRLyThuyet == 'OK' &&
                     contract[i].vchRThucHanh == 'OK' &&
                     contract[i].vchRCompleteWork == 'OK' &&
