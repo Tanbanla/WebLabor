@@ -875,7 +875,7 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError1')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            if (twocontract[i].vchRReasultsLeader != 'OK' &&
+            if (twocontract[i].vchRReasultsLeader == 'NG' &&
                 (twocontract[i].nvchRCompleteWork == 'OK' &&
                     twocontract[i].nvchRUseful == 'OK' &&
                     twocontract[i].nvchROther == 'OK')) {
