@@ -1466,7 +1466,7 @@ class DashboardControllerApprentice extends GetxController {
           ..inTViolation = row[15]?.value != null
               ? int.tryParse(row[15]!.value.toString()) ?? 0
               : 0
-          ..nvarchaRViolation //= row[14]!.value.toString()
+          ..nvarchaRViolation
           ..vchRLyThuyet
           ..vchRThucHanh
           ..vchRCompleteWork
@@ -1551,6 +1551,153 @@ class DashboardControllerApprentice extends GetxController {
       isLoading(false);
     }
   }
+// ham nhap thong tin tu file
+Future<void> importExceltoApp(Uint8List bytes, String userUpdate) async {
+  try {
+    isLoading(true);
+    
+    // Implement your Excel parsing and data import logic here
+    // 1. Parse the Excel file
+    final excel = Excel.decodeBytes(bytes);
+    // 2. Validate the data
+    final sheet = excel.tables.keys.first;
+    final rows = excel.tables[sheet]!.rows;
+    // 3. Send to API or update local state
+    if (rows.isEmpty || rows[0].length < 4) {
+      throw Exception('File Excel không đúng định dạng');
+    }
+    
+    // 4. Refresh data
+    final List<ApprenticeContract> importedTwoContract = [];
+    int _i = 19;
+    
+    // Start from row 1 (skip header row) and process until empty row
+    while (_i < rows.length && rows[_i][2]?.value?.toString().isEmpty == false) {
+      final row = rows[_i];
+      
+      // Lấy thông tin employeeId để tìm dữ liệu hiện có
+      final employeeId = row[1]?.value?.toString();
+      
+      if (employeeId == null || employeeId.isEmpty) {
+        _i++;
+        continue;
+      }
+      
+      // Tìm dữ liệu hiện có từ filterdataList và dataList
+      final existingDataFromFilter = filterdataList.firstWhere(
+        (item) => item.vchREmployeeId == employeeId,
+        orElse: () => ApprenticeContract(),
+      );
+      
+      final existingDataFromData = dataList.firstWhere(
+        (item) => item.vchREmployeeId == employeeId,
+        orElse: () => ApprenticeContract(),
+      );
+      
+      // Ưu tiên dữ liệu từ filterdataList, nếu không có thì dùng từ dataList
+      final existingData = existingDataFromFilter.id != 0 
+          ? existingDataFromFilter 
+          : existingDataFromData;
+      
+      // Create and populate - giữ nguyên các trường khác từ dữ liệu hiện có
+      final twocontract = ApprenticeContract()
+        ..id = existingData.id ?? 0
+        ..vchRCodeApprover = existingData.vchRCodeApprover
+        ..vchRCodeSection = existingData.vchRCodeSection
+        ..vchRNameSection = existingData.vchRNameSection
+        ..vchREmployeeId = employeeId
+        ..vchRTyperId = existingData.vchRTyperId
+        ..vchREmployeeName = existingData.vchREmployeeName
+        ..dtMBrithday = existingData.dtMBrithday
+        ..chRPosition = existingData.chRPosition
+        ..chRCodeGrade = existingData.chRCodeGrade
+        ..chRCostCenterName = existingData.chRCostCenterName
+        ..dtMJoinDate = existingData.dtMJoinDate
+        ..dtMEndDate = existingData.dtMEndDate
+        ..fLGoLeaveLate = existingData.fLGoLeaveLate
+        ..fLNotLeaveDay = existingData.fLNotLeaveDay
+        ..inTViolation = existingData.inTViolation
+        // CẬP NHẬT các trường từ file Excel
+        ..nvarchaRViolation = row[16]?.value?.toString() // Cập nhật từ file
+        ..vchRLyThuyet = row[17]?.value?.toString() // Cập nhật từ file
+        ..vchRThucHanh = row[18]?.value?.toString() // Cập nhật từ file
+        ..vchRCompleteWork = row[19]?.value?.toString() // Cập nhật từ file
+        ..vchRLearnWork = row[20]?.value?.toString() // Cập nhật từ file
+        ..vchRThichNghi = row[21]?.value?.toString() // Cập nhật từ file
+        ..vchRUseful = row[22]?.value?.toString() // Cập nhật từ file
+        ..vchRContact = row[23]?.value?.toString() // Cập nhật từ file
+        ..vcHNeedViolation = row[24]?.value?.toString() // Cập nhật từ file
+        ..vchRReasultsLeader = row[25]?.value?.toString() // Cập nhật từ file
+        ..biTNoReEmployment = row[26]?.value != null 
+            ? (row[26]!.value.toString().toLowerCase() == 'true' || 
+              row[26]!.value.toString() == '1')
+            : existingData.biTNoReEmployment
+        // Giữ nguyên các trường khác từ dữ liệu hiện có
+        ..nvchRNoReEmpoyment = existingData.nvchRNoReEmpoyment
+        ..nvchRPthcSection = existingData.nvchRPthcSection
+        ..vchRLeaderEvalution = existingData.vchRLeaderEvalution
+        ..dtMLeadaerEvalution = existingData.dtMLeadaerEvalution
+        ..biTApproverPer = existingData.biTApproverPer
+        ..nvchRApproverPer = existingData.nvchRApproverPer
+        ..dtMApproverPer = existingData.dtMApproverPer
+        ..nvchRApproverChief = existingData.nvchRApproverChief
+        ..dtMApproverChief = existingData.dtMApproverChief
+        ..biTApproverSectionManager = existingData.biTApproverSectionManager
+        ..nvchRApproverManager = existingData.nvchRApproverManager
+        ..dtMApproverManager = existingData.dtMApproverManager
+        ..biTApproverDirector = existingData.biTApproverDirector
+        ..nvchRApproverDirector = existingData.nvchRApproverDirector
+        ..dtMApproverDirector = existingData.dtMApproverDirector
+        ..vchRUserCreate = existingData.vchRUserCreate ?? userUpdate
+        ..dtMCreate = existingData.dtMCreate ?? formatDateTime(DateTime.now())
+        ..vchRUserUpdate = userUpdate
+        ..dtMUpdate = formatDateTime(DateTime.now())
+        ..inTStatusId = existingData.inTStatusId ?? 1
+        ..vchRNote = existingData.vchRNote
+        ..useRApproverPer = existingData.useRApproverPer
+        ..useRApproverChief = existingData.useRApproverChief
+        ..useRApproverSectionManager = existingData.useRApproverSectionManager
+        ..useRApproverDirector = existingData.useRApproverDirector
+        ..dtmApproverDeft = existingData.dtmApproverDeft
+        ..userApproverDeft = existingData.userApproverDeft
+        ..bitApproverDeft = existingData.bitApproverDeft
+        ..nvchrApproverDeft = existingData.nvchrApproverDeft;
+
+      // Validate required fields
+      if (twocontract.vchREmployeeId?.isEmpty == true ||
+          twocontract.vchREmployeeName?.isEmpty == true ||
+          twocontract.vchRCodeSection?.isEmpty == true) {
+        _i++;
+        continue;
+      }
+      
+      if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+        _i++;
+        continue;
+      }
+      
+      final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
+      if (parsedEndDate != null &&
+          parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+        _i++;
+        continue;
+      }
+      
+      importedTwoContract.add(twocontract);
+      _i++;
+    }
+    
+    // 5. kiem tra so luong du lieu import
+    if (importedTwoContract.isEmpty) {
+      throw Exception('Không có dữ liệu hợp lệ để import');
+    }
+    
+  } catch (e) {
+    throw Exception('Import failed: $e');
+  } finally {
+    isLoading(false);
+  }
+}
 
   // ham format String to date
   DateTime? parseDateTime(String? dateString) {
