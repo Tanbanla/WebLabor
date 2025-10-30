@@ -85,7 +85,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 : parts.firstOrNull?.trim() ?? '';
           }
           // truong hop PTHC phong ban
-          controller.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
+          controller.changeStatus(
+            'PTHC',
+            sectionName,
+            authState.user!.chRUserid.toString(),
+          );
         } else {
           // truong hop khác
           controller.changeStatus('PTHC', null, null);
@@ -100,10 +104,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           sectionName,
           authState.user!.chRUserid.toString(),
         );
-        controllerUserApprover.changeStatus(
-          sectionName,
-          'Section Manager',
-        );
+        controllerUserApprover.changeStatus(sectionName, 'Section Manager');
       } else {
         // truong hop leader
         controller.changeStatus(
@@ -112,10 +113,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           authState.user!.chRUserid.toString(),
         );
         // truong hop leader
-        controllerUserApprover.changeStatus(
-          sectionName,
-          'Chief',
-        );
+        controllerUserApprover.changeStatus(sectionName, 'Chief');
       }
       _statusInitialized = true;
     } catch (e) {
@@ -297,7 +295,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
 
-                  await controllerTwo.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString());
+                  await controllerTwo.changeStatus(
+                    'PTHC',
+                    sectionName,
+                    authState.user!.chRUserid.toString(),
+                  );
                 } else if (authState.user!.chRGroup.toString() == "Chief") {
                   await controllerTwo.changeStatus(
                     '5',
@@ -485,6 +487,77 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           return desired; // large keep original
         }
 
+        // Only allow filtering by status "PTHC" and "Leader" on this screen
+        final statusOptions = <Map<String, String>>[
+          {'code': 'PTHC', 'label': 'PTHC'},
+          {'code': 'Leader', 'label': 'Leader'},
+        ];
+
+        Widget statusDropdown = SizedBox(
+          width: fw(150),
+          child: Obx(
+            () => DropdownButtonFormField<String>(
+              value: controller.selectedStatus.value.isEmpty
+                  ? null
+                  : controller.selectedStatus.value,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                hintText: tr('status'),
+                hintStyle: TextStyle(fontSize: 15, color: Colors.grey[500]),
+                prefixIcon: Icon(
+                  Iconsax.activity,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: Colors.black54,
+                    width: .5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.blue[300]!, width: 1.5),
+                ),
+                isDense: true,
+              ),
+              isExpanded: true,
+              hint: Text(
+                tr('status'),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              items: statusOptions.map((option) {
+                return DropdownMenuItem<String>(
+                  value: option['code']!,
+                  child: Text(
+                    option['label']!,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) => controller.updateStatus(value),
+              dropdownColor: Colors.white,
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey[600],
+                size: 20,
+              ),
+              menuMaxHeight: 200,
+            ),
+          ),
+        );
+
         final List<Widget> filters = [
           if (!isXSmall)
             Padding(
@@ -539,6 +612,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               onChanged: (v) => controller.updateGroup(v),
             ),
           ),
+          // Status dropdown (PTHC / Leader)
+          if (authState.user!.chRGroup.toString() == "PTHC") statusDropdown,
           buildActionButton(
             icon: Iconsax.refresh,
             color: Colors.blue,
