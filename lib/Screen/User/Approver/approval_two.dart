@@ -34,20 +34,38 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = Provider.of<AuthState>(context, listen: false);
+      _reloadData(authState.user!.chRUserid.toString());
+    });
+  }
+
+  Future<void> _reloadData(String userId) async {
+    controller.filterdataList.clear();
+    if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
+    controller.isLoading.value = true;
+    try {
+      await controller.fetchPTHCData();
+      controller.refreshSearch();
+      controller.changeStatus('approval', null, userId);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Reload failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      controller.isLoading.value = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    // String sectionName = authState.user!.chRSecCode
-    //     .toString()
-    //     .split(':')[1]
-    //     .trim();
-    // phan xem ai dang vao man so sanh
-    controller.refreshSearch();
-    controller.fetchPTHCData();
-    controller.changeStatus(
-      'approval',
-      null,
-      authState.user!.chRUserid.toString(),
-    );
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -212,7 +230,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             icon: Iconsax.refresh,
             color: Colors.blue,
             tooltip: tr('Rfilter'),
-            onPressed: () => controller.refreshFilteredList(),
+            onPressed: () async {
+              final authState = Provider.of<AuthState>(context, listen: false);
+              await _reloadData(authState.user!.chRUserid.toString());
+              controller.refreshFilteredList();
+            },
           ),
           buildActionButton(
             icon: Iconsax.export,

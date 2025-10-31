@@ -890,7 +890,7 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError')} ${twocontract[i].vchREmployeeId}',
               );
             }
-            if (chucVu == "Chief") {
+            if (chucVu == "Chief"|| chucVu == "Expert") {
               twocontract[i].inTStatusId = 6;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userUpdate;
@@ -971,7 +971,7 @@ class DashboardControllerTwo extends GetxController {
       //fetchPTHCData();
       final twocontractOld = getSelectedItems();
       List<dynamic> notApproval = [];
-      List<dynamic> twocontract = [];
+      List<TwoContract> twocontract = [];
       String mailSend = "";
       String sectionAp = "";
       String PheDuyetMail = "";
@@ -1001,10 +1001,11 @@ class DashboardControllerTwo extends GetxController {
             if (twocontract[i].biTApproverSectionManager == true) {
               twocontract[i].inTStatusId = 7;
               mailSend = await NextApprovel(
-                section: twocontract[i].vchRCodeSection,
+                section: "",
                 chucVu: "Dept Manager",
                 dept: dept,
               );
+              twocontract[i].userApproverDeft = mailSend;
             } else {
               if ((twocontract[i].nvchRApproverManager?.isEmpty ?? true)) {
                 throw Exception(
@@ -1023,10 +1024,11 @@ class DashboardControllerTwo extends GetxController {
             if (twocontract[i].bitApproverDeft == true) {
               twocontract[i].inTStatusId = 8;
               mailSend = await NextApprovel(
-                section: twocontract[i].vchRCodeSection,
+                section: "",
                 chucVu: "Director",
                 dept: dept,
               );
+              twocontract[i].useRApproverDirector = mailSend;
             } else {
               if ((twocontract[i].nvchrApproverDeft?.isEmpty ?? true)) {
                 throw Exception(
@@ -1923,10 +1925,12 @@ class DashboardControllerTwo extends GetxController {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           // Process and join emails in one efficient operation
-          return (jsonData['data'] as List)
-              .map((item) => ApproverUser.fromJson(item).chREmployeeMail)
-              .where((email) => email != null && email.isNotEmpty)
-              .join(';');
+          final adidList = (jsonData['data'] as List)
+              .map((item) => ApproverUser.fromJson(item))
+              .map((user) => user.chREmployeeAdid ?? "")
+              .where((adid) => adid.isNotEmpty)
+              .toList();
+          return adidList.isNotEmpty ? adidList.first : "";
         }
         throw Exception(
           'API request failed: ${jsonData['message'] ?? 'Unknown error'}',

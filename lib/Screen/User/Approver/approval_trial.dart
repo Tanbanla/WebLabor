@@ -35,17 +35,49 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   int _rowsPerPage = 50;
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  // Removed _initialLoadDone (không sử dụng)
+
+  @override
+  void initState() {
+    super.initState();
+    // Đợi frame đầu tiên để đảm bảo Provider/Localization đã sẵn sàng
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = Provider.of<AuthState>(context, listen: false);
+      _reloadData(authState.user!.chRUserid.toString());
+    });
+  }
+
+  Future<void> _reloadData(String userId) async {
+    // Clear dữ liệu cũ trước khi load mới để tránh hiển thị dữ liệu stale
+    controller.filterdataList.clear();
+    if (controller.selectRows.isNotEmpty) {
+      controller.selectRows.clear();
+    }
+    // Bắt đầu hiển thị loading
+    controller.isLoading.value = true;
+    try {
+      // Gọi API / xử lý cần thiết
+      await controller.fetchPTHCData();
+      controller.refreshSearch();
+      controller.changeStatus('approval', null, userId);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Reload failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      controller.isLoading.value = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthState>(context, listen: true);
-    // phan xem ai dang vao man so sanh
-    controller.fetchPTHCData();
-    controller.refreshSearch();
-    controller.changeStatus(
-      'approval',
-      null,
-      authState.user!.chRUserid.toString(),
-    );
+    // Lấy AuthState nếu cần dùng trong tương lai (xoá để tránh cảnh báo unused)
+    // Không còn load dữ liệu trực tiếp trong build để tránh gọi lặp thừa.
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -210,7 +242,11 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             icon: Iconsax.refresh,
             color: Colors.blue,
             tooltip: tr('Rfilter'),
-            onPressed: () => controller.refreshFilteredList(),
+            onPressed: () async {
+              // Refresh danh sách + reload lại dữ liệu từ server
+              await _reloadData(authState.user!.chRUserid.toString());
+              controller.refreshFilteredList();
+            },
           ),
           buildActionButton(
             icon: Iconsax.export,

@@ -282,17 +282,17 @@ class ApprenticeContract {
     if (json["dtM_DUE_DATE"] is String) {
       dtMDueDate = json["dtM_DUE_DATE"];
     }
-    if (json["DTM_APPROVER_DEFT"] is String) {
-      dtmApproverDeft = json["DTM_APPROVER_DEFT"];
+    if (json["dtM_APPROVER_DEFT"] is String) {
+      dtmApproverDeft = json["dtM_APPROVER_DEFT"];
     }
-    if (json["USER_APPROVER_DEFT"] is String) {
-      userApproverDeft = json["USER_APPROVER_DEFT"];
+    if (json["useR_APPROVER_DEFT"] is String) {
+      userApproverDeft = json["useR_APPROVER_DEFT"];
     }
-    if (json["BIT_APRROVER_DEFT"] is bool) {
-      bitApproverDeft = json["BIT_APRROVER_DEFT"];
+    if (json["biT_APRROVER_DEFT"] is bool) {
+      bitApproverDeft = json["biT_APRROVER_DEFT"];
     }
-    if (json["NVCHR_APROVER_DEFT"] is String) {
-      nvchrApproverDeft = json["NVCHR_APROVER_DEFT"];
+    if (json["nvchR_APROVER_DEFT"] is String) {
+      nvchrApproverDeft = json["nvchR_APROVER_DEFT"];
     }
   }
 

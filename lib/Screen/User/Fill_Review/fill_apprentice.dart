@@ -66,7 +66,6 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       await controllerPTHC.fetchPTHCSectionList(
         authState.user!.chREmployeeId.toString(),
       );
-
       final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
       String sectionName = parts.length >= 2
           ? '${parts[0].trim()} : ${parts[1].trim()}'
@@ -98,7 +97,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           sectionName,
           'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
         );
-      } else if (authState.user!.chRGroup.toString() == "Chief") {
+      } else if (authState.user!.chRGroup.toString() == "Chief"||
+          authState.user!.chRGroup.toString() == "Expert") {
         controller.changeStatus(
           '5',
           sectionName,
@@ -113,7 +113,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           authState.user!.chRUserid.toString(),
         );
         // truong hop leader
-        controllerUserApprover.changeStatus(sectionName, 'Chief');
+        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
       }
       _statusInitialized = true;
     } catch (e) {
