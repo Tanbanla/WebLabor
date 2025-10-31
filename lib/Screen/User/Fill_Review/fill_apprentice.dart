@@ -55,6 +55,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
       controller.refreshSearch();
       controller.fetchPTHCData();
+      await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
   }
@@ -273,8 +274,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           // Send button
           GestureDetector(
             onTap: () async {
-              if (selectedConfirmer.value == null &&
-                  authState.user!.chRGroup.toString() != "Chief") {
+              if (selectedConfirmer.value == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(tr('pleasecomfirm')),
@@ -284,7 +284,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 return;
               }
               try {
-                final controllerTwo = Get.find<DashboardControllerApprentice>();
+                final controllerTwo = Get.find<DashboardControllerApprentice>();                
                 await controllerTwo.updateListApprenticeContractFill(
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
@@ -300,7 +300,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     sectionName,
                     authState.user!.chRUserid.toString(),
                   );
-                } else if (authState.user!.chRGroup.toString() == "Chief") {
+                } else if (authState.user!.chRGroup.toString() == "Chief" || authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     '5',
                     sectionName,
@@ -594,13 +594,86 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               onChanged: (v) => controller.updateEmployeeName(v),
             ),
           ),
+          // chọn phòng ban 
           SizedBox(
-            width: fw(160),
-            child: _buildFilterFieldWithIcon(
-              width: fw(160),
-              hint: tr('department'),
-              icon: Iconsax.building_3,
-              onChanged: (v) => controller.updateDepartment(v),
+            width: fw(200),
+            child: Obx(
+              () => DropdownButtonFormField<String>(
+                value: controller.departmentQuery.value.isEmpty
+                    ? null
+                    : controller.departmentQuery.value,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: tr('department'),
+                  labelStyle: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  prefixIcon: Icon(
+                    Iconsax.building_4,
+                    size: 20,
+                    color: Colors.grey[600],
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: Colors.black54,
+                      width: 0.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Colors.blue[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                  isDense: true,
+                ),
+                hint: Text(
+                  tr('department'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                items:
+                    [
+                      DropdownMenuItem<String>(
+                        value: '',
+                        child: Text(
+                          tr('all'),
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ] +
+                    controller.listSection
+                        .map(
+                          (section) => DropdownMenuItem<String>(
+                            value: section,
+                            child: Text(
+                              section,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (value) {
+                  controller.updateDepartment(value ?? '');
+                },
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                menuMaxHeight: 320,
+                dropdownColor: Colors.white,
+              ),
             ),
           ),
           SizedBox(

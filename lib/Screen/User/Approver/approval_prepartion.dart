@@ -37,12 +37,13 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: true);
+    controller.fetchSectionList();
     // Lấy dữ liệu mặc định theo trialContract (apprentice)
     controller.fetchData(
       contractType: 'apprentice',
       statusId: '2',
       section: null,
-      adid: authState.user?.chRUserid ?? '',
+      adid: authState.user?.chRUserid ?? 'c',
     );
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -358,12 +359,84 @@ class _ApprovalPrepartionScreenState extends State<ApprovalPrepartionScreen> {
             ),
           ),
           SizedBox(
-            width: fw(160),
-            child: _buildFilterFieldWithIcon(
-              width: fw(160),
-              hint: tr('department'),
-              icon: Iconsax.building_3,
-              onChanged: (v) => controller.updateDepartment(v),
+            width: fw(200),
+            child: Obx(
+              () => DropdownButtonFormField<String>(
+                value: controller.departmentQuery.value.isEmpty
+                    ? null
+                    : controller.departmentQuery.value,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: tr('department'),
+                  labelStyle: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  prefixIcon: Icon(
+                    Iconsax.building_4,
+                    size: 20,
+                    color: Colors.grey[600],
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: Colors.black54,
+                      width: 0.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Colors.blue[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                  isDense: true,
+                ),
+                hint: Text(
+                  tr('department'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                items:
+                    [
+                      DropdownMenuItem<String>(
+                        value: '',
+                        child: Text(
+                          tr('all'),
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ] +
+                    controller.listSection
+                        .map(
+                          (section) => DropdownMenuItem<String>(
+                            value: section,
+                            child: Text(
+                              section,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (value) {
+                  controller.updateDepartment(value ?? '');
+                },
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                menuMaxHeight: 320,
+                dropdownColor: Colors.white,
+              ),
             ),
           ),
           SizedBox(

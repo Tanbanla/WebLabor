@@ -554,7 +554,8 @@ class DashboardControllerUser extends GetxController {
     try {
       isLoading(true);
       final requestBody = {
-        "title": "THÔNG BÁO: YÊU CẦU ĐÁNH GIÁ HỢP ĐỒNG BỊ TỪ CHỐI",
+        "title":
+            "THÔNG BÁO: KẾT QUẢ ĐÁNH GIÁ HỢP ĐỒNG LAO ĐỘNG BỊ TỪ CHỐI/ 通知：労働契約評価の結果は却下されました",
         "mail_from": "LaborContractEvaluationSystem@brothergroup.net",
         "mail_to": to == "null" ? "" : to,
         "mail_cc": cc == "null" ? "" : cc,
