@@ -35,6 +35,10 @@ class DashboardControllerApprentice extends GetxController {
   var pthcList = <PthcGroup>[].obs;
 
   RxString currentStatusId = "1".obs;
+  // Lưu trữ file lỗi import để có thể tải xuống giao diện
+  Rx<Uint8List?> lastImportErrorExcel = Rx<Uint8List?>(null);
+  // Danh sách thông báo lỗi từng dòng
+  RxList<String> lastImportErrors = <String>[].obs;
 
   @override
   void onInit() {
@@ -1569,8 +1573,11 @@ class DashboardControllerApprentice extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
 
-      // 4. Refresh data
-      final List<ApprenticeContract> importedTwoContract = [];
+  // 4. Refresh data & tracking errors
+  final List<ApprenticeContract> importedTwoContract = [];
+  final List<Map<String, dynamic>> errorRows = []; // store raw + reason
+  lastImportErrors.clear();
+  lastImportErrorExcel.value = null;
       int _i = 19;
 
       // Start from row 1 (skip header row) and process until empty row
@@ -1582,6 +1589,12 @@ class DashboardControllerApprentice extends GetxController {
         final employeeId = row[1]?.value?.toString();
 
         if (employeeId == null || employeeId.isEmpty) {
+          errorRows.add({
+            'row': _i + 1,
+            'employeeId': employeeId ?? '',
+            'reason': 'Thiếu mã nhân viên',
+          });
+          lastImportErrors.add('Row ${_i + 1}: Thiếu mã nhân viên');
           _i++;
           continue;
         }
@@ -1680,11 +1693,23 @@ class DashboardControllerApprentice extends GetxController {
         if (twocontract.vchREmployeeId?.isEmpty == true ||
             twocontract.vchREmployeeName?.isEmpty == true ||
             twocontract.vchRCodeSection?.isEmpty == true) {
+          errorRows.add({
+            'row': _i + 1,
+            'employeeId': employeeId,
+            'reason': 'Thiếu thông tin bắt buộc',
+          });
+          lastImportErrors.add('Row ${_i + 1}: Thiếu thông tin bắt buộc');
           _i++;
           continue;
         }
 
         if (!await checkEmployeeExists(twocontract.vchREmployeeId!)) {
+          errorRows.add({
+            'row': _i + 1,
+            'employeeId': employeeId,
+            'reason': 'Nhân viên không tồn tại',
+          });
+          lastImportErrors.add('Row ${_i + 1}: Nhân viên không tồn tại');
           _i++;
           continue;
         }
@@ -1692,6 +1717,12 @@ class DashboardControllerApprentice extends GetxController {
         final parsedEndDate = parseDateTime(twocontract.dtMEndDate);
         if (parsedEndDate != null &&
             parsedEndDate.difference(DateTime.now()).inDays.abs() <= 10) {
+          errorRows.add({
+            'row': _i + 1,
+            'employeeId': employeeId,
+            'reason': 'Hạn đánh giá quá gần (<=10 ngày)',
+          });
+          lastImportErrors.add('Row ${_i + 1}: Hạn đánh giá quá gần (<=10 ngày)');
           _i++;
           continue;
         }
@@ -1702,7 +1733,48 @@ class DashboardControllerApprentice extends GetxController {
 
       // 5. kiem tra so luong du lieu import
       if (importedTwoContract.isEmpty) {
+        // Tạo file lỗi nếu có errorRows
+        if (errorRows.isNotEmpty) {
+          final errorExcel = Excel.createExcel();
+          final Sheet sheetErrors = errorExcel['Errors'];
+          sheetErrors.appendRow([
+            TextCellValue('Row'),
+            TextCellValue('EmployeeId'),
+            TextCellValue('Reason'),
+          ]);
+          for (final er in errorRows) {
+            sheetErrors.appendRow([
+              TextCellValue(er['row'].toString()),
+              TextCellValue(er['employeeId']?.toString() ?? ''),
+              TextCellValue(er['reason']?.toString() ?? ''),
+            ]);
+          }
+          final bytesErr = errorExcel.encode();
+          if (bytesErr != null) {
+            lastImportErrorExcel.value = Uint8List.fromList(bytesErr);
+          }
+        }
         throw Exception('Không có dữ liệu hợp lệ để import');
+      } else if (errorRows.isNotEmpty) {
+        // Có cả dữ liệu đúng lẫn lỗi: tạo file lỗi để người dùng xem
+        final errorExcel = Excel.createExcel();
+        final Sheet sheetErrors = errorExcel['Errors'];
+        sheetErrors.appendRow([
+          TextCellValue('Row'),
+          TextCellValue('EmployeeId'),
+          TextCellValue('Reason'),
+        ]);
+        for (final er in errorRows) {
+          sheetErrors.appendRow([
+            TextCellValue(er['row'].toString()),
+            TextCellValue(er['employeeId']?.toString() ?? ''),
+            TextCellValue(er['reason']?.toString() ?? ''),
+          ]);
+        }
+        final bytesErr = errorExcel.encode();
+        if (bytesErr != null) {
+          lastImportErrorExcel.value = Uint8List.fromList(bytesErr);
+        }
       }
     } catch (e) {
       throw Exception('Import failed: $e');
