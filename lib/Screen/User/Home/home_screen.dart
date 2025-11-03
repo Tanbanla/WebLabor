@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
           '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}';
     } else {
       linkApi =
-          '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}/${authState.user!.chRSecCode}';
+          '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}/${authState.user!.chRUserid}/${authState.user!.chRGroup}';
     }
     setState(() {
       isLoading = true;

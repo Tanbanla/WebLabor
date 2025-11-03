@@ -143,7 +143,8 @@ class Common {
       "Report/get-quantity-total-contract-statistic-by-year/";
   static const String ContractTotalByMonth =
       "Report/get-quantity-total-contract-statistic/";
-
+  static const String ContractTotalByUser =
+      "Report/get-quantity-total-contract-statistic-by-section";
   // Send mail
   static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
   static const String SendMailCustom =
