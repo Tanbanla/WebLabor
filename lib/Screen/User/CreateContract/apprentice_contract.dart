@@ -42,7 +42,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   Widget build(BuildContext context) {
     controller.refreshSearch();
     controller.fetchSectionList();
-    controller.changeStatus('1', null, null);
+    controller.changeStatus('1', null, null,null);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(
@@ -211,7 +211,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                await controllerTwo.changeStatus("1", null, null);
+                await controllerTwo.changeStatus("1", null, null,null);
                 if (context.mounted) {
                   // Hiển thị thông báo thành công
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1000,14 +1000,14 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
                             selectedFileData.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null);
+                          await controller.changeStatus("1", null, null,null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileContract(
                             selectedFile.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null);
+                          await controller.changeStatus("1", null, null,null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -2070,7 +2070,7 @@ class _EditContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
@@ -2193,7 +2193,7 @@ class _DeleteContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -2518,7 +2518,7 @@ class _showAddDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                     } catch (e) {
                       // errorMessage.value =
                       //     '${tr('ErrorUpdate')}${e.toString()}';
@@ -2651,7 +2651,7 @@ class _DeleteListContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {

@@ -60,8 +60,14 @@ class DashboardControllerApprentice extends GetxController {
     String newStatusId,
     String? newSection,
     String? adid,
+    String? chucVu,
   ) async {
-    await fetchDataBy(statusId: newStatusId, section: newSection, adid: adid);
+    await fetchDataBy(
+      statusId: newStatusId,
+      section: newSection,
+      adid: adid,
+      chucVu: chucVu,
+    );
   }
 
   List<ApprenticeContract> getSelectedItems() {
@@ -339,6 +345,7 @@ class DashboardControllerApprentice extends GetxController {
     String? statusId,
     String? section,
     String? adid,
+    String? chucVu,
   }) async {
     try {
       isLoading(true);
@@ -480,14 +487,19 @@ class DashboardControllerApprentice extends GetxController {
               adid.isNotEmpty) {
             // Filter locally for matching approver ADID in any approval role
             final filtered = data.where((a) {
-              return a['inT_STATUS_ID'] != null &&
-                  [6, 7, 8].contains(a['inT_STATUS_ID']) &&
-                  (a['userApproverSectionManager'] == adid ||
-                      a['userApproverDeft'] == adid ||
-                      a['userApproverDirector'] == adid ||
-                      a['useR_APPROVER_SECTION_MANAGER'] == adid ||
-                      a['useR_APPROVER_DEFT'] == adid ||
-                      a['useR_APPROVER_DIRECTOR'] == adid);
+              if (chucVu == "Section Manager") {
+                return a['inT_STATUS_ID'] != null &&
+                    [6].contains(a['inT_STATUS_ID']) &&
+                    (a['userApproverSectionManager'] == adid ||
+                        a['useR_APPROVER_SECTION_MANAGER'] == adid);
+              } else {
+                return a['inT_STATUS_ID'] != null &&
+                    [7, 8].contains(a['inT_STATUS_ID']) &&
+                    (a['userApproverDeft'] == adid ||
+                        a['userApproverDirector'] == adid ||
+                        a['useR_APPROVER_DEFT'] == adid ||
+                        a['useR_APPROVER_DIRECTOR'] == adid);
+              }
             }).toList();
             dataList.assignAll(
               filtered

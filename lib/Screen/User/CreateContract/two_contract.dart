@@ -40,7 +40,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   @override
   Widget build(BuildContext context) {
     controller.refreshSearch();
-    controller.changeStatus('1', null, null);
+    controller.changeStatus('1', null, null, null);
     controller.fetchSectionList();
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -210,7 +210,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                await controllerTwo.changeStatus("1", null, null);
+                await controllerTwo.changeStatus("1", null, null,null);
                 if (context.mounted) {
                   // Hiển thị thông báo thành công
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1012,14 +1012,14 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                             selectedFileData.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null);
+                          await controller.changeStatus("1", null, null,null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileTwoContract(
                             selectedFile.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null);
+                          await controller.changeStatus("1", null, null,null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -2222,7 +2222,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
@@ -2370,7 +2370,7 @@ class _DeleteTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -2648,7 +2648,7 @@ class _showAddDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
@@ -2791,7 +2791,7 @@ class _DeleteListContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null);
+                      await controller.changeStatus("1", null, null,null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {

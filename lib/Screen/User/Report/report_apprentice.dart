@@ -37,6 +37,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   final ScrollController _scrollController = ScrollController();
   // Right side (scrollable columns) horizontal scroll controller
   final ScrollController _rightScrollController = ScrollController();
+  // Vertical controllers for frozen (left) and scrollable (right) sections to sync
+  final ScrollController _leftVerticalController = ScrollController();
+  final ScrollController _rightVerticalController = ScrollController();
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
@@ -54,6 +57,29 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
+
+    // Sync vertical scroll between frozen (left) and scrollable (right) sections
+    _leftVerticalController.addListener(() {
+      if (_rightVerticalController.hasClients &&
+          _rightVerticalController.offset != _leftVerticalController.offset) {
+        _rightVerticalController.jumpTo(_leftVerticalController.offset);
+      }
+    });
+    _rightVerticalController.addListener(() {
+      if (_leftVerticalController.hasClients &&
+          _leftVerticalController.offset != _rightVerticalController.offset) {
+        _leftVerticalController.jumpTo(_rightVerticalController.offset);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _leftVerticalController.dispose();
+    _rightVerticalController.dispose();
+    _scrollController.dispose();
+    _rightScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _prepareStatus(AuthState authState) async {
@@ -117,7 +143,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                 );
                 return Stack(
                   children: [
-                    Positioned.fill(child: _buildDataTable()),
+                    //Positioned.fill(child: _buildDataTable()),
                     // Replaced original table with frozen columns implementation
                     // Positioned.fill(child: _buildDataTable()),
                     // New frozen table:
@@ -817,7 +843,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     final frozenColumns = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 70,
+        width: 50,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -845,7 +871,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 60,
+        width: 40,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -1022,18 +1048,22 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     for (final r in fullRows) {
       final cells = r.cells;
       final frozenCellCount = showAction ? 7 : 6; // number of left cells
-      frozenRows.add(DataRow(
-        selected: r.selected,
-        onSelectChanged: r.onSelectChanged,
-        color: r.color,
-        cells: cells.take(frozenCellCount).toList(),
-      ));
-      scrollableRows.add(DataRow(
-        selected: r.selected,
-        onSelectChanged: r.onSelectChanged,
-        color: r.color,
-        cells: cells.skip(frozenCellCount).toList(),
-      ));
+      frozenRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.take(frozenCellCount).toList(),
+        ),
+      );
+      scrollableRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.skip(frozenCellCount).toList(),
+        ),
+      );
     }
 
     return Theme(
@@ -1062,42 +1092,50 @@ class _ReportApprenticeState extends State<ReportApprentice> {
             Expanded(
               child: Row(
                 children: [
-                  // Frozen side
+                  // Frozen side with its own vertical scrollbar
                   ConstrainedBox(
                     constraints: const BoxConstraints(minWidth: 900),
-                    child: SingleChildScrollView(
-                      controller: _scrollController, // vertical sync
-                      child: DataTable(
-                        headingRowHeight: 66,
-                        dataRowHeight: 56,
-                        showCheckboxColumn: true,
-                        columns: frozenColumns,
-                        rows: frozenRows,
+                    child: Scrollbar(
+                      controller: _leftVerticalController,
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        controller: _leftVerticalController,
+                        child: DataTable(
+                          headingRowHeight: 66,
+                          dataRowHeight: 56,
+                          showCheckboxColumn: true,
+                          columns: frozenColumns,
+                          rows: frozenRows,
+                        ),
                       ),
                     ),
                   ),
-                  // Vertical divider between frozen and scrollable parts
+                  // Divider
                   Container(
                     width: 1,
                     height: double.infinity,
                     color: Colors.grey[300],
                   ),
-                  // Scrollable side
+                  // Scrollable side (horizontal + synced vertical)
                   Expanded(
                     child: Scrollbar(
-                      thumbVisibility: true,
                       controller: _rightScrollController,
+                      thumbVisibility: true,
                       child: SingleChildScrollView(
                         controller: _rightScrollController,
                         scrollDirection: Axis.horizontal,
-                        child: SingleChildScrollView(
-                          controller: _scrollController, // vertical sync
-                          child: DataTable(
-                            headingRowHeight: 66,
-                            dataRowHeight: 56,
-                            showCheckboxColumn: false, // checkbox already at left
-                            columns: scrollableColumns,
-                            rows: scrollableRows,
+                        child: Scrollbar(
+                          controller: _rightVerticalController,
+                          thumbVisibility: true,
+                          child: SingleChildScrollView(
+                            controller: _rightVerticalController,
+                            child: DataTable(
+                              headingRowHeight: 66,
+                              dataRowHeight: 56,
+                              showCheckboxColumn: false,
+                              columns: scrollableColumns,
+                              rows: scrollableRows,
+                            ),
                           ),
                         ),
                       ),

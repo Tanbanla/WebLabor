@@ -38,11 +38,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = Provider.of<AuthState>(context, listen: false);
-      _reloadData(authState.user!.chRUserid.toString());
+      _reloadData(authState.user!.chRUserid.toString(), authState.user!.chRGroup.toString());
     });
   }
 
-  Future<void> _reloadData(String userId) async {
+  Future<void> _reloadData(String userId, String? chucVu) async {
     controller.filterdataList.clear();
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
@@ -50,7 +50,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       await controller.fetchSectionList();
       await controller.fetchPTHCData();
       controller.refreshSearch();
-      controller.changeStatus('approval', null, userId);
+      controller.changeStatus('approval', null, userId, chucVu);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -305,7 +305,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             tooltip: tr('Rfilter'),
             onPressed: () async {
               final authState = Provider.of<AuthState>(context, listen: false);
-              await _reloadData(authState.user!.chRUserid.toString());
+              await _reloadData(authState.user!.chRUserid.toString(), authState.user!.chRGroup.toString());
               controller.refreshFilteredList();
             },
           ),
@@ -320,7 +320,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             color: Colors.orange,
             tooltip: tr('ReturnS'),
             onPressed: () =>
-                _ReturnSDialog(authState.user!.chRUserid.toString()),
+                _ReturnSDialog(authState.user!.chRUserid.toString(), authState.user!.chRGroup.toString()),
           ),
           GestureDetector(
             onTap: () async {
@@ -332,6 +332,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   'approval',
                   null,
                   authState.user!.chRUserid.toString(),
+                  authState.user!.chRGroup.toString(),
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1132,7 +1133,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     );
   }
 
-  void _ReturnSDialog(String adid) {
+  void _ReturnSDialog(String adid, String chucVu) {
     final controller = Get.find<DashboardControllerTwo>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -1165,7 +1166,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                   reasonController.text,
                 );
                 // phan xem ai dang vao man so sanh
-                controller.changeStatus('approval', null, adid);
+                controller.changeStatus('approval', null, adid, chucVu);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

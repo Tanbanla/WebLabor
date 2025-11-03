@@ -89,10 +89,11 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             'PTHC',
             sectionName,
             authState.user!.chRUserid.toString(),
+            null
           );
         } else {
           // truong hop khác
-          controller.changeStatus('PTHC', null, null);
+          controller.changeStatus('PTHC', null, null, null);
         }
         controllerUserApprover.changeStatus(
           sectionName,
@@ -103,7 +104,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         controller.changeStatus(
           '5',
           sectionName,
-          authState.user!.chRUserid.toString(),
+          authState.user!.chRUserid.toString(),null
         );
         controllerUserApprover.changeStatus(sectionName, 'Section Manager');
       } else {
@@ -111,7 +112,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         controller.changeStatus(
           '4',
           sectionName,
-          authState.user!.chRUserid.toString(),
+          authState.user!.chRUserid.toString(),null
         );
         // truong hop leader
         controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
@@ -298,20 +299,20 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   await controllerTwo.changeStatus(
                     'PTHC',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 } else if (authState.user!.chRGroup.toString() == "Chief" || authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     '5',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
                     '4',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 }
                 if (context.mounted) {
@@ -1770,16 +1771,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
 
-                  await controller.changeStatus('PTHC', sectionName, adid);
+                  await controller.changeStatus('PTHC', sectionName, adid,null);
                 } else if (group == "Chief") {
                   await controller.changeStatus(
                     '5',
                     sectionName,
                     adid.toString(),
+                    null
                   );
                 } else {
                   // truong hop leader
-                  await controller.changeStatus('4', sectionName, adid);
+                  await controller.changeStatus('4', sectionName, adid,null);
                 }
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -3599,21 +3601,21 @@ class _ReturnConApprenticetract extends StatelessWidget {
                         await controller.changeStatus(
                           'PTHC',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                           "Chief") {
                         await controller.changeStatus(
                           '5',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       } else {
                         // truong hop leader
                         await controller.changeStatus(
                           '4',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       }
                       if (context.mounted) {

@@ -43,11 +43,11 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     // Đợi frame đầu tiên để đảm bảo Provider/Localization đã sẵn sàng
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = Provider.of<AuthState>(context, listen: false);
-      _reloadData(authState.user!.chRUserid.toString());
+      _reloadData(authState.user!.chRUserid.toString(),authState.user!.chRGroup.toString());
     });
   }
 
-  Future<void> _reloadData(String userId) async {
+  Future<void> _reloadData(String userId,String groupId) async {
     // Clear dữ liệu cũ trước khi load mới để tránh hiển thị dữ liệu stale
     controller.filterdataList.clear();
     if (controller.selectRows.isNotEmpty) {
@@ -60,7 +60,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       await controller.fetchSectionList();
       await controller.fetchPTHCData();
       controller.refreshSearch();
-      controller.changeStatus('approval', null, userId);
+      controller.changeStatus('approval', null, userId, groupId);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -317,7 +317,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             tooltip: tr('Rfilter'),
             onPressed: () async {
               // Refresh danh sách + reload lại dữ liệu từ server
-              await _reloadData(authState.user!.chRUserid.toString());
+              await _reloadData(authState.user!.chRUserid.toString(),authState.user!.chRGroup.toString());
               controller.refreshFilteredList();
             },
           ),
@@ -332,7 +332,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             color: Colors.orange,
             tooltip: tr('ReturnS'),
             onPressed: () =>
-                _ReturnSDialog(authState.user!.chRUserid.toString()),
+                _ReturnSDialog(authState.user!.chRUserid.toString(), authState.user!.chRGroup.toString()),
           ),
           GestureDetector(
             onTap: () async {
@@ -344,6 +344,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   'approval',
                   null,
                   authState.user!.chRUserid.toString(),
+                  authState.user!.chRGroup.toString(),
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1147,7 +1148,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     );
   }
 
-  void _ReturnSDialog(String adid) {
+  void _ReturnSDialog(String adid, String chucVu) {
     final controller = Get.find<DashboardControllerApprentice>();
     final reasonController = TextEditingController();
     final messageError = ''.obs;
@@ -1180,7 +1181,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   adid,
                   reasonController.text,
                 );
-                controller.changeStatus('approval', null, adid);
+                controller.changeStatus('approval', null, adid,chucVu);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

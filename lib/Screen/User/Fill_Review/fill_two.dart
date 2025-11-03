@@ -89,10 +89,10 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           controller.changeStatus(
             'PTHC',
             sectionName,
-            authState.user!.chRUserid.toString(),
+            authState.user!.chRUserid.toString(),null
           );
         } else {
-          controller.changeStatus('PTHC', null, null);
+          controller.changeStatus('PTHC', null, null,null);
         }
         controllerUserApprover.changeStatus(
           sectionName,
@@ -102,14 +102,14 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         controller.changeStatus(
           '5',
           sectionName,
-          authState.user!.chRUserid.toString(),
+          authState.user!.chRUserid.toString(),null
         );
         controllerUserApprover.changeStatus(sectionName, 'Section Manager');
       } else {
         controller.changeStatus(
           '4',
           sectionName,
-          authState.user!.chRUserid.toString(),
+          authState.user!.chRUserid.toString(),null
         );
         // truong hop leader
         controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
@@ -463,20 +463,20 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   await controllerTwo.changeStatus(
                     'PTHC',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 } else if (authState.user!.chRGroup.toString() == "Chief"|| authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     '5',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
                     '4',
                     sectionName,
-                    authState.user!.chRUserid.toString(),
+                    authState.user!.chRUserid.toString(),null
                   );
                 }
                 if (context.mounted) {
@@ -1720,12 +1720,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 );
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
-                  await controller.changeStatus('PTHC', sectionName, adid);
+                  await controller.changeStatus('PTHC', sectionName, adid,null);
                 } else if (group == "Chief") {
-                  await controller.changeStatus('5', sectionName, adid);
+                  await controller.changeStatus('5', sectionName, adid,null);
                 } else {
                   // truong hop leader
-                  await controller.changeStatus('4', sectionName, adid);
+                  await controller.changeStatus('4', sectionName, adid,null);
                 }
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -3099,21 +3099,21 @@ class _ReturnTwoContract extends StatelessWidget {
                         await controller.changeStatus(
                           'PTHC',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                           "Chief") {
                         await controller.changeStatus(
                           '5',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       } else {
                         // truong hop leader
                         await controller.changeStatus(
                           '4',
                           sectionName,
-                          authState.user!.chRUserid.toString(),
+                          authState.user!.chRUserid.toString(),null
                         );
                       }
                       if (context.mounted) {
