@@ -877,12 +877,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             ),
           ),
           // Import Excel evaluation results
-          buildActionButton(
-            icon: Icons.upload_file,
-            color: Colors.indigo,
-            tooltip: tr('importExcel'),
-            onPressed: () => _pickAndImportExcel(authState),
-          ),
+          // buildActionButton(
+          //   icon: Icons.upload_file,
+          //   color: Colors.indigo,
+          //   tooltip: tr('importExcel'),
+          //   onPressed: () => _pickAndImportExcel(authState),
+          // ),
         ];
 
         return Container(

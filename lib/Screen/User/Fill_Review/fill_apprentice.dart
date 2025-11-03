@@ -709,12 +709,13 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               authState.user!.chRGroup.toString(),
             ),
           ),
-          buildActionButton(
-            icon: Icons.upload_file,
-            color: Colors.indigo,
-            tooltip: tr('importExcel'),
-            onPressed: () => _pickAndImportExcel(authState),
-          ),
+          // buildActionButton(
+          //   icon: Icons.upload_file,
+          //   color: Colors.indigo,
+          //   tooltip: tr('importExcel'),
+          //   onPressed: () => _pickAndImportExcel(authState),
+          // ),
+          
         //    // Download error Excel if exists
         //   Obx(() => controller.lastImportErrorExcel.value == null
         //       ? const SizedBox()

@@ -389,41 +389,51 @@ class DashboardControllerApprentice extends GetxController {
       } else {
         sectionValues = [trimmed];
       }
-      // Build request body
-      final filters = [
-        if (statusId == 'approval')
-          {
-            "field": "INT_STATUS_ID",
-            "value": ["6", "7", "8"],
-            "operator": "IN",
-            "logicType": "AND",
-          }
-        else if (statusId == 'PTHC')
-          {
-            "field": "INT_STATUS_ID",
-            "value": ["3", "4"],
-            "operator": "IN",
-            "logicType": "AND",
-          }
-        else
-          {
-            "field": "INT_STATUS_ID",
-            "value": statusId,
-            "operator": "=",
-            "logicType": "AND",
-          },
-        if (section != null && section.isNotEmpty)
-          {
-            "field": "VCHR_CODE_SECTION",
-            "value": sectionValues,
-            "operator": "in",
-            "logicType": "AND",
-          },
-        if (adid != null &&
-            adid.isNotEmpty &&
-            statusId != 'PTHC') //&& statusId == 'approval'
-          {"field": cloumn, "value": adid, "operator": "=", "logicType": "AND"},
-      ];
+      // Build request body (approval will only filter by status; adid applied locally)
+      final List<Map<String, dynamic>> filters = [];
+      if (statusId == 'approval') {
+        filters.add({
+          "field": "INT_STATUS_ID",
+          "value": ["6", "7", "8"],
+          "operator": "IN",
+          "logicType": "AND",
+        });
+      } else if (statusId == 'PTHC') {
+        filters.add({
+          "field": "INT_STATUS_ID",
+          "value": ["3", "4"],
+          "operator": "IN",
+          "logicType": "AND",
+        });
+      } else {
+        filters.add({
+          "field": "INT_STATUS_ID",
+          "value": statusId,
+          "operator": "=",
+          "logicType": "AND",
+        });
+      }
+
+      if (section != null && section.isNotEmpty) {
+        filters.add({
+          "field": "VCHR_CODE_SECTION",
+          "value": sectionValues,
+          "operator": "IN",
+          "logicType": "AND",
+        });
+      }
+
+      if (adid != null &&
+          adid.isNotEmpty &&
+          statusId != 'PTHC' &&
+          statusId != 'approval') {
+        filters.add({
+          "field": cloumn,
+          "value": adid,
+          "operator": "=",
+          "logicType": "AND",
+        });
+      }
 
       final requestBody = {
         "pageNumber": -1,
@@ -462,6 +472,30 @@ class DashboardControllerApprentice extends GetxController {
                             a['inT_STATUS_ID'] == 4) ||
                         (a['inT_STATUS_ID'] == 3),
                   )
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+          } else if (statusId == 'approval' &&
+              adid != null &&
+              adid.isNotEmpty) {
+            // Filter locally for matching approver ADID in any approval role
+            final filtered = data.where((a) {
+              return a['inT_STATUS_ID'] != null &&
+                  [6, 7, 8].contains(a['inT_STATUS_ID']) &&
+                  (a['userApproverSectionManager'] == adid ||
+                      a['userApproverDeft'] == adid ||
+                      a['userApproverDirector'] == adid ||
+                      a['useR_APPROVER_SECTION_MANAGER'] == adid ||
+                      a['useR_APPROVER_DEFT'] == adid ||
+                      a['useR_APPROVER_DIRECTOR'] == adid);
+            }).toList();
+            dataList.assignAll(
+              filtered
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+            originalList.assignAll(
+              filtered
                   .map((contract) => ApprenticeContract.fromJson(contract))
                   .toList(),
             );
@@ -1084,7 +1118,7 @@ class DashboardControllerApprentice extends GetxController {
                 chucVu: "Dept Manager",
                 dept: dept,
               );
-              contract[i].useRApproverDeft = mailSend;
+              contract[i].userApproverDeft = mailSend.split('@')[0];
             } else {
               if ((contract[i].nvchRApproverSectionManager?.isEmpty ?? true)) {
                 throw Exception(
@@ -1573,11 +1607,11 @@ class DashboardControllerApprentice extends GetxController {
         throw Exception('File Excel không đúng định dạng');
       }
 
-  // 4. Refresh data & tracking errors
-  final List<ApprenticeContract> importedTwoContract = [];
-  final List<Map<String, dynamic>> errorRows = []; // store raw + reason
-  lastImportErrors.clear();
-  lastImportErrorExcel.value = null;
+      // 4. Refresh data & tracking errors
+      final List<ApprenticeContract> importedTwoContract = [];
+      final List<Map<String, dynamic>> errorRows = []; // store raw + reason
+      lastImportErrors.clear();
+      lastImportErrorExcel.value = null;
       int _i = 19;
 
       // Start from row 1 (skip header row) and process until empty row
@@ -1722,7 +1756,9 @@ class DashboardControllerApprentice extends GetxController {
             'employeeId': employeeId,
             'reason': 'Hạn đánh giá quá gần (<=10 ngày)',
           });
-          lastImportErrors.add('Row ${_i + 1}: Hạn đánh giá quá gần (<=10 ngày)');
+          lastImportErrors.add(
+            'Row ${_i + 1}: Hạn đánh giá quá gần (<=10 ngày)',
+          );
           _i++;
           continue;
         }
