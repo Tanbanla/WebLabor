@@ -29,7 +29,12 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   final DashboardControllerApprentice controller = Get.put(
     DashboardControllerApprentice(),
   );
-  final ScrollController _scrollController = ScrollController();
+  // Horizontal controller for the scrollable (right) section
+  final ScrollController _rightScrollController = ScrollController();
+  // Vertical controllers for left (frozen) and right (scrollable) sections
+  final ScrollController _leftVerticalController = ScrollController();
+  final ScrollController _rightVerticalController = ScrollController();
+  bool _isSyncingScroll = false; // guard to prevent recursive jumpTo
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
@@ -40,14 +45,46 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
   @override
   void initState() {
     super.initState();
+    // Set up vertical scroll synchronization between frozen and scrollable panes
+    _leftVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_rightVerticalController.hasClients) {
+        _rightVerticalController.jumpTo(
+          _leftVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
+    _rightVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_leftVerticalController.hasClients) {
+        _leftVerticalController.jumpTo(
+          _rightVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
     // Đợi frame đầu tiên để đảm bảo Provider/Localization đã sẵn sàng
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = Provider.of<AuthState>(context, listen: false);
-      _reloadData(authState.user!.chRUserid.toString(),authState.user!.chRGroup.toString());
+      _reloadData(
+        authState.user!.chRUserid.toString(),
+        authState.user!.chRGroup.toString(),
+      );
     });
   }
 
-  Future<void> _reloadData(String userId,String groupId) async {
+  @override
+  void dispose() {
+    _leftVerticalController.dispose();
+    _rightVerticalController.dispose();
+    _rightScrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _reloadData(String userId, String groupId) async {
     // Clear dữ liệu cũ trước khi load mới để tránh hiển thị dữ liệu stale
     controller.filterdataList.clear();
     if (controller.selectRows.isNotEmpty) {
@@ -104,7 +141,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 );
                 return Stack(
                   children: [
-                    Positioned.fill(child: _buildDataTable()),
+                    Positioned.fill(child: _buildFrozenDataTable()),
                     if (controller.isLoading.value)
                       Positioned.fill(
                         child: Container(
@@ -317,7 +354,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             tooltip: tr('Rfilter'),
             onPressed: () async {
               // Refresh danh sách + reload lại dữ liệu từ server
-              await _reloadData(authState.user!.chRUserid.toString(),authState.user!.chRGroup.toString());
+              await _reloadData(
+                authState.user!.chRUserid.toString(),
+                authState.user!.chRGroup.toString(),
+              );
               controller.refreshFilteredList();
             },
           ),
@@ -331,8 +371,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             icon: Iconsax.back_square,
             color: Colors.orange,
             tooltip: tr('ReturnS'),
-            onPressed: () =>
-                _ReturnSDialog(authState.user!.chRUserid.toString(), authState.user!.chRGroup.toString()),
+            onPressed: () => _ReturnSDialog(
+              authState.user!.chRUserid.toString(),
+              authState.user!.chRGroup.toString(),
+            ),
           ),
           GestureDetector(
             onTap: () async {
@@ -486,7 +528,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     );
   }
 
-  Widget _buildDataTable() {
+  // New frozen columns table replacing the old horizontal-only table.
+  Widget _buildFrozenDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -511,250 +554,280 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         ),
         child: Column(
           children: [
-            Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: 4480, //2570,
-                    child: Builder(
-                      builder: (context) {
-                        final dataSource = MyData(context);
-                        final total = controller.filterdataList.length;
-                        if (_firstRowIndex >= total && total > 0) {
-                          _firstRowIndex =
-                              (total - 1) - ((total - 1) % _rowsPerPage);
-                        }
-                        final endIndex = (_firstRowIndex + _rowsPerPage) > total
-                            ? total
-                            : (_firstRowIndex + _rowsPerPage);
-                        final visibleCount = endIndex - _firstRowIndex;
-                        return Obx(
-                          () => DataTable2(
-                            columnSpacing: 12,
-                            minWidth: 2000,
-                            horizontalMargin: 12,
-                            dataRowHeight: 56,
-                            headingRowHeight: 66,
-                            headingTextStyle: TextStyle(
-                              color: Colors.blue[800],
-                              fontWeight: FontWeight.bold,
-                            ),
-                            headingRowDecoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                              color: Colors.blue[50],
-                            ),
-                            showCheckboxColumn: true,
-                            columns: [
-                              DataColumnCustom(
-                                title: tr('stt'),
-                                width: 70,
-                                onSort: controller.sortById,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumn2
-                              // DataColumnCustom(
-                              //   title: tr('action'),
-                              //   width: 100,
-                              //   fontSize: Common.sizeColumn,
-                              // ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('Hientrang'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('DotDanhGia'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('employeeCode'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('gender'),
-                                width: 60,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('fullName'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('department'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('group'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('age'),
-                                width: 70,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('position'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('salaryGrade'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEffective'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEndDate'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('earlyLateCount'),
-                                width: 110,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unreportedLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('violationCount'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('reason'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('lythuyet'),
-                                width: 130,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('thuchanh'),
-                                width: 130,
-                                fontSize: Common.sizeColumn,
-                                maxLines: 2,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('congviec'),
-                                width: 130,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('hochoi'),
-                                width: 130,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('thichnghi'),
-                                width: 130,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('tinhthan'),
-                                fontSize: Common.sizeColumn,
-                                width: 150,
-                                maxLines: 3,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('baocao'),
-                                fontSize: Common.sizeColumn,
-                                width: 130,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('chaphanh'),
-                                fontSize: Common.sizeColumn,
-                                width: 130,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('ketqua'),
-                                fontSize: Common.sizeColumn,
-                                width: 150,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('note'),
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // đề xuất của phòng ban
-                              DataColumnCustom(
-                                title: tr('notRehirable'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              //
-                              DataColumnCustom(
-                                title: tr('notRehirableReason'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // nguoi de xuat cua phong ban
-                              DataColumnCustom(
-                                title: tr('DeXuat'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // chief xác nhận kết quả
-                              DataColumnCustom(
-                                title: tr('ChiefApproval'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('Apporval'), //tr('notRehirable'),
-                                width: 170,
-                                fontSize: Common.sizeColumn,
-                                maxLines: 2,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('LydoTuChoi'), //tr('Lydo'),
-                                width: 170,
-                                fontSize: Common.sizeColumn,
-                                maxLines: 2,
-                              ).toDataColumn2(),
-                            ],
-                            rows: List.generate(
-                              visibleCount,
-                              (i) => dataSource.getRow(_firstRowIndex + i)!,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: _buildFrozenBody()),
             _buildCustomPaginator(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFrozenBody() {
+    final dataSource = MyData(context);
+    final total = controller.filterdataList.length;
+    if (_firstRowIndex >= total && total > 0) {
+      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
+    }
+    final endIndex = (_firstRowIndex + _rowsPerPage) > total
+        ? total
+        : (_firstRowIndex + _rowsPerPage);
+    final visibleCount = endIndex - _firstRowIndex;
+    final fullRows = List.generate(
+      visibleCount,
+      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+    );
+    // Define frozen (first 7) columns - keep order exactly as original
+    final frozenCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('stt'),
+        width: 70,
+        onSort: controller.sortById,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Hientrang'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('DotDanhGia'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('employeeCode'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('gender'),
+        width: 60,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('fullName'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('department'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    // Remaining scrollable columns preserving order
+    final scrollCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('group'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('age'),
+        width: 70,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('position'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('salaryGrade'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEffective'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEndDate'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('earlyLateCount'),
+        width: 110,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unreportedLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('violationCount'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('reason'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('lythuyet'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('thuchanh'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+        maxLines: 2,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('congviec'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('hochoi'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('thichnghi'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('tinhthan'),
+        width: 150,
+        maxLines: 3,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('baocao'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('chaphanh'),
+        width: 130,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('ketqua'),
+        width: 150,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('note'),
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirable'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirableReason'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('DeXuat'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('ChiefApproval'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Apporval'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('LydoTuChoi'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final frozenCount = frozenCols.length;
+    final frozenRows = <DataRow>[];
+    final scrollRows = <DataRow>[];
+    for (final r in fullRows) {
+      final cells = r.cells;
+      frozenRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.take(frozenCount).toList(),
+        ),
+      );
+      scrollRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.skip(frozenCount).toList(),
+        ),
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 820),
+          child: Scrollbar(
+            controller: _leftVerticalController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _leftVerticalController,
+              child: DataTable(
+                headingRowHeight: 66,
+                dataRowHeight: 56,
+                showCheckboxColumn: true,
+                columns: frozenCols,
+                rows: frozenRows,
+              ),
+            ),
+          ),
+        ),
+        Container(width: 1, color: Colors.grey[300]),
+        Expanded(
+          child: Scrollbar(
+            controller: _rightScrollController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _rightScrollController,
+              scrollDirection: Axis.horizontal,
+              child: Scrollbar(
+                controller: _rightVerticalController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _rightVerticalController,
+                  child: DataTable(
+                    headingRowHeight: 66,
+                    dataRowHeight: 56,
+                    showCheckboxColumn: false,
+                    columns: scrollCols,
+                    rows: scrollRows,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1181,7 +1254,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   adid,
                   reasonController.text,
                 );
-                controller.changeStatus('approval', null, adid,chucVu);
+                controller.changeStatus('approval', null, adid, chucVu);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

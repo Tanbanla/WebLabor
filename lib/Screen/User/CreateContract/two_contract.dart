@@ -31,12 +31,49 @@ class TwoContractScreen extends StatefulWidget {
 
 class _TwoContractScreenState extends State<TwoContractScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
-  final ScrollController _scrollController = ScrollController();
+  // Controllers for frozen columns table
+  final ScrollController _rightScrollController = ScrollController();
+  final ScrollController _leftVerticalController = ScrollController();
+  final ScrollController _rightVerticalController = ScrollController();
+  bool _isSyncingScroll = false;
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
   int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  @override
+  void initState() {
+    super.initState();
+    _leftVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_rightVerticalController.hasClients) {
+        _rightVerticalController.jumpTo(
+          _leftVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
+    _rightVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_leftVerticalController.hasClients) {
+        _leftVerticalController.jumpTo(
+          _rightVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _leftVerticalController.dispose();
+    _rightVerticalController.dispose();
+    _rightScrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     controller.refreshSearch();
@@ -64,14 +101,13 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
             // Data Table
             Expanded(
               child: Obx(() {
-                // trigger rebuild when list changes
                 Visibility(
                   visible: false,
                   child: Text(controller.filterdataList.length.toString()),
                 );
                 return Stack(
                   children: [
-                    Positioned.fill(child: _buildDataTable()),
+                    Positioned.fill(child: _buildFrozenDataTable()),
                     if (controller.isLoading.value)
                       Positioned.fill(
                         child: Container(
@@ -210,7 +246,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                 );
-                await controllerTwo.changeStatus("1", null, null,null);
+                await controllerTwo.changeStatus("1", null, null, null);
                 if (context.mounted) {
                   // Hiển thị thông báo thành công
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -548,7 +584,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
     );
   }
 
-  Widget _buildDataTable() {
+  Widget _buildFrozenDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -573,172 +609,209 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
         ),
         child: Column(
           children: [
-            Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: 2420, //2570,
-                    child: Builder(
-                      builder: (context) {
-                        final dataSource = MyData(context);
-                        final total = controller.filterdataList.length;
-                        if (_firstRowIndex >= total && total > 0) {
-                          _firstRowIndex =
-                              (total - 1) - ((total - 1) % _rowsPerPage);
-                        }
-                        final endIndex = (_firstRowIndex + _rowsPerPage) > total
-                            ? total
-                            : (_firstRowIndex + _rowsPerPage);
-                        final visibleCount = endIndex - _firstRowIndex;
-                        return Obx(
-                          () => DataTable2(
-                            columnSpacing: 12,
-                            minWidth: 2000,
-                            horizontalMargin: 12,
-                            dataRowHeight: 56,
-                            headingRowHeight: 66,
-                            headingTextStyle: TextStyle(
-                              color: Colors.blue[800],
-                              fontWeight: FontWeight.bold,
-                            ),
-                            headingRowDecoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                              color: Colors.blue[50],
-                            ),
-                            showCheckboxColumn: true,
-                            columns: [
-                              DataColumnCustom(
-                                title: tr('stt'),
-                                width: 70,
-                                onSort: controller.sortById,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumn2
-                              DataColumnCustom(
-                                title: tr('action'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('employeeCode'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('gender'),
-                                width: 60,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('fullName'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('department'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                maxLines: 2,
-                                title: tr('group'),
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('age'),
-                                width: 70,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('position'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('salaryGrade'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEffective'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEndDate'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('earlyLateCount'),
-                                width: 110,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('paidLeave'),
-                                width: 100,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unpaidLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unreportedLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('violationCount'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('reason'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('TruongPhong'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('LydoTuChoi'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                            ],
-                            rows: List.generate(
-                              visibleCount,
-                              (i) => dataSource.getRow(_firstRowIndex + i)!,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: _buildFrozenBody()),
             _buildCustomPaginator(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFrozenBody() {
+    final dataSource = MyData(context);
+    final total = controller.filterdataList.length;
+    if (_firstRowIndex >= total && total > 0) {
+      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
+    }
+    final endIndex = (_firstRowIndex + _rowsPerPage) > total
+        ? total
+        : (_firstRowIndex + _rowsPerPage);
+    final visibleCount = endIndex - _firstRowIndex;
+    final fullRows = List.generate(
+      visibleCount,
+      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+    );
+    final frozenCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('stt'),
+        width: 70,
+        onSort: controller.sortById,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('action'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('employeeCode'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('gender'),
+        width: 60,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('fullName'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('department'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('group'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final scrollCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('age'),
+        width: 70,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('position'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('salaryGrade'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEffective'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEndDate'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('earlyLateCount'),
+        width: 110,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('paidLeave'),
+        width: 100,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unpaidLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unreportedLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('violationCount'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('reason'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('TruongPhong'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('LydoTuChoi'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final frozenCount = frozenCols.length;
+    final frozenRows = <DataRow>[];
+    final scrollRows = <DataRow>[];
+    for (final r in fullRows) {
+      final cells = r.cells;
+      frozenRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.take(frozenCount).toList(),
+        ),
+      );
+      scrollRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.skip(frozenCount).toList(),
+        ),
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 780),
+          child: Scrollbar(
+            controller: _leftVerticalController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _leftVerticalController,
+              child: DataTable(
+                headingRowHeight: 66,
+                dataRowHeight: 56,
+                showCheckboxColumn: true,
+                columns: frozenCols,
+                rows: frozenRows,
+              ),
+            ),
+          ),
+        ),
+        Container(width: 1, color: Colors.grey[300]),
+        Expanded(
+          child: Scrollbar(
+            controller: _rightScrollController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _rightScrollController,
+              scrollDirection: Axis.horizontal,
+              child: Scrollbar(
+                controller: _rightVerticalController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _rightVerticalController,
+                  child: DataTable(
+                    headingRowHeight: 66,
+                    dataRowHeight: 56,
+                    showCheckboxColumn: false,
+                    columns: scrollCols,
+                    rows: scrollRows,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1012,14 +1085,14 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
                             selectedFileData.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null,null);
+                          await controller.changeStatus("1", null, null, null);
                         } else {
                           // Xử lý mobile/desktop
                           await controller.importExcelMobileTwoContract(
                             selectedFile.value!,
                             authState.user!.chRUserid.toString(),
                           );
-                          await controller.changeStatus("1", null, null,null);
+                          await controller.changeStatus("1", null, null, null);
                         }
                         // Close the dialog after successful import
                         if (mounted) {
@@ -2222,7 +2295,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null,null);
+                      await controller.changeStatus("1", null, null, null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
@@ -2370,7 +2443,7 @@ class _DeleteTwoContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null,null);
+                      await controller.changeStatus("1", null, null, null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {
@@ -2648,7 +2721,7 @@ class _showAddDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null,null);
+                      await controller.changeStatus("1", null, null, null);
                       showDialog(
                         // ignore: use_build_context_synchronously
                         context: context,
@@ -2791,7 +2864,7 @@ class _DeleteListContractDialog extends StatelessWidget {
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
-                      await controller.changeStatus("1", null, null,null);
+                      await controller.changeStatus("1", null, null, null);
                     } catch (e) {
                       // Xử lý lỗi nếu cần
                       if (context.mounted) {

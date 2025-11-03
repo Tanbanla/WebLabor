@@ -37,6 +37,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     DashboardControllerUserApprover(),
   );
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _rightScrollController = ScrollController();
+  final ScrollController _leftVerticalController = ScrollController();
+  final ScrollController _rightVerticalController = ScrollController();
   // Pagination customization
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -55,6 +58,28 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
+
+    _leftVerticalController.addListener(() {
+      if (_rightVerticalController.hasClients &&
+          _rightVerticalController.offset != _leftVerticalController.offset) {
+        _rightVerticalController.jumpTo(_leftVerticalController.offset);
+      }
+    });
+    _rightVerticalController.addListener(() {
+      if (_leftVerticalController.hasClients &&
+          _leftVerticalController.offset != _rightVerticalController.offset) {
+        _leftVerticalController.jumpTo(_rightVerticalController.offset);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _leftVerticalController.dispose();
+    _rightVerticalController.dispose();
+    _scrollController.dispose();
+    _rightScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _prepareStatus(AuthState authState) async {
@@ -89,27 +114,31 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           controller.changeStatus(
             'PTHC',
             sectionName,
-            authState.user!.chRUserid.toString(),null
+            authState.user!.chRUserid.toString(),
+            null,
           );
         } else {
-          controller.changeStatus('PTHC', null, null,null);
+          controller.changeStatus('PTHC', null, null, null);
         }
         controllerUserApprover.changeStatus(
           sectionName,
           'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
         );
-      } else if (authState.user!.chRGroup.toString() == "Chief"|| authState.user!.chRGroup.toString() == "Expert") {
+      } else if (authState.user!.chRGroup.toString() == "Chief" ||
+          authState.user!.chRGroup.toString() == "Expert") {
         controller.changeStatus(
           '5',
           sectionName,
-          authState.user!.chRUserid.toString(),null
+          authState.user!.chRUserid.toString(),
+          null,
         );
         controllerUserApprover.changeStatus(sectionName, 'Section Manager');
       } else {
         controller.changeStatus(
           '4',
           sectionName,
-          authState.user!.chRUserid.toString(),null
+          authState.user!.chRUserid.toString(),
+          null,
         );
         // truong hop leader
         controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
@@ -146,7 +175,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
               child: Obx(() {
                 return Stack(
                   children: [
-                    Positioned.fill(child: _buildDataTable()),
+                    Positioned.fill(child: _buildFrozenDataTable()),
                     if (controller.isLoading.value)
                       Positioned.fill(
                         child: Container(
@@ -463,20 +492,24 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   await controllerTwo.changeStatus(
                     'PTHC',
                     sectionName,
-                    authState.user!.chRUserid.toString(),null
+                    authState.user!.chRUserid.toString(),
+                    null,
                   );
-                } else if (authState.user!.chRGroup.toString() == "Chief"|| authState.user!.chRGroup.toString() == "Expert") {
+                } else if (authState.user!.chRGroup.toString() == "Chief" ||
+                    authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     '5',
                     sectionName,
-                    authState.user!.chRUserid.toString(),null
+                    authState.user!.chRUserid.toString(),
+                    null,
                   );
                 } else {
                   // truong hop leader
                   await controllerTwo.changeStatus(
                     '4',
                     sectionName,
-                    authState.user!.chRUserid.toString(),null
+                    authState.user!.chRUserid.toString(),
+                    null,
                   );
                 }
                 if (context.mounted) {
@@ -852,8 +885,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             ),
           ),
           // Status dropdown (PTHC / Leader)
-          if(authState.user!.chRGroup.toString() == "PTHC")
-          statusDropdown,
+          if (authState.user!.chRGroup.toString() == "PTHC") statusDropdown,
           buildActionButton(
             icon: Iconsax.refresh,
             color: Colors.blue,
@@ -945,7 +977,10 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           Get.snackbar('Import', 'Không đọc được dữ liệu file');
           return;
         }
-        await dash.importExceltoApp(bytes, authState.user!.chRUserid.toString());
+        await dash.importExceltoApp(
+          bytes,
+          authState.user!.chRUserid.toString(),
+        );
       } else {
         final result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
@@ -956,13 +991,16 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         if (path == null) return;
         final file = File(path);
         final bytes = await file.readAsBytes();
-        await dash.importExceltoApp(bytes, authState.user!.chRUserid.toString());
+        await dash.importExceltoApp(
+          bytes,
+          authState.user!.chRUserid.toString(),
+        );
       }
       // Auto download error file (Web) if exists
       if (dash.lastImportErrorExcel.value != null && kIsWeb) {
         final errorBytes = dash.lastImportErrorExcel.value!;
         final blob = html.Blob([
-          errorBytes
+          errorBytes,
         ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         final url = html.Url.createObjectUrlFromBlob(blob);
         html.AnchorElement(href: url)
@@ -1024,7 +1062,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     );
   }
 
-  Widget _buildDataTable() {
+  Widget _buildFrozenDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
         cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
@@ -1049,236 +1087,262 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         ),
         child: Column(
           children: [
-            Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: 3820, //2570,
-                    child: Builder(
-                      builder: (context) {
-                        final dataSource = MyData(context);
-                        final total = controller.filterdataList.length;
-                        if (_firstRowIndex >= total && total > 0) {
-                          _firstRowIndex =
-                              (total - 1) - ((total - 1) % _rowsPerPage);
-                        }
-                        final endIndex = (_firstRowIndex + _rowsPerPage) > total
-                            ? total
-                            : (_firstRowIndex + _rowsPerPage);
-                        final visibleCount = endIndex - _firstRowIndex;
-                        return Obx(
-                          () => DataTable2(
-                            columnSpacing: 12,
-                            minWidth: 2000,
-                            horizontalMargin: 12,
-                            dataRowHeight: 56,
-                            headingRowHeight: 66,
-                            headingTextStyle: TextStyle(
-                              color: Colors.blue[800],
-                              fontWeight: FontWeight.bold,
-                            ),
-                            headingRowDecoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                              color: Colors.blue[50],
-                            ),
-                            showCheckboxColumn: true,
-                            columns: [
-                              DataColumnCustom(
-                                title: tr('stt'),
-                                width: 70,
-                                onSort: controller.sortById,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumn2
-                              DataColumnCustom(
-                                title: tr('action'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('Hientrang'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('DotDanhGia'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('employeeCode'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('gender'),
-                                width: 60,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('fullName'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('department'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('group'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('age'),
-                                width: 70,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('position'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('salaryGrade'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEffective'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEndDate'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('earlyLateCount'),
-                                width: 110,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('paidLeave'),
-                                width: 100,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unpaidLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unreportedLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('violationCount'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('reason'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumnCustom(
-                              //   title: tr('healthCheckResult'),
-                              //   width: 170,
-                              //   maxLines: 2,
-                              //   fontSize: Common.sizeColumn,
-                              // ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('congviec'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('tinhthan'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('khac'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('note'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-
-                              ///
-                              DataColumnCustom(
-                                title: tr('evaluationResult'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('notRehirable'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('notRehirableReason'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // Approval
-                              DataColumnCustom(
-                                title: tr('Apporval'), //tr('notRehirable'),
-                                width: 100,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr(
-                                  'LydoTuChoi',
-                                ), //tr('notRehirableReason'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                            ],
-                            rows: List.generate(
-                              visibleCount,
-                              (i) => dataSource.getRow(_firstRowIndex + i)!,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: _buildFrozenBody()),
             _buildCustomPaginator(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFrozenBody() {
+    final dataSource = MyData(context);
+    final total = controller.filterdataList.length;
+    if (_firstRowIndex >= total && total > 0) {
+      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
+    }
+    final endIndex = (_firstRowIndex + _rowsPerPage) > total
+        ? total
+        : (_firstRowIndex + _rowsPerPage);
+    final visibleCount = endIndex - _firstRowIndex;
+    final fullRows = List.generate(
+      visibleCount,
+      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+    );
+    final frozenCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('stt'),
+        width: 70,
+        onSort: controller.sortById,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('action'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Hientrang'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('DotDanhGia'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('employeeCode'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('gender'),
+        width: 60,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('fullName'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final scrollCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('department'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('group'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('age'),
+        width: 70,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('position'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('salaryGrade'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEffective'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEndDate'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('earlyLateCount'),
+        width: 110,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('paidLeave'),
+        width: 100,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unpaidLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unreportedLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('violationCount'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('reason'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('congviec'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('tinhthan'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('khac'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('note'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('evaluationResult'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirable'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirableReason'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Apporval'),
+        width: 100,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('LydoTuChoi'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final frozenCount = frozenCols.length;
+    final frozenRows = <DataRow>[];
+    final scrollRows = <DataRow>[];
+    for (final r in fullRows) {
+      final cells = r.cells;
+      frozenRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.take(frozenCount).toList(),
+        ),
+      );
+      scrollRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.skip(frozenCount).toList(),
+        ),
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 900),
+          child: Scrollbar(
+            controller: _leftVerticalController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _leftVerticalController,
+              child: DataTable(
+                headingRowHeight: 66,
+                dataRowHeight: 56,
+                showCheckboxColumn: true,
+                columns: frozenCols,
+                rows: frozenRows,
+              ),
+            ),
+          ),
+        ),
+        Container(width: 1, color: Colors.grey[300]),
+        Expanded(
+          child: Scrollbar(
+            controller: _rightScrollController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _rightScrollController,
+              scrollDirection: Axis.horizontal,
+              child: Scrollbar(
+                controller: _rightVerticalController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _rightVerticalController,
+                  child: DataTable(
+                    headingRowHeight: 66,
+                    dataRowHeight: 56,
+                    showCheckboxColumn: false,
+                    columns: scrollCols,
+                    rows: scrollRows,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1720,12 +1784,17 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 );
                 if (group == "PTHC" || group == "Admin") {
                   // truong hop PTHC phong ban
-                  await controller.changeStatus('PTHC', sectionName, adid,null);
+                  await controller.changeStatus(
+                    'PTHC',
+                    sectionName,
+                    adid,
+                    null,
+                  );
                 } else if (group == "Chief") {
-                  await controller.changeStatus('5', sectionName, adid,null);
+                  await controller.changeStatus('5', sectionName, adid, null);
                 } else {
                   // truong hop leader
-                  await controller.changeStatus('4', sectionName, adid,null);
+                  await controller.changeStatus('4', sectionName, adid, null);
                 }
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -3099,21 +3168,24 @@ class _ReturnTwoContract extends StatelessWidget {
                         await controller.changeStatus(
                           'PTHC',
                           sectionName,
-                          authState.user!.chRUserid.toString(),null
+                          authState.user!.chRUserid.toString(),
+                          null,
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                           "Chief") {
                         await controller.changeStatus(
                           '5',
                           sectionName,
-                          authState.user!.chRUserid.toString(),null
+                          authState.user!.chRUserid.toString(),
+                          null,
                         );
                       } else {
                         // truong hop leader
                         await controller.changeStatus(
                           '4',
                           sectionName,
-                          authState.user!.chRUserid.toString(),null
+                          authState.user!.chRUserid.toString(),
+                          null,
                         );
                       }
                       if (context.mounted) {

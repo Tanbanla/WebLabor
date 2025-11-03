@@ -111,7 +111,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                 );
                 return Stack(
                   children: [
-                    Positioned.fill(child: _buildDataTable()),
+                    Positioned.fill(child: _buildFrozenDataTable()),
                     if (controller.isLoading.value)
                       Positioned.fill(
                         child: Container(
@@ -496,11 +496,531 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     );
   }
 
-  Widget _buildDataTable() {
+  // Widget _buildDataTable() {
+  //   final authState = Provider.of<AuthState>(context, listen: true);
+  //   return Theme(
+  //     data: Theme.of(context).copyWith(
+  //       cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
+  //       dividerTheme: DividerThemeData(
+  //         color: Colors.grey[200],
+  //         thickness: 1,
+  //         space: 0,
+  //       ),
+  //     ),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(12),
+  //         color: Colors.white,
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.grey.withOpacity(0.1),
+  //             spreadRadius: 1,
+  //             blurRadius: 3,
+  //             offset: const Offset(0, 1),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Column(
+  //         children: [
+  //           Expanded(
+  //             child: Scrollbar(
+  //               controller: _scrollController,
+  //               thumbVisibility: true,
+  //               child: SingleChildScrollView(
+  //                 controller: _scrollController,
+  //                 scrollDirection: Axis.horizontal,
+  //                 child: SizedBox(
+  //                   width: 4590, //2570,
+  //                   child: Builder(
+  //                     builder: (context) {
+  //                       final dataSource = MyData(context);
+  //                       final total = controller.filterdataList.length;
+  //                       if (_firstRowIndex >= total && total > 0) {
+  //                         _firstRowIndex =
+  //                             (total - 1) - ((total - 1) % _rowsPerPage);
+  //                       }
+  //                       final endIndex = (_firstRowIndex + _rowsPerPage) > total
+  //                           ? total
+  //                           : (_firstRowIndex + _rowsPerPage);
+  //                       final visibleCount = endIndex - _firstRowIndex;
+  //                       return Obx(
+  //                         () => DataTable2(
+  //                           columnSpacing: 12,
+  //                           minWidth: 2000,
+  //                           horizontalMargin: 12,
+  //                           dataRowHeight: 56,
+  //                           headingRowHeight: 66,
+  //                           headingTextStyle: TextStyle(
+  //                             color: Colors.blue[800],
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                           headingRowDecoration: BoxDecoration(
+  //                             borderRadius: const BorderRadius.vertical(
+  //                               top: Radius.circular(12),
+  //                             ),
+  //                             color: Colors.blue[50],
+  //                           ),
+  //                           showCheckboxColumn: true,
+  //                           columns: [
+  //                             DataColumnCustom(
+  //                               title: tr('stt'),
+  //                               width: 70,
+  //                               onSort: controller.sortById,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             // DataColumn2
+  //                             if (authState.user?.chRGroup != 'PTHC')
+  //                               DataColumnCustom(
+  //                                 title: tr('action'),
+  //                                 width: 100,
+  //                                 fontSize: Common.sizeColumn,
+  //                               ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('Hientrang'),
+  //                               width: 130,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('DotDanhGia'),
+  //                               width: 180,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('employeeCode'),
+  //                               width: 100,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('gender'),
+  //                               width: 60,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('fullName'),
+  //                               width: 180,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('department'),
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('group'),
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('age'),
+  //                               width: 70,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('position'),
+  //                               width: 100,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('salaryGrade'),
+  //                               width: 100,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('contractEffective'),
+  //                               width: 120,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('contractEndDate'),
+  //                               width: 120,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('earlyLateCount'),
+  //                               width: 110,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('paidLeave'),
+  //                               width: 100,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('unpaidLeave'),
+  //                               width: 90,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('unreportedLeave'),
+  //                               width: 90,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('violationCount'),
+  //                               width: 130,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('reason'),
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             // DataColumnCustom(
+  //                             //   title: tr('healthCheckResult'),
+  //                             //   width: 170,
+  //                             //   maxLines: 2,
+  //                             //   fontSize: Common.sizeColumn,
+  //                             // ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('congviec'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('tinhthan'),
+  //                               width: 170,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('khac'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('note'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+
+  //                             ///
+  //                             DataColumnCustom(
+  //                               title: tr('evaluationResult'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('notRehirable'),
+  //                               width: 170,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('notRehirableReason'),
+  //                               width: 170,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             // các trường thông tin phê duyệt
+  //                             DataColumnCustom(
+  //                               title: tr('Nguoilap'),
+  //                               width: 100,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('Nhansu'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('NguoiDanhgia'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             // chief xác nhận kết quả
+  //                             DataColumnCustom(
+  //                               title: tr('ChiefApproval'),
+  //                               width: 170,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('TruongPhong'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('QuanLyCC'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                             DataColumnCustom(
+  //                               title: tr('GiamDoc'),
+  //                               width: 150,
+  //                               maxLines: 2,
+  //                               fontSize: Common.sizeColumn,
+  //                             ).toDataColumn2(),
+  //                           ],
+  //                           rows: List.generate(
+  //                             visibleCount,
+  //                             (i) => dataSource.getRow(_firstRowIndex + i)!,
+  //                           ),
+  //                         ),
+  //                       );
+  //                     },
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           _buildCustomPaginator(),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildFrozenDataTable() {
     final authState = Provider.of<AuthState>(context, listen: true);
+    final dataSource = MyData(context);
+    final total = controller.filterdataList.length;
+    if (_firstRowIndex >= total && total > 0) {
+      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
+    }
+    final endIndex = (_firstRowIndex + _rowsPerPage) > total
+        ? total
+        : (_firstRowIndex + _rowsPerPage);
+    final visibleCount = endIndex - _firstRowIndex;
+    final fullRows = List.generate(
+      visibleCount,
+      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+    );
+    final bool showAction = authState.user?.chRGroup != 'PTHC';
+    final frozenCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('stt'),
+        width: 70,
+        onSort: controller.sortById,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      if (showAction)
+        DataColumnCustom(
+          title: tr('action'),
+          width: 100,
+          fontSize: Common.sizeColumn,
+        ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Hientrang'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('DotDanhGia'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('employeeCode'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('gender'),
+        width: 60,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('fullName'),
+        width: 180,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final scrollCols = <DataColumn>[
+      DataColumnCustom(
+        title: tr('department'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('group'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('age'),
+        width: 70,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('position'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('salaryGrade'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEffective'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('contractEndDate'),
+        width: 120,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('earlyLateCount'),
+        width: 110,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('paidLeave'),
+        width: 100,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unpaidLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('unreportedLeave'),
+        width: 90,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('violationCount'),
+        width: 130,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('reason'),
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('congviec'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('tinhthan'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('khac'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('note'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('evaluationResult'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirable'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('notRehirableReason'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Nguoilap'),
+        width: 100,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('Nhansu'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('NguoiDanhgia'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('ChiefApproval'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('TruongPhong'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('QuanLyCC'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('GiamDoc'),
+        width: 150,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+    ];
+    final frozenCount = frozenCols.length;
+    final frozenRows = <DataRow>[];
+    final scrollRows = <DataRow>[];
+    for (final r in fullRows) {
+      final cells = r.cells;
+      frozenRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.take(frozenCount).toList(),
+        ),
+      );
+      scrollRows.add(
+        DataRow(
+          selected: r.selected,
+          onSelectChanged: r.onSelectChanged,
+          color: r.color,
+          cells: cells.skip(frozenCount).toList(),
+        ),
+      );
+    }
     return Theme(
       data: Theme.of(context).copyWith(
-        cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
         dividerTheme: DividerThemeData(
           color: Colors.grey[200],
           thickness: 1,
@@ -523,259 +1043,46 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: 4590, //2570,
-                    child: Builder(
-                      builder: (context) {
-                        final dataSource = MyData(context);
-                        final total = controller.filterdataList.length;
-                        if (_firstRowIndex >= total && total > 0) {
-                          _firstRowIndex =
-                              (total - 1) - ((total - 1) % _rowsPerPage);
-                        }
-                        final endIndex = (_firstRowIndex + _rowsPerPage) > total
-                            ? total
-                            : (_firstRowIndex + _rowsPerPage);
-                        final visibleCount = endIndex - _firstRowIndex;
-                        return Obx(
-                          () => DataTable2(
-                            columnSpacing: 12,
-                            minWidth: 2000,
-                            horizontalMargin: 12,
-                            dataRowHeight: 56,
-                            headingRowHeight: 66,
-                            headingTextStyle: TextStyle(
-                              color: Colors.blue[800],
-                              fontWeight: FontWeight.bold,
-                            ),
-                            headingRowDecoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                              color: Colors.blue[50],
-                            ),
-                            showCheckboxColumn: true,
-                            columns: [
-                              DataColumnCustom(
-                                title: tr('stt'),
-                                width: 70,
-                                onSort: controller.sortById,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumn2
-                              if (authState.user?.chRGroup != 'PTHC')
-                                DataColumnCustom(
-                                  title: tr('action'),
-                                  width: 100,
-                                  fontSize: Common.sizeColumn,
-                                ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('Hientrang'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('DotDanhGia'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('employeeCode'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('gender'),
-                                width: 60,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('fullName'),
-                                width: 180,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('department'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('group'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('age'),
-                                width: 70,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('position'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('salaryGrade'),
-                                width: 100,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEffective'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('contractEndDate'),
-                                width: 120,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('earlyLateCount'),
-                                width: 110,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('paidLeave'),
-                                width: 100,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unpaidLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('unreportedLeave'),
-                                width: 90,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('violationCount'),
-                                width: 130,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('reason'),
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // DataColumnCustom(
-                              //   title: tr('healthCheckResult'),
-                              //   width: 170,
-                              //   maxLines: 2,
-                              //   fontSize: Common.sizeColumn,
-                              // ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('congviec'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('tinhthan'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('khac'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('note'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-
-                              ///
-                              DataColumnCustom(
-                                title: tr('evaluationResult'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('notRehirable'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('notRehirableReason'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // các trường thông tin phê duyệt
-                              DataColumnCustom(
-                                title: tr('Nguoilap'),
-                                width: 100,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('Nhansu'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('NguoiDanhgia'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              // chief xác nhận kết quả
-                              DataColumnCustom(
-                                title: tr('ChiefApproval'),
-                                width: 170,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('TruongPhong'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('QuanLyCC'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                              DataColumnCustom(
-                                title: tr('GiamDoc'),
-                                width: 150,
-                                maxLines: 2,
-                                fontSize: Common.sizeColumn,
-                              ).toDataColumn2(),
-                            ],
-                            rows: List.generate(
-                              visibleCount,
-                              (i) => dataSource.getRow(_firstRowIndex + i)!,
-                            ),
-                          ),
-                        );
-                      },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment:  MainAxisAlignment.start,
+                children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 900),
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: DataTable(
+                          headingRowHeight: 66,
+                          dataRowHeight: 56,
+                          showCheckboxColumn: true,
+                          columns: frozenCols,
+                          rows: frozenRows,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Container(width: 1, color: Colors.grey[300]),
+                  Expanded(
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: DataTable(
+                            headingRowHeight: 66,
+                            dataRowHeight: 56,
+                            showCheckboxColumn: false,
+                            columns: scrollCols,
+                            rows: scrollRows,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             _buildCustomPaginator(),
