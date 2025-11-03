@@ -805,66 +805,66 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   }
 
   // Pick Excel file and import evaluation results via controller.importExceltoApp
-  Future<void> _pickAndImportExcel(AuthState authState) async {
-    final dash = Get.find<DashboardControllerApprentice>();
-    try {
-      if (kIsWeb) {
-        final result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['xlsx', 'xls', 'xlsm'],
-          withData: true,
-        );
-        if (result == null || result.files.isEmpty) return;
-        final file = result.files.first;
-        final bytes = file.bytes;
-        if (bytes == null) {
-          Get.snackbar('Import', 'Không đọc được dữ liệu file');
-          return;
-        }
-        await dash.importExceltoApp(
-          bytes,
-          authState.user!.chRUserid.toString(),
-        );
-      } else {
-        final result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['xlsx', 'xls', 'xlsm'],
-        );
-        if (result == null || result.files.isEmpty) return;
-        final path = result.files.first.path;
-        if (path == null) return;
-        final file = File(path);
-        final bytes = await file.readAsBytes();
-        await dash.importExceltoApp(
-          bytes,
-          authState.user!.chRUserid.toString(),
-        );
-      }
-      // Tự động tải file lỗi nếu có (Web only)
-      if (dash.lastImportErrorExcel.value != null && kIsWeb) {
-        final errorBytes = dash.lastImportErrorExcel.value!;
-        final blob = html.Blob([
-          errorBytes,
-        ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        html.AnchorElement(href: url)
-          ..setAttribute('download', 'import_errors_apprentice.xlsx')
-          ..click();
-        html.Url.revokeObjectUrl(url);
-      }
-      if (dash.lastImportErrors.isNotEmpty) {
-        Get.snackbar(
-          'Import',
-          'Hoàn tất với lỗi. Đã xuất file lỗi (nếu Web). Tổng lỗi: ${dash.lastImportErrors.length}',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      } else {
-        Get.snackbar('Import', 'Import dữ liệu thành công');
-      }
-    } catch (e) {
-      Get.snackbar('Import lỗi', e.toString());
-    }
-  }
+  // Future<void> _pickAndImportExcel(AuthState authState) async {
+  //   final dash = Get.find<DashboardControllerApprentice>();
+  //   try {
+  //     if (kIsWeb) {
+  //       final result = await FilePicker.platform.pickFiles(
+  //         type: FileType.custom,
+  //         allowedExtensions: ['xlsx', 'xls', 'xlsm'],
+  //         withData: true,
+  //       );
+  //       if (result == null || result.files.isEmpty) return;
+  //       final file = result.files.first;
+  //       final bytes = file.bytes;
+  //       if (bytes == null) {
+  //         Get.snackbar('Import', 'Không đọc được dữ liệu file');
+  //         return;
+  //       }
+  //       await dash.importExceltoApp(
+  //         bytes,
+  //         authState.user!.chRUserid.toString(),
+  //       );
+  //     } else {
+  //       final result = await FilePicker.platform.pickFiles(
+  //         type: FileType.custom,
+  //         allowedExtensions: ['xlsx', 'xls', 'xlsm'],
+  //       );
+  //       if (result == null || result.files.isEmpty) return;
+  //       final path = result.files.first.path;
+  //       if (path == null) return;
+  //       final file = File(path);
+  //       final bytes = await file.readAsBytes();
+  //       await dash.importExceltoApp(
+  //         bytes,
+  //         authState.user!.chRUserid.toString(),
+  //       );
+  //     }
+  //     // Tự động tải file lỗi nếu có (Web only)
+  //     if (dash.lastImportErrorExcel.value != null && kIsWeb) {
+  //       final errorBytes = dash.lastImportErrorExcel.value!;
+  //       final blob = html.Blob([
+  //         errorBytes,
+  //       ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  //       final url = html.Url.createObjectUrlFromBlob(blob);
+  //       html.AnchorElement(href: url)
+  //         ..setAttribute('download', 'import_errors_apprentice.xlsx')
+  //         ..click();
+  //       html.Url.revokeObjectUrl(url);
+  //     }
+  //     if (dash.lastImportErrors.isNotEmpty) {
+  //       Get.snackbar(
+  //         'Import',
+  //         'Hoàn tất với lỗi. Đã xuất file lỗi (nếu Web). Tổng lỗi: ${dash.lastImportErrors.length}',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //       );
+  //     } else {
+  //       Get.snackbar('Import', 'Import dữ liệu thành công');
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar('Import lỗi', e.toString());
+  //   }
+  // }
 
   // Download error Excel (web only currently)
   // void _downloadImportErrors() {

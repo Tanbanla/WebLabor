@@ -29,7 +29,6 @@ class ReportTwoScreen extends StatefulWidget {
 
 class _ReportTwoScreenState extends State<ReportTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
-  final ScrollController _scrollController = ScrollController();
   final DashboardControllerPTHC controllerPTHC = Get.put(
     DashboardControllerPTHC(),
   );
