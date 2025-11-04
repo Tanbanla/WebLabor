@@ -301,17 +301,17 @@ class TwoContract {
     return _data;
   }
 }
-// Director
-// Expert
-// Technician
-// General Director
-// Chief
-// Dept Manager
-// Leader
-// Supervisor
-// Section Manager
-// Staff
-// Operator
+// 1 Director
+// 2 General Director
+// 3 Dept Manager
+// 4 Section Manager
+// 5 Chief
+// 5 Expert
+// 6 Technician
+// 6 Leader
+// 6 Supervisor
+// 6 Staff
+// 6 Operator
 
 
 // {

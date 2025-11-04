@@ -1090,6 +1090,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         ? 820
         : 720; // approximate total width of frozen columns
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
           constraints: BoxConstraints(minWidth: leftMinWidth),

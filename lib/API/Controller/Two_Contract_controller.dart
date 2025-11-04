@@ -58,7 +58,12 @@ class DashboardControllerTwo extends GetxController {
     String? adid,
     String? chucVu,
   ) async {
-    await fetchDataBy(statusId: newStatusId, section: newSection, adid: adid, chucVu: chucVu);
+    await fetchDataBy(
+      statusId: newStatusId,
+      section: newSection,
+      adid: adid,
+      chucVu: chucVu,
+    );
   }
 
   void showError(String message) {
@@ -1052,8 +1057,10 @@ class DashboardControllerTwo extends GetxController {
           case 6:
             twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
             twocontract[i].useRApproverSectionManager = userApprover;
-            if (twocontract[i].biTApproverSectionManager == true) {
+            if (twocontract[i].biTApproverSectionManager == true ||
+                twocontract[i].biTApproverSectionManager == null) {
               twocontract[i].inTStatusId = 7;
+              twocontract[i].bitApproverDeft = true;
               mailSend = await NextApprovel(
                 section: "",
                 chucVu: "Dept Manager",
@@ -1075,8 +1082,10 @@ class DashboardControllerTwo extends GetxController {
           case 7:
             twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             twocontract[i].userApproverDeft = userApprover;
-            if (twocontract[i].bitApproverDeft == true) {
+            if (twocontract[i].bitApproverDeft == true ||
+                twocontract[i].bitApproverDeft == null) {
               twocontract[i].inTStatusId = 8;
+              twocontract[i].biTApproverDirector = true;
               mailSend = await NextApprovel(
                 section: "",
                 chucVu: "Director",
@@ -1113,7 +1122,8 @@ class DashboardControllerTwo extends GetxController {
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
-            if (twocontract[i].biTApproverDirector == true) {
+            if (twocontract[i].biTApproverDirector == true ||
+                twocontract[i].biTApproverDirector == null) {
               twocontract[i].inTStatusId = 9;
             } else {
               if ((twocontract[i].nvchRApproverDirector?.isEmpty ?? true)) {

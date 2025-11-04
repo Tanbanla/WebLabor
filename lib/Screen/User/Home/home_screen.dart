@@ -207,91 +207,95 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
-                  ContractStatsScreen(
-                    vaitro: authState.user!.chRGroup,
-                    section: authState.user!.chRSecCode,
-                  ),
-
-                  // Biểu đồ tròn
-                  Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  if (authState.user!.chRGroup.toString() == 'Chief Per' ||
+                      authState.user!.chRGroup.toString() == 'Per' ||
+                      authState.user!.chRGroup.toString() == 'Admin')
+                    ContractStatsScreen(
+                      vaitro: authState.user!.chRGroup,
+                      section: authState.user!.chRSecCode,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            tr('TyLeHoanThanh'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            height: 250,
-                            child: PieChart(
-                              PieChartData(
-                                sectionsSpace: 2,
-                                centerSpaceRadius: 60,
-                                sections: [
-                                  PieChartSectionData(
-                                    color: Colors.green,
-                                    value: (contractStats.totalBothApproved)
-                                        .toDouble(),
-                                    title:
-                                        '${((contractStats.totalBothApproved) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
-                                    radius: 60,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  PieChartSectionData(
-                                    color: Colors.orange,
-                                    value:
-                                        (contractStats
-                                                    .totalApprenticeWaitingApprove +
-                                                contractStats
-                                                    .totalTwoYearWaitingApprove)
-                                            .toDouble(),
-                                    title:
-                                        '${((contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
-                                    radius: 60,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                  if (authState.user!.chRGroup.toString() == 'Chief Per' ||
+                      authState.user!.chRGroup.toString() == 'Per' ||
+                      authState.user!.chRGroup.toString() == 'Admin')
+                    // Biểu đồ tròn
+                    Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              tr('TyLeHoanThanh'),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[700],
                               ),
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildLegend(
-                                color: Colors.green,
-                                text: tr('DaDuyet'),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 250,
+                              child: PieChart(
+                                PieChartData(
+                                  sectionsSpace: 2,
+                                  centerSpaceRadius: 60,
+                                  sections: [
+                                    PieChartSectionData(
+                                      color: Colors.green,
+                                      value: (contractStats.totalBothApproved)
+                                          .toDouble(),
+                                      title:
+                                          '${((contractStats.totalBothApproved) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
+                                      radius: 60,
+                                      titleStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    PieChartSectionData(
+                                      color: Colors.orange,
+                                      value:
+                                          (contractStats
+                                                      .totalApprenticeWaitingApprove +
+                                                  contractStats
+                                                      .totalTwoYearWaitingApprove)
+                                              .toDouble(),
+                                      title:
+                                          '${((contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove) / (contractStats.totalApprenticeWaitingApprove + contractStats.totalTwoYearWaitingApprove + contractStats.totalBothApproved) * 100).toStringAsFixed(1)}%',
+                                      radius: 60,
+                                      titleStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(width: 20),
-                              _buildLegend(
-                                color: Colors.orange,
-                                text: tr('ChoDuyet'),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildLegend(
+                                  color: Colors.green,
+                                  text: tr('DaDuyet'),
+                                ),
+                                const SizedBox(width: 20),
+                                _buildLegend(
+                                  color: Colors.orange,
+                                  text: tr('ChoDuyet'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ],
             ),

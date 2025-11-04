@@ -1123,8 +1123,10 @@ class DashboardControllerApprentice extends GetxController {
           case 6:
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
-            if (contract[i].biTApproverSectionManager == true) {
+            if (contract[i].biTApproverSectionManager == true ||
+                contract[i].biTApproverSectionManager == null) {
               contract[i].inTStatusId = 7;
+              contract[i].bitApproverDeft = true;
               mailSend = await NextApprovel(
                 section: "",
                 chucVu: "Dept Manager",
@@ -1147,7 +1149,7 @@ class DashboardControllerApprentice extends GetxController {
             //xu ly khi xong
             contract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             contract[i].userApproverDeft = userApprover;
-            if (contract[i].bitApproverDeft == true) {
+            if (contract[i].bitApproverDeft == true || contract[i].bitApproverDeft == null) {
               contract[i].inTStatusId = 9;
             } else {
               if ((contract[i].nvchrApproverDeft?.isEmpty ?? true)) {
