@@ -32,6 +32,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   final DashboardControllerPTHC controllerPTHC = Get.put(
     DashboardControllerPTHC(),
   );
+  // Controllers for frozen table implementation (vertical sync + horizontal scroll)
+  final ScrollController _rightScrollController = ScrollController();
+  final ScrollController _leftVerticalController = ScrollController();
+  final ScrollController _rightVerticalController = ScrollController();
+  bool _isSyncingScroll = false; // guard to avoid recursive jumpTo
   // Pagination customization
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -51,6 +56,35 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
+    // Sync vertical scroll between frozen (left) and scrollable (right) sections
+    _leftVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_rightVerticalController.hasClients) {
+        _rightVerticalController.jumpTo(
+          _leftVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
+    _rightVerticalController.addListener(() {
+      if (_isSyncingScroll) return;
+      _isSyncingScroll = true;
+      if (_leftVerticalController.hasClients) {
+        _leftVerticalController.jumpTo(
+          _rightVerticalController.position.pixels,
+        );
+      }
+      _isSyncingScroll = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _leftVerticalController.dispose();
+    _rightVerticalController.dispose();
+    _rightScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _prepareStatus(AuthState authState) async {
@@ -58,7 +92,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     try {
       // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
-        authState.user!.chREmployeeId.toString(),
+        authState.user!.chRUserid.toString(),
       );
       String sectionName = '';
       if (authState.user!.chRGroup.toString() == "PTHC") {
@@ -785,6 +819,38 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   // }
 
   Widget _buildFrozenDataTable() {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerTheme: DividerThemeData(
+          color: Colors.grey[200],
+          thickness: 1,
+          space: 0,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Expanded(child: _buildFrozenBody()),
+            _buildCustomPaginator(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFrozenBody() {
     final authState = Provider.of<AuthState>(context, listen: true);
     final dataSource = MyData(context);
     final total = controller.filterdataList.length;
@@ -800,6 +866,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
     );
     final bool showAction = authState.user?.chRGroup != 'PTHC';
+    // Frozen columns (first 7 logical including optional action)
     final frozenCols = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
@@ -840,6 +907,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
     ];
+    // Scrollable columns (remaining order preserved)
     final scrollCols = <DataColumn>[
       DataColumnCustom(
         title: tr('department'),
@@ -1018,76 +1086,54 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         ),
       );
     }
-    return Theme(
-      data: Theme.of(context).copyWith(
-        dividerTheme: DividerThemeData(
-          color: Colors.grey[200],
-          thickness: 1,
-          space: 0,
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment:  MainAxisAlignment.start,
-                children: [
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(minWidth: 900),
-                    child: Scrollbar(
-                      thumbVisibility: true,
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: DataTable(
-                          headingRowHeight: 66,
-                          dataRowHeight: 56,
-                          showCheckboxColumn: true,
-                          columns: frozenCols,
-                          rows: frozenRows,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(width: 1, color: Colors.grey[300]),
-                  Expanded(
-                    child: Scrollbar(
-                      thumbVisibility: true,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SingleChildScrollView(
-                          controller: ScrollController(),
-                          child: DataTable(
-                            headingRowHeight: 66,
-                            dataRowHeight: 56,
-                            showCheckboxColumn: false,
-                            columns: scrollCols,
-                            rows: scrollRows,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+    final double leftMinWidth = showAction
+        ? 820
+        : 720; // approximate total width of frozen columns
+    return Row(
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(minWidth: leftMinWidth),
+          child: Scrollbar(
+            controller: _leftVerticalController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _leftVerticalController,
+              child: DataTable(
+                headingRowHeight: 66,
+                dataRowHeight: 56,
+                showCheckboxColumn: true,
+                columns: frozenCols,
+                rows: frozenRows,
               ),
             ),
-            _buildCustomPaginator(),
-          ],
+          ),
         ),
-      ),
+        Container(width: 1, color: Colors.grey[300]),
+        Expanded(
+          child: Scrollbar(
+            controller: _rightScrollController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _rightScrollController,
+              scrollDirection: Axis.horizontal,
+              child: Scrollbar(
+                controller: _rightVerticalController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _rightVerticalController,
+                  child: DataTable(
+                    headingRowHeight: 66,
+                    dataRowHeight: 56,
+                    showCheckboxColumn: false,
+                    columns: scrollCols,
+                    rows: scrollRows,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

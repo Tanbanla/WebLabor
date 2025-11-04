@@ -91,7 +91,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     try {
       // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
-        authState.user!.chREmployeeId.toString(),
+        authState.user!.chRUserid.toString(),
       );
       final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
       String sectionName = parts.length >= 2

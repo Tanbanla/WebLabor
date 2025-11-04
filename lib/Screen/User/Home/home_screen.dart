@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
           '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}';
     } else {
       linkApi =
-          '${Common.API}${Common.ContractTotalByMonth}${DateTime.now().month}/${DateTime.now().year}/${authState.user!.chRUserid}/${authState.user!.chRGroup}';
+          '${Common.API}${Common.ContractTotalByUser}${DateTime.now().month}/${DateTime.now().year}/${authState.user!.chRUserid}/${authState.user!.chRGroup}';
     }
     setState(() {
       isLoading = true;
@@ -125,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
                                 if (authState.user!.chRGroup.toString() ==
-                                    'Chief') {
+                                        'Chief' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Expert') {
                                   context.go(AppRoutes.fillApprentice);
                                 } else if (authState.user!.chRGroup
                                             .toString() ==
@@ -165,7 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
                                 if (authState.user!.chRGroup.toString() ==
-                                    'Chief') {
+                                        'Chief' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Expert') {
                                   context.go(AppRoutes.fillTwo);
                                 } else if (authState.user!.chRGroup
                                             .toString() ==

@@ -87,7 +87,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     try {
       // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
-        authState.user!.chREmployeeId.toString(),
+        authState.user!.chRUserid.toString(),
       );
       String sectionName = '';
       if (authState.user!.chRGroup.toString() == "PTHC") {

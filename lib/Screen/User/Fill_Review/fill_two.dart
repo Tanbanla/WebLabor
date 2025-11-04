@@ -87,7 +87,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     try {
       // Bắt buộc load danh sách section PTHC trước khi xử lý changeStatus
       await controllerPTHC.fetchPTHCSectionList(
-        authState.user!.chREmployeeId.toString(),
+        authState.user!.chRUserid.toString(),
       );
 
       // String sectionName = authState.user!.chRSecCode
