@@ -942,6 +942,14 @@ class DashboardControllerTwo extends GetxController {
                 '${tr('InputError2')} ${twocontract[i].vchREmployeeId}',
               );
             }
+            if (twocontract[i].vchRReasultsLeader != 'NG' &&
+                (twocontract[i].nvchRCompleteWork != 'OK' ||
+                    twocontract[i].nvchRUseful != 'OK' ||
+                    twocontract[i].nvchROther != 'OK')) {
+              throw Exception(
+                '${tr('InputError3')} ${twocontract[i].vchREmployeeId}',
+              );
+            }
             if (twocontract[i].biTNoReEmployment == false &&
                 (twocontract[i].nvchRNoReEmpoyment == null ||
                     twocontract[i].nvchRNoReEmpoyment == "")) {

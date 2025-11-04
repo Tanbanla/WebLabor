@@ -177,4 +177,5 @@
   ,"ChonThang":"Chọn tháng"
   ,"Thang":"Tháng"
   ,"Nam":"Năm"
+  ,"InputError3":"Khi có ít nhất 1 tiêu chí đánh giá là NG  thì điểm đánh giá cuối cùng chỉ được sửa thành NG"
 }

@@ -949,6 +949,19 @@ class DashboardControllerApprentice extends GetxController {
                 '${tr('InputError2')} ${contract[i].vchREmployeeId}',
               );
             }
+            if (contract[i].vchRReasultsLeader != 'NG' &&
+                (contract[i].vchRLyThuyet != 'OK' ||
+                    contract[i].vchRThucHanh != 'OK' ||
+                    contract[i].vchRCompleteWork != 'OK' ||
+                    contract[i].vchRLearnWork != 'OK' ||
+                    contract[i].vchRThichNghi != 'OK' ||
+                    contract[i].vchRUseful != 'OK' ||
+                    contract[i].vchRContact != 'OK' ||
+                    contract[i].vcHNeedViolation != 'OK')) {
+              throw Exception(
+                '${tr('InputError3')} ${contract[i].vchREmployeeId}',
+              );
+            }
             // &&(contract[i].vchRNote == '' ||
             //       contract[i].vchRNote == null)
             if (contract[i].biTNoReEmployment == false &&
