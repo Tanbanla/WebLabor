@@ -518,7 +518,7 @@ class DashboardControllerTwo extends GetxController {
               adid.isNotEmpty){
             // Filter locally for matching approver ADID in any approval role
             final filtered = data.where((a) =>
-                    (a['useR_APPROVER_DEFT'] == adid ||
+                    (a['useR_APPROVER_CHIEF'] == adid ||
                       a['vchR_LEADER_EVALUTION'] == adid)
             ).toList();
             dataList.assignAll(

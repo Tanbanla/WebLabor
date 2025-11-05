@@ -524,7 +524,7 @@ class DashboardControllerApprentice extends GetxController {
             final filtered = data
                 .where(
                   (a) =>
-                      (a['useR_APPROVER_DEFT'] == adid ||
+                      (a['useR_APPROVER_CHIEF'] == adid ||
                       a['vchR_LEADER_EVALUTION'] == adid),
                 )
                 .toList();

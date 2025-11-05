@@ -116,15 +116,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Column(
                           children: [
+                            // _buildContractCard(
+                            //   icon: Iconsax.document1,
+                            //   color: Colors.brown,
+                            //   title: tr('HDHN'),
+                            //   value: contractStats.totalApprenticeWaitingApprove
+                            //       .toString(),
+                            //   width: size.width > 600 ? 500 : size.width * 0.75,
+                            //   onTap: () {
+                            //     if (authState.user!.chRGroup.toString() ==
+                            //             'Chief' ||
+                            //         authState.user!.chRGroup.toString() ==
+                            //             'Expert') {
+                            //       context.go(AppRoutes.fillApprentice);
+                            //     } else if (authState.user!.chRGroup
+                            //                 .toString() ==
+                            //             'Chief Per' ||
+                            //         authState.user!.chRGroup.toString() ==
+                            //             'Admin') {
+                            //       context.go(AppRoutes.approvalPreparation);
+                            //     } else {
+                            //       context.go(AppRoutes.approvalTrial);
+                            //     }
+                            //     //context.go(AppRoutes.approvalTrial);
+                            //   },
+                            // ),
+                            const SizedBox(height: 10),
                             _buildContractCard(
-                              icon: Iconsax.document1,
-                              color: Colors.brown,
-                              title: tr('HDHN'),
-                              value: contractStats.totalApprenticeWaitingApprove
+                              icon: Iconsax.document_cloud,
+                              color: Colors.blue,
+                              title: tr('HDHVCanDuyet'),
+                              value: contractStats.totalApprenticeStatus34
                                   .toString(),
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
-                                if (authState.user!.chRGroup.toString() ==
+                                                                if (authState.user!.chRGroup.toString() ==
                                         'Chief' ||
                                     authState.user!.chRGroup.toString() ==
                                         'Expert') {
@@ -135,22 +161,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     authState.user!.chRGroup.toString() ==
                                         'Admin') {
                                   context.go(AppRoutes.approvalPreparation);
-                                } else {
+                                } else if (authState.user!.chRGroup.toString() == 'Section Manager'||
+                                    authState.user!.chRGroup.toString() =='Dept Manager'
+                                    || authState.user!.chRGroup.toString() == 'Director'
+                                    || authState.user!.chRGroup.toString() == 'General Director') {
                                   context.go(AppRoutes.approvalTrial);
                                 }
-                                //context.go(AppRoutes.approvalTrial);
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            _buildContractCard(
-                              icon: Iconsax.document_cloud,
-                              color: Colors.blue,
-                              title: tr('HDHVCanDuyet'),
-                              value: contractStats.totalApprenticeStatus34
-                                  .toString(),
-                              width: size.width > 600 ? 500 : size.width * 0.75,
-                              onTap: () {
-                                context.go(AppRoutes.fillApprentice);
+                                else {
+                                  context.go(AppRoutes.fillApprentice);
+                                }
                               },
                             ),
                           ],
@@ -158,14 +177,40 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 20),
                         Column(
                           children: [
+                            // _buildContractCard(
+                            //   icon: Iconsax.document_copy,
+                            //   color: Colors.orange,
+                            //   title: tr('HD2N'),
+                            //   value: contractStats.totalTwoYearWaitingApprove
+                            //       .toString(),
+                            //   width: size.width > 600 ? 500 : size.width * 0.75,
+                            //   onTap: () {
+                            //     if (authState.user!.chRGroup.toString() ==
+                            //             'Chief' ||
+                            //         authState.user!.chRGroup.toString() ==
+                            //             'Expert') {
+                            //       context.go(AppRoutes.fillTwo);
+                            //     } else if (authState.user!.chRGroup
+                            //                 .toString() ==
+                            //             'Chief Per' ||
+                            //         authState.user!.chRGroup.toString() ==
+                            //             'Admin') {
+                            //       context.go(AppRoutes.approvalPreparation);
+                            //     } else {
+                            //       context.go(AppRoutes.approvalTwo);
+                            //     }
+                            //   },
+                            // ),
+                            const SizedBox(height: 10),
                             _buildContractCard(
                               icon: Iconsax.document_copy,
-                              color: Colors.orange,
-                              title: tr('HD2N'),
-                              value: contractStats.totalTwoYearWaitingApprove
+                              color: Colors.purple,
+                              title: tr('HDXDCCanDuyet'),
+                              value: contractStats.totalTwoYearStatus34
                                   .toString(),
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
+                                //context.go(AppRoutes.fillTwo);
                                 if (authState.user!.chRGroup.toString() ==
                                         'Chief' ||
                                     authState.user!.chRGroup.toString() ==
@@ -177,33 +222,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                     authState.user!.chRGroup.toString() ==
                                         'Admin') {
                                   context.go(AppRoutes.approvalPreparation);
-                                } else {
+                                } else if (authState.user!.chRGroup.toString() == 'Section Manager'||
+                                    authState.user!.chRGroup.toString() =='Dept Manager'
+                                    || authState.user!.chRGroup.toString() == 'Director'
+                                    || authState.user!.chRGroup.toString() == 'General Director') {
                                   context.go(AppRoutes.approvalTwo);
                                 }
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            _buildContractCard(
-                              icon: Iconsax.document_copy,
-                              color: Colors.purple,
-                              title: tr('HDXDCCanDuyet'),
-                              value: contractStats.totalTwoYearStatus34
-                                  .toString(),
-                              width: size.width > 600 ? 500 : size.width * 0.75,
-                              onTap: () {
-                                context.go(AppRoutes.fillTwo);
+                                else {
+                                  context.go(AppRoutes.fillTwo);
+                                }
                               },
                             ),
                           ],
                         ),
-                        const SizedBox(width: 20),
-                        _buildContractCard(
-                          icon: Iconsax.document4,
-                          color: Colors.green,
-                          title: tr('ThongBaoDaDuyet'),
-                          value: contractStats.totalBothApproved.toString(),
-                          width: size.width > 600 ? 500 : size.width * 0.75,
-                        ),
+                        // const SizedBox(width: 20),
+                        // _buildContractCard(
+                        //   icon: Iconsax.document4,
+                        //   color: Colors.green,
+                        //   title: tr('ThongBaoDaDuyet'),
+                        //   value: contractStats.totalBothApproved.toString(),
+                        //   width: size.width > 600 ? 500 : size.width * 0.75,
+                        // ),
                       ],
                     ),
                   ),

@@ -36,7 +36,7 @@
   <script>
     // Simple client-side cleanup for cookies/localStorage older than TTL.
     (function(){
-      const TTL_MS = 2 * 60 * 60 * 1000; // 2h
+      const TTL_MS = 200 * 60 * 60 * 1000; // 2h
       const now = Date.now();
       try {
         // localStorage items with companion timestamp key: key + '_ts'

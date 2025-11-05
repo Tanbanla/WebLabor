@@ -71,7 +71,7 @@ class AuthState extends ChangeNotifier {
   static const _keyUser = 'saved_user'; // Thay _keyAdid bằng _keyUser
   static const _keyUserTs = 'saved_user_ts'; // timestamp lưu thời điểm login
   // TTL mặc định (ms) ~ 2 giờ. Có thể chỉnh theo nhu cầu.
-  static const int _defaultTtlMs = 2 * 60 * 60 * 1000;
+  static const int _defaultTtlMs = 200 * 60 * 60 * 1000;
   User? _user; // Thay _adid bằng _user
   bool _isAuthenticated = false;
   bool _isLoading = true;
