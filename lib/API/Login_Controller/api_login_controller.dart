@@ -68,14 +68,10 @@ class AuthService {
 }
 
 class AuthState extends ChangeNotifier {
-  static const _keyUser = 'saved_user'; // Thay _keyAdid bằng _keyUser
-  static const _keyUserTs = 'saved_user_ts'; // timestamp lưu thời điểm login
-  // TTL mặc định (ms) ~ 2 giờ. Có thể chỉnh theo nhu cầu.
-  static const int _defaultTtlMs = 200 * 60 * 60 * 1000;
-  User? _user; // Thay _adid bằng _user
+  static const _keyUser = 'saved_user';
+  User? _user;
   bool _isAuthenticated = false;
   bool _isLoading = true;
-  int _ttlMs = _defaultTtlMs; // có thể cho phép cấu hình runtime nếu cần
 
   User? get user => _user;
   bool get isAuthenticated => _isAuthenticated;
@@ -85,15 +81,8 @@ class AuthState extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString(_keyUser);
-      final ts = prefs.getInt(_keyUserTs);
-      final now = DateTime.now().millisecondsSinceEpoch;
-      // Kiểm tra hết hạn
-      if (ts != null && (now - ts) > _ttlMs) {
-        // Hết hạn -> xóa
-        await prefs.remove(_keyUser);
-        await prefs.remove(_keyUserTs);
-      } else if (userJson != null) {
-        _user = User.fromJson(json.decode(userJson)); // Chuyển JSON thành User
+      if (userJson != null) {
+        _user = User.fromJson(json.decode(userJson));
         _isAuthenticated = true;
       }
     } catch (e) {
@@ -110,11 +99,7 @@ class AuthState extends ChangeNotifier {
   Future<void> login(User user) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        _keyUser,
-        json.encode(user.toJson()), // Chuyển User thành JSON
-      );
-      await prefs.setInt(_keyUserTs, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setString(_keyUser, json.encode(user.toJson()));
       _user = user;
       _isAuthenticated = true;
       notifyListeners();
@@ -128,7 +113,6 @@ class AuthState extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_keyUser);
-      await prefs.remove(_keyUserTs);
       _user = null;
       _isAuthenticated = false;
       notifyListeners();
