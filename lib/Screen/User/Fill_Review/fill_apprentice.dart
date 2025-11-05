@@ -128,7 +128,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       } else if (authState.user!.chRGroup.toString() == "Chief" ||
           authState.user!.chRGroup.toString() == "Expert") {
         controller.changeStatus(
-          '5',
+          'Chief',
           sectionName,
           authState.user!.chRUserid.toString(),
           null,
@@ -324,24 +324,24 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     authState.user!.chRGroup.toString() == "Admin") {
                   // truong hop PTHC phong ban
                   if (authState.user!.chRGroup.toString() == "PTHC") {
-                      sectionName = '';
-                      if (controllerPTHC.listPTHCsection.isNotEmpty) {
-                        sectionName =
-                            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-                      } else {
-                        sectionName = parts.length >= 2
-                            ? '${parts[0].trim()} : ${parts[1].trim()}'
-                            : parts.firstOrNull?.trim() ?? '';
-                      }
-                      controllerTwo.changeStatus(
-                        'PTHC',
-                        sectionName,
-                        authState.user!.chRUserid.toString(),
-                        null,
-                      );
+                    sectionName = '';
+                    if (controllerPTHC.listPTHCsection.isNotEmpty) {
+                      sectionName =
+                          '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
                     } else {
-                      controllerTwo.changeStatus('PTHC', null, null, null);
+                      sectionName = parts.length >= 2
+                          ? '${parts[0].trim()} : ${parts[1].trim()}'
+                          : parts.firstOrNull?.trim() ?? '';
                     }
+                    controllerTwo.changeStatus(
+                      'PTHC',
+                      sectionName,
+                      authState.user!.chRUserid.toString(),
+                      null,
+                    );
+                  } else {
+                    controllerTwo.changeStatus('PTHC', null, null, null);
+                  }
                   // await controllerTwo.changeStatus(
                   //   'PTHC',
                   //   sectionName,
@@ -351,7 +351,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                 } else if (authState.user!.chRGroup.toString() == "Chief" ||
                     authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
-                    '5',
+                    'Chief',
                     sectionName,
                     authState.user!.chRUserid.toString(),
                     null,
@@ -1868,9 +1868,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     adid,
                     null,
                   );
-                } else if (group == "Chief") {
+                } else if (group == "Chief" || group == "Expert") {
                   await controller.changeStatus(
-                    '5',
+                    'Chief',
                     sectionName,
                     adid.toString(),
                     null,
@@ -3701,9 +3701,9 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           null,
                         );
                       } else if (authState.user!.chRGroup.toString() ==
-                          "Chief") {
+                          "Chief" || authState.user!.chRGroup.toString() == "Expert") {
                         await controller.changeStatus(
-                          '5',
+                          'Chief',
                           sectionName,
                           authState.user!.chRUserid.toString(),
                           null,

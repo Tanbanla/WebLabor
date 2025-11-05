@@ -412,6 +412,13 @@ class DashboardControllerApprentice extends GetxController {
           "operator": "IN",
           "logicType": "AND",
         });
+      } else if (statusId == 'Chief') {
+        filters.add({
+          "field": "INT_STATUS_ID",
+          "value": ["4", "5"],
+          "operator": "IN",
+          "logicType": "AND",
+        });
       } else {
         filters.add({
           "field": "INT_STATUS_ID",
@@ -433,7 +440,8 @@ class DashboardControllerApprentice extends GetxController {
       if (adid != null &&
           adid.isNotEmpty &&
           statusId != 'PTHC' &&
-          statusId != 'approval') {
+          statusId != 'approval' &&
+          statusId != 'Chief') {
         filters.add({
           "field": cloumn,
           "value": adid,
@@ -501,6 +509,25 @@ class DashboardControllerApprentice extends GetxController {
                         a['useR_APPROVER_DIRECTOR'] == adid);
               }
             }).toList();
+            dataList.assignAll(
+              filtered
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+            originalList.assignAll(
+              filtered
+                  .map((contract) => ApprenticeContract.fromJson(contract))
+                  .toList(),
+            );
+          } else if (statusId == 'Chief' && adid != null && adid.isNotEmpty) {
+            // Filter locally for matching approver ADID in any approval role
+            final filtered = data
+                .where(
+                  (a) =>
+                      (a['useR_APPROVER_DEFT'] == adid ||
+                      a['vchR_LEADER_EVALUTION'] == adid),
+                )
+                .toList();
             dataList.assignAll(
               filtered
                   .map((contract) => ApprenticeContract.fromJson(contract))
@@ -818,7 +845,7 @@ class DashboardControllerApprentice extends GetxController {
           '2',
           '$userApprover@brothergroup.net',
           '$userApprover@brothergroup.net',
-          '$userApprover@brothergroup.net',
+          '$userApprover@brothergroup.net;khanhmf@brothergroup.net',
         );
       } else {
         final error = json.decode(response.body);
@@ -840,6 +867,7 @@ class DashboardControllerApprentice extends GetxController {
     String chucVu,
   ) async {
     try {
+
       List<dynamic> contract = [];
       final contractOld = getSelectedItems();
       if (contractOld.isEmpty) {
@@ -1025,7 +1053,7 @@ class DashboardControllerApprentice extends GetxController {
             '2',
             '$userApprover@brothergroup.net',
             '$userApprover@brothergroup.net',
-            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net;khanhmf@brothergroup.net',
           );
         }
       } else {
@@ -1162,7 +1190,8 @@ class DashboardControllerApprentice extends GetxController {
             //xu ly khi xong
             contract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             contract[i].userApproverDeft = userApprover;
-            if (contract[i].bitApproverDeft == true || contract[i].bitApproverDeft == null) {
+            if (contract[i].bitApproverDeft == true ||
+                contract[i].bitApproverDeft == null) {
               contract[i].inTStatusId = 9;
             } else {
               if ((contract[i].nvchrApproverDeft?.isEmpty ?? true)) {

@@ -407,7 +407,15 @@ class DashboardControllerTwo extends GetxController {
           "operator": "IN",
           "logicType": "AND",
         });
-      } else {
+      }  else if (statusId == 'Chief'){
+        filters.add({
+          "field": "INT_STATUS_ID",
+          "value": ["4", "5"],
+          "operator": "IN",
+          "logicType": "AND",
+        });
+      }
+      else {
         filters.add({
           "field": "INT_STATUS_ID",
           "value": statusId,
@@ -426,7 +434,7 @@ class DashboardControllerTwo extends GetxController {
       if (adid != null &&
           adid.isNotEmpty &&
           statusId != 'PTHC' &&
-          statusId != 'approval') {
+          statusId != 'approval'&& statusId != 'Chief') {
         filters.add({
           "field": cloumn,
           "value": adid,
@@ -505,7 +513,26 @@ class DashboardControllerTwo extends GetxController {
                   .map((contract) => TwoContract.fromJson(contract))
                   .toList(),
             );
-          } else {
+          } else if (statusId == 'Chief'&&
+              adid != null &&
+              adid.isNotEmpty){
+            // Filter locally for matching approver ADID in any approval role
+            final filtered = data.where((a) =>
+                    (a['useR_APPROVER_DEFT'] == adid ||
+                      a['vchR_LEADER_EVALUTION'] == adid)
+            ).toList();
+            dataList.assignAll(
+              filtered
+                  .map((contract) => TwoContract.fromJson(contract))
+                  .toList(),
+            );
+            originalList.assignAll(
+              filtered
+                  .map((contract) => TwoContract.fromJson(contract))
+                  .toList(),
+            );
+          }
+          else {
             dataList.assignAll(
               data.map((contract) => TwoContract.fromJson(contract)).toList(),
             );
@@ -1014,7 +1041,7 @@ class DashboardControllerTwo extends GetxController {
             '4',
             '$userApprover@brothergroup.net',
             '$userApprover@brothergroup.net',
-            '$userApprover@brothergroup.net',
+            '$userApprover@brothergroup.net;khanhmf@brothergroup.net',
           );
         }
       } else {

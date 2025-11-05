@@ -127,7 +127,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       } else if (authState.user!.chRGroup.toString() == "Chief" ||
           authState.user!.chRGroup.toString() == "Expert") {
         controller.changeStatus(
-          '5',
+          'Chief',
           sectionName,
           authState.user!.chRUserid.toString(),
           null,
@@ -517,7 +517,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                 } else if (authState.user!.chRGroup.toString() == "Chief" ||
                     authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
-                    '5',
+                    'Chief',
                     sectionName,
                     authState.user!.chRUserid.toString(),
                     null,
@@ -1809,8 +1809,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     adid,
                     null,
                   );
-                } else if (group == "Chief") {
-                  await controller.changeStatus('5', sectionName, adid, null);
+                } else if (group == "Chief" || group == "Export") {
+                  await controller.changeStatus('Chief', sectionName, adid, null);
                 } else {
                   // truong hop leader
                   await controller.changeStatus('4', sectionName, adid, null);
@@ -3191,9 +3191,9 @@ class _ReturnTwoContract extends StatelessWidget {
                           null,
                         );
                       } else if (authState.user!.chRGroup.toString() ==
-                          "Chief") {
+                          "Chief" || authState.user!.chRGroup.toString() == "Expert") {
                         await controller.changeStatus(
-                          '5',
+                          'Chief',
                           sectionName,
                           authState.user!.chRUserid.toString(),
                           null,
