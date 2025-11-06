@@ -407,15 +407,14 @@ class DashboardControllerTwo extends GetxController {
           "operator": "IN",
           "logicType": "AND",
         });
-      }  else if (statusId == 'Chief'){
+      } else if (statusId == 'Chief') {
         filters.add({
           "field": "INT_STATUS_ID",
           "value": ["4", "5"],
           "operator": "IN",
           "logicType": "AND",
         });
-      }
-      else {
+      } else {
         filters.add({
           "field": "INT_STATUS_ID",
           "value": statusId,
@@ -434,7 +433,8 @@ class DashboardControllerTwo extends GetxController {
       if (adid != null &&
           adid.isNotEmpty &&
           statusId != 'PTHC' &&
-          statusId != 'approval'&& statusId != 'Chief') {
+          statusId != 'approval' &&
+          statusId != 'Chief') {
         filters.add({
           "field": cloumn,
           "value": adid,
@@ -513,14 +513,15 @@ class DashboardControllerTwo extends GetxController {
                   .map((contract) => TwoContract.fromJson(contract))
                   .toList(),
             );
-          } else if (statusId == 'Chief'&&
-              adid != null &&
-              adid.isNotEmpty){
+          } else if (statusId == 'Chief' && adid != null && adid.isNotEmpty) {
             // Filter locally for matching approver ADID in any approval role
-            final filtered = data.where((a) =>
-                    (a['useR_APPROVER_CHIEF'] == adid ||
-                      a['vchR_LEADER_EVALUTION'] == adid)
-            ).toList();
+            final filtered = data
+                .where(
+                  (a) =>
+                      (a['useR_APPROVER_CHIEF'] == adid ||
+                      a['vchR_LEADER_EVALUTION'] == adid),
+                )
+                .toList();
             dataList.assignAll(
               filtered
                   .map((contract) => TwoContract.fromJson(contract))
@@ -531,8 +532,7 @@ class DashboardControllerTwo extends GetxController {
                   .map((contract) => TwoContract.fromJson(contract))
                   .toList(),
             );
-          }
-          else {
+          } else {
             dataList.assignAll(
               data.map((contract) => TwoContract.fromJson(contract)).toList(),
             );
@@ -1059,7 +1059,10 @@ class DashboardControllerTwo extends GetxController {
   }
 
   //update thong tin Phe duyet
-  Future<void> updateListTwoContractApproval(String userApprover) async {
+  Future<void> updateListTwoContractApproval(
+    String userApprover,
+    String? nextApproverAdid,
+  ) async {
     try {
       // List<TwoContract> twocontract,
       //fetchPTHCData();
@@ -1096,11 +1099,16 @@ class DashboardControllerTwo extends GetxController {
                 twocontract[i].biTApproverSectionManager == null) {
               twocontract[i].inTStatusId = 7;
               twocontract[i].bitApproverDeft = true;
-              mailSend = await NextApprovel(
-                section: "",
-                chucVu: "Dept Manager",
-                dept: dept,
-              );
+              // Use selected next approver if provided, otherwise fallback to API lookup
+              if (nextApproverAdid != null && nextApproverAdid.isNotEmpty) {
+                mailSend = nextApproverAdid;
+              } else {
+                mailSend = await NextApprovel(
+                  section: "",
+                  chucVu: "Dept Manager",
+                  dept: dept,
+                );
+              }
               twocontract[i].userApproverDeft = mailSend.split('@')[0];
             } else {
               if ((twocontract[i].nvchRApproverManager?.isEmpty ?? true)) {

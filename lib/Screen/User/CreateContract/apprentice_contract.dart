@@ -153,7 +153,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
 
   Widget _buildApproverPer() {
     final controller = Get.put(DashboardControllerUserApprover());
-    controller.changeStatus('ADM-PER', 'Section Manager');
+    controller.changeStatus('ADM-PER', 'Section Manager', null);
     final RxString selectedConfirmerId = RxString('');
     final Rx<ApproverUser?> selectedConfirmer = Rx<ApproverUser?>(null);
     final authState = Provider.of<AuthState>(context, listen: true);

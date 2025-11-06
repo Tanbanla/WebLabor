@@ -178,4 +178,6 @@
   ,"Thang":"Tháng"
   ,"Nam":"Năm"
   ,"InputError3":"Khi có ít nhất 1 tiêu chí đánh giá là NG  thì điểm đánh giá cuối cùng chỉ được sửa thành NG"
+  ,"selectApprover":"Chọn người phê duyệt tiếp theo"
+  ,"pleaseSelectApprover":"Vui lòng chọn người phê duyệt bước tiếp theo"
 }

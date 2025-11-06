@@ -16,8 +16,8 @@ class DashboardControllerUserApprover extends GetxController {
     //fetchDummyData();
   }
 
-  Future<void> changeStatus(String newSection, String newChuVu) async {
-    await fetchDummyData(section: newSection, chucVu: newChuVu);
+  Future<void> changeStatus(String newSection, String newChuVu, String? dept) async {
+    await fetchDummyData(section: newSection, chucVu: newChuVu, dept: dept);
   }
 
   void showError(String message) {
@@ -31,7 +31,7 @@ class DashboardControllerUserApprover extends GetxController {
   }
 
   // lay du lieu
-  Future<void> fetchDummyData({String? section, String? chucVu}) async {
+  Future<void> fetchDummyData({String? section, String? chucVu, String? dept}) async {
     try {
       isLoading(true);
       // Format section: if it is a JSON array string => convert to comma separated
@@ -58,9 +58,8 @@ class DashboardControllerUserApprover extends GetxController {
 
       final qp = <String, String>{};
       if (formattedSection != null) qp['section'] = formattedSection;
-      if (chucVu != null && chucVu.trim().isNotEmpty)
-        qp['positionGroups'] = chucVu.trim();
-
+      if (chucVu != null && chucVu.trim().isNotEmpty) qp['positionGroups'] = chucVu.trim();
+      if(dept != null && dept.trim().isNotEmpty) qp['dept'] = dept.trim();
       final Uri uri = Uri.parse(
         '${Common.API}${Common.UserApprover}',
       ).replace(queryParameters: qp);

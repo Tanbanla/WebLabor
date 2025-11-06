@@ -3,6 +3,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
+import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -18,6 +19,8 @@ import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 
+import 'package:web_labor_contract/class/User_Approver.dart';
+
 class ApprovalTwoScreen extends StatefulWidget {
   const ApprovalTwoScreen({super.key});
 
@@ -27,6 +30,11 @@ class ApprovalTwoScreen extends StatefulWidget {
 
 class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
+    final DashboardControllerUserApprover controllerUserApprover = Get.put(
+    DashboardControllerUserApprover(),
+  );
+  // Selected next approver (Dept Manager) when current user is Section Manager or admin
+  String? _selectedNextApproverAdid;
   // Controllers for frozen/scrollable implementation
   final ScrollController _rightScrollController = ScrollController();
   final ScrollController _leftVerticalController = ScrollController();
@@ -66,6 +74,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       _reloadData(
         authState.user!.chRUserid.toString(),
         authState.user!.chRGroup.toString(),
+        authState.user!.chRSecCode.toString(),
       );
     });
   }
@@ -78,7 +87,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     super.dispose();
   }
 
-  Future<void> _reloadData(String userId, String? chucVu) async {
+  Future<void> _reloadData(String userId, String? chucVu, String? section) async {
     controller.filterdataList.clear();
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
@@ -87,6 +96,16 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       await controller.fetchPTHCData();
       controller.refreshSearch();
       controller.changeStatus('approval', null, userId, chucVu);
+       if (chucVu == "Section Manager" || chucVu== "Admin") {
+        // Tìm vị trí bắt đầu của phần dept
+        List<String> parts = section == null ? [] : (section).split(": ");
+        String prPart = parts[1];
+
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
+        controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -196,6 +215,9 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     final authState = Provider.of<AuthState>(context, listen: false);
     final DashboardControllerTwo controller =
         Get.find<DashboardControllerTwo>();
+    final bool requiresNextApprover =
+        authState.user!.chRGroup == "Section Manager" ||
+        authState.user!.chRGroup == "Admin";
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -344,6 +366,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
               await _reloadData(
                 authState.user!.chRUserid.toString(),
                 authState.user!.chRGroup.toString(),
+                authState.user!.chRSecCode.toString(),
               );
               controller.refreshFilteredList();
             },
@@ -363,11 +386,123 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
               authState.user!.chRGroup.toString(),
             ),
           ),
+           if (requiresNextApprover)
+            SizedBox(
+              width: fw(250),
+              child: Obx(() {
+                // Force rebuild when list changes
+                Visibility(
+                  visible: false,
+                  child: Text(
+                    controllerUserApprover.dataList.length.toString(),
+                  ),
+                );
+                // Build a unique list of approvers by ADID to avoid duplicate value assertion
+                final rawApprovers = controllerUserApprover.dataList
+                    .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
+                    .toList();
+                final seen = <String>{};
+                final uniqueApprovers = <ApproverUser>[];
+                for (final u in rawApprovers) {
+                  final adid =
+                      u.chREmployeeAdid!; // safe due to earlier where filter
+                  if (seen.add(adid)) uniqueApprovers.add(u);
+                }
+                final selectedValid =
+                    _selectedNextApproverAdid != null &&
+                    uniqueApprovers.any(
+                      (u) => u.chREmployeeAdid == _selectedNextApproverAdid,
+                    );
+                return DropdownButtonFormField<String>(
+                  // If previously selected value no longer valid, show null to prevent assertion
+                  value: selectedValid ? _selectedNextApproverAdid : null,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: tr('selectApprover'),
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    prefixIcon: Icon(
+                      Icons.person_search,
+                      size: 20,
+                      color: Colors.grey[600],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: Colors.black54,
+                        width: 0.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.blue[300]!,
+                        width: 1.5,
+                      ),
+                    ),
+                    isDense: true,
+                  ),
+                  hint: Text(
+                    tr('selectApprover'),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  ),
+                  items: uniqueApprovers
+                      .map(
+                        (u) => DropdownMenuItem<String>(
+                          value: u.chREmployeeAdid!,
+                          child: Text(
+                            '${u.chREmployeeName ?? ''} (${u.chRPositionGroup ?? u.chRPosition ?? ''})',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedNextApproverAdid = val;
+                    });
+                  },
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    size: 20,
+                    color: Colors.grey[600],
+                  ),
+                  menuMaxHeight: 320,
+                  dropdownColor: Colors.white,
+                );
+              }),
+            ),
           GestureDetector(
             onTap: () async {
               try {
+                // Require approver selection if needed
+                if (requiresNextApprover &&
+                    (_selectedNextApproverAdid == null ||
+                        _selectedNextApproverAdid!.isEmpty)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(tr('pleaseSelectApprover')),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
                 await controller.updateListTwoContractApproval(
                   authState.user!.chRUserid.toString(),
+                  _selectedNextApproverAdid,
                 );
                 controller.changeStatus(
                   'approval',

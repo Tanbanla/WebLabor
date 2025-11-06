@@ -124,6 +124,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         controllerUserApprover.changeStatus(
           sectionName,
           'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+          null
         );
       } else if (authState.user!.chRGroup.toString() == "Chief" ||
           authState.user!.chRGroup.toString() == "Expert") {
@@ -133,7 +134,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           authState.user!.chRUserid.toString(),
           null,
         );
-        controllerUserApprover.changeStatus(sectionName, 'Section Manager');
+        controllerUserApprover.changeStatus(sectionName, 'Section Manager',null);
       } else {
         // truong hop leader
         controller.changeStatus(
@@ -143,7 +144,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           null,
         );
         // truong hop leader
-        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
+        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert', null);
       }
       _statusInitialized = true;
     } catch (e) {

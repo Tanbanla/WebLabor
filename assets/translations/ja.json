@@ -177,5 +177,7 @@
   "ChonThang":"月を選択",
   "Thang":"月",
   "Nam":"年",
-  "InputError3":"評価基準のいずれかがNGである場合、最終評価はNGにのみ修正できます"
+  "InputError3":"評価基準のいずれかがNGである場合、最終評価はNGにのみ修正できます",
+  "selectApprover":"次の承認者を選択"
+  ,"pleaseSelectApprover":"次の承認者を選択してください"
 }

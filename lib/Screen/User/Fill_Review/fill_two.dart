@@ -123,6 +123,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         controllerUserApprover.changeStatus(
           sectionName,
           'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+          null
         );
       } else if (authState.user!.chRGroup.toString() == "Chief" ||
           authState.user!.chRGroup.toString() == "Expert") {
@@ -132,7 +133,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           authState.user!.chRUserid.toString(),
           null,
         );
-        controllerUserApprover.changeStatus(sectionName, 'Section Manager');
+        controllerUserApprover.changeStatus(sectionName, 'Section Manager',null);
       } else {
         controller.changeStatus(
           '4',
@@ -141,7 +142,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           null,
         );
         // truong hop leader
-        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert');
+        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert',null);
       }
       _statusInitialized = true;
     } catch (e) {

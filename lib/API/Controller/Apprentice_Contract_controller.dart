@@ -867,7 +867,6 @@ class DashboardControllerApprentice extends GetxController {
     String chucVu,
   ) async {
     try {
-
       List<dynamic> contract = [];
       final contractOld = getSelectedItems();
       if (contractOld.isEmpty) {
@@ -1131,7 +1130,10 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // update thong tin phe duyet
-  Future<void> updateListApprenticeContractApproval(String userApprover) async {
+  Future<void> updateListApprenticeContractApproval(
+    String userApprover, {
+    String? nextApproverAdid,
+  }) async {
     try {
       final contractOld = getSelectedItems();
       //fetchPTHCData();
@@ -1168,11 +1170,16 @@ class DashboardControllerApprentice extends GetxController {
                 contract[i].biTApproverSectionManager == null) {
               contract[i].inTStatusId = 7;
               contract[i].bitApproverDeft = true;
-              mailSend = await NextApprovel(
-                section: "",
-                chucVu: "Dept Manager",
-                dept: dept,
-              );
+              // Use selected next approver if provided, otherwise fallback to API lookup
+              if (nextApproverAdid != null && nextApproverAdid.isNotEmpty) {
+                mailSend = nextApproverAdid;
+              } else {
+                mailSend = await NextApprovel(
+                  section: "",
+                  chucVu: "Dept Manager",
+                  dept: dept,
+                );
+              }
               contract[i].userApproverDeft = mailSend.split('@')[0];
             } else {
               if ((contract[i].nvchRApproverSectionManager?.isEmpty ?? true)) {
