@@ -994,7 +994,23 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].biTApproverChief = true;
               twocontract[i].nvchRApproverChief = '';
               twocontract[i].useRApproverSectionManager = userApprover;
-            } else {
+              twocontract[i].biTApproverSectionManager = true;
+            }else if(chucVu == "Section Manager"){
+              twocontract[i].inTStatusId = 7;
+              twocontract[i].vchRLeaderEvalution = userUpdate;
+              twocontract[i].useRApproverChief = userUpdate;
+              twocontract[i].useRApproverSectionManager = userUpdate;
+              twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
+              twocontract[i].dtMApproverChief= formatDateTime(DateTime.now());
+              twocontract[i].biTApproverChief = false;
+              twocontract[i].nvchRApproverChief = '';
+              twocontract[i].biTApproverSectionManager = true;
+              twocontract[i].nvchRApproverManager = '';
+              twocontract[i].userApproverDeft = userApprover;
+              twocontract[i].bitApproverDeft = true;
+            }
+            else {
               twocontract[i].inTStatusId = 5;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userApprover;
@@ -1023,6 +1039,7 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].useRApproverChief = userUpdate;
               twocontract[i].useRApproverSectionManager = userApprover;
               twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
+              twocontract[i].biTApproverSectionManager = true;
             }
             break;
         }

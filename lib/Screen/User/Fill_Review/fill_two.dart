@@ -85,64 +85,59 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
   Future<void> _prepareStatus(AuthState authState) async {
     if (_statusInitialized) return;
     try {
-      // Bắt buộc load danh sách section PTHC trước khi xử lý changeStatus
-      await controllerPTHC.fetchPTHCSectionList(
-        authState.user!.chRUserid.toString(),
-      );
+      // Always load section list first
+      await controllerPTHC.fetchPTHCSectionList(authState.user!.chRUserid.toString());
 
-      // String sectionName = authState.user!.chRSecCode
-      //     .toString()
-      //     .split(':')[1]
-      //     .trim();
-      final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+      final group = authState.user!.chRGroup?.toString() ?? '';
+      final secCode = authState.user!.chRSecCode?.toString() ?? '';
+      final parts = secCode.split(':');
       String sectionName = parts.length >= 2
           ? '${parts[0].trim()} : ${parts[1].trim()}'
-          : parts.firstOrNull?.trim() ?? '';
-      if (authState.user!.chRGroup.toString() == "PTHC" ||
-          authState.user!.chRGroup.toString() == "Per" ||
-          authState.user!.chRGroup.toString() == "Admin") {
-        if (authState.user!.chRGroup.toString() == "PTHC") {
-          sectionName = '';
+          : (parts.isNotEmpty ? parts[0].trim() : '');
+
+      switch (group) {
+        case 'PTHC':
           if (controllerPTHC.listPTHCsection.isNotEmpty) {
-            sectionName =
-                '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+            sectionName = '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
           } else {
             sectionName = parts.length >= 2
                 ? '${parts[0].trim()} : ${parts[1].trim()}'
-                : parts.firstOrNull?.trim() ?? '';
+                : (parts.isNotEmpty ? parts[0].trim() : '');
           }
-          controller.changeStatus(
-            'PTHC',
+          controller.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString(), null);
+          controllerUserApprover.changeStatus(
             sectionName,
-            authState.user!.chRUserid.toString(),
+            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
             null,
           );
-        } else {
+          break;
+        case 'Per':
+        case 'Admin':
           controller.changeStatus('PTHC', null, null, null);
-        }
-        controllerUserApprover.changeStatus(
-          sectionName,
-          'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
-          null
-        );
-      } else if (authState.user!.chRGroup.toString() == "Chief" ||
-          authState.user!.chRGroup.toString() == "Expert") {
-        controller.changeStatus(
-          'Chief',
-          sectionName,
-          authState.user!.chRUserid.toString(),
-          null,
-        );
-        controllerUserApprover.changeStatus(sectionName, 'Section Manager',null);
-      } else {
-        controller.changeStatus(
-          '4',
-          sectionName,
-          authState.user!.chRUserid.toString(),
-          null,
-        );
-        // truong hop leader
-        controllerUserApprover.changeStatus(sectionName, 'Chief,Expert',null);
+          controllerUserApprover.changeStatus(
+            sectionName,
+            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+            null,
+          );
+          break;
+        case 'Chief':
+        case 'Expert':
+          controller.changeStatus('Chief', sectionName, authState.user!.chRUserid.toString(), null);
+          controllerUserApprover.changeStatus(sectionName, 'Section Manager', null);
+          break;
+        case 'Section Manager':
+          // Extract dept from secCode
+          String dept = '';
+          if (parts.length >= 2) {
+            final prParts = parts[1].split('-');
+            dept = prParts[0];
+          }
+          controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString(), null);
+          controllerUserApprover.changeStatus('', 'Dept Manager', dept);
+          break;
+        default:
+          controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString(), null);
+          controllerUserApprover.changeStatus(sectionName, 'Chief,Expert', null);
       }
       _statusInitialized = true;
     } catch (e) {
