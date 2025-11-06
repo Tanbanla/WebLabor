@@ -214,13 +214,18 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             .toList();
       // Quyen phe duyet
       case 'Chief Section':
-      case 'Section Manager':
       case 'General Director':
       case 'Dept Manager':
       case 'Director':
         return allCdms
             .where(
               (cdm) => cdm.title == tr("approval") || cdm.title == tr('home'),
+            )
+            .toList();
+      case 'Section Manager':
+          return allCdms
+            .where(
+              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home') || cdm.title == tr("fillEvaluation"),
             )
             .toList();
       default:
