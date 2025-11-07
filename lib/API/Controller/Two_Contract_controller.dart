@@ -489,18 +489,27 @@ class DashboardControllerTwo extends GetxController {
               adid.isNotEmpty) {
             // Local filtering for approval users
             final filtered = data.where((a) {
-              if (chucVu == "Section Manager") {
-                return a['inT_STATUS_ID'] != null &&
-                    [6].contains(a['inT_STATUS_ID']) &&
-                    (a['userApproverSectionManager'] == adid ||
-                        a['useR_APPROVER_SECTION_MANAGER'] == adid);
-              } else {
-                return a['inT_STATUS_ID'] != null &&
-                    [7, 8].contains(a['inT_STATUS_ID']) &&
-                    (a['userApproverDeft'] == adid ||
-                        a['userApproverDirector'] == adid ||
-                        a['useR_APPROVER_DEFT'] == adid ||
-                        a['useR_APPROVER_DIRECTOR'] == adid);
+              switch (chucVu) {
+                case "Section Manager":
+                  return a['inT_STATUS_ID'] != null &&
+                      [6].contains(a['inT_STATUS_ID']) &&
+                      (a['userApproverSectionManager'] == adid ||
+                          a['useR_APPROVER_SECTION_MANAGER'] == adid);
+                case "Dept":
+                case "Dept Manager":
+                  return a['inT_STATUS_ID'] != null &&
+                      [7].contains(a['inT_STATUS_ID']) &&
+                      (a['userApproverDirector'] == adid ||
+                          a['useR_APPROVER_DIRECTOR'] == adid);
+                default:
+                  return a['inT_STATUS_ID'] != null &&
+                      [6, 7, 8].contains(a['inT_STATUS_ID']) &&
+                      (a['userApproverDeft'] == adid ||
+                          a['userApproverDirector'] == adid ||
+                          a['useR_APPROVER_DEFT'] == adid ||
+                          a['useR_APPROVER_DIRECTOR'] == adid ||
+                          a['userApproverSectionManager'] == adid ||
+                          a['useR_APPROVER_SECTION_MANAGER'] == adid);
               }
             }).toList();
             dataList.assignAll(
