@@ -233,9 +233,14 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final authState = Provider.of<AuthState>(context, listen: false);
     final DashboardControllerApprentice controller =
         Get.find<DashboardControllerApprentice>();
+    // Build a unique list of approvers by ADID to avoid duplicate value assertion
+    final rawApprovers = controllerUserApprover.dataList
+        .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
+        .toList();
     final bool requiresNextApprover =
-        authState.user!.chRGroup == "Section Manager" ||
-        authState.user!.chRGroup == "Admin";
+        (authState.user!.chRGroup == "Section Manager" ||
+            authState.user!.chRGroup == "Admin") &&
+        (rawApprovers.length > 1);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -415,10 +420,6 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                     controllerUserApprover.dataList.length.toString(),
                   ),
                 );
-                // Build a unique list of approvers by ADID to avoid duplicate value assertion
-                final rawApprovers = controllerUserApprover.dataList
-                    .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
-                    .toList();
                 final seen = <String>{};
                 final uniqueApprovers = <ApproverUser>[];
                 for (final u in rawApprovers) {

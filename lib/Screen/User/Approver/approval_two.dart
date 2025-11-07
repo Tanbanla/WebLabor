@@ -30,7 +30,7 @@ class ApprovalTwoScreen extends StatefulWidget {
 
 class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
   final DashboardControllerTwo controller = Get.put(DashboardControllerTwo());
-    final DashboardControllerUserApprover controllerUserApprover = Get.put(
+  final DashboardControllerUserApprover controllerUserApprover = Get.put(
     DashboardControllerUserApprover(),
   );
   // Selected next approver (Dept Manager) when current user is Section Manager or admin
@@ -87,7 +87,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     super.dispose();
   }
 
-  Future<void> _reloadData(String userId, String? chucVu, String? section) async {
+  Future<void> _reloadData(
+    String userId,
+    String? chucVu,
+    String? section,
+  ) async {
     controller.filterdataList.clear();
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
@@ -96,7 +100,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       await controller.fetchPTHCData();
       controller.refreshSearch();
       controller.changeStatus('approval', null, userId, chucVu);
-       if (chucVu == "Section Manager" || chucVu== "Admin") {
+      if (chucVu == "Section Manager" || chucVu == "Admin") {
         // Tìm vị trí bắt đầu của phần dept
         List<String> parts = section == null ? [] : (section).split(": ");
         String prPart = parts[1];
@@ -215,9 +219,14 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     final authState = Provider.of<AuthState>(context, listen: false);
     final DashboardControllerTwo controller =
         Get.find<DashboardControllerTwo>();
+    // Build a unique list of approvers by ADID to avoid duplicate value assertion
+    final rawApprovers = controllerUserApprover.dataList
+        .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
+        .toList();
     final bool requiresNextApprover =
-        authState.user!.chRGroup == "Section Manager" ||
-        authState.user!.chRGroup == "Admin";
+        (authState.user!.chRGroup == "Section Manager" ||
+            authState.user!.chRGroup == "Admin") &&
+        (rawApprovers.length > 1);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -386,7 +395,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
               authState.user!.chRGroup.toString(),
             ),
           ),
-           if (requiresNextApprover)
+          if (requiresNextApprover)
             SizedBox(
               width: fw(250),
               child: Obx(() {
@@ -397,10 +406,6 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                     controllerUserApprover.dataList.length.toString(),
                   ),
                 );
-                // Build a unique list of approvers by ADID to avoid duplicate value assertion
-                final rawApprovers = controllerUserApprover.dataList
-                    .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
-                    .toList();
                 final seen = <String>{};
                 final uniqueApprovers = <ApproverUser>[];
                 for (final u in rawApprovers) {

@@ -89,7 +89,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   Future<void> _prepareStatus(AuthState authState) async {
     if (_statusInitialized) return;
     try {
-      await controllerPTHC.fetchPTHCSectionList(authState.user!.chRUserid.toString());
+      await controllerPTHC.fetchPTHCSectionList(
+        authState.user!.chRUserid.toString(),
+      );
 
       final group = authState.user!.chRGroup?.toString() ?? '';
       final secCode = authState.user!.chRSecCode?.toString() ?? '';
@@ -101,13 +103,19 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       switch (group) {
         case 'PTHC':
           if (controllerPTHC.listPTHCsection.isNotEmpty) {
-            sectionName = '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+            sectionName =
+                '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
           } else {
             sectionName = parts.length >= 2
                 ? '${parts[0].trim()} : ${parts[1].trim()}'
                 : (parts.isNotEmpty ? parts[0].trim() : '');
           }
-          controller.changeStatus('PTHC', sectionName, authState.user!.chRUserid.toString(), null);
+          controller.changeStatus(
+            'PTHC',
+            sectionName,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -125,8 +133,27 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           break;
         case 'Chief':
         case 'Expert':
-          controller.changeStatus('Chief', sectionName, authState.user!.chRUserid.toString(), null);
-          controllerUserApprover.changeStatus(sectionName, 'Section Manager', null);
+          controller.changeStatus(
+            'Chief',
+            sectionName,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
+          await controllerUserApprover.changeStatus(
+            sectionName,
+            'Section Manager',
+            null,
+          );
+          if(controllerUserApprover.dataList.isEmpty){
+              // Tìm vị trí bắt đầu của phần dept
+              List<String> parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+              String prPart = parts[1];
+
+              // Tách phần phòng ban
+              List<String> prParts = prPart.split("-");
+              String dept = prParts[0];
+              controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+          }
           break;
         case 'Section Manager':
           String dept = '';
@@ -134,12 +161,26 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             final prParts = parts[1].split('-');
             dept = prParts[0];
           }
-          controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString(), null);
+          controller.changeStatus(
+            '4',
+            sectionName,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
           controllerUserApprover.changeStatus('', 'Dept Manager', dept);
           break;
         default:
-          controller.changeStatus('4', sectionName, authState.user!.chRUserid.toString(), null);
-          controllerUserApprover.changeStatus(sectionName, 'Chief,Expert', null);
+          controller.changeStatus(
+            '4',
+            sectionName,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
+          controllerUserApprover.changeStatus(
+            sectionName,
+            'Chief,Expert',
+            null,
+          );
       }
       _statusInitialized = true;
     } catch (e) {
@@ -158,10 +199,6 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           children: [
             // Header + Search + Note (responsive combined layout)
             _buildHeaderSearchWithNote(),
-            // User approver
-            _buildApproverPer(),
-            const SizedBox(height: 10),
-
             // Data Table
             Expanded(
               child: Obx(() {
@@ -909,6 +946,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               _buildHeader(),
               const SizedBox(height: 10),
               _buildSearchAndActions(),
+              const SizedBox(height: 10),
+              _buildApproverPer(),
             ],
           );
         }
@@ -923,6 +962,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   _buildHeader(),
                   const SizedBox(height: 10),
                   _buildSearchAndActions(),
+                  const SizedBox(height: 10),
+                  _buildApproverPer(),
                 ],
               ),
             ),
@@ -3696,7 +3737,8 @@ class _ReturnConApprenticetract extends StatelessWidget {
                           null,
                         );
                       } else if (authState.user!.chRGroup.toString() ==
-                          "Chief" || authState.user!.chRGroup.toString() == "Expert") {
+                              "Chief" ||
+                          authState.user!.chRGroup.toString() == "Expert") {
                         await controller.changeStatus(
                           'Chief',
                           sectionName,
