@@ -40,6 +40,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
   final ScrollController _rightScrollController = ScrollController();
   final ScrollController _leftVerticalController = ScrollController();
   final ScrollController _rightVerticalController = ScrollController();
+  String userCase = ""; // phân biệt các trường hợp người dùng khác nhau
   // Pagination customization
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
@@ -151,6 +152,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             List<String> prParts = prPart.split("-");
             String dept = prParts[0];
             controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+            userCase = "ACC";
           }
           break;
         case 'Section Manager':
@@ -516,6 +518,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                   authState.user!.chRGroup.toString(),
+                  userCase,
                 );
                 if (authState.user!.chRGroup.toString() == "PTHC" ||
                     authState.user!.chRGroup.toString() == "Per" ||

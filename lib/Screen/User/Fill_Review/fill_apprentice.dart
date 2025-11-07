@@ -42,6 +42,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
   final ScrollController _rightScrollController = ScrollController();
   final ScrollController _leftVerticalController = ScrollController();
   final ScrollController _rightVerticalController = ScrollController();
+  String userCase = ""; // phân biệt các trường hợp người dùng khác nhau
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
@@ -144,15 +145,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             'Section Manager',
             null,
           );
-          if(controllerUserApprover.dataList.isEmpty){
-              // Tìm vị trí bắt đầu của phần dept
-              List<String> parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
-              String prPart = parts[1];
+          if (controllerUserApprover.dataList.isEmpty) {
+            // Tìm vị trí bắt đầu của phần dept
+            List<String> parts =
+                authState.user!.chRSecCode?.toString().split(':') ?? [];
+            String prPart = parts[1];
 
-              // Tách phần phòng ban
-              List<String> prParts = prPart.split("-");
-              String dept = prParts[0];
-              controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+            // Tách phần phòng ban
+            List<String> prParts = prPart.split("-");
+            String dept = prParts[0];
+            controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+            userCase = "ACC";
           }
           break;
         case 'Section Manager':
@@ -350,6 +353,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   selectedConfirmerId.value.toString(),
                   authState.user!.chRUserid.toString(),
                   authState.user!.chRGroup.toString(),
+                  userCase,
                 );
                 if (authState.user!.chRGroup.toString() == "PTHC" ||
                     authState.user!.chRGroup.toString() == "Per" ||

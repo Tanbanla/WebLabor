@@ -120,7 +120,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         // Tách phần phòng ban
         List<String> prParts = prPart.split("-");
         String dept = prParts[0];
-        controllerUserApprover.changeStatus("", 'Dept Manager', dept);
+        // Đảm bảo danh sách approver được load trước khi giao diện hiển thị dropdown
+        await controllerUserApprover.changeStatus("", 'Dept Manager', dept);
       }
     } catch (e) {
       if (mounted) {
@@ -233,14 +234,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final authState = Provider.of<AuthState>(context, listen: false);
     final DashboardControllerApprentice controller =
         Get.find<DashboardControllerApprentice>();
-    // Build a unique list of approvers by ADID to avoid duplicate value assertion
-    final rawApprovers = controllerUserApprover.dataList
-        .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
-        .toList();
-    final bool requiresNextApprover =
-        (authState.user!.chRGroup == "Section Manager" ||
-            authState.user!.chRGroup == "Admin") &&
-        (rawApprovers.length > 1);
+    // Lưu ý: Không tính trước requiresNextApprover ở đây vì dataList có thể chưa load.
+    // Sẽ tính bên trong Obx để phản ứng với thay đổi data.
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -409,106 +404,124 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
               authState.user!.chRGroup.toString(),
             ),
           ),
-          if (requiresNextApprover)
-            SizedBox(
-              width: fw(250),
-              child: Obx(() {
-                // Force rebuild when list changes
-                Visibility(
-                  visible: false,
-                  child: Text(
-                    controllerUserApprover.dataList.length.toString(),
+          // Dropdown chọn người duyệt kế tiếp (chỉ chiếm không gian khi thực sự cần)
+          Obx(() {
+            // Loading state: chỉ hiển thị spinner nếu user có khả năng cần chọn approver
+            final potentiallyNeedsApprover =
+                (authState.user!.chRGroup == "Section Manager" ||
+                authState.user!.chRGroup == "Admin");
+            if (controllerUserApprover.isLoading.value) {
+              if (!potentiallyNeedsApprover) return const SizedBox.shrink();
+              return SizedBox(
+                width: fw(120),
+                child: const Center(
+                  child: SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: CircularProgressIndicator(strokeWidth: 3),
                   ),
+                ),
+              );
+            }
+            final rawApprovers = controllerUserApprover.dataList
+                .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
+                .toList();
+            final requiresNextApprover =
+                potentiallyNeedsApprover && rawApprovers.length > 1;
+            if (!requiresNextApprover) return const SizedBox.shrink();
+            final seen = <String>{};
+            final uniqueApprovers = <ApproverUser>[];
+            for (final u in rawApprovers) {
+              final adid = u.chREmployeeAdid!; // safe due to filter
+              if (seen.add(adid)) uniqueApprovers.add(u);
+            }
+            final selectedValid =
+                _selectedNextApproverAdid != null &&
+                uniqueApprovers.any(
+                  (u) => u.chREmployeeAdid == _selectedNextApproverAdid,
                 );
-                final seen = <String>{};
-                final uniqueApprovers = <ApproverUser>[];
-                for (final u in rawApprovers) {
-                  final adid =
-                      u.chREmployeeAdid!; // safe due to earlier where filter
-                  if (seen.add(adid)) uniqueApprovers.add(u);
-                }
-                final selectedValid =
-                    _selectedNextApproverAdid != null &&
-                    uniqueApprovers.any(
-                      (u) => u.chREmployeeAdid == _selectedNextApproverAdid,
-                    );
-                return DropdownButtonFormField<String>(
-                  // If previously selected value no longer valid, show null to prevent assertion
-                  value: selectedValid ? _selectedNextApproverAdid : null,
-                  isExpanded: true,
-                  decoration: InputDecoration(
-                    labelText: tr('selectApprover'),
-                    labelStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[700],
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                    prefixIcon: Icon(
-                      Icons.person_search,
-                      size: 20,
-                      color: Colors.grey[600],
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: Colors.black54,
-                        width: 0.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.blue[300]!,
-                        width: 1.5,
-                      ),
-                    ),
-                    isDense: true,
+            return SizedBox(
+              width: fw(250),
+              child: DropdownButtonFormField<String>(
+                value: selectedValid ? _selectedNextApproverAdid : null,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: tr('selectApprover'),
+                  labelStyle: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                  hint: Text(
-                    tr('selectApprover'),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                  ),
-                  items: uniqueApprovers
-                      .map(
-                        (u) => DropdownMenuItem<String>(
-                          value: u.chREmployeeAdid!,
-                          child: Text(
-                            '${u.chREmployeeName ?? ''} (${u.chRPositionGroup ?? u.chRPosition ?? ''})',
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedNextApproverAdid = val;
-                    });
-                  },
-                  icon: Icon(
-                    Icons.arrow_drop_down,
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  prefixIcon: Icon(
+                    Icons.person_search,
                     size: 20,
                     color: Colors.grey[600],
                   ),
-                  menuMaxHeight: 320,
-                  dropdownColor: Colors.white,
-                );
-              }),
-            ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: Colors.black54,
+                      width: 0.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Colors.blue[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                  isDense: true,
+                ),
+                hint: Text(
+                  tr('selectApprover'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                items: uniqueApprovers
+                    .map(
+                      (u) => DropdownMenuItem<String>(
+                        value: u.chREmployeeAdid!,
+                        child: Text(
+                          '${u.chREmployeeName ?? ''} (${u.chRPositionGroup ?? u.chRPosition ?? ''})',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedNextApproverAdid = val;
+                  });
+                },
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                menuMaxHeight: 320,
+                dropdownColor: Colors.white,
+              ),
+            );
+          }),
           GestureDetector(
             onTap: () async {
               try {
                 // Require approver selection if needed
-                if (requiresNextApprover &&
+                final needNextApprover =
+                    (authState.user!.chRGroup == "Section Manager" ||
+                        authState.user!.chRGroup == "Admin") &&
+                    controllerUserApprover.dataList
+                            .where((u) => (u.chREmployeeAdid ?? '').isNotEmpty)
+                            .length >
+                        1;
+                if (needNextApprover &&
                     (_selectedNextApproverAdid == null ||
                         _selectedNextApproverAdid!.isEmpty)) {
                   ScaffoldMessenger.of(context).showSnackBar(

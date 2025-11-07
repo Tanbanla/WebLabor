@@ -865,9 +865,10 @@ class DashboardControllerApprentice extends GetxController {
     String userApprover,
     String userUpdate,
     String chucVu,
+    String caseUser,
   ) async {
     try {
-      List<dynamic> contract = [];
+      List<ApprenticeContract> contract = [];
       final contractOld = getSelectedItems();
       if (contractOld.isEmpty) {
         throw Exception(tr('LoiGui'));
@@ -1003,27 +1004,26 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].vchRLeaderEvalution = userUpdate;
               contract[i].useRApproverChief = userUpdate;
               contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-              contract[i].dtMApproverChief= formatDateTime(DateTime.now());
+              contract[i].dtMApproverChief = formatDateTime(DateTime.now());
               contract[i].biTApproverChief = true;
               contract[i].nvchRApproverChief = '';
               contract[i].useRApproverSectionManager = userApprover;
               contract[i].biTApproverSectionManager = true;
-            }else if(chucVu == "Section Manager"){
+            } else if (chucVu == "Section Manager") {
               contract[i].inTStatusId = 7;
               contract[i].vchRLeaderEvalution = userUpdate;
               contract[i].useRApproverChief = userUpdate;
               contract[i].useRApproverSectionManager = userUpdate;
               contract[i].dtMApproverManager = formatDateTime(DateTime.now());
               contract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-              contract[i].dtMApproverChief= formatDateTime(DateTime.now());
+              contract[i].dtMApproverChief = formatDateTime(DateTime.now());
               contract[i].biTApproverChief = false;
               contract[i].nvchRApproverChief = '';
               contract[i].biTApproverSectionManager = true;
               contract[i].nvchRApproverManager = '';
               contract[i].userApproverDeft = userApprover;
               contract[i].bitApproverDeft = true;
-            }
-            else {
+            } else {
               contract[i].inTStatusId = 5;
               contract[i].vchRLeaderEvalution = userUpdate;
               contract[i].useRApproverChief = userApprover;
@@ -1046,10 +1046,27 @@ class DashboardControllerApprentice extends GetxController {
               contract[i].useRApproverChief = userUpdate;
               contract[i].dtMApproverChief = formatDateTime(DateTime.now());
             } else {
-              contract[i].inTStatusId = 6;
-              contract[i].useRApproverChief = userUpdate;
-              contract[i].useRApproverSectionManager = userApprover;
-              contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+              switch (caseUser) {
+                case "ACC":
+                  contract[i].inTStatusId = 7;
+                  contract[i].useRApproverChief = userUpdate;
+                  contract[i].useRApproverSectionManager = userApprover;
+                  contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+                  contract[i].biTApproverSectionManager = true;
+                  contract[i].dtMApproverManager = formatDateTime(
+                    DateTime.now(),
+                  );
+                  contract[i].nvchRApproverManager = '';
+                  contract[i].userApproverDeft = userApprover;
+                  contract[i].bitApproverDeft = true;
+                  break;
+                default:
+                  contract[i].inTStatusId = 6;
+                  contract[i].useRApproverChief = userUpdate;
+                  contract[i].useRApproverSectionManager = userApprover;
+                  contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+                  break;
+              }
             }
             break;
         }

@@ -856,6 +856,7 @@ class DashboardControllerTwo extends GetxController {
     String userApprover,
     String userUpdate,
     String chucVu,
+    String userCase,
   ) async {
     try {
       List<dynamic> twocontract = [];
@@ -995,22 +996,25 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].nvchRApproverChief = '';
               twocontract[i].useRApproverSectionManager = userApprover;
               twocontract[i].biTApproverSectionManager = true;
-            }else if(chucVu == "Section Manager"){
+            } else if (chucVu == "Section Manager") {
               twocontract[i].inTStatusId = 7;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userUpdate;
               twocontract[i].useRApproverSectionManager = userUpdate;
-              twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
-              twocontract[i].dtMLeadaerEvalution = formatDateTime(DateTime.now());
-              twocontract[i].dtMApproverChief= formatDateTime(DateTime.now());
+              twocontract[i].dtMApproverManager = formatDateTime(
+                DateTime.now(),
+              );
+              twocontract[i].dtMLeadaerEvalution = formatDateTime(
+                DateTime.now(),
+              );
+              twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
               twocontract[i].biTApproverChief = false;
               twocontract[i].nvchRApproverChief = '';
               twocontract[i].biTApproverSectionManager = true;
               twocontract[i].nvchRApproverManager = '';
               twocontract[i].userApproverDeft = userApprover;
               twocontract[i].bitApproverDeft = true;
-            }
-            else {
+            } else {
               twocontract[i].inTStatusId = 5;
               twocontract[i].vchRLeaderEvalution = userUpdate;
               twocontract[i].useRApproverChief = userApprover;
@@ -1035,11 +1039,31 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].useRApproverChief = userUpdate;
               twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
             } else {
-              twocontract[i].inTStatusId = 6;
-              twocontract[i].useRApproverChief = userUpdate;
-              twocontract[i].useRApproverSectionManager = userApprover;
-              twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
-              twocontract[i].biTApproverSectionManager = true;
+              switch (userCase) {
+                case "ACC":
+                  twocontract[i].inTStatusId = 7;
+                  twocontract[i].useRApproverChief = userUpdate;
+                  twocontract[i].useRApproverSectionManager = userApprover;
+                  twocontract[i].dtMApproverChief = formatDateTime(
+                    DateTime.now(),
+                  );
+                  twocontract[i].biTApproverSectionManager = true;
+                  twocontract[i].dtMApproverManager = formatDateTime(
+                    DateTime.now(),
+                  );
+                  twocontract[i].nvchRApproverManager = '';
+                  twocontract[i].userApproverDeft = userApprover;
+                  twocontract[i].bitApproverDeft = true;
+                  break;
+                default:
+                  twocontract[i].inTStatusId = 6;
+                  twocontract[i].useRApproverChief = userUpdate;
+                  twocontract[i].useRApproverSectionManager = userApprover;
+                  twocontract[i].dtMApproverChief = formatDateTime(
+                    DateTime.now(),
+                  );
+                  twocontract[i].biTApproverSectionManager = true;
+              }
             }
             break;
         }
