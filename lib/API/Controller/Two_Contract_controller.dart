@@ -1145,8 +1145,7 @@ class DashboardControllerTwo extends GetxController {
           case 6:
             twocontract[i].dtMApproverManager = formatDateTime(DateTime.now());
             twocontract[i].useRApproverSectionManager = userApprover;
-            if (twocontract[i].biTApproverSectionManager == true ||
-                twocontract[i].biTApproverSectionManager == null) {
+            if (twocontract[i].biTApproverSectionManager != false) {
               twocontract[i].inTStatusId = 7;
               twocontract[i].bitApproverDeft = true;
               // Use selected next approver if provided, otherwise fallback to API lookup
@@ -1175,8 +1174,7 @@ class DashboardControllerTwo extends GetxController {
           case 7:
             twocontract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             twocontract[i].userApproverDeft = userApprover;
-            if (twocontract[i].bitApproverDeft == true ||
-                twocontract[i].bitApproverDeft == null) {
+            if (twocontract[i].bitApproverDeft != false) {
               twocontract[i].inTStatusId = 8;
               twocontract[i].biTApproverDirector = true;
               mailSend = await NextApprovel(
@@ -1215,8 +1213,7 @@ class DashboardControllerTwo extends GetxController {
           case 8:
             twocontract[i].dtMApproverDirector = formatDateTime(DateTime.now());
             twocontract[i].useRApproverDirector = userApprover;
-            if (twocontract[i].biTApproverDirector == true ||
-                twocontract[i].biTApproverDirector == null) {
+            if (twocontract[i].biTApproverDirector != false) {
               twocontract[i].inTStatusId = 9;
             } else {
               if ((twocontract[i].nvchRApproverDirector?.isEmpty ?? true)) {

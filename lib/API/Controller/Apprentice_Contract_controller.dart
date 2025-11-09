@@ -1172,7 +1172,7 @@ class DashboardControllerApprentice extends GetxController {
       final contractOld = getSelectedItems();
       //fetchPTHCData();
       List<dynamic> notApproval = [];
-      List<dynamic> contract = [];
+      List<ApprenticeContract> contract = [];
       String mailSend = "";
       String sectionAp = "";
       String PheDuyetMail = "";
@@ -1200,8 +1200,7 @@ class DashboardControllerApprentice extends GetxController {
           case 6:
             contract[i].dtMApproverManager = formatDateTime(DateTime.now());
             contract[i].useRApproverSectionManager = userApprover;
-            if (contract[i].biTApproverSectionManager == true ||
-                contract[i].biTApproverSectionManager == null) {
+            if (contract[i].biTApproverSectionManager != false) {
               contract[i].inTStatusId = 7;
               contract[i].bitApproverDeft = true;
               // Use selected next approver if provided, otherwise fallback to API lookup
@@ -1216,7 +1215,7 @@ class DashboardControllerApprentice extends GetxController {
               }
               contract[i].userApproverDeft = mailSend.split('@')[0];
             } else {
-              if ((contract[i].nvchRApproverSectionManager?.isEmpty ?? true)) {
+              if ((contract[i].nvchRApproverManager?.isEmpty ?? true)) {
                 throw Exception(
                   '${tr('NotApproval')} ${contract[i].vchREmployeeName}',
                 );
@@ -1231,8 +1230,7 @@ class DashboardControllerApprentice extends GetxController {
             //xu ly khi xong
             contract[i].dtmApproverDeft = formatDateTime(DateTime.now());
             contract[i].userApproverDeft = userApprover;
-            if (contract[i].bitApproverDeft == true ||
-                contract[i].bitApproverDeft == null) {
+            if (contract[i].bitApproverDeft != false) {
               contract[i].inTStatusId = 9;
             } else {
               if ((contract[i].nvchrApproverDeft?.isEmpty ?? true)) {
