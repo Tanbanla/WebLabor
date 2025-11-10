@@ -1022,6 +1022,12 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
+        title: tr('LydoTuChoi'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
         title: tr('Nguoilap'),
         width: 100,
         maxLines: 2,
@@ -1103,6 +1109,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               child: DataTable(
                 headingRowHeight: 66,
                 dataRowHeight: 56,
+                horizontalMargin: 8, // Giảm margin
+                columnSpacing: 8, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -1126,6 +1134,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   child: DataTable(
                     headingRowHeight: 66,
                     dataRowHeight: 56,
+                    horizontalMargin: 8, // Giảm margin
+                    columnSpacing: 8, // Giảm khoảng cách cột
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
@@ -1676,11 +1686,13 @@ class MyData extends DataTableSource {
       },
       cells: [
         DataCell(
-          Text(
-            (index + 1).toString(),
-            style: TextStyle(
-              color: Colors.blue[800],
-              fontSize: Common.sizeColumn,
+          Center(
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(
+                color: Colors.blue[800],
+                fontSize: Common.sizeColumn,
+              ),
             ),
           ),
         ),
@@ -1885,28 +1897,32 @@ class MyData extends DataTableSource {
         ),
         // ghi chu
         DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNote(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: noteController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('note'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+          Text(
+            noteController.text,
+            style: TextStyle(fontSize: Common.sizeColumn),
           ),
+          // Focus(
+          //   onFocusChange: (hasFocus) {
+          //     if (!hasFocus) {
+          //       // Chỉ update khi mất focus
+          //       controller.updateNote(
+          //         data.vchREmployeeId.toString(),
+          //         reasonController.text,
+          //       );
+          //     }
+          //   },
+          //   child: TextFormField(
+          //     controller: noteController,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //     decoration: InputDecoration(
+          //       labelText: tr('note'),
+          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
 
         ///ket qua cuoi cung
@@ -1923,24 +1939,6 @@ class MyData extends DataTableSource {
             );
             final rawStatus =
                 controller.filterdataList[index].biTNoReEmployment;
-            // () {
-            //   if (controller.filterdataList.length > index) {
-            //     return switch (data.inTStatusId) {
-            //       6 =>
-            //         controller.filterdataList[index].biTApproverChief ?? true,
-            //       7 =>
-            //         controller
-            //                 .filterdataList[index]
-            //                 .biTApproverSectionManager ??
-            //             true,
-            //       8 =>
-            //         controller.filterdataList[index].biTApproverDirector ??
-            //             true,
-            //       _ => true,
-            //     };
-            //   }
-            //   return true;
-            // }();
             final status = rawStatus == true ? 'OK' : 'NG';
             return DropdownButton<String>(
               value: status,
@@ -1991,29 +1989,39 @@ class MyData extends DataTableSource {
           }),
         ),
         DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNotRehireReasonApprovel(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
-                  data.inTStatusId,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+          Text(
+            data.nvchRNoReEmpoyment?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
           ),
+        ),
+        DataCell(
+          Text(
+            reasonController.text,
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+          // Focus(
+          //   onFocusChange: (hasFocus) {
+          //     if (!hasFocus) {
+          //       // Chỉ update khi mất focus
+          //       controller.updateNotRehireReasonApprovel(
+          //         data.vchREmployeeId.toString(),
+          //         reasonController.text,
+          //         data.inTStatusId,
+          //       );
+          //     }
+          //   },
+          //   child: TextFormField(
+          //     controller: reasonController,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //     decoration: InputDecoration(
+          //       labelText: tr('reason'),
+          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
         // thong tin phe duyet
         DataCell(

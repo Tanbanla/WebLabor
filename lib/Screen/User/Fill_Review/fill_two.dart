@@ -1166,39 +1166,39 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
     final frozenCols = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 70,
+        width: 20,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('action'),
-        width: 100,
+        width: 80,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Hientrang'),
-        width: 130,
+        width: 100,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('DotDanhGia'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('employeeCode'),
-        width: 100,
+        width: 70,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 60,
+        width: 20,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('fullName'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
     ];
@@ -1355,7 +1355,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 900),
+          constraints: const BoxConstraints(maxWidth: 750),
           child: Scrollbar(
             controller: _leftVerticalController,
             thumbVisibility: true,
@@ -1364,6 +1364,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
               child: DataTable(
                 headingRowHeight: 66,
                 dataRowHeight: 56,
+                horizontalMargin: 8, // Giảm margin
+                columnSpacing: 8, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -2001,11 +2003,13 @@ class MyData extends DataTableSource {
       },
       cells: [
         DataCell(
-          Text(
-            (index + 1).toString(),
-            style: TextStyle(
-              color: isReturn ? Colors.red[900] : Colors.blue[800],
-              fontSize: Common.sizeColumn,
+          Center(
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(
+                color: isReturn ? Colors.red[900] : Colors.blue[800],
+                fontSize: Common.sizeColumn,
+              ),
             ),
           ),
         ),

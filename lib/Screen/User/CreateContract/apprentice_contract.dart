@@ -759,7 +759,7 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 780),
+          constraints: const BoxConstraints(maxWidth: 780),
           child: Scrollbar(
             controller: _leftVerticalController,
             thumbVisibility: true,
@@ -768,6 +768,8 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
               child: DataTable(
                 headingRowHeight: 66,
                 dataRowHeight: 56,
+                horizontalMargin: 8, // Giảm margin
+                columnSpacing: 8, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -1461,11 +1463,13 @@ class MyData extends DataTableSource {
       },
       cells: [
         DataCell(
-          Text(
-            (index + 1).toString(),
-            style: TextStyle(
-              color: isRejected ? Colors.red[900] : Colors.blue[800],
-              fontSize: Common.sizeColumn, // Added fontSize 12
+          Center(
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(
+                color: isRejected ? Colors.red[900] : Colors.blue[800],
+                fontSize: Common.sizeColumn, // Added fontSize 12
+              ),
             ),
           ),
         ),
@@ -1508,9 +1512,11 @@ class MyData extends DataTableSource {
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
-          Text(
-            data.vchRTyperId ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRTyperId ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // Copyable vchREmployeeName

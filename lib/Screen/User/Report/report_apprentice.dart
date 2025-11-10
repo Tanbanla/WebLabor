@@ -843,40 +843,40 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     final frozenColumns = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 50,
+        width: 20,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       if (showAction)
         DataColumnCustom(
           title: tr('action'),
-          width: 100,
+          width: 80,
           fontSize: Common.sizeColumn,
         ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Hientrang'),
-        width: 130,
+        width: 100,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('DotDanhGia'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('employeeCode'),
-        width: 100,
+        width: 70,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 40,
+        width: 20,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('fullName'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
     ];
@@ -990,6 +990,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('note'),
+        width: 170,
+        maxLines: 3,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -1003,6 +1005,12 @@ class _ReportApprenticeState extends State<ReportApprentice> {
         width: 170,
         fontSize: Common.sizeColumn,
         maxLines: 2,
+      ).toDataColumn2(),
+      DataColumnCustom(
+        title: tr('LydoTuChoi'),
+        width: 170,
+        maxLines: 2,
+        fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Nguoilap'),
@@ -1092,11 +1100,14 @@ class _ReportApprenticeState extends State<ReportApprentice> {
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment:  MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Frozen side with its own vertical scrollbar
                   ConstrainedBox(
-                    constraints: const BoxConstraints(minWidth: 900),
+                    constraints: const BoxConstraints(
+                      minWidth: 750,
+                      maxWidth: 750,
+                    ),
                     child: Scrollbar(
                       controller: _leftVerticalController,
                       thumbVisibility: true,
@@ -1105,6 +1116,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                         child: DataTable(
                           headingRowHeight: 66,
                           dataRowHeight: 56,
+                          horizontalMargin: 8, // Giảm margin
+                          columnSpacing: 8, // Giảm khoảng cách cột
                           showCheckboxColumn: true,
                           columns: frozenColumns,
                           rows: frozenRows,
@@ -1134,6 +1147,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                             child: DataTable(
                               headingRowHeight: 66,
                               dataRowHeight: 56,
+                              horizontalMargin: 8, // Giảm margin
+                              columnSpacing: 8, // Giảm khoảng cách cột
                               showCheckboxColumn: false,
                               columns: scrollableColumns,
                               rows: scrollableRows,
@@ -1705,11 +1720,13 @@ class MyData extends DataTableSource {
       },
       cells: [
         DataCell(
-          Text(
-            (index + 1).toString(),
-            style: TextStyle(
-              color: Colors.blue[800],
-              fontSize: Common.sizeColumn,
+          Center(
+            child: Text(
+              (index + 1).toString(),
+              style: TextStyle(
+                color: Colors.blue[800],
+                fontSize: Common.sizeColumn,
+              ),
             ),
           ),
         ),
@@ -1790,9 +1807,11 @@ class MyData extends DataTableSource {
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
-          Text(
-            data.vchRTyperId ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRTyperId ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // Copyable vchREmployeeName
@@ -1972,28 +1991,38 @@ class MyData extends DataTableSource {
           }),
         ),
         DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                controller.updateNotRehireReasonApprovel(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
-                  data.inTStatusId,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: reasonController,
-              style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('reason'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+          Text(
+            data.nvchRNoReEmpoyment?.toString() ?? "",
+            style: TextStyle(fontSize: Common.sizeColumn),
           ),
+        ),
+        DataCell(
+          Text(
+            reasonController.text,
+            style: TextStyle(fontSize: Common.sizeColumn),
+          ),
+          // Focus(
+          //   onFocusChange: (hasFocus) {
+          //     if (!hasFocus) {
+          //       controller.updateNotRehireReasonApprovel(
+          //         data.vchREmployeeId.toString(),
+          //         reasonController.text,
+          //         data.inTStatusId,
+          //       );
+          //     }
+          //   },
+          //   child: TextFormField(
+          //     controller: reasonController,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //     decoration: InputDecoration(
+          //       labelText: tr('reason'),
+          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
         // Phê duyệt
         DataCell(

@@ -770,7 +770,7 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 780),
+          constraints: const BoxConstraints(maxHeight: 780),
           child: Scrollbar(
             controller: _leftVerticalController,
             thumbVisibility: true,
@@ -779,6 +779,8 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
               child: DataTable(
                 headingRowHeight: 66,
                 dataRowHeight: 56,
+                horizontalMargin: 8, // Giảm margin
+                columnSpacing: 8, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
