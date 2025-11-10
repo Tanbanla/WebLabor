@@ -716,12 +716,14 @@ class DashboardControllerTwo extends GetxController {
 
       notApproval.add(contractCopy);
       contract.biTNoReEmployment = false;
-      if (contract.inTStatusId == 3) {
-        contract.inTStatusId = 1;
-      } else if (contract.inTStatusId == 4) {
-        contract.inTStatusId = 3;
-      } else if (contract.inTStatusId == 5) {
-        contract.inTStatusId = 4;
+      if (!reason.contains("Trả về từ báo cáo của nhân sự")) {
+        if (contract.inTStatusId == 3) {
+          contract.inTStatusId = 1;
+        } else if (contract.inTStatusId == 4) {
+          contract.inTStatusId = 3;
+        } else if (contract.inTStatusId == 5) {
+          contract.inTStatusId = 4;
+        }
       }
       if (notApproval.isNotEmpty) {
         final specialSection = pthcList.firstWhere(
@@ -934,16 +936,16 @@ class DashboardControllerTwo extends GetxController {
 
           // Kiểm tra thay đổi nếu tìm thấy bản ghi gốc
           if (original != null) {
-            final bool hasChanges = _hasMeaningfulChanges(
-              original,
-              twocontract[i],
-            );
-            if (!hasChanges) {
-              // Không có thay đổi thực sự
-              throw Exception(
-                '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
-              );
-            }
+            // final bool hasChanges = _hasMeaningfulChanges(
+            //   original,
+            //   twocontract[i],
+            // );
+            // if (!hasChanges) {
+            //   // Không có thay đổi thực sự
+            //   throw Exception(
+            //     '${tr('CapNhat')} ${twocontract[i].vchREmployeeId}',
+            //   );
+            // }
           }
         }
         twocontract[i].vchRUserUpdate = userUpdate;

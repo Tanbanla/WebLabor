@@ -1968,7 +1968,6 @@ class MyData extends DataTableSource {
     );
     final returnController = TextEditingController(
       text: [
-        data.nvchRNoReEmpoyment,
         data.nvchRApproverChief,
         data.nvchRApproverManager,
         data.nvchrApproverDeft,
@@ -2766,7 +2765,6 @@ class MyData extends DataTableSource {
                 child: Text(controller.filterdataList[index].toString()),
               );
               final rawStatus = [
-                data.nvchRNoReEmpoyment,
                 data.nvchRApproverChief,
                 data.nvchRApproverManager,
                 data.nvchrApproverDeft,

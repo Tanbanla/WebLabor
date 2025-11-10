@@ -54,6 +54,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       controller.refreshSearch();
       controller.fetchSectionList();
       await controller.fetchSectionList();
+      await controller.fetchPTHCData();
       await _prepareStatus(authState);
     });
     // Sync vertical scroll between frozen (left) and scrollable (right) sections
@@ -1910,7 +1911,7 @@ class MyData extends DataTableSource {
               softWrap: true,
               style: TextStyle(fontSize: Common.sizeColumn),
             ),
-          )
+          ),
 
           // Focus(
           //   onFocusChange: (hasFocus) {

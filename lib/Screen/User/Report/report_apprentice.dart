@@ -55,6 +55,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
       controller.refreshSearch();
       await controller.fetchSectionList();
+      await controller.fetchPTHCData();
       await _prepareStatus(authState);
     });
 
