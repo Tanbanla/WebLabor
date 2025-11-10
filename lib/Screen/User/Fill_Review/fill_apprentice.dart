@@ -165,7 +165,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             dept = prParts[0];
           }
           controller.changeStatus(
-            '4',
+            'Chief',
             sectionName,
             authState.user!.chRUserid.toString(),
             null,
