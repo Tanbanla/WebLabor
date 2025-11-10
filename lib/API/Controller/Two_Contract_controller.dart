@@ -498,9 +498,11 @@ class DashboardControllerTwo extends GetxController {
                 case "Dept":
                 case "Dept Manager":
                   return a['inT_STATUS_ID'] != null &&
-                      [7].contains(a['inT_STATUS_ID']) &&
-                      (a['userApproverDirector'] == adid ||
-                          a['useR_APPROVER_DIRECTOR'] == adid);
+                      [6, 7].contains(a['inT_STATUS_ID']) &&
+                      (a['userApproverDeft'] == adid ||
+                          a['useR_APPROVER_DEFT'] == adid ||
+                          a['userApproverSectionManager'] == adid ||
+                          a['useR_APPROVER_SECTION_MANAGER'] == adid);
                 default:
                   return a['inT_STATUS_ID'] != null &&
                       [6, 7, 8].contains(a['inT_STATUS_ID']) &&
