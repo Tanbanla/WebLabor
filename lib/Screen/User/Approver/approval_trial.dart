@@ -1705,9 +1705,13 @@ class MyData extends DataTableSource {
         ),
         // ly do k tuyen dung lai
         DataCell(
-          Center(
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
             child: Text(
-              data.nvchRNoReEmpoyment ?? "",
+              data.vchRNote ?? '',
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
               style: TextStyle(fontSize: Common.sizeColumn),
             ),
           ),

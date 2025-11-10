@@ -1928,9 +1928,19 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.vchRNote?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          // Text(
+          //   data.vchRNote?.toString() ?? "",
+          //   style: TextStyle(fontSize: Common.sizeColumn),
+          // ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: Text(
+              data.vchRNote ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(

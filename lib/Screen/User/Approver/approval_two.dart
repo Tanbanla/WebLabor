@@ -1684,28 +1684,38 @@ class MyData extends DataTableSource {
         ),
         // note
         DataCell(
-          Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                // Chỉ update khi mất focus
-                controller.updateNote(
-                  data.vchREmployeeId.toString(),
-                  reasonController.text,
-                );
-              }
-            },
-            child: TextFormField(
-              controller: noteController,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: Text(
+              noteController.text,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
               style: TextStyle(fontSize: Common.sizeColumn),
-              decoration: InputDecoration(
-                labelText: tr('note'),
-                labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
             ),
           ),
+          // Focus(
+          //   onFocusChange: (hasFocus) {
+          //     if (!hasFocus) {
+          //       // Chỉ update khi mất focus
+          //       controller.updateNote(
+          //         data.vchREmployeeId.toString(),
+          //         reasonController.text,
+          //       );
+          //     }
+          //   },
+          //   child: TextFormField(
+          //     controller: noteController,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //     decoration: InputDecoration(
+          //       labelText: tr('note'),
+          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
         // ket qua danh gia
         DataCell(

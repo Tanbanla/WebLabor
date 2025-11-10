@@ -1897,10 +1897,21 @@ class MyData extends DataTableSource {
         ),
         // ghi chu
         DataCell(
-          Text(
-            noteController.text,
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
+          // Text(
+          //   noteController.text,
+          //   style: TextStyle(fontSize: Common.sizeColumn),
+          // ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: Text(
+              noteController.text,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          )
+
           // Focus(
           //   onFocusChange: (hasFocus) {
           //     if (!hasFocus) {
