@@ -551,21 +551,28 @@ class DashboardControllerApprentice extends GetxController {
               adid.isNotEmpty) {
             // Filter locally for matching approver ADID in any approval role
             final filtered = data.where((a) {
-              switch (chucVu) {
-                case "Section Manager":
-                  return a['inT_STATUS_ID'] != null &&
-                      [6].contains(a['inT_STATUS_ID']) &&
-                      (a['userApproverSectionManager'] == adid ||
-                          a['useR_APPROVER_SECTION_MANAGER'] == adid);
-                default:
                   return ((a['inT_STATUS_ID'] == 7 &&
-                          a['useR_APPROVER_DEFT'] == adid) ||
-                      (a['inT_STATUS_ID'] == 8 &&
-                          a['useR_APPROVER_DIRECTOR'] == adid)
-                      ||(a['inT_STATUS_ID'] == 6 &&
-                          a['useR_APPROVER_SECTION_MANAGER'] == adid)
-                      );
-              }
+                      a['useR_APPROVER_DEFT'] == adid) ||
+                  (a['inT_STATUS_ID'] == 8 &&
+                      a['useR_APPROVER_DIRECTOR'] == adid)
+                  ||(a['inT_STATUS_ID'] == 6 &&
+                      a['useR_APPROVER_SECTION_MANAGER'] == adid)
+                  );
+              // switch (chucVu) {
+              //   case "Section Manager":
+              //     return a['inT_STATUS_ID'] != null &&
+              //         [6].contains(a['inT_STATUS_ID']) &&
+              //         (a['userApproverSectionManager'] == adid ||
+              //             a['useR_APPROVER_SECTION_MANAGER'] == adid);
+              //   default:
+              //     return ((a['inT_STATUS_ID'] == 7 &&
+              //             a['useR_APPROVER_DEFT'] == adid) ||
+              //         (a['inT_STATUS_ID'] == 8 &&
+              //             a['useR_APPROVER_DIRECTOR'] == adid)
+              //         ||(a['inT_STATUS_ID'] == 6 &&
+              //             a['useR_APPROVER_SECTION_MANAGER'] == adid)
+              //         );
+              // }
             }).toList();
             dataList.assignAll(
               filtered
