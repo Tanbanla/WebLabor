@@ -124,6 +124,13 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           );
           break;
         case 'Per':
+          controller.changeStatus('PTHC', null, authState.user!.chRUserid.toString(), null);
+          controllerUserApprover.changeStatus(
+            sectionName,
+            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+            null,
+          );
+          break;
         case 'Admin':
           controller.changeStatus('PTHC', null, null, null);
           controllerUserApprover.changeStatus(
