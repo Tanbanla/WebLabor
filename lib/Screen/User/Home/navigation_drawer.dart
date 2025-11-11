@@ -219,13 +219,13 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
       case 'Director':
         return allCdms
             .where(
-              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home'),
+              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home') || cdm.title == tr("report"),
             )
             .toList();
       case 'Section Manager':
           return allCdms
             .where(
-              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home') || cdm.title == tr("fillEvaluation"),
+              (cdm) => cdm.title == tr("approval") || cdm.title == tr('home') || cdm.title == tr("fillEvaluation") || cdm.title == tr("report"),
             )
             .toList();
       default:

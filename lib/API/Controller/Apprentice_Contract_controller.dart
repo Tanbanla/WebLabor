@@ -255,59 +255,115 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // lay du lieu data
-  Future<void> fetchDummyData(String? section) async {
+  Future<void> fetchDummyData(String? section, String? chucVu) async {
     try {
       isLoading(true);
       http.Response response;
-      if (section == null || section.trim().isEmpty) {
-        // Lấy toàn bộ danh sách (không lọc theo section)
-        response = await http.get(
-          Uri.parse(Common.API + Common.ApprenticeGetAll),
-          headers: {'Content-Type': 'application/json'},
-        );
-      } else {
-        // Lọc theo section thông qua search API
-        // Có 2 trường hợp đầu vào:
-        // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
-        // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
-        List<String> sectionValues;
-        final trimmed = section.trim();
-        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-          try {
-            final decoded = json.decode(trimmed);
-            if (decoded is List) {
-              sectionValues = decoded.map((e) => e.toString().trim()).toList();
-            } else {
+      switch (chucVu) {
+        case "PTHC":
+        case "Section Manager":
+          // Lọc theo section thông qua search API
+          // Có 2 trường hợp đầu vào:
+          // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
+          // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+          List<String> sectionValues;
+          final trimmed = section == null ? "" : section.trim();
+          if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            try {
+              final decoded = json.decode(trimmed);
+              if (decoded is List) {
+                sectionValues = decoded
+                    .map((e) => e.toString().trim())
+                    .toList();
+              } else {
+                sectionValues = [trimmed];
+              }
+            } catch (_) {
               sectionValues = [trimmed];
             }
-          } catch (_) {
+          } else {
             sectionValues = [trimmed];
           }
-        } else {
-          sectionValues = [trimmed];
-        }
 
-        final filters = [
-          {
-            "field": "VCHR_CODE_SECTION",
-            "value": sectionValues,
-            "operator": "IN",
-            "logicType": "AND",
-          },
-        ];
-        final requestBody = {
-          "pageNumber": -1,
-          "pageSize": 10,
-          "filters": filters,
-        };
-        // Debug log (có thể bỏ nếu không cần)
-        // ignore: avoid_print
-        print('fetchDummyData request: ${json.encode(requestBody)}');
-        response = await http.post(
-          Uri.parse(Common.API + Common.ApprenticeSreachBy),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(requestBody),
-        );
+          final filters = [
+            {
+              "field": "VCHR_CODE_SECTION",
+              "value": sectionValues,
+              "operator": "IN",
+              "logicType": "AND",
+            },
+          ];
+          final requestBody = {
+            "pageNumber": -1,
+            "pageSize": 10,
+            "filters": filters,
+          };
+          // ignore: avoid_print
+          print('fetchDummyData request: ${json.encode(requestBody)}');
+          response = await http.post(
+            Uri.parse(Common.API + Common.ApprenticeSreachBy),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(requestBody),
+          );
+          break;
+        case "Dept":
+        case "Dept Manager":
+          final filters = [
+            {
+              "field": "VCHR_CODE_SECTION",
+              "value": "%$section%",
+              "operator": "LIKE",
+              "logicType": "AND",
+            },
+          ];
+          final requestBody = {
+            "pageNumber": -1,
+            "pageSize": 10,
+            "filters": filters,
+          };
+          // ignore: avoid_print
+          print('fetchDummyData request: ${json.encode(requestBody)}');
+          response = await http.post(
+            Uri.parse(Common.API + Common.ApprenticeSreachBy),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(requestBody),
+          );
+          break;
+        case "Director":
+        case "General Director":
+          if (section == null || section.isEmpty) {
+            throw Exception('Section is required for Director role');
+          }
+          List<String> sectionValues = section.split(",");
+          final filters = [];
+          for (var a in sectionValues) {
+            filters.add({
+              "field": "VCHR_CODE_SECTION",
+              "value": '%${a.trim()}%',
+              "operator": "LIKE",
+              "logicType": "OR",
+            });
+          }
+          final requestBody = {
+            "pageNumber": -1,
+            "pageSize": 10,
+            "filters": filters,
+          };
+          // ignore: avoid_print
+          print('fetchDummyData request: ${json.encode(requestBody)}');
+          response = await http.post(
+            Uri.parse(Common.API + Common.ApprenticeSreachBy),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(requestBody),
+          );
+          break;
+        default:
+          // Lấy toàn bộ danh sách (không lọc theo section)
+          response = await http.get(
+            Uri.parse(Common.API + Common.ApprenticeGetAll),
+            headers: {'Content-Type': 'application/json'},
+          );
+          break;
       }
 
       if (response.statusCode == 200) {
@@ -671,7 +727,7 @@ class DashboardControllerApprentice extends GetxController {
 
       notApproval.add(contractCopy);
       contract.biTNoReEmployment = false;
-      
+
       if (!reason.contains("Trả về từ báo cáo của nhân sự")) {
         if (contract.inTStatusId == 3) {
           contract.inTStatusId = 1;

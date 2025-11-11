@@ -102,9 +102,40 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               : parts.firstOrNull?.trim() ?? '';
         }
         // truong hop PTHC phong ban
-        controller.fetchDummyData(sectionName);
+        controller.fetchDummyData(sectionName, "PTHC");
       } else {
-        controller.fetchDummyData(null);
+        switch (authState.user!.chRGroup.toString()) {
+          case "Section Manager":
+            await controller.fetchDummyData(
+              authState.user!.chRSecCode?.toString(),
+              "Section Manager",
+            );
+            break;
+          case "Dept Manager":
+          case "Dept":
+            // Tìm vị trí bắt đầu của phần dept
+            List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+                .split(": ");
+            String prPart = parts[1];
+
+            // Tách phần phòng ban
+            List<String> prParts = prPart.split("-");
+            String dept = prParts[0];
+            await controller.fetchDummyData(dept, "Dept Manager");
+            break;
+          case "Director":
+          case "General Director":
+            // Tìm vị trí bắt đầu của phần dept
+            await controller.fetchDummyData(
+              authState.user!.chRSecCode?.toString(),
+              "Director",
+            );
+            break;
+          default:
+            await controller.fetchDummyData(null, null);
+            break;
+        }
+        //controller.fetchDummyData(null);
       }
       _statusInitialized = true;
     } catch (e) {
@@ -821,7 +852,10 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     final authState = Provider.of<AuthState>(context, listen: true);
     // Determine how many columns at left are frozen.
     // Base frozen: STT, (Action), Hientrang, DotDanhGia, employeeCode, gender, fullName => 7 or 6 if Action hidden.
-    final bool showAction = authState.user?.chRGroup != 'PTHC';
+    final bool showAction =
+        authState.user?.chRGroup == 'Admin' ||
+        authState.user?.chRGroup == 'Chief Per' ||
+        authState.user?.chRGroup == 'Per';
 
     final dataSource = MyData(context);
     final total = controller.filterdataList.length;
@@ -1732,7 +1766,9 @@ class MyData extends DataTableSource {
           ),
         ),
         // Action
-        if (authState.user?.chRGroup != 'PTHC')
+        if (authState.user?.chRGroup == 'Admin' ||
+            authState.user?.chRGroup == 'Chief Per' ||
+            authState.user?.chRGroup == 'Per')
           DataCell(
             Center(
               child: Row(
@@ -2715,9 +2751,43 @@ class _EditContractDialog extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       if (context.mounted) {
                         Navigator.of(context).pop();
@@ -2950,9 +3020,43 @@ class _UpdateDtmDue extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        await controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       // await controller.fetchDummyData();
                       if (context.mounted) {
@@ -3308,9 +3412,43 @@ class _UpdateKetQua extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        await controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       if (context.mounted) {
                         Navigator.of(context).pop();
@@ -3549,9 +3687,43 @@ class _ReturnContract extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        await controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       if (context.mounted) {
                         Navigator.of(context).pop();

@@ -930,7 +930,7 @@ class _EditUserDialog extends StatelessWidget {
                       'Chief Per',
                       'PTHC',
                       'Leader',
-                      'Chief Section',
+                      'Chief',
                       'Section Manager',
                       'Director',
                     ].contains(user.chRGroup)
@@ -950,8 +950,8 @@ class _EditUserDialog extends StatelessWidget {
                   DropdownMenuItem(value: 'PTHC', child: Text('PTHC')),
                   DropdownMenuItem(value: 'Leader', child: Text('Leader')),
                   DropdownMenuItem(
-                    value: 'Chief Section',
-                    child: Text('Chief Section'),
+                    value: 'Chief',
+                    child: Text('Chief'),
                   ),
                   DropdownMenuItem(
                     value: 'Section Manager',
@@ -1131,7 +1131,7 @@ class __showAddDialogState extends State<_showAddDialog> {
                 'Chief Per',
                 'PTHC',
                 'Leader',
-                'Chief Section',
+                'Chief',
                 'Section Manager',
                 'Director',
               ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),

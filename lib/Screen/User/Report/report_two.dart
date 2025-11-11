@@ -107,9 +107,39 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               : parts.firstOrNull?.trim() ?? '';
         }
         // truong hop PTHC phong ban
-        controller.fetchDummyData(sectionName);
+        controller.fetchDummyData(sectionName, "PTHC");
       } else {
-        controller.fetchDummyData(null);
+        switch (authState.user!.chRGroup.toString()) {
+          case "Section Manager":
+            await controller.fetchDummyData(
+              authState.user!.chRSecCode?.toString(),
+              "Section Manager",
+            );
+            break;
+          case "Dept Manager":
+          case "Dept":
+            // Tìm vị trí bắt đầu của phần dept
+            List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+                .split(": ");
+            String prPart = parts[1];
+
+            // Tách phần phòng ban
+            List<String> prParts = prPart.split("-");
+            String dept = prParts[0];
+            await controller.fetchDummyData(dept, "Dept Manager");
+            break;
+          case "Director":
+          case "General Director":
+            // Tìm vị trí bắt đầu của phần dept
+            await controller.fetchDummyData(
+              authState.user!.chRSecCode?.toString(),
+              "Director",
+            );
+            break;
+          default:
+            await controller.fetchDummyData(null, null);
+            break;
+        }
       }
       _statusInitialized = true;
     } catch (e) {
@@ -530,295 +560,6 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     );
   }
 
-  // Widget _buildDataTable() {
-  //   final authState = Provider.of<AuthState>(context, listen: true);
-  //   return Theme(
-  //     data: Theme.of(context).copyWith(
-  //       cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
-  //       dividerTheme: DividerThemeData(
-  //         color: Colors.grey[200],
-  //         thickness: 1,
-  //         space: 0,
-  //       ),
-  //     ),
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(12),
-  //         color: Colors.white,
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.grey.withOpacity(0.1),
-  //             spreadRadius: 1,
-  //             blurRadius: 3,
-  //             offset: const Offset(0, 1),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Column(
-  //         children: [
-  //           Expanded(
-  //             child: Scrollbar(
-  //               controller: _scrollController,
-  //               thumbVisibility: true,
-  //               child: SingleChildScrollView(
-  //                 controller: _scrollController,
-  //                 scrollDirection: Axis.horizontal,
-  //                 child: SizedBox(
-  //                   width: 4590, //2570,
-  //                   child: Builder(
-  //                     builder: (context) {
-  //                       final dataSource = MyData(context);
-  //                       final total = controller.filterdataList.length;
-  //                       if (_firstRowIndex >= total && total > 0) {
-  //                         _firstRowIndex =
-  //                             (total - 1) - ((total - 1) % _rowsPerPage);
-  //                       }
-  //                       final endIndex = (_firstRowIndex + _rowsPerPage) > total
-  //                           ? total
-  //                           : (_firstRowIndex + _rowsPerPage);
-  //                       final visibleCount = endIndex - _firstRowIndex;
-  //                       return Obx(
-  //                         () => DataTable2(
-  //                           columnSpacing: 12,
-  //                           minWidth: 2000,
-  //                           horizontalMargin: 12,
-  //                           dataRowHeight: 56,
-  //                           headingRowHeight: 66,
-  //                           headingTextStyle: TextStyle(
-  //                             color: Colors.blue[800],
-  //                             fontWeight: FontWeight.bold,
-  //                           ),
-  //                           headingRowDecoration: BoxDecoration(
-  //                             borderRadius: const BorderRadius.vertical(
-  //                               top: Radius.circular(12),
-  //                             ),
-  //                             color: Colors.blue[50],
-  //                           ),
-  //                           showCheckboxColumn: true,
-  //                           columns: [
-  //                             DataColumnCustom(
-  //                               title: tr('stt'),
-  //                               width: 70,
-  //                               onSort: controller.sortById,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // DataColumn2
-  //                             if (authState.user?.chRGroup != 'PTHC')
-  //                               DataColumnCustom(
-  //                                 title: tr('action'),
-  //                                 width: 100,
-  //                                 fontSize: Common.sizeColumn,
-  //                               ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('Hientrang'),
-  //                               width: 130,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('DotDanhGia'),
-  //                               width: 180,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('employeeCode'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('gender'),
-  //                               width: 60,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('fullName'),
-  //                               width: 180,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('department'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('group'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('age'),
-  //                               width: 70,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('position'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('salaryGrade'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('contractEffective'),
-  //                               width: 120,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('contractEndDate'),
-  //                               width: 120,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('earlyLateCount'),
-  //                               width: 110,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('paidLeave'),
-  //                               width: 100,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('unpaidLeave'),
-  //                               width: 90,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('unreportedLeave'),
-  //                               width: 90,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('violationCount'),
-  //                               width: 130,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('reason'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // DataColumnCustom(
-  //                             //   title: tr('healthCheckResult'),
-  //                             //   width: 170,
-  //                             //   maxLines: 2,
-  //                             //   fontSize: Common.sizeColumn,
-  //                             // ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('congviec'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('tinhthan'),
-  //                               width: 170,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('khac'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('note'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-
-  //                             ///
-  //                             DataColumnCustom(
-  //                               title: tr('evaluationResult'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('notRehirable'),
-  //                               width: 170,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('notRehirableReason'),
-  //                               width: 170,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // các trường thông tin phê duyệt
-  //                             DataColumnCustom(
-  //                               title: tr('Nguoilap'),
-  //                               width: 100,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('Nhansu'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('NguoiDanhgia'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // chief xác nhận kết quả
-  //                             DataColumnCustom(
-  //                               title: tr('ChiefApproval'),
-  //                               width: 170,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('TruongPhong'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('QuanLyCC'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('GiamDoc'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                           ],
-  //                           rows: List.generate(
-  //                             visibleCount,
-  //                             (i) => dataSource.getRow(_firstRowIndex + i)!,
-  //                           ),
-  //                         ),
-  //                       );
-  //                     },
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //           _buildCustomPaginator(),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildFrozenDataTable() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -866,7 +607,10 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       visibleCount,
       (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
     );
-    final bool showAction = authState.user?.chRGroup != 'PTHC';
+    final bool showAction =
+        authState.user?.chRGroup == 'Admin' ||
+        authState.user?.chRGroup == 'Chief Per' ||
+        authState.user?.chRGroup == 'Per';
     // Frozen columns (first 7 logical including optional action)
     final frozenCols = <DataColumn>[
       DataColumnCustom(
@@ -1698,7 +1442,9 @@ class MyData extends DataTableSource {
           ),
         ),
         //Action
-        if (authState.user?.chRGroup != 'PTHC')
+        if (authState.user?.chRGroup == 'Admin' ||
+            authState.user?.chRGroup == 'Chief Per' ||
+            authState.user?.chRGroup == 'Per')
           DataCell(
             Center(
               child: Row(
@@ -2808,9 +2554,43 @@ class _EditTwoContractDialog extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       if (context.mounted) {
                         Navigator.of(context).pop();
@@ -3042,9 +2822,43 @@ class _UpdateDtmDue extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
 
                       if (context.mounted) {
@@ -3399,9 +3213,43 @@ class _UpdateKetQua extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
 
                       if (context.mounted) {
@@ -3640,9 +3488,43 @@ class _ReturnContract extends StatelessWidget {
                               : parts.firstOrNull?.trim() ?? '';
                         }
                         // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName);
+                        controller.fetchDummyData(sectionName, "PTHC");
                       } else {
-                        controller.fetchDummyData(null);
+                        switch (authState.user!.chRGroup.toString()) {
+                          case "Section Manager":
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Section Manager",
+                            );
+                            break;
+                          case "Dept Manager":
+                          case "Dept":
+                            // Tìm vị trí bắt đầu của phần dept
+                            List<String> parts =
+                                (authState.user!.chRSecCode?.toString() ?? '')
+                                    .split(": ");
+                            String prPart = parts[1];
+
+                            // Tách phần phòng ban
+                            List<String> prParts = prPart.split("-");
+                            String dept = prParts[0];
+                            await controller.fetchDummyData(
+                              dept,
+                              "Dept Manager",
+                            );
+                            break;
+                          case "Director":
+                          case "General Director":
+                            // Tìm vị trí bắt đầu của phần dept
+                            await controller.fetchDummyData(
+                              authState.user!.chRSecCode?.toString(),
+                              "Director",
+                            );
+                            break;
+                          default:
+                            await controller.fetchDummyData(null, null);
+                            break;
+                        }
                       }
                       if (context.mounted) {
                         Navigator.of(context).pop();
