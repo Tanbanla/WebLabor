@@ -1333,8 +1333,6 @@ class DashboardControllerTwo extends GetxController {
         body: json.encode(twocontract),
       );
       if (response.statusCode == 200) {
-        //await fetchDataBy();
-        final controlleruser = Get.put(DashboardControllerUser());
         //mail phe duyet
         if (mailSend != '') {
           //controlleruser.SendMail('6', mailSend, mailSend, mailSend);
