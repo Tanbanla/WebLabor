@@ -793,24 +793,33 @@ class DashboardControllerTwo extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-        // Lấy danh sách email cc theo section (nếu có)
-        final sectionCc = pthcList
-            .where((item) => item.section == contract.vchRCodeSection)
-            .map((item) => item.mailcc)
-            .where((e) => e != null && e.trim().isNotEmpty)
-            .cast<String>()
-            .toList();
-
-        // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
-        final ccEmails = [
-          ...sectionCc,
+          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+          final sectionItems = pthcList.where(
+            (item) => item.section == contract.vchRCodeSection,
+          );
+          final ccSet = <String>{};
+          final toSet = <String>{};
+          for (final item in sectionItems) {
+            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+              ccSet.add(item.mailcc!.trim());
+            }
+            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+              toSet.add(item.mailto!.trim());
+            }
+          }
           if (specialSection.mailcc != null &&
-              specialSection.mailcc!.trim().isNotEmpty)
-            specialSection.mailcc?.trim(),
-        ].join(';');
-        final controlleruser = Get.put(DashboardControllerUser());
+              specialSection.mailcc!.trim().isNotEmpty) {
+            ccSet.add(specialSection.mailcc!.trim());
+          }
+          if (specialSection.mailto != null &&
+              specialSection.mailto!.trim().isNotEmpty) {
+            toSet.add(specialSection.mailto!.trim());
+          }
+          final ccEmails = ccSet.join(';');
+          final toEmails = toSet.join(';');
+          final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
-          specialSection.mailto.toString(),
+          '${specialSection.mailto};$toEmails',
           ccEmails,
           specialSection.mailbcc.toString(),
           notApproval,
@@ -1338,28 +1347,38 @@ class DashboardControllerTwo extends GetxController {
           // );
         }
         // mail canh bao
-        //Special case for section "1120-1 : ADM-PER"
+        //Special case for section 
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          // Lấy danh sách email cc theo section (nếu có)
-          final sectionCc = pthcList
-              .where((item) => item.section == sectionAp)
-              .map((item) => item.mailcc)
-              .where((e) => e != null && e.trim().isNotEmpty)
-              .cast<String>()
-              .toList();
-
-          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
-          final ccEmails = [
-            ...sectionCc,
-            if (specialSection.mailcc != null &&
-                specialSection.mailcc!.trim().isNotEmpty)
-              specialSection.mailcc?.trim(),
-          ].join(';');
+          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+          final sectionItems = pthcList.where(
+            (item) => item.section == sectionAp,
+          );
+          final ccSet = <String>{};
+          final toSet = <String>{};
+          for (final item in sectionItems) {
+            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+              ccSet.add(item.mailcc!.trim());
+            }
+            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+              toSet.add(item.mailto!.trim());
+            }
+          }
+          if (specialSection.mailcc != null &&
+              specialSection.mailcc!.trim().isNotEmpty) {
+            ccSet.add(specialSection.mailcc!.trim());
+          }
+          if (specialSection.mailto != null &&
+              specialSection.mailto!.trim().isNotEmpty) {
+            toSet.add(specialSection.mailto!.trim());
+          }
+          final ccEmails = ccSet.join(';');
+          final toEmails = toSet.join(';');
+          final controlleruser = Get.put(DashboardControllerUser());
           controlleruser.SendMailCustom(
-            specialSection.mailto.toString(),
+            '${specialSection.mailto};$toEmails',
             '$ccEmails;$PheDuyetMail',
             specialSection.mailbcc.toString(),
             notApproval,
@@ -2328,31 +2347,39 @@ class DashboardControllerTwo extends GetxController {
         body: json.encode(twocontract),
       );
       if (response.statusCode == 200) {
-        //await fetchDataBy();
-        final controlleruser = Get.put(DashboardControllerUser());
         // mail canh bao
-        //Special case for section "1120-1 : ADM-PER"
+        //Special case for section 
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          // Lấy danh sách email cc theo section (nếu có)
-          final sectionCc = pthcList
-              .where((item) => item.section == sectionAp)
-              .map((item) => item.mailcc)
-              .where((e) => e != null && e.trim().isNotEmpty)
-              .cast<String>()
-              .toList();
-
-          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
-          final ccEmails = [
-            ...sectionCc,
-            if (specialSection.mailcc != null &&
-                specialSection.mailcc!.trim().isNotEmpty)
-              specialSection.mailcc?.trim(),
-          ].join(';');
+          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+          final sectionItems = pthcList.where(
+            (item) => item.section == sectionAp,
+          );
+          final ccSet = <String>{};
+          final toSet = <String>{};
+          for (final item in sectionItems) {
+            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+              ccSet.add(item.mailcc!.trim());
+            }
+            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+              toSet.add(item.mailto!.trim());
+            }
+          }
+          if (specialSection.mailcc != null &&
+              specialSection.mailcc!.trim().isNotEmpty) {
+            ccSet.add(specialSection.mailcc!.trim());
+          }
+          if (specialSection.mailto != null &&
+              specialSection.mailto!.trim().isNotEmpty) {
+            toSet.add(specialSection.mailto!.trim());
+          }
+          final ccEmails = ccSet.join(';');
+          final toEmails = toSet.join(';');
+          final controlleruser = Get.put(DashboardControllerUser());
           controlleruser.SendMailCustom(
-            specialSection.mailto.toString(),
+            '${specialSection.mailto};$toEmails',
             ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
@@ -2410,31 +2437,40 @@ class DashboardControllerTwo extends GetxController {
         body: json.encode(twocontract),
       );
       if (response.statusCode == 200) {
-        //await fetchDataBy();
-        final controlleruser = Get.put(DashboardControllerUser());
         // mail canh bao
-        //Special case for section "1120-1 : ADM-PER"
+        //Special case for section
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-          // Lấy danh sách email cc theo section (nếu có)
-          final sectionCc = pthcList
-              .where((item) => item.section == sectionAp)
-              .map((item) => item.mailcc)
-              .where((e) => e != null && e.trim().isNotEmpty)
-              .cast<String>()
-              .toList();
+          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+          final sectionItems = pthcList.where(
+            (item) => item.section == sectionAp,
+          );
+          final ccSet = <String>{};
+          final toSet = <String>{};
+          for (final item in sectionItems) {
+            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+              ccSet.add(item.mailcc!.trim());
+            }
+            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+              toSet.add(item.mailto!.trim());
+            }
+          }
+          if (specialSection.mailcc != null &&
+              specialSection.mailcc!.trim().isNotEmpty) {
+            ccSet.add(specialSection.mailcc!.trim());
+          }
+          if (specialSection.mailto != null &&
+              specialSection.mailto!.trim().isNotEmpty) {
+            toSet.add(specialSection.mailto!.trim());
+          }
+          final ccEmails = ccSet.join(';');
+          final toEmails = toSet.join(';');
+          final controlleruser = Get.put(DashboardControllerUser());
 
-          // Ghép các email cc, bỏ qua rỗng để không sinh ra ();
-          final ccEmails = [
-            ...sectionCc,
-            if (specialSection.mailcc != null &&
-                specialSection.mailcc!.trim().isNotEmpty)
-              specialSection.mailcc?.trim(),
-          ].join(';');
           controlleruser.SendMailCustom(
-            specialSection.mailto.toString(),
+            '${specialSection.mailto};$toEmails',
             ccEmails,
             specialSection.mailbcc.toString(),
             notApproval,
