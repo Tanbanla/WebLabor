@@ -1168,9 +1168,17 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   ),
                   // Scrollable side (horizontal + synced vertical)
                   Expanded(
-                    child: Scrollbar(
+                    child: RawScrollbar(
                       controller: _rightScrollController,
                       thumbVisibility: true,
+                      trackVisibility: true,
+                      thickness: 10,
+                      radius: const Radius.circular(8),
+                      thumbColor: Common.primaryColor.withOpacity(0.7),
+                      trackColor: Colors.white.withOpacity(0.15),
+                      fadeDuration: const Duration(milliseconds: 500),
+                      timeToFade: const Duration(seconds: 2),
+                      scrollbarOrientation: ScrollbarOrientation.bottom,
                       child: SingleChildScrollView(
                         controller: _rightScrollController,
                         scrollDirection: Axis.horizontal,

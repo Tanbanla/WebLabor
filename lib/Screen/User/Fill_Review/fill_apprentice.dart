@@ -124,7 +124,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           );
           break;
         case 'Per':
-          controller.changeStatus('PTHC', null, authState.user!.chRUserid.toString(), null);
+          controller.changeStatus(
+            'PTHC',
+            null,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -1422,9 +1427,17 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         ),
         Container(width: 1, color: Colors.grey[300]),
         Expanded(
-          child: Scrollbar(
+          child: RawScrollbar(
             controller: _rightScrollController,
             thumbVisibility: true,
+            trackVisibility: true,
+            thickness: 10,
+            radius: const Radius.circular(8),
+            thumbColor: Common.primaryColor.withOpacity(0.7),
+            trackColor: Colors.white.withOpacity(0.15),
+            fadeDuration: const Duration(milliseconds: 500),
+            timeToFade: const Duration(seconds: 2),
+            scrollbarOrientation: ScrollbarOrientation.bottom,
             child: SingleChildScrollView(
               controller: _rightScrollController,
               scrollDirection: Axis.horizontal,
@@ -1436,6 +1449,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   child: DataTable(
                     headingRowHeight: 66,
                     dataRowHeight: 56,
+                    horizontalMargin: 8, // Giảm margin
+                    columnSpacing: 8, // Giảm khoảng cách cột
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
