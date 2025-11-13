@@ -9,15 +9,10 @@ import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
-import 'package:excel/excel.dart' hide Border;
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
-import 'package:universal_html/html.dart' as html;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'dart:io';
 import 'package:provider/provider.dart';
 
 class ReportApprentice extends StatefulWidget {
@@ -43,7 +38,6 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
-  int _firstRowIndex = 0; // track first row of current page
   final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
   bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
@@ -83,63 +77,82 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     super.dispose();
   }
 
+  Future<void> phanQuyen(AuthState authState, int? page, int? size) async {
+    String sectionName = '';
+    if (authState.user!.chRGroup.toString() == "PTHC") {
+      if (controllerPTHC.listPTHCsection.isNotEmpty) {
+        sectionName =
+            '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+      } else {
+        final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+        sectionName = parts.length >= 2
+            ? '${parts[0].trim()} : ${parts[1].trim()}'
+            : parts.firstOrNull?.trim() ?? '';
+      }
+      // truong hop PTHC phong ban
+      await controller.fetchPagedApprenticeContracts(
+        page: page,
+        size: size,
+        chucVu: "PTHC",
+        section: sectionName,
+      );
+    } else {
+      switch (authState.user!.chRGroup.toString()) {
+        case "Section Manager":
+          await controller.fetchPagedApprenticeContracts(
+            page: page,
+            size: size,
+            chucVu: "Section Manager",
+            section: authState.user!.chRSecCode?.toString(),
+          );
+          break;
+        case "Dept Manager":
+        case "Dept":
+          // Tìm vị trí bắt đầu của phần dept
+          List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+              .split(": ");
+          String prPart = parts[1];
+
+          // Tách phần phòng ban
+          List<String> prParts = prPart.split("-");
+          String dept = prParts[0];
+          await controller.fetchPagedApprenticeContracts(
+            page: page,
+            size: size,
+            chucVu: "Dept Manager",
+            section: dept,
+          );
+          break;
+        case "Director":
+        case "General Director":
+          // Tìm vị trí bắt đầu của phần dept
+          await controller.fetchPagedApprenticeContracts(
+            page: page,
+            size: size,
+            chucVu: "Director",
+            section: authState.user!.chRSecCode?.toString(),
+          );
+          break;
+        default:
+          await controller.fetchPagedApprenticeContracts(
+            page: page,
+            size: size,
+          );
+          break;
+      }
+      //controller.fetchDummyData(null);
+    }
+  }
+
   Future<void> _prepareStatus(AuthState authState) async {
     if (_statusInitialized) return;
     try {
-      // Bắt buộc phải tải listPTHCsection trước khi so sánh
       await controllerPTHC.fetchPTHCSectionList(
         authState.user!.chRUserid.toString(),
       );
-      String sectionName = '';
-      if (authState.user!.chRGroup.toString() == "PTHC") {
-        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName =
-              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        } else {
-          final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
-          sectionName = parts.length >= 2
-              ? '${parts[0].trim()} : ${parts[1].trim()}'
-              : parts.firstOrNull?.trim() ?? '';
-        }
-        // truong hop PTHC phong ban
-        controller.fetchDummyData(sectionName, "PTHC");
-      } else {
-        switch (authState.user!.chRGroup.toString()) {
-          case "Section Manager":
-            await controller.fetchDummyData(
-              authState.user!.chRSecCode?.toString(),
-              "Section Manager",
-            );
-            break;
-          case "Dept Manager":
-          case "Dept":
-            // Tìm vị trí bắt đầu của phần dept
-            List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
-                .split(": ");
-            String prPart = parts[1];
-
-            // Tách phần phòng ban
-            List<String> prParts = prPart.split("-");
-            String dept = prParts[0];
-            await controller.fetchDummyData(dept, "Dept Manager");
-            break;
-          case "Director":
-          case "General Director":
-            // Tìm vị trí bắt đầu của phần dept
-            await controller.fetchDummyData(
-              authState.user!.chRSecCode?.toString(),
-              "Director",
-            );
-            break;
-          default:
-            await controller.fetchDummyData(null, null);
-            break;
-        }
-        //controller.fetchDummyData(null);
-      }
+      await phanQuyen(authState, 1, _rowsPerPage);
       _statusInitialized = true;
     } catch (e) {
-      // Có thể log hoặc hiển thị lỗi nếu cần
       debugPrint('Prepare status error: $e');
     }
   }
@@ -245,6 +258,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
 
   Widget _buildSearchAndActions() {
     final DashboardControllerApprentice controller = Get.find();
+    final authState = Provider.of<AuthState>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxW = constraints.maxWidth;
@@ -325,7 +339,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                 );
               }).toList(),
               onChanged: (value) {
-                controller.updateStatus(value);
+                //controller.updateStatus(value);
+                controller.selectedStatus.value = value ?? '';
+                phanQuyen(authState, 1, _rowsPerPage);
               },
               dropdownColor: Colors.white,
               icon: Icon(
@@ -354,7 +370,11 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               width: fw(240),
               hint: tr('DotDanhGia'),
               icon: Iconsax.document_filter,
-              onChanged: (v) => controller.updateApproverCode(v),
+              onChanged: (v) => {
+                controller.approverCodeQuery.value = v,
+                phanQuyen(authState, 1, _rowsPerPage),
+                //controller.updateApproverCode(v)
+              },
             ),
           ),
           statusDropdown,
@@ -364,7 +384,11 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               width: fw(140),
               hint: tr('employeeCode'),
               icon: Iconsax.tag,
-              onChanged: (v) => controller.updateEmployeeId(v),
+              onChanged: (v) => {
+                //controller.updateEmployeeId(v)
+                controller.employeeIdQuery.value = v,
+                phanQuyen(authState, 1, _rowsPerPage),
+              },
             ),
           ),
           SizedBox(
@@ -373,7 +397,10 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               width: fw(240),
               hint: tr('fullName'),
               icon: Iconsax.user,
-              onChanged: (v) => controller.updateEmployeeName(v),
+              onChanged: (v) => {
+                controller.employeeNameQuery.value = v,
+                phanQuyen(authState, 1, _rowsPerPage),
+              }, //controller.updateEmployeeName(v),
             ),
           ),
           SizedBox(
@@ -445,7 +472,9 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                         )
                         .toList(),
                 onChanged: (value) {
-                  controller.updateDepartment(value ?? '');
+                  controller.departmentQuery.value = value ?? '';
+                  phanQuyen(authState, 1, _rowsPerPage);
+                  //controller.updateDepartment(value ?? '');
                 },
                 icon: Icon(
                   Icons.arrow_drop_down,
@@ -463,14 +492,20 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               width: fw(140),
               hint: tr('group'),
               icon: Iconsax.people,
-              onChanged: (v) => controller.updateGroup(v),
+              onChanged: (v) => {
+                controller.groupQuery.value = v,
+                phanQuyen(authState, 1, _rowsPerPage),
+              },
             ),
           ),
           buildActionButton(
             icon: Iconsax.refresh,
             color: Colors.blue,
             tooltip: tr('Rfilter'),
-            onPressed: () => controller.refreshFilteredList(),
+            onPressed: () => {
+              controller.refreshFilteredList(),
+              phanQuyen(authState, 1, _rowsPerPage),
+            },
           ),
           buildActionButton(
             icon: Iconsax.export,
@@ -563,290 +598,6 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     );
   }
 
-  // Widget _buildDataTable() {
-  //   final authState = Provider.of<AuthState>(context, listen: true);
-  //   return Theme(
-  //     data: Theme.of(context).copyWith(
-  //       cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
-  //       dividerTheme: DividerThemeData(
-  //         color: Colors.grey[200],
-  //         thickness: 1,
-  //         space: 0,
-  //       ),
-  //     ),
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(12),
-  //         color: Colors.white,
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.grey.withOpacity(0.1),
-  //             spreadRadius: 1,
-  //             blurRadius: 3,
-  //             offset: const Offset(0, 1),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Column(
-  //         children: [
-  //           Expanded(
-  //             child: Scrollbar(
-  //               controller: _scrollController,
-  //               thumbVisibility: true,
-  //               child: SingleChildScrollView(
-  //                 controller: _scrollController,
-  //                 scrollDirection: Axis.horizontal,
-  //                 child: SizedBox(
-  //                   width: 4870, //2570,
-  //                   child: Builder(
-  //                     builder: (context) {
-  //                       final dataSource = MyData(context);
-  //                       final total = controller.filterdataList.length;
-  //                       if (_firstRowIndex >= total && total > 0) {
-  //                         _firstRowIndex =
-  //                             (total - 1) - ((total - 1) % _rowsPerPage);
-  //                       }
-  //                       final endIndex = (_firstRowIndex + _rowsPerPage) > total
-  //                           ? total
-  //                           : (_firstRowIndex + _rowsPerPage);
-  //                       final visibleCount = endIndex - _firstRowIndex;
-  //                       return Obx(
-  //                         () => DataTable2(
-  //                           columnSpacing: 12,
-  //                           minWidth: 2000,
-  //                           horizontalMargin: 12,
-  //                           dataRowHeight: 56,
-  //                           headingRowHeight: 66,
-  //                           headingTextStyle: TextStyle(
-  //                             color: Colors.blue[800],
-  //                             fontWeight: FontWeight.bold,
-  //                           ),
-  //                           headingRowDecoration: BoxDecoration(
-  //                             borderRadius: const BorderRadius.vertical(
-  //                               top: Radius.circular(12),
-  //                             ),
-  //                             color: Colors.blue[50],
-  //                           ),
-  //                           showCheckboxColumn: true,
-  //                           columns: [
-  //                             DataColumnCustom(
-  //                               title: tr('stt'),
-  //                               width: 70,
-  //                               onSort: controller.sortById,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // DataColumn2
-  //                             if (authState.user?.chRGroup != 'PTHC')
-  //                               DataColumnCustom(
-  //                                 title: tr('action'),
-  //                                 width: 100,
-  //                                 fontSize: Common.sizeColumn,
-  //                               ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('Hientrang'),
-  //                               width: 130,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('DotDanhGia'),
-  //                               width: 180,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('employeeCode'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('gender'),
-  //                               width: 60,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('fullName'),
-  //                               width: 180,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('department'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('group'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('age'),
-  //                               width: 70,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('position'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('salaryGrade'),
-  //                               width: 100,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('contractEffective'),
-  //                               width: 120,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('contractEndDate'),
-  //                               width: 120,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('earlyLateCount'),
-  //                               width: 110,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('unreportedLeave'),
-  //                               width: 90,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('violationCount'),
-  //                               width: 130,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('reason'),
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('lythuyet'),
-  //                               width: 130,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('thuchanh'),
-  //                               width: 130,
-  //                               fontSize: Common.sizeColumn,
-  //                               maxLines: 2,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('congviec'),
-  //                               width: 130,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('hochoi'),
-  //                               width: 130,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('thichnghi'),
-  //                               width: 130,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('tinhthan'),
-  //                               fontSize: Common.sizeColumn,
-  //                               width: 150,
-  //                               maxLines: 3,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('baocao'),
-  //                               fontSize: Common.sizeColumn,
-  //                               width: 130,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('chaphanh'),
-  //                               fontSize: Common.sizeColumn,
-  //                               width: 130,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('ketqua'),
-  //                               fontSize: Common.sizeColumn,
-  //                               width: 150,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('note'),
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('notRehirable'),
-  //                               width: 170,
-  //                               fontSize: Common.sizeColumn,
-  //                               maxLines: 2,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('Lydo'),
-  //                               width: 170,
-  //                               fontSize: Common.sizeColumn,
-  //                               maxLines: 2,
-  //                             ).toDataColumn2(),
-  //                             // các trường thông tin phê duyệt
-  //                             DataColumnCustom(
-  //                               title: tr('Nguoilap'),
-  //                               width: 100,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('Nhansu'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('NguoiDanhgia'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             // chief xác nhận kết quả
-  //                             DataColumnCustom(
-  //                               title: tr('ChiefApproval'),
-  //                               width: 170,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('TruongPhong'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                             DataColumnCustom(
-  //                               title: tr('QuanLyCC'),
-  //                               width: 150,
-  //                               maxLines: 2,
-  //                               fontSize: Common.sizeColumn,
-  //                             ).toDataColumn2(),
-  //                           ],
-  //                           rows: List.generate(
-  //                             visibleCount,
-  //                             (i) => dataSource.getRow(_firstRowIndex + i)!,
-  //                           ),
-  //                         ),
-  //                       );
-  //                     },
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //           _buildCustomPaginator(),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   // New frozen columns table: first 7 logical columns (including conditional Action) remain fixed.
   Widget _buildFrozenDataTable() {
     final authState = Provider.of<AuthState>(context, listen: true);
@@ -858,19 +609,13 @@ class _ReportApprenticeState extends State<ReportApprentice> {
         authState.user?.chRGroup == 'Per';
 
     final dataSource = MyData(context);
-    final total = controller.filterdataList.length;
-    if (_firstRowIndex >= total && total > 0) {
-      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
-    }
-    final endIndex = (_firstRowIndex + _rowsPerPage) > total
-        ? total
-        : (_firstRowIndex + _rowsPerPage);
-    final visibleCount = endIndex - _firstRowIndex;
+    final visibleCount =
+        controller.filterdataList.length; // server returns page-sized data
 
     // Build rows once then split cells.
     final List<DataRow2> fullRows = List.generate(
       visibleCount,
-      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+      (i) => dataSource.getRow(i) as DataRow2,
     );
 
     // For styling header reuse DataColumn definitions from original.
@@ -1212,455 +957,165 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   }
 
   Widget _buildCustomPaginator() {
-    final total = controller.filterdataList.length;
-    final start = total == 0 ? 0 : _firstRowIndex + 1;
-    final end = (_firstRowIndex + _rowsPerPage) > total
-        ? total
-        : (_firstRowIndex + _rowsPerPage);
-
-    final isFirstPage = _firstRowIndex == 0;
-    final isLastPage = end >= total;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(
-          top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+    final authState = Provider.of<AuthState>(context, listen: false);
+    return Obx(() {
+      final current = controller.currentPage.value;
+      final totalP = controller.totalPages.value;
+      //final count = controller.totalCount.value;
+      final isFirst = current <= 1;
+      final isLast = totalP == 0 ? true : current >= totalP;
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border(
+            top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left side - Rows per page selector
-          Row(
-            children: [
-              Text(
-                tr('rowsPerPage'),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: DropdownButton<int>(
-                  value: _rowsPerPage,
-                  underline: const SizedBox(), // Remove default underline
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-                  style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                  items: _availableRowsPerPage
-                      .map(
-                        (e) => DropdownMenuItem<int>(
-                          value: e,
-                          child: Text(
-                            '$e',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() {
-                        _rowsPerPage = v;
-                        _firstRowIndex = 0;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          // Center - Page info
-          Text(
-            '$start - $end / $total',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          // Right side - Navigation buttons
-          Row(
-            children: [
-              // First page
-              IconButton(
-                icon: Icon(Icons.first_page, size: 20),
-                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('firstPage'),
-                onPressed: isFirstPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = 0;
-                        });
-                      },
-              ),
-
-              // Previous page
-              IconButton(
-                icon: Icon(Icons.chevron_left, size: 24),
-                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('previousPage'),
-                onPressed: isFirstPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = (_firstRowIndex - _rowsPerPage)
-                              .clamp(0, total);
-                        });
-                      },
-              ),
-
-              // Page indicator (optional)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  '${(_firstRowIndex ~/ _rowsPerPage) + 1}',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  tr('rowsPerPage'),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[700],
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                const SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.grey[300]!, width: 1),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: DropdownButton<int>(
+                    value: controller.pageSize.value,
+                    underline: const SizedBox(),
+                    icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                    items: _availableRowsPerPage
+                        .map(
+                          (e) => DropdownMenuItem<int>(
+                            value: e,
+                            child: Text(
+                              '$e',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) async {
+                      if (v != null) {
+                        await phanQuyen(authState, 1, v);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              'Page $current / $totalP', //(${tr('total')}: $count)
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
               ),
-
-              // Next page
-              IconButton(
-                icon: Icon(Icons.chevron_right, size: 24),
-                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('nextPage'),
-                onPressed: isLastPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = (_firstRowIndex + _rowsPerPage)
-                              .clamp(0, (total - 1).clamp(0, total));
-                        });
-                      },
-              ),
-
-              // Last page
-              IconButton(
-                icon: Icon(Icons.last_page, size: 20),
-                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('lastPage'),
-                onPressed: isLastPage
-                    ? null
-                    : () {
-                        setState(() {
-                          final remainder = total % _rowsPerPage;
-                          _firstRowIndex = remainder == 0
-                              ? total - _rowsPerPage
-                              : total - remainder;
-                        });
-                      },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showExportDialog() {
-    final controller = Get.find<DashboardControllerApprentice>();
-    String getStatusLabel(int? IntStatus) {
-      switch (IntStatus) {
-        case 1:
-          return 'New';
-        case 2:
-          return 'Per/人事課の中級管理職';
-        case 3:
-          return 'PTHC';
-        case 4:
-          return 'Leader';
-        case 5:
-          return 'Chief';
-        case 6:
-          return 'QLTC/中級管理職';
-        case 7:
-          return 'QLCC/上級管理職';
-        case 8:
-          return 'Director/管掌取締役';
-        case 9:
-          return 'Done';
-        default:
-          return 'Not Error';
-      }
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(tr('export')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
-            const SizedBox(height: 16),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  children: [
-                    Icon(Iconsax.document_text, size: 40, color: Colors.blue),
-                    const SizedBox(height: 8),
-                    const Text('Excel', style: TextStyle(fontSize: 16)),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.first_page, size: 20),
+                  color: isFirst ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('firstPage'),
+                  onPressed: isFirst
+                      ? null
+                      : () async {
+                          await phanQuyen(
+                            authState,
+                            1,
+                            controller.pageSize.value,
+                          );
+                        },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, size: 24),
+                  color: isFirst ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('previousPage'),
+                  onPressed: isFirst
+                      ? null
+                      : () async {
+                          await phanQuyen(
+                            authState,
+                            current - 1,
+                            controller.pageSize.value,
+                          );
+                        },
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    '$current',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, size: 24),
+                  color: isLast ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('nextPage'),
+                  onPressed: isLast
+                      ? null
+                      : () async {
+                          await phanQuyen(
+                            authState,
+                            current + 1,
+                            controller.pageSize.value,
+                          );
+                        },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.last_page, size: 20),
+                  color: isLast ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('lastPage'),
+                  onPressed: isLast || totalP == 0
+                      ? null
+                      : () async {
+                          await phanQuyen(
+                            authState,
+                            totalP,
+                            controller.pageSize.value,
+                          );
+                        },
                 ),
               ],
             ),
           ],
         ),
+      );
+    });
+  }
+
+  void _showExportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr('export')),
+        content: Text(tr('fickExport')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(tr('Cancel')),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                controller.isLoadingExport.value = true;
-
-                // 1. Đọc file template
-                final ByteData templateData = await rootBundle.load(
-                  'assets/templates/MauTV.xlsx',
-                );
-                final excel = Excel.decodeBytes(
-                  templateData.buffer.asUint8List(),
-                );
-                final sheet =
-                    excel['Sheet1']; //?? excel[excel.tables.keys.first];
-                const startRow = 15; // Dòng bắt đầu điền dữ liệu
-                // Xác nhận danh sách xuất dữ liệu
-                List<ApprenticeContract> dataToExport =
-                    controller.getSelectedItems().isNotEmpty
-                    ? controller.getSelectedItems()
-                    : List.from(controller.filterdataList);
-                // 2. Điền dữ liệu vào các ô
-                for (int i = 0; i < dataToExport.length; i++) {
-                  final item = dataToExport[i];
-                  final row = startRow + i;
-                  // Lấy style từ dòng mẫu (dòng 6)
-                  final templateRow = startRow - 1;
-                  getStyle(String column) => sheet
-                      .cell(CellIndex.indexByString('$column$templateRow'))
-                      .cellStyle;
-
-                  // Điền dữ liệu với style được copy từ template
-                  void setCellValue(String column, dynamic value) {
-                    final cell = sheet.cell(
-                      CellIndex.indexByString('$column$row'),
-                    );
-                    cell.value = value is DateTime
-                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
-                        : TextCellValue(value.toString());
-                    cell.cellStyle = getStyle(column);
-                  }
-
-                  // Điền từng giá trị vào các cột
-                  setCellValue('A', i + 1);
-                  setCellValue('B', getStatusLabel(item.inTStatusId));
-                  setCellValue('C', item.vchRCodeApprover ?? '');
-                  setCellValue('D', item.vchREmployeeId ?? '');
-                  setCellValue('E', item.vchRTyperId ?? '');
-                  setCellValue('F', item.vchREmployeeName ?? '');
-                  setCellValue('G', item.vchRNameSection ?? '');
-                  setCellValue('H', item.chRCostCenterName ?? '');
-                  setCellValue('I', getAgeFromBirthday(item.dtMBrithday));
-                  setCellValue('J', item.chRPosition ?? '');
-                  setCellValue('K', item.chRCodeGrade ?? '');
-                  if (item.dtMJoinDate != null) {
-                    setCellValue(
-                      'L',
-                      DateFormat(
-                        'dd/MM/yyyy',
-                      ).format(DateTime.parse(item.dtMJoinDate!)),
-                    );
-                  }
-                  if (item.dtMEndDate != null) {
-                    setCellValue(
-                      'M',
-                      DateFormat(
-                        'dd/MM/yyyy',
-                      ).format(DateTime.parse(item.dtMEndDate!)),
-                    );
-                  }
-                  setCellValue('N', item.fLGoLeaveLate ?? '0');
-                  setCellValue('O', item.fLNotLeaveDay ?? '0');
-                  setCellValue('P', item.inTViolation ?? '0');
-                  setCellValue(
-                    'Q',
-                    item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''),
-                  );
-                  setCellValue(
-                    'R',
-                    item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''),
-                  );
-                  setCellValue(
-                    'S',
-                    item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''),
-                  );
-                  setCellValue(
-                    'T',
-                    item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''),
-                  );
-                  setCellValue(
-                    'U',
-                    item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''),
-                  );
-                  setCellValue(
-                    'V',
-                    item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''),
-                  );
-                  setCellValue(
-                    'W',
-                    item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''),
-                  );
-                  setCellValue(
-                    'X',
-                    item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''),
-                  );
-                  setCellValue(
-                    'Y',
-                    item.inTStatusId == 3
-                        ? ""
-                        : (item.vchRReasultsLeader ?? ''),
-                  );
-                  setCellValue(
-                    'Z',
-                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
-                  );
-                  setCellValue(
-                    'AA',
-                    item.biTNoReEmployment == null
-                        ? ""
-                        : (item.biTNoReEmployment ? "" : "X"),
-                  );
-                  setCellValue(
-                    'AB',
-                    item.inTStatusId == 3
-                        ? ""
-                        : (item.nvchRNoReEmpoyment ?? ''),
-                  );
-                  setCellValue('AC', item.vchRUserCreate ?? '');
-                  setCellValue('AD', item.useRApproverPer ?? '');
-                  setCellValue('AE', item.vchRLeaderEvalution ?? '');
-                  setCellValue('AF', item.useRApproverChief ?? '');
-                  setCellValue('AG', item.useRApproverSectionManager ?? '');
-                  setCellValue('AH', item.userApproverDeft ?? '');
-                }
-
-                // 3. Xuất file
-                final bytes = excel.encode();
-                if (bytes == null) throw Exception(tr('Notsavefile'));
-
-                final fileName =
-                    'DanhSachDanhGiaHopDongThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
-
-                if (kIsWeb) {
-                  final blob = html.Blob(
-                    [bytes],
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                  );
-                  final url = html.Url.createObjectUrlFromBlob(blob);
-                  html.AnchorElement(href: url)
-                    ..setAttribute('download', fileName)
-                    ..click();
-                  html.Url.revokeObjectUrl(url);
-                } else {
-                  final String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: tr('savefile'),
-                    fileName: fileName,
-                    type: FileType.custom,
-                    allowedExtensions: ['xlsx'],
-                  );
-
-                  if (outputFile != null) {
-                    await File(outputFile).writeAsBytes(bytes, flush: true);
-                  }
-                }
-
-                // 4. Hiển thị thông báo
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      icon: const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 50,
-                      ),
-                      title: Text(
-                        tr('Done'),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(tr('exportDone')),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text(tr('Cancel')),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('${tr('exportError')}${e.toString()}'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(tr('Cancel')),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              } finally {
-                controller.isLoadingExport.value = false;
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: Obx(
-              () => controller.isLoadingExport.value
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(tr('Export')),
-            ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(tr('close')),
           ),
         ],
       ),

@@ -36,6 +36,12 @@ class DashboardControllerTwo extends GetxController {
   // Tracking import errors (file + messages) similar to Apprentice controller
   Rx<Uint8List?> lastImportErrorExcel = Rx<Uint8List?>(null);
   RxList<String> lastImportErrors = <String>[].obs;
+  // ==================== Server-side pagination state ====================
+  final currentPage = 1.obs; // 1-based index
+  final pageSize =
+      50.obs; // default rows per page (matches previous UI default)
+  final totalPages = 1.obs;
+  final totalCount = 0.obs;
   @override
   void onInit() {
     super.onInit();
@@ -207,6 +213,234 @@ class DashboardControllerTwo extends GetxController {
     filterdataList.value = result;
     // Rebuild selection states to align with filtered list length
     selectRows.assignAll(List.generate(filterdataList.length, (_) => false));
+  }
+
+  // ==================== Server-side pagination helpers ====================
+  int _statusStringToId(String s) {
+    switch (s) {
+      case 'New':
+        return 1;
+      case 'Per':
+        return 2;
+      case 'PTHC':
+        return 3;
+      case 'Leader':
+        return 4;
+      case 'Chief':
+        return 5;
+      case 'QLTC':
+        return 6;
+      case 'QLCC':
+        return 7;
+      case 'Director':
+        return 8;
+      case 'Done':
+        return 9;
+      default:
+        return -1;
+    }
+  }
+
+  List<Map<String, dynamic>> _buildServerFilters({
+    String? statusOverride,
+    String? sectionOverride,
+    String? adid,
+    String? chucVu,
+  }) {
+    final List<Map<String, dynamic>> filters = [];
+    final statusFilter = statusOverride ?? selectedStatus.value;
+    // Status mapping (aggregate cases first)
+    if (statusFilter.isNotEmpty && statusFilter != 'all') {
+      if (statusFilter == 'Not Done') {
+        filters.add({
+          'field': 'INT_STATUS_ID',
+          'value': ['1', '2', '3', '4', '5', '6', '7', '8'],
+          'operator': 'IN',
+          'logicType': 'AND',
+        });
+      } else if (statusFilter == 'approval') {
+        filters.add({
+          'field': 'INT_STATUS_ID',
+          'value': ['6', '7', '8'],
+          'operator': 'IN',
+          'logicType': 'AND',
+        });
+      } else if (statusFilter == 'PTHC') {
+        filters.add({
+          'field': 'INT_STATUS_ID',
+          'value': ['3', '4'],
+          'operator': 'IN',
+          'logicType': 'AND',
+        });
+      } else if (statusFilter == 'Chief') {
+        filters.add({
+          'field': 'INT_STATUS_ID',
+          'value': ['4', '5'],
+          'operator': 'IN',
+          'logicType': 'AND',
+        });
+      } else {
+        final id = _statusStringToId(statusFilter).toString();
+        if (id != '-1') {
+          filters.add({
+            'field': 'INT_STATUS_ID',
+            'value': id,
+            'operator': '=',
+            'logicType': 'AND',
+          });
+        }
+      }
+    }
+
+    final sectionVal = sectionOverride ?? departmentQuery.value;
+    if (sectionVal.isNotEmpty) {
+      filters.add({
+        'field': 'VCHR_CODE_SECTION',
+        'value': '%$sectionVal%',
+        'operator': 'LIKE',
+        'logicType': 'AND',
+      });
+    }
+    if (approverCodeQuery.value.isNotEmpty) {
+      filters.add({
+        'field': 'VCHR_CODE_APPROVER',
+        'value': '%${approverCodeQuery.value}%',
+        'operator': 'LIKE',
+        'logicType': 'AND',
+      });
+    }
+    if (employeeIdQuery.value.isNotEmpty) {
+      filters.add({
+        'field': 'VCHR_EMPLOYEE_ID',
+        'value': '%${employeeIdQuery.value}%',
+        'operator': 'LIKE',
+        'logicType': 'AND',
+      });
+    }
+    if (employeeNameQuery.value.isNotEmpty) {
+      filters.add({
+        'field': 'VCHR_EMPLOYEE_NAME',
+        'value': '%${employeeNameQuery.value}%',
+        'operator': 'LIKE',
+        'logicType': 'AND',
+      });
+    }
+    if (groupQuery.value.isNotEmpty) {
+      filters.add({
+        'field': 'CHR_COST_CENTER_NAME',
+        'value': '%${groupQuery.value}%',
+        'operator': 'LIKE',
+        'logicType': 'AND',
+      });
+    }
+
+    // Optional approver column restriction based on status & role (similar to fetchDataBy logic)
+    if (adid != null && adid.isNotEmpty) {
+      String col = '';
+      switch (statusFilter) {
+        case 'Per':
+          col = 'USER_APPROVER_PER';
+          break;
+        case 'PTHC':
+          col = 'VCHR_PTHC_SECTION';
+          break;
+        case 'Leader':
+          col = 'VCHR_LEADER_EVALUTION';
+          break;
+        case 'Chief':
+          col = 'USER_APPROVER_CHIEF';
+          break;
+        case 'QLTC':
+          col = 'USER_APPROVER_SECTION_MANAGER';
+          break;
+        case 'QLCC':
+          col = 'USER_APPROVER_DEFT';
+          break;
+        case 'Director':
+          col = 'USER_APPROVER_DIRECTOR';
+          break;
+      }
+      if (col.isNotEmpty &&
+          statusFilter != 'PTHC' &&
+          statusFilter != 'approval' &&
+          statusFilter != 'Chief') {
+        filters.add({
+          'field': col,
+          'value': adid,
+          'operator': '=',
+          'logicType': 'AND',
+        });
+      }
+    }
+    return filters;
+  }
+
+  Future<void> fetchPagedTwoContracts({
+    int? pageNumber,
+    String? statusOverride,
+    String? sectionOverride,
+    String? adid,
+    String? chucVu,
+  }) async {
+    try {
+      isLoading(true);
+      final page = pageNumber ?? currentPage.value;
+      final filters = _buildServerFilters(
+        statusOverride: statusOverride,
+        sectionOverride: sectionOverride,
+        adid: adid,
+        chucVu: chucVu,
+      );
+      final requestBody = {
+        'pageNumber': page,
+        'pageSize': pageSize.value,
+        'filters': filters,
+      };
+      final response = await http.post(
+        Uri.parse(Common.API + Common.TwoSreachBy),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final wrapper = jsonData['data'];
+          final List<dynamic> rawData =
+              (wrapper is Map && wrapper['data'] != null)
+              ? wrapper['data']
+              : [];
+          totalPages.value = (wrapper is Map && wrapper['totalPages'] != null)
+              ? wrapper['totalPages'] ?? 1
+              : 1;
+          totalCount.value = (wrapper is Map && wrapper['totalCount'] != null)
+              ? wrapper['totalCount'] ?? rawData.length
+              : rawData.length;
+          currentPage.value = (wrapper is Map && wrapper['pageIndex'] != null)
+              ? (wrapper['pageIndex'] ?? page)
+              : page;
+          dataList.assignAll(
+            rawData.map((e) => TwoContract.fromJson(e)).toList(),
+          );
+          filterdataList.assignAll(dataList);
+          originalList.assignAll(
+            dataList,
+          ); // page snapshot for change detection
+          selectRows.assignAll(List.generate(dataList.length, (_) => false));
+        } else {
+          throw Exception(
+            jsonData['message'] ?? 'Failed to load Two contracts',
+          );
+        }
+      } else {
+        throw Exception(
+          'Failed to load Two contracts (status ${response.statusCode})',
+        );
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch page: $e');
+    } finally {
+      isLoading(false);
+    }
   }
 
   // Old individual filter methods removed in favor of applyFilters().
@@ -546,13 +780,12 @@ class DashboardControllerTwo extends GetxController {
               adid.isNotEmpty) {
             // Local filtering for approval users
             final filtered = data.where((a) {
-                    return ((a['inT_STATUS_ID'] == 7 &&
-                          a['useR_APPROVER_DEFT'] == adid) ||
-                      (a['inT_STATUS_ID'] == 8 &&
-                          a['useR_APPROVER_DIRECTOR'] == adid)
-                      ||(a['inT_STATUS_ID'] == 6 &&
-                          a['useR_APPROVER_SECTION_MANAGER'] == adid)
-                      );
+              return ((a['inT_STATUS_ID'] == 7 &&
+                      a['useR_APPROVER_DEFT'] == adid) ||
+                  (a['inT_STATUS_ID'] == 8 &&
+                      a['useR_APPROVER_DIRECTOR'] == adid) ||
+                  (a['inT_STATUS_ID'] == 6 &&
+                      a['useR_APPROVER_SECTION_MANAGER'] == adid));
               // switch (chucVu) {
               //   case "Section Manager":
               //     return a['inT_STATUS_ID'] != null &&
@@ -793,31 +1026,31 @@ class DashboardControllerTwo extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
-          final sectionItems = pthcList.where(
-            (item) => item.section == contract.vchRCodeSection,
-          );
-          final ccSet = <String>{};
-          final toSet = <String>{};
-          for (final item in sectionItems) {
-            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
-              ccSet.add(item.mailcc!.trim());
-            }
-            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
-              toSet.add(item.mailto!.trim());
-            }
+        // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+        final sectionItems = pthcList.where(
+          (item) => item.section == contract.vchRCodeSection,
+        );
+        final ccSet = <String>{};
+        final toSet = <String>{};
+        for (final item in sectionItems) {
+          if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+            ccSet.add(item.mailcc!.trim());
           }
-          if (specialSection.mailcc != null &&
-              specialSection.mailcc!.trim().isNotEmpty) {
-            ccSet.add(specialSection.mailcc!.trim());
+          if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+            toSet.add(item.mailto!.trim());
           }
-          if (specialSection.mailto != null &&
-              specialSection.mailto!.trim().isNotEmpty) {
-            toSet.add(specialSection.mailto!.trim());
-          }
-          final ccEmails = ccSet.join(';');
-          final toEmails = toSet.join(';');
-          final controlleruser = Get.put(DashboardControllerUser());
+        }
+        if (specialSection.mailcc != null &&
+            specialSection.mailcc!.trim().isNotEmpty) {
+          ccSet.add(specialSection.mailcc!.trim());
+        }
+        if (specialSection.mailto != null &&
+            specialSection.mailto!.trim().isNotEmpty) {
+          toSet.add(specialSection.mailto!.trim());
+        }
+        final ccEmails = ccSet.join(';');
+        final toEmails = toSet.join(';');
+        final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           '${specialSection.mailto};$toEmails',
           ccEmails,
@@ -1345,7 +1578,7 @@ class DashboardControllerTwo extends GetxController {
           // );
         }
         // mail canh bao
-        //Special case for section 
+        //Special case for section
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
@@ -2346,7 +2579,7 @@ class DashboardControllerTwo extends GetxController {
       );
       if (response.statusCode == 200) {
         // mail canh bao
-        //Special case for section 
+        //Special case for section
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",

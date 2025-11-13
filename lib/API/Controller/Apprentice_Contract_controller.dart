@@ -26,6 +26,12 @@ class DashboardControllerApprentice extends GetxController {
   final employeeNameQuery = ''.obs;
   final departmentQuery = ''.obs;
   final groupQuery = ''.obs;
+  // =========== Server side pagination state ===========
+  final currentPage = 1.obs; // pageIndex from API (1-based)
+  final pageSize = 50.obs; // pageSize used in request
+  final totalPages = 0.obs; // totalPages from API
+  final totalCount = 0.obs; // totalCount from API
+  // =====================================================
   RxList<bool> selectRows = <bool>[].obs;
   RxInt sortCloumnIndex = 0.obs;
   RxBool sortAscending = true.obs;
@@ -45,6 +51,222 @@ class DashboardControllerApprentice extends GetxController {
     super.onInit();
     //fetchDummyData();
     //fetchDataBy(statusId: currentStatusId.value);
+  }
+
+  // Build filters for server-side search based on current UI state
+  List<Map<String, dynamic>> _buildServerFilters(
+    String chucVu, {
+    String? section,
+  }) {
+    final List<Map<String, dynamic>> filters = [];
+    // Status filter
+    if (selectedStatus.value.isEmpty || selectedStatus.value == 'all') {
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": "",
+        "operator": "is Not Null",
+        "logicType": "AND",
+      });
+    } else if (selectedStatus.value == 'Not Done') {
+      // Not Done = status != 9 (backend may not support !=; fallback to IN of all except 9)
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": [1, 2, 3, 4, 5, 6, 7, 8],
+        "operator": "IN",
+        "logicType": "AND",
+      });
+    } else {
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": _mapStatusToId(selectedStatus.value),
+        "operator": "=",
+        "logicType": "AND",
+      });
+    }
+
+    // Text filters (LIKE)
+    if (approverCodeQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_CODE_APPROVER",
+        "value": "%${approverCodeQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    if (employeeIdQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_EMPLOYEE_ID",
+        "value": "%${employeeIdQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    if (employeeNameQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_EMPLOYEE_NAME",
+        "value": "%${employeeNameQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    //----------------- trường hợp là quản lý các phòng ban --------------------\\
+    switch (chucVu) {
+      case "PTHC":
+      case "Section Manager":
+        // Lọc theo section thông qua search API
+        // Có 2 trường hợp đầu vào:
+        // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
+        // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+        List<String> sectionValues;
+        final trimmed = section == null ? "" : section.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          try {
+            final decoded = json.decode(trimmed);
+            if (decoded is List) {
+              sectionValues = decoded.map((e) => e.toString().trim()).toList();
+            } else {
+              sectionValues = [trimmed];
+            }
+          } catch (_) {
+            sectionValues = [trimmed];
+          }
+        } else {
+          sectionValues = [trimmed];
+        }
+
+        filters.add({
+          "field": "VCHR_CODE_SECTION",
+          "value": sectionValues,
+          "operator": "IN",
+          "logicType": "AND",
+        });
+        break;
+      case "Dept":
+      case "Dept Manager":
+        filters.add({
+          "field": "VCHR_CODE_SECTION",
+          "value": "%$section%",
+          "operator": "LIKE",
+          "logicType": "AND",
+        });
+        break;
+      case "Director":
+      case "General Director":
+        if (section == null || section.isEmpty) {
+          throw Exception('Section is required for Director role');
+        }
+        List<String> sectionValues = section.split(",");
+        for (var a in sectionValues) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": '%${a.trim()}%',
+            "operator": "LIKE",
+            "logicType": "OR",
+          });
+        }
+      default:
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_NAME_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+        }
+        break;
+    }
+    if (groupQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "CHR_COST_CENTER_NAME",
+        "value": "%${groupQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    return filters;
+  }
+
+  dynamic _mapStatusToId(String status) {
+    switch (status) {
+      case 'New':
+        return 1;
+      case 'Per':
+      case 'Per/人事課の中級管理職':
+        return 2;
+      case 'PTHC':
+        return 3;
+      case 'Leader':
+        return 4;
+      case 'Chief':
+        return 5;
+      case 'QLTC':
+      case 'QLTC/中級管理職':
+        return 6;
+      case 'QLCC':
+      case 'QLCC/上級管理職':
+        return 7;
+      case 'Director':
+      case 'Director/管掌取締役':
+        return 8;
+      case 'Done':
+        return 9;
+      default:
+        return 1;
+    }
+  }
+
+  // Server-side pagination & filtering fetch
+  Future<void> fetchPagedApprenticeContracts({
+    int? page,
+    int? size,
+    String? chucVu,
+    String? section,
+  }) async {
+    try {
+      isLoading(true);
+      if (page != null) currentPage.value = page;
+      if (size != null) pageSize.value = size;
+      final body = {
+        "pageNumber": currentPage.value,
+        "pageSize": pageSize.value,
+        "filters": _buildServerFilters(chucVu ?? '', section: section),
+        "sortOptions": [
+          {"field": "DTM_CREATE", "sortDirection": "desc"},
+        ],
+      };
+      print('fetchDummyData request: ${json.encode(body)}');
+      final response = await http.post(
+        Uri.parse(Common.API + Common.ApprenticeSreachBy),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(body),
+      );
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true) {
+          final dataObj = jsonData['data'] ?? {};
+          totalPages.value = dataObj['totalPages'] ?? 0;
+          totalCount.value = dataObj['totalCount'] ?? 0;
+          pageSize.value = dataObj['pageSize'] ?? pageSize.value;
+          currentPage.value = dataObj['pageIndex'] ?? currentPage.value;
+          final List<dynamic> rows = dataObj['data'] ?? [];
+          dataList.assignAll(
+            rows.map((e) => ApprenticeContract.fromJson(e)).toList(),
+          );
+          filterdataList.assignAll(dataList); // current page data
+          selectRows.assignAll(
+            List.generate(filterdataList.length, (_) => false),
+          );
+        } else {
+          throw Exception(jsonData['message'] ?? 'Fetch failed');
+        }
+      } else {
+        throw Exception('HTTP ${response.statusCode}');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch paged data: $e');
+    } finally {
+      isLoading(false);
+    }
   }
 
   ApprenticeContract? _byEmp(String employeeCode) {
@@ -749,31 +971,31 @@ class DashboardControllerApprentice extends GetxController {
         final specialSection = pthcList.firstWhere(
           (item) => item.section == "1120-1 : ADM-PER",
         );
-          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
-          final sectionItems = pthcList.where(
-            (item) => item.section == contract.vchRCodeSection,
-          );
-          final ccSet = <String>{};
-          final toSet = <String>{};
-          for (final item in sectionItems) {
-            if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
-              ccSet.add(item.mailcc!.trim());
-            }
-            if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
-              toSet.add(item.mailto!.trim());
-            }
+        // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+        final sectionItems = pthcList.where(
+          (item) => item.section == contract.vchRCodeSection,
+        );
+        final ccSet = <String>{};
+        final toSet = <String>{};
+        for (final item in sectionItems) {
+          if (item.mailcc != null && item.mailcc!.trim().isNotEmpty) {
+            ccSet.add(item.mailcc!.trim());
           }
-          if (specialSection.mailcc != null &&
-              specialSection.mailcc!.trim().isNotEmpty) {
-            ccSet.add(specialSection.mailcc!.trim());
+          if (item.mailto != null && item.mailto!.trim().isNotEmpty) {
+            toSet.add(item.mailto!.trim());
           }
-          if (specialSection.mailto != null &&
-              specialSection.mailto!.trim().isNotEmpty) {
-            toSet.add(specialSection.mailto!.trim());
-          }
-          final ccEmails = ccSet.join(';');
-          final toEmails = toSet.join(';');
-          final controlleruser = Get.put(DashboardControllerUser());
+        }
+        if (specialSection.mailcc != null &&
+            specialSection.mailcc!.trim().isNotEmpty) {
+          ccSet.add(specialSection.mailcc!.trim());
+        }
+        if (specialSection.mailto != null &&
+            specialSection.mailto!.trim().isNotEmpty) {
+          toSet.add(specialSection.mailto!.trim());
+        }
+        final ccEmails = ccSet.join(';');
+        final toEmails = toSet.join(';');
+        final controlleruser = Get.put(DashboardControllerUser());
         controlleruser.SendMailCustom(
           '${specialSection.mailto};$toEmails',
           ccEmails,
@@ -2449,7 +2671,7 @@ class DashboardControllerApprentice extends GetxController {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",
           );
-                   // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
+          // Tối ưu lấy email cc và to, loại bỏ trùng lặp, kiểm tra null/empty một lần
           final sectionItems = pthcList.where(
             (item) => item.section == sectionAp,
           );
@@ -2535,7 +2757,7 @@ class DashboardControllerApprentice extends GetxController {
       );
       if (response.statusCode == 200) {
         // mail canh bao
-        //Special case for section 
+        //Special case for section
         if (notApproval.isNotEmpty) {
           final specialSection = pthcList.firstWhere(
             (item) => item.section == "1120-1 : ADM-PER",

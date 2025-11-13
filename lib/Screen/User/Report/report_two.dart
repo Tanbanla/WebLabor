@@ -40,9 +40,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   // Pagination customization
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
-  int _rowsPerPage = 50;
-  int _firstRowIndex = 0; // track first row of current page
-  final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  // Server-side pagination options
+  final List<int> _availableServerRowsPerPage = const [50, 100, 150, 200];
   bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
   void initState() {
@@ -362,7 +361,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                 );
               }).toList(),
               onChanged: (value) {
-                controller.updateStatus(value);
+                controller.selectedStatus.value = value ?? '';
+                controller.fetchPagedTwoContracts();
               },
               dropdownColor: Colors.white,
               icon: Icon(
@@ -391,7 +391,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               width: fw(240),
               hint: tr('DotDanhGia'),
               icon: Iconsax.document_filter,
-              onChanged: (v) => controller.updateApproverCode(v),
+              onChanged: (v) => {
+                //controller.updateApproverCode(v)
+                controller.approverCodeQuery.value = v,
+                controller.fetchPagedTwoContracts(),
+              },
             ),
           ),
           statusDropdown,
@@ -401,7 +405,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               width: fw(140),
               hint: tr('employeeCode'),
               icon: Iconsax.tag,
-              onChanged: (v) => controller.updateEmployeeId(v),
+              onChanged: (v) => {
+                //controller.updateEmployeeId(v),
+                controller.employeeIdQuery.value = v,
+                controller.fetchPagedTwoContracts(),
+              },
             ),
           ),
           SizedBox(
@@ -410,7 +418,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               width: fw(240),
               hint: tr('fullName'),
               icon: Iconsax.user,
-              onChanged: (v) => controller.updateEmployeeName(v),
+              onChanged: (v) => {
+                //controller.updateEmployeeName(v)},
+                controller.employeeNameQuery.value = v,
+                controller.fetchPagedTwoContracts(),
+              },
             ),
           ),
           SizedBox(
@@ -482,7 +494,9 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                         )
                         .toList(),
                 onChanged: (value) {
-                  controller.updateDepartment(value ?? '');
+                  //controller.updateDepartment(value ?? '');
+                  controller.departmentQuery.value = value ?? '';
+                  controller.fetchPagedTwoContracts();
                 },
                 icon: Icon(
                   Icons.arrow_drop_down,
@@ -500,14 +514,19 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               width: fw(140),
               hint: tr('group'),
               icon: Iconsax.people,
-              onChanged: (v) => controller.updateGroup(v),
+              onChanged: (v) => {
+                controller.groupQuery.value = v,
+                controller.fetchPagedTwoContracts(),
+              },
             ),
           ),
           buildActionButton(
             icon: Iconsax.refresh,
             color: Colors.blue,
             tooltip: tr('Rfilter'),
-            onPressed: () => controller.refreshFilteredList(),
+            onPressed: () => {
+              controller.refreshSearch(),
+              controller.fetchPagedTwoContracts(),},
           ),
           buildActionButton(
             icon: Iconsax.export,
@@ -585,7 +604,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         child: Column(
           children: [
             Expanded(child: _buildFrozenBody()),
-            _buildCustomPaginator(),
+            _buildServerPaginator(),
           ],
         ),
       ),
@@ -596,16 +615,10 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     final authState = Provider.of<AuthState>(context, listen: true);
     final dataSource = MyData(context);
     final total = controller.filterdataList.length;
-    if (_firstRowIndex >= total && total > 0) {
-      _firstRowIndex = (total - 1) - ((total - 1) % _rowsPerPage);
-    }
-    final endIndex = (_firstRowIndex + _rowsPerPage) > total
-        ? total
-        : (_firstRowIndex + _rowsPerPage);
-    final visibleCount = endIndex - _firstRowIndex;
+    // Server-side pagination: we only have one page worth of data in filterdataList.
     final fullRows = List.generate(
-      visibleCount,
-      (i) => dataSource.getRow(_firstRowIndex + i) as DataRow2,
+      total,
+      (i) => dataSource.getRow(i) as DataRow2,
     );
     final bool showAction =
         authState.user?.chRGroup == 'Admin' ||
@@ -902,165 +915,131 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
     );
   }
 
-  Widget _buildCustomPaginator() {
-    final total = controller.filterdataList.length;
-    final start = total == 0 ? 0 : _firstRowIndex + 1;
-    final end = (_firstRowIndex + _rowsPerPage) > total
-        ? total
-        : (_firstRowIndex + _rowsPerPage);
-
-    final isFirstPage = _firstRowIndex == 0;
-    final isLastPage = end >= total;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(
-          top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+  Widget _buildServerPaginator() {
+    return Obx(() {
+      final isFirst = controller.currentPage.value <= 1;
+      final isLast =
+          controller.currentPage.value >= controller.totalPages.value;
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border(
+            top: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left side - Rows per page selector
-          Row(
-            children: [
-              Text(
-                tr('rowsPerPage'),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: DropdownButton<int>(
-                  value: _rowsPerPage,
-                  underline: const SizedBox(), // Remove default underline
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-                  style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                  items: _availableRowsPerPage
-                      .map(
-                        (e) => DropdownMenuItem<int>(
-                          value: e,
-                          child: Text(
-                            '$e',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() {
-                        _rowsPerPage = v;
-                        _firstRowIndex = 0;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          // Center - Page info
-          Text(
-            '$start - $end / $total',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          // Right side - Navigation buttons
-          Row(
-            children: [
-              // First page
-              IconButton(
-                icon: Icon(Icons.first_page, size: 20),
-                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('firstPage'),
-                onPressed: isFirstPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = 0;
-                        });
-                      },
-              ),
-
-              // Previous page
-              IconButton(
-                icon: Icon(Icons.chevron_left, size: 24),
-                color: isFirstPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('previousPage'),
-                onPressed: isFirstPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = (_firstRowIndex - _rowsPerPage)
-                              .clamp(0, total);
-                        });
-                      },
-              ),
-
-              // Page indicator (optional)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  '${(_firstRowIndex ~/ _rowsPerPage) + 1}',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  tr('rowsPerPage'),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[700],
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                const SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.grey[300]!, width: 1),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: DropdownButton<int>(
+                    value: controller.pageSize.value,
+                    underline: const SizedBox(),
+                    icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                    items: _availableServerRowsPerPage
+                        .map(
+                          (e) => DropdownMenuItem<int>(
+                            value: e,
+                            child: Text(
+                              '$e',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) async {
+                      if (v != null) {
+                        controller.pageSize.value = v;
+                        await controller.fetchPagedTwoContracts(pageNumber: 1);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              'Page ${controller.currentPage.value} / ${controller.totalPages.value}', //• ${controller.totalCount.value}
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
               ),
-
-              // Next page
-              IconButton(
-                icon: Icon(Icons.chevron_right, size: 24),
-                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('nextPage'),
-                onPressed: isLastPage
-                    ? null
-                    : () {
-                        setState(() {
-                          _firstRowIndex = (_firstRowIndex + _rowsPerPage)
-                              .clamp(0, (total - 1).clamp(0, total));
-                        });
-                      },
-              ),
-
-              // Last page
-              IconButton(
-                icon: Icon(Icons.last_page, size: 20),
-                color: isLastPage ? Colors.grey[400] : Colors.blue[600],
-                tooltip: tr('lastPage'),
-                onPressed: isLastPage
-                    ? null
-                    : () {
-                        setState(() {
-                          final remainder = total % _rowsPerPage;
-                          _firstRowIndex = remainder == 0
-                              ? total - _rowsPerPage
-                              : total - remainder;
-                        });
-                      },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.first_page, size: 20),
+                  color: isFirst ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('firstPage'),
+                  onPressed: isFirst
+                      ? null
+                      : () async =>
+                            controller.fetchPagedTwoContracts(pageNumber: 1),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, size: 24),
+                  color: isFirst ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('previousPage'),
+                  onPressed: isFirst
+                      ? null
+                      : () async => controller.fetchPagedTwoContracts(
+                          pageNumber: controller.currentPage.value - 1,
+                        ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    '${controller.currentPage.value}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, size: 24),
+                  color: isLast ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('nextPage'),
+                  onPressed: isLast
+                      ? null
+                      : () async => controller.fetchPagedTwoContracts(
+                          pageNumber: controller.currentPage.value + 1,
+                        ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.last_page, size: 20),
+                  color: isLast ? Colors.grey[400] : Colors.blue[600],
+                  tooltip: tr('lastPage'),
+                  onPressed: isLast
+                      ? null
+                      : () async => controller.fetchPagedTwoContracts(
+                          pageNumber: controller.totalPages.value,
+                        ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _showExportDialog() {
@@ -1441,7 +1420,11 @@ class MyData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              (index + 1).toString(),
+              (((controller.currentPage.value - 1) *
+                          controller.pageSize.value) +
+                      index +
+                      1)
+                  .toString(),
               style: TextStyle(
                 color: Colors.blue[800],
                 fontSize: Common.sizeColumn,
