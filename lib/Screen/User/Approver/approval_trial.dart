@@ -108,8 +108,19 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     controller.isLoading.value = true;
     try {
       // Gọi API / xử lý cần thiết  userId
-      if (controller.listSection.isEmpty) {
-        await controller.fetchSectionList(section, groupId);
+      if (groupId == "Dept" || groupId == "Dept Manager") {
+        // Tìm vị trí bắt đầu của phần dept
+        List<String> parts = (section).split(": ");
+        String prPart = parts[1];
+
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
+        await controller.fetchSectionList(dept, groupId);
+      } else {
+        if (controller.listSection.isEmpty) {
+          await controller.fetchSectionList(section, groupId);
+        }
       }
 
       await controller.fetchPTHCData();
