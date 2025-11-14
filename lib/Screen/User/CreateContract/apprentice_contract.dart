@@ -78,7 +78,9 @@ class _ApprenticeContractScreenState extends State<ApprenticeContractScreen> {
   @override
   Widget build(BuildContext context) {
     controller.refreshSearch();
-    controller.fetchSectionList();
+    if (controller.listSection.isEmpty){
+      controller.fetchSectionList(null, "Admin");
+    }
     controller.changeStatus('1', null, null, null);
     return Scaffold(
       backgroundColor: Colors.grey[50],

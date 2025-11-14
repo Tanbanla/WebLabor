@@ -108,7 +108,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     controller.isLoading.value = true;
     try {
       // Gọi API / xử lý cần thiết  userId
-      await controller.fetchSectionList();
+      if (controller.listSection.isEmpty) {
+        await controller.fetchSectionList(section, groupId);
+      }
+
       await controller.fetchPTHCData();
       controller.refreshSearch();
       controller.changeStatus('approval', null, userId, groupId);

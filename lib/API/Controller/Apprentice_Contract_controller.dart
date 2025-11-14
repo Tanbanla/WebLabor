@@ -113,10 +113,7 @@ class DashboardControllerApprentice extends GetxController {
     switch (chucVu) {
       case "PTHC":
       case "Section Manager":
-        // Lọc theo section thông qua search API
-        // Có 2 trường hợp đầu vào:
-        // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
-        // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+        // Lọc theo section thông qua search
         List<String> sectionValues;
         final trimmed = section == null ? "" : section.trim();
         if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
@@ -133,16 +130,39 @@ class DashboardControllerApprentice extends GetxController {
         } else {
           sectionValues = [trimmed];
         }
-
-        filters.add({
-          "field": "VCHR_CODE_SECTION",
-          "value": sectionValues,
-          "operator": "IN",
-          "logicType": "AND",
-        });
-        break;
+        // chọn có trong phòng ban không
+        // final checkS = sectionValues
+        //     .where((element) => element == departmentQuery.value)
+        //     .toList();
+        if (departmentQuery.value.isNotEmpty) {
+          //&& checkS.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        } else {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": sectionValues,
+            "operator": "IN",
+            "logicType": "AND",
+          });
+          break;
+        }
       case "Dept":
       case "Dept Manager":
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        }
         filters.add({
           "field": "VCHR_CODE_SECTION",
           "value": "%$section%",
@@ -155,6 +175,15 @@ class DashboardControllerApprentice extends GetxController {
         if (section == null || section.isEmpty) {
           throw Exception('Section is required for Director role');
         }
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        }
         List<String> sectionValues = section.split(",");
         for (var a in sectionValues) {
           filters.add({
@@ -164,10 +193,11 @@ class DashboardControllerApprentice extends GetxController {
             "logicType": "OR",
           });
         }
+        break;
       default:
         if (departmentQuery.value.isNotEmpty) {
           filters.add({
-            "field": "VCHR_NAME_SECTION",
+            "field": "VCHR_CODE_SECTION",
             "value": "%${departmentQuery.value}%",
             "operator": "LIKE",
             "logicType": "AND",
@@ -2585,7 +2615,7 @@ class DashboardControllerApprentice extends GetxController {
   }
 
   // lay thong tin section
-  Future<void> fetchSectionList() async {
+  Future<void> fetchSectionList(String? section, String? chucVu) async {
     try {
       //isLoading(true);
       final response = await http.get(
@@ -2597,7 +2627,72 @@ class DashboardControllerApprentice extends GetxController {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           final List<dynamic> data = jsonData['data'];
-          listSection.assignAll(data.map((item) => item.toString()).toList());
+          switch (chucVu) {
+            case "PTHC":
+            case "Section Manager":
+              // Lọc theo section thông qua search API
+              // Có 2 trường hợp đầu vào:
+              // 1) section = "2100: PR1-PR1" (chuỗi đơn) => value phải là ["2100: PR1-PR1"]
+              // 2) section = '["2100: PR1-PR1", "1234: ABC-XYZ"]' (chuỗi JSON list) => parse ra List
+              List<String> sectionValues;
+              final trimmed = section == null ? "" : section.trim();
+              if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                try {
+                  final decoded = json.decode(trimmed);
+                  if (decoded is List) {
+                    sectionValues = decoded
+                        .map((e) => e.toString().trim())
+                        .toList();
+                  } else {
+                    sectionValues = [trimmed];
+                  }
+                } catch (_) {
+                  sectionValues = [trimmed];
+                }
+              } else {
+                sectionValues = [trimmed];
+              }
+              listSection.assignAll(sectionValues);
+              break;
+            case "Dept":
+            case "Dept Manager":
+              // Lọc theo dept thông qua search API
+              listSection.assignAll(
+                data
+                    .where((item) => item.toString().contains(section ?? ""))
+                    .map((item) => item.toString())
+                    .toList(),
+              );
+              break;
+            case "Director":
+            case "General Director":
+              if (section == null || section.isEmpty) {
+                throw Exception('Section is required for Director role');
+              }
+              List<String> sectionValues = section.split(",");
+              listSection.assignAll(
+                data
+                    .where((item) {
+                      String itemString = item.toString();
+                      return sectionValues.any(
+                        (section) => itemString.contains(section),
+                      );
+                    })
+                    .map((item) => item.toString())
+                    .toList(),
+              );
+              break;
+            case "Admin":
+            case "Per":
+              // Lấy toàn bộ danh sách (không lọc)
+              listSection.addAll(data.map((item) => item.toString()).toList());
+              break;
+            default:
+              // Lấy toàn bộ danh sách (không lọc theo section)
+              listSection.add(section ?? "");
+              break;
+          }
+          // listSection.assignAll(data.map((item) => item.toString()).toList());
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to load data');
         }

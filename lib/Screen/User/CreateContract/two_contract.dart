@@ -78,7 +78,9 @@ class _TwoContractScreenState extends State<TwoContractScreen> {
   Widget build(BuildContext context) {
     controller.refreshSearch();
     controller.changeStatus('1', null, null, null);
-    controller.fetchSectionList();
+    if (controller.listSection.isEmpty) {
+      controller.fetchSectionList(null, "Admin");
+    }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Padding(

@@ -56,7 +56,6 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       final authState = Provider.of<AuthState>(context, listen: false);
       controller.refreshSearch();
       controller.fetchPTHCData();
-      await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
 
@@ -114,6 +113,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'PTHC');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -127,6 +129,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(null, 'Per');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -135,6 +140,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           break;
         case 'Admin':
           controller.changeStatus('PTHC', null, null, null);
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(null, 'Admin');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -149,6 +157,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Chief');
+          }
           await controllerUserApprover.changeStatus(
             sectionName,
             'Section Manager',
@@ -180,6 +191,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Section Manager');
+          }
           controllerUserApprover.changeStatus('', 'Dept Manager', dept);
           break;
         default:
@@ -189,6 +203,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Leader');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Chief,Expert',

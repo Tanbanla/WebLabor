@@ -96,7 +96,9 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
     try {
-      await controller.fetchSectionList();
+      if (controller.listSection.isEmpty) {
+        await controller.fetchSectionList(section, chucVu);
+      }
       await controller.fetchPTHCData();
       controller.refreshSearch();
       controller.changeStatus('approval', null, userId, chucVu);

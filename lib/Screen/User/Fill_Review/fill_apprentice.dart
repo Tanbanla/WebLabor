@@ -59,7 +59,6 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
       controller.refreshSearch();
       controller.fetchPTHCData();
-      await controller.fetchSectionList();
       await _prepareStatus(authState);
     });
 
@@ -117,6 +116,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'PTHC');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -130,6 +132,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(null, 'Per');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -138,6 +143,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           break;
         case 'Admin':
           controller.changeStatus('PTHC', null, null, null);
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(null, 'Admin');
+          }
           controllerUserApprover.changeStatus(
             sectionName,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
@@ -152,6 +160,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Chief');
+          }
           await controllerUserApprover.changeStatus(
             sectionName,
             'Section Manager',
@@ -176,6 +187,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             final prParts = parts[1].split('-');
             dept = prParts[0];
           }
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Section Manager');
+          }
           controller.changeStatus(
             'Chief',
             sectionName,
@@ -191,6 +205,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             authState.user!.chRUserid.toString(),
             null,
           );
+          if (controller.listSection.isEmpty) {
+            await controller.fetchSectionList(sectionName, 'Leader');
+          }
+
           controllerUserApprover.changeStatus(
             sectionName,
             'Chief,Expert',

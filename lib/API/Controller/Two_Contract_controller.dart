@@ -216,11 +216,175 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // ==================== Server-side pagination helpers ====================
-  int _statusStringToId(String s) {
-    switch (s) {
+  // Build filters for server-side search based on current UI state
+  List<Map<String, dynamic>> _buildServerFilters(
+    String chucVu, {
+    String? section,
+  }) {
+    final List<Map<String, dynamic>> filters = [];
+    // Status filter
+    if (selectedStatus.value.isEmpty || selectedStatus.value == 'all') {
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": "",
+        "operator": "is Not Null",
+        "logicType": "AND",
+      });
+    } else if (selectedStatus.value == 'Not Done') {
+      // Not Done = status != 9 (backend may not support !=; fallback to IN of all except 9)
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": [1, 2, 3, 4, 5, 6, 7, 8],
+        "operator": "IN",
+        "logicType": "AND",
+      });
+    } else {
+      filters.add({
+        "field": "INT_STATUS_ID",
+        "value": _mapStatusToId(selectedStatus.value),
+        "operator": "=",
+        "logicType": "AND",
+      });
+    }
+
+    // Text filters (LIKE)
+    if (approverCodeQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_CODE_APPROVER",
+        "value": "%${approverCodeQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    if (employeeIdQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_EMPLOYEE_ID",
+        "value": "%${employeeIdQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    if (employeeNameQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "VCHR_EMPLOYEE_NAME",
+        "value": "%${employeeNameQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    //----------------- trường hợp là quản lý các phòng ban --------------------\\
+    switch (chucVu) {
+      case "PTHC":
+      case "Section Manager":
+        // Lọc theo section thông qua search
+        List<String> sectionValues;
+        final trimmed = section == null ? "" : section.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          try {
+            final decoded = json.decode(trimmed);
+            if (decoded is List) {
+              sectionValues = decoded.map((e) => e.toString().trim()).toList();
+            } else {
+              sectionValues = [trimmed];
+            }
+          } catch (_) {
+            sectionValues = [trimmed];
+          }
+        } else {
+          sectionValues = [trimmed];
+        }
+        // chọn có trong phòng ban không
+        // final checkS = sectionValues
+        //     .where((element) => element == departmentQuery.value)
+        //     .toList();
+        if (departmentQuery.value.isNotEmpty) {
+          //&& checkS.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        } else {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": sectionValues,
+            "operator": "IN",
+            "logicType": "AND",
+          });
+          break;
+        }
+      case "Dept":
+      case "Dept Manager":
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        }
+        filters.add({
+          "field": "VCHR_CODE_SECTION",
+          "value": "%$section%",
+          "operator": "LIKE",
+          "logicType": "AND",
+        });
+        break;
+      case "Director":
+      case "General Director":
+        if (section == null || section.isEmpty) {
+          throw Exception('Section is required for Director role');
+        }
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+          break;
+        }
+        List<String> sectionValues = section.split(",");
+        for (var a in sectionValues) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": '%${a.trim()}%',
+            "operator": "LIKE",
+            "logicType": "OR",
+          });
+        }
+        break;
+      default:
+        if (departmentQuery.value.isNotEmpty) {
+          filters.add({
+            "field": "VCHR_CODE_SECTION",
+            "value": "%${departmentQuery.value}%",
+            "operator": "LIKE",
+            "logicType": "AND",
+          });
+        }
+        break;
+    }
+    if (groupQuery.value.isNotEmpty) {
+      filters.add({
+        "field": "CHR_COST_CENTER_NAME",
+        "value": "%${groupQuery.value}%",
+        "operator": "LIKE",
+        "logicType": "AND",
+      });
+    }
+    return filters;
+  }
+
+  dynamic _mapStatusToId(String status) {
+    switch (status) {
       case 'New':
         return 1;
       case 'Per':
+      case 'Per/人事課の中級管理職':
         return 2;
       case 'PTHC':
         return 3;
@@ -229,172 +393,40 @@ class DashboardControllerTwo extends GetxController {
       case 'Chief':
         return 5;
       case 'QLTC':
+      case 'QLTC/中級管理職':
         return 6;
       case 'QLCC':
+      case 'QLCC/上級管理職':
         return 7;
       case 'Director':
+      case 'Director/管掌取締役':
         return 8;
       case 'Done':
         return 9;
       default:
-        return -1;
+        return 1;
     }
-  }
-
-  List<Map<String, dynamic>> _buildServerFilters({
-    String? statusOverride,
-    String? sectionOverride,
-    String? adid,
-    String? chucVu,
-  }) {
-    final List<Map<String, dynamic>> filters = [];
-    final statusFilter = statusOverride ?? selectedStatus.value;
-    // Status mapping (aggregate cases first)
-    if (statusFilter.isNotEmpty && statusFilter != 'all') {
-      if (statusFilter == 'Not Done') {
-        filters.add({
-          'field': 'INT_STATUS_ID',
-          'value': ['1', '2', '3', '4', '5', '6', '7', '8'],
-          'operator': 'IN',
-          'logicType': 'AND',
-        });
-      } else if (statusFilter == 'approval') {
-        filters.add({
-          'field': 'INT_STATUS_ID',
-          'value': ['6', '7', '8'],
-          'operator': 'IN',
-          'logicType': 'AND',
-        });
-      } else if (statusFilter == 'PTHC') {
-        filters.add({
-          'field': 'INT_STATUS_ID',
-          'value': ['3', '4'],
-          'operator': 'IN',
-          'logicType': 'AND',
-        });
-      } else if (statusFilter == 'Chief') {
-        filters.add({
-          'field': 'INT_STATUS_ID',
-          'value': ['4', '5'],
-          'operator': 'IN',
-          'logicType': 'AND',
-        });
-      } else {
-        final id = _statusStringToId(statusFilter).toString();
-        if (id != '-1') {
-          filters.add({
-            'field': 'INT_STATUS_ID',
-            'value': id,
-            'operator': '=',
-            'logicType': 'AND',
-          });
-        }
-      }
-    }
-
-    final sectionVal = sectionOverride ?? departmentQuery.value;
-    if (sectionVal.isNotEmpty) {
-      filters.add({
-        'field': 'VCHR_CODE_SECTION',
-        'value': '%$sectionVal%',
-        'operator': 'LIKE',
-        'logicType': 'AND',
-      });
-    }
-    if (approverCodeQuery.value.isNotEmpty) {
-      filters.add({
-        'field': 'VCHR_CODE_APPROVER',
-        'value': '%${approverCodeQuery.value}%',
-        'operator': 'LIKE',
-        'logicType': 'AND',
-      });
-    }
-    if (employeeIdQuery.value.isNotEmpty) {
-      filters.add({
-        'field': 'VCHR_EMPLOYEE_ID',
-        'value': '%${employeeIdQuery.value}%',
-        'operator': 'LIKE',
-        'logicType': 'AND',
-      });
-    }
-    if (employeeNameQuery.value.isNotEmpty) {
-      filters.add({
-        'field': 'VCHR_EMPLOYEE_NAME',
-        'value': '%${employeeNameQuery.value}%',
-        'operator': 'LIKE',
-        'logicType': 'AND',
-      });
-    }
-    if (groupQuery.value.isNotEmpty) {
-      filters.add({
-        'field': 'CHR_COST_CENTER_NAME',
-        'value': '%${groupQuery.value}%',
-        'operator': 'LIKE',
-        'logicType': 'AND',
-      });
-    }
-
-    // Optional approver column restriction based on status & role (similar to fetchDataBy logic)
-    if (adid != null && adid.isNotEmpty) {
-      String col = '';
-      switch (statusFilter) {
-        case 'Per':
-          col = 'USER_APPROVER_PER';
-          break;
-        case 'PTHC':
-          col = 'VCHR_PTHC_SECTION';
-          break;
-        case 'Leader':
-          col = 'VCHR_LEADER_EVALUTION';
-          break;
-        case 'Chief':
-          col = 'USER_APPROVER_CHIEF';
-          break;
-        case 'QLTC':
-          col = 'USER_APPROVER_SECTION_MANAGER';
-          break;
-        case 'QLCC':
-          col = 'USER_APPROVER_DEFT';
-          break;
-        case 'Director':
-          col = 'USER_APPROVER_DIRECTOR';
-          break;
-      }
-      if (col.isNotEmpty &&
-          statusFilter != 'PTHC' &&
-          statusFilter != 'approval' &&
-          statusFilter != 'Chief') {
-        filters.add({
-          'field': col,
-          'value': adid,
-          'operator': '=',
-          'logicType': 'AND',
-        });
-      }
-    }
-    return filters;
   }
 
   Future<void> fetchPagedTwoContracts({
-    int? pageNumber,
-    String? statusOverride,
-    String? sectionOverride,
+    int? page,
+    int? size,
     String? adid,
     String? chucVu,
+    String? section,
   }) async {
     try {
       isLoading(true);
-      final page = pageNumber ?? currentPage.value;
-      final filters = _buildServerFilters(
-        statusOverride: statusOverride,
-        sectionOverride: sectionOverride,
-        adid: adid,
-        chucVu: chucVu,
-      );
+      if (page != null) currentPage.value = page;
+      if (size != null) pageSize.value = size;
+      final filters = _buildServerFilters(chucVu ?? '', section: section);
       final requestBody = {
-        'pageNumber': page,
+        'pageNumber': currentPage.value,
         'pageSize': pageSize.value,
         'filters': filters,
+        "sortOptions": [
+          {"field": "DTM_CREATE", "sortDirection": "desc"},
+        ],
       };
       final response = await http.post(
         Uri.parse(Common.API + Common.TwoSreachBy),
@@ -2494,7 +2526,34 @@ class DashboardControllerTwo extends GetxController {
   }
 
   // lay thong tin section
-  Future<void> fetchSectionList() async {
+  // Future<void> fetchSectionList() async {
+  //   try {
+  //     //isLoading(true);
+  //     final response = await http.get(
+  //       Uri.parse(Common.API + Common.UserSection),
+  //       headers: {'Content-Type': 'application/json'},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final jsonData = json.decode(response.body);
+  //       if (jsonData['success'] == true) {
+  //         final List<dynamic> data = jsonData['data'];
+  //         listSection.assignAll(data.map((item) => item.toString()).toList());
+  //       } else {
+  //         throw Exception(jsonData['message'] ?? 'Failed to load data');
+  //       }
+  //     } else {
+  //       throw Exception('Failed to load data');
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar('Error', 'Failed to fetch section data: $e');
+  //     rethrow;
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+  // lay thong tin section
+  Future<void> fetchSectionList(String? section, String? chucVu) async {
     try {
       //isLoading(true);
       final response = await http.get(
@@ -2506,7 +2565,68 @@ class DashboardControllerTwo extends GetxController {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
           final List<dynamic> data = jsonData['data'];
-          listSection.assignAll(data.map((item) => item.toString()).toList());
+          switch (chucVu) {
+            case "PTHC":
+            case "Section Manager":
+              List<String> sectionValues;
+              final trimmed = section == null ? "" : section.trim();
+              if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                try {
+                  final decoded = json.decode(trimmed);
+                  if (decoded is List) {
+                    sectionValues = decoded
+                        .map((e) => e.toString().trim())
+                        .toList();
+                  } else {
+                    sectionValues = [trimmed];
+                  }
+                } catch (_) {
+                  sectionValues = [trimmed];
+                }
+              } else {
+                sectionValues = [trimmed];
+              }
+              listSection.assignAll(sectionValues);
+              break;
+            case "Dept":
+            case "Dept Manager":
+              // Lọc theo dept thông qua search API
+              listSection.assignAll(
+                data
+                    .where((item) => item.toString().contains(section ?? ""))
+                    .map((item) => item.toString())
+                    .toList(),
+              );
+              break;
+            case "Director":
+            case "General Director":
+              if (section == null || section.isEmpty) {
+                throw Exception('Section is required for Director role');
+              }
+              List<String> sectionValues = section.split(",");
+              listSection.assignAll(
+                data
+                    .where((item) {
+                      String itemString = item.toString();
+                      return sectionValues.any(
+                        (section) => itemString.contains(section),
+                      );
+                    })
+                    .map((item) => item.toString())
+                    .toList(),
+              );
+              break;
+            case "Admin":
+            case "Per":
+              // Lấy toàn bộ danh sách (không lọc)
+              listSection.addAll(data.map((item) => item.toString()).toList());
+              break;
+            default:
+              // Lấy toàn bộ danh sách (không lọc theo section)
+              listSection.add(section ?? "");
+              break;
+          }
+          // listSection.assignAll(data.map((item) => item.toString()).toList());
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to load data');
         }

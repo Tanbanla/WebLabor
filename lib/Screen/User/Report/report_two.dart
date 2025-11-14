@@ -41,6 +41,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   // Server-side pagination options
+  int _rowsPerPage = 50;
   final List<int> _availableServerRowsPerPage = const [50, 100, 150, 200];
   bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
@@ -51,8 +52,6 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       final authState = Provider.of<AuthState>(context, listen: false);
       // Làm mới các dữ liệu tìm kiếm ban đầu (chỉ 1 lần)
       controller.refreshSearch();
-      controller.fetchSectionList();
-      await controller.fetchSectionList();
       await controller.fetchPTHCData();
       await _prepareStatus(authState);
     });
@@ -94,52 +93,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       await controllerPTHC.fetchPTHCSectionList(
         authState.user!.chRUserid.toString(),
       );
-      String sectionName = '';
-      if (authState.user!.chRGroup.toString() == "PTHC") {
-        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-          sectionName =
-              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-        } else {
-          final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
-          sectionName = parts.length >= 2
-              ? '${parts[0].trim()} : ${parts[1].trim()}'
-              : parts.firstOrNull?.trim() ?? '';
-        }
-        // truong hop PTHC phong ban
-        controller.fetchDummyData(sectionName, "PTHC");
-      } else {
-        switch (authState.user!.chRGroup.toString()) {
-          case "Section Manager":
-            await controller.fetchDummyData(
-              authState.user!.chRSecCode?.toString(),
-              "Section Manager",
-            );
-            break;
-          case "Dept Manager":
-          case "Dept":
-            // Tìm vị trí bắt đầu của phần dept
-            List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
-                .split(": ");
-            String prPart = parts[1];
-
-            // Tách phần phòng ban
-            List<String> prParts = prPart.split("-");
-            String dept = prParts[0];
-            await controller.fetchDummyData(dept, "Dept Manager");
-            break;
-          case "Director":
-          case "General Director":
-            // Tìm vị trí bắt đầu của phần dept
-            await controller.fetchDummyData(
-              authState.user!.chRSecCode?.toString(),
-              "Director",
-            );
-            break;
-          default:
-            await controller.fetchDummyData(null, null);
-            break;
-        }
-      }
+      await _phanQuyen(authState, 1, _rowsPerPage);
       _statusInitialized = true;
     } catch (e) {
       // Có thể log hoặc hiển thị lỗi nếu cần
@@ -281,6 +235,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
 
   Widget _buildSearchAndActions() {
     final DashboardControllerTwo controller = Get.find();
+    final authState = Provider.of<AuthState>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxW = constraints.maxWidth;
@@ -362,7 +317,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               }).toList(),
               onChanged: (value) {
                 controller.selectedStatus.value = value ?? '';
-                controller.fetchPagedTwoContracts();
+                _phanQuyen(authState, 1, _rowsPerPage);
               },
               dropdownColor: Colors.white,
               icon: Icon(
@@ -394,7 +349,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               onChanged: (v) => {
                 //controller.updateApproverCode(v)
                 controller.approverCodeQuery.value = v,
-                controller.fetchPagedTwoContracts(),
+                _phanQuyen(authState, 1, _rowsPerPage),
               },
             ),
           ),
@@ -408,7 +363,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               onChanged: (v) => {
                 //controller.updateEmployeeId(v),
                 controller.employeeIdQuery.value = v,
-                controller.fetchPagedTwoContracts(),
+                _phanQuyen(authState, 1, _rowsPerPage),
               },
             ),
           ),
@@ -421,7 +376,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               onChanged: (v) => {
                 //controller.updateEmployeeName(v)},
                 controller.employeeNameQuery.value = v,
-                controller.fetchPagedTwoContracts(),
+                _phanQuyen(authState, 1, _rowsPerPage),
               },
             ),
           ),
@@ -496,7 +451,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                 onChanged: (value) {
                   //controller.updateDepartment(value ?? '');
                   controller.departmentQuery.value = value ?? '';
-                  controller.fetchPagedTwoContracts();
+                  _phanQuyen(authState, 1, _rowsPerPage);
                 },
                 icon: Icon(
                   Icons.arrow_drop_down,
@@ -516,7 +471,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               icon: Iconsax.people,
               onChanged: (v) => {
                 controller.groupQuery.value = v,
-                controller.fetchPagedTwoContracts(),
+                _phanQuyen(authState, 1, _rowsPerPage),
               },
             ),
           ),
@@ -526,7 +481,8 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
             tooltip: tr('Rfilter'),
             onPressed: () => {
               controller.refreshSearch(),
-              controller.fetchPagedTwoContracts(),},
+              _phanQuyen(authState, 1, _rowsPerPage),
+            },
           ),
           buildActionButton(
             icon: Iconsax.export,
@@ -916,6 +872,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   }
 
   Widget _buildServerPaginator() {
+    final authState = Provider.of<AuthState>(context, listen: false);
     return Obx(() {
       final isFirst = controller.currentPage.value <= 1;
       final isLast =
@@ -967,7 +924,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                     onChanged: (v) async {
                       if (v != null) {
                         controller.pageSize.value = v;
-                        await controller.fetchPagedTwoContracts(pageNumber: 1);
+                        await _phanQuyen(authState, 1, v);
                       }
                     },
                   ),
@@ -990,8 +947,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   tooltip: tr('firstPage'),
                   onPressed: isFirst
                       ? null
-                      : () async =>
-                            controller.fetchPagedTwoContracts(pageNumber: 1),
+                      : () async => await _phanQuyen(
+                          authState,
+                          1,
+                          controller.pageSize.value,
+                        ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.chevron_left, size: 24),
@@ -999,8 +959,10 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   tooltip: tr('previousPage'),
                   onPressed: isFirst
                       ? null
-                      : () async => controller.fetchPagedTwoContracts(
-                          pageNumber: controller.currentPage.value - 1,
+                      : () async => await _phanQuyen(
+                          authState,
+                          controller.currentPage.value - 1,
+                          controller.pageSize.value,
                         ),
                 ),
                 Container(
@@ -1020,8 +982,10 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   tooltip: tr('nextPage'),
                   onPressed: isLast
                       ? null
-                      : () async => controller.fetchPagedTwoContracts(
-                          pageNumber: controller.currentPage.value + 1,
+                      : () async => await _phanQuyen(
+                          authState,
+                          controller.currentPage.value + 1,
+                          controller.pageSize.value,
                         ),
                 ),
                 IconButton(
@@ -1030,8 +994,10 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                   tooltip: tr('lastPage'),
                   onPressed: isLast
                       ? null
-                      : () async => controller.fetchPagedTwoContracts(
-                          pageNumber: controller.totalPages.value,
+                      : () async => await _phanQuyen(
+                          authState,
+                          controller.totalPages.value,
+                          controller.pageSize.value,
                         ),
                 ),
               ],
@@ -1446,8 +1412,10 @@ class MyData extends DataTableSource {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) =>
-                            _EditTwoContractDialog(twoContract: data),
+                        builder: (context) => _EditTwoContractDialog(
+                          twoContract: data,
+                          size: controller.pageSize.value,
+                        ),
                       );
                     },
                   ),
@@ -1459,7 +1427,10 @@ class MyData extends DataTableSource {
                       if (data.dtMDueDate != null) {
                         showDialog(
                           context: context,
-                          builder: (context) => _UpdateDtmDue(contract: data),
+                          builder: (context) => _UpdateDtmDue(
+                            contract: data,
+                            size: controller.pageSize.value,
+                          ),
                         );
                       } else {
                         showDialog(
@@ -1483,7 +1454,10 @@ class MyData extends DataTableSource {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) => _UpdateKetQua(contract: data),
+                          builder: (context) => _UpdateKetQua(
+                            contract: data,
+                            size: controller.pageSize.value,
+                          ),
                         );
                       },
                     ),
@@ -1497,7 +1471,10 @@ class MyData extends DataTableSource {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) => _ReturnContract(contract: data),
+                          builder: (context) => _ReturnContract(
+                            contract: data,
+                            size: controller.pageSize.value,
+                          ),
                         );
                       },
                     ),
@@ -2027,8 +2004,8 @@ class _EditTwoContractDialog extends StatelessWidget {
   final TwoContract twoContract;
   final DashboardControllerTwo controller = Get.find();
   final DashboardControllerPTHC controllerPTHC = Get.find();
-
-  _EditTwoContractDialog({required this.twoContract});
+  final int? size;
+  _EditTwoContractDialog({required this.twoContract, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -2528,61 +2505,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-                      String sectionName = '';
-                      // reset du lieu
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
-                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-                          sectionName =
-                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-                        } else {
-                          final parts =
-                              authState.user!.chRSecCode?.toString().split(
-                                ':',
-                              ) ??
-                              [];
-                          sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
-                              : parts.firstOrNull?.trim() ?? '';
-                        }
-                        // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName, "PTHC");
-                      } else {
-                        switch (authState.user!.chRGroup.toString()) {
-                          case "Section Manager":
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Section Manager",
-                            );
-                            break;
-                          case "Dept Manager":
-                          case "Dept":
-                            // Tìm vị trí bắt đầu của phần dept
-                            List<String> parts =
-                                (authState.user!.chRSecCode?.toString() ?? '')
-                                    .split(": ");
-                            String prPart = parts[1];
-
-                            // Tách phần phòng ban
-                            List<String> prParts = prPart.split("-");
-                            String dept = prParts[0];
-                            await controller.fetchDummyData(
-                              dept,
-                              "Dept Manager",
-                            );
-                            break;
-                          case "Director":
-                          case "General Director":
-                            // Tìm vị trí bắt đầu của phần dept
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Director",
-                            );
-                            break;
-                          default:
-                            await controller.fetchDummyData(null, null);
-                            break;
-                        }
-                      }
+                      await _phanQuyen(authState, 1, size ?? 50);
                       if (context.mounted) {
                         Navigator.of(context).pop();
                       }
@@ -2667,7 +2590,8 @@ class _UpdateDtmDue extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
   final DashboardControllerPTHC controllerPTHC = Get.find();
-  _UpdateDtmDue({required this.contract});
+  final int? size;
+  _UpdateDtmDue({required this.contract, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -2795,63 +2719,7 @@ class _UpdateDtmDue extends StatelessWidget {
                         edited,
                         authState.user!.chRUserid.toString(),
                       );
-
-                      String sectionName = '';
-                      // reset du lieu
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
-                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-                          sectionName =
-                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-                        } else {
-                          final parts =
-                              authState.user!.chRSecCode?.toString().split(
-                                ':',
-                              ) ??
-                              [];
-                          sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
-                              : parts.firstOrNull?.trim() ?? '';
-                        }
-                        // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName, "PTHC");
-                      } else {
-                        switch (authState.user!.chRGroup.toString()) {
-                          case "Section Manager":
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Section Manager",
-                            );
-                            break;
-                          case "Dept Manager":
-                          case "Dept":
-                            // Tìm vị trí bắt đầu của phần dept
-                            List<String> parts =
-                                (authState.user!.chRSecCode?.toString() ?? '')
-                                    .split(": ");
-                            String prPart = parts[1];
-
-                            // Tách phần phòng ban
-                            List<String> prParts = prPart.split("-");
-                            String dept = prParts[0];
-                            await controller.fetchDummyData(
-                              dept,
-                              "Dept Manager",
-                            );
-                            break;
-                          case "Director":
-                          case "General Director":
-                            // Tìm vị trí bắt đầu của phần dept
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Director",
-                            );
-                            break;
-                          default:
-                            await controller.fetchDummyData(null, null);
-                            break;
-                        }
-                      }
-
+                      await _phanQuyen(authState, 1, size ?? 50);
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -2963,7 +2831,8 @@ class _UpdateKetQua extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
   final DashboardControllerPTHC controllerPTHC = Get.find();
-  _UpdateKetQua({required this.contract});
+  final int? size;
+  _UpdateKetQua({required this.contract, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -3186,63 +3055,7 @@ class _UpdateKetQua extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                         ketquaOld.value,
                       );
-
-                      String sectionName = '';
-                      // reset du lieu
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
-                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-                          sectionName =
-                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-                        } else {
-                          final parts =
-                              authState.user!.chRSecCode?.toString().split(
-                                ':',
-                              ) ??
-                              [];
-                          sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
-                              : parts.firstOrNull?.trim() ?? '';
-                        }
-                        // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName, "PTHC");
-                      } else {
-                        switch (authState.user!.chRGroup.toString()) {
-                          case "Section Manager":
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Section Manager",
-                            );
-                            break;
-                          case "Dept Manager":
-                          case "Dept":
-                            // Tìm vị trí bắt đầu của phần dept
-                            List<String> parts =
-                                (authState.user!.chRSecCode?.toString() ?? '')
-                                    .split(": ");
-                            String prPart = parts[1];
-
-                            // Tách phần phòng ban
-                            List<String> prParts = prPart.split("-");
-                            String dept = prParts[0];
-                            await controller.fetchDummyData(
-                              dept,
-                              "Dept Manager",
-                            );
-                            break;
-                          case "Director":
-                          case "General Director":
-                            // Tìm vị trí bắt đầu của phần dept
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Director",
-                            );
-                            break;
-                          default:
-                            await controller.fetchDummyData(null, null);
-                            break;
-                        }
-                      }
-
+                      await _phanQuyen(authState, 1, size ?? 50);
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -3323,7 +3136,8 @@ class _ReturnContract extends StatelessWidget {
   final TwoContract contract;
   final DashboardControllerTwo controller = Get.find();
   final DashboardControllerPTHC controllerPTHC = Get.find();
-  _ReturnContract({required this.contract});
+  final int? size;
+  _ReturnContract({required this.contract, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -3462,61 +3276,7 @@ class _ReturnContract extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                         "Trả về từ báo cáo của nhân sự",
                       );
-                      String sectionName = '';
-                      // reset du lieu
-                      if (authState.user!.chRGroup.toString() == "PTHC") {
-                        if (controllerPTHC.listPTHCsection.isNotEmpty) {
-                          sectionName =
-                              '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
-                        } else {
-                          final parts =
-                              authState.user!.chRSecCode?.toString().split(
-                                ':',
-                              ) ??
-                              [];
-                          sectionName = parts.length >= 2
-                              ? '${parts[0].trim()} : ${parts[1].trim()}'
-                              : parts.firstOrNull?.trim() ?? '';
-                        }
-                        // truong hop PTHC phong ban
-                        controller.fetchDummyData(sectionName, "PTHC");
-                      } else {
-                        switch (authState.user!.chRGroup.toString()) {
-                          case "Section Manager":
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Section Manager",
-                            );
-                            break;
-                          case "Dept Manager":
-                          case "Dept":
-                            // Tìm vị trí bắt đầu của phần dept
-                            List<String> parts =
-                                (authState.user!.chRSecCode?.toString() ?? '')
-                                    .split(": ");
-                            String prPart = parts[1];
-
-                            // Tách phần phòng ban
-                            List<String> prParts = prPart.split("-");
-                            String dept = prParts[0];
-                            await controller.fetchDummyData(
-                              dept,
-                              "Dept Manager",
-                            );
-                            break;
-                          case "Director":
-                          case "General Director":
-                            // Tìm vị trí bắt đầu của phần dept
-                            await controller.fetchDummyData(
-                              authState.user!.chRSecCode?.toString(),
-                              "Director",
-                            );
-                            break;
-                          default:
-                            await controller.fetchDummyData(null, null);
-                            break;
-                        }
-                      }
+                      await _phanQuyen(authState, 1, size ?? 50);
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -3546,5 +3306,96 @@ class _ReturnContract extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+///
+Future<void> _phanQuyen(AuthState authState, int? page, int? size) async {
+  final DashboardControllerTwo controller = Get.find();
+  final DashboardControllerPTHC controllerPTHC = Get.find();
+  String sectionName = '';
+  if (authState.user!.chRGroup.toString() == "PTHC") {
+    if (controllerPTHC.listPTHCsection.isNotEmpty) {
+      sectionName =
+          '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+    } else {
+      final parts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+      sectionName = parts.length >= 2
+          ? '${parts[0].trim()} : ${parts[1].trim()}'
+          : parts.firstOrNull?.trim() ?? '';
+    }
+    if (controller.listSection.isEmpty) {
+      await controller.fetchSectionList(sectionName, 'PTHC');
+    }
+    // truong hop PTHC phong ban
+    await controller.fetchPagedTwoContracts(
+      page: page,
+      size: size,
+      chucVu: "PTHC",
+      section: sectionName,
+    );
+  } else {
+    switch (authState.user!.chRGroup.toString()) {
+      case "Section Manager":
+        await controller.fetchPagedTwoContracts(
+          page: page,
+          size: size,
+          chucVu: "Section Manager",
+          section: authState.user!.chRSecCode?.toString(),
+        );
+        if (controller.listSection.isEmpty) {
+          await controller.fetchSectionList(
+            authState.user!.chRSecCode?.toString(),
+            "Section Manager",
+          );
+        }
+
+        break;
+      case "Dept Manager":
+      case "Dept":
+        // Tìm vị trí bắt đầu của phần dept
+        List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+            .split(": ");
+        String prPart = parts[1];
+
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
+        if (controller.listSection.isEmpty) {
+          await controller.fetchSectionList(dept, "Dept Manager");
+        }
+
+        await controller.fetchPagedTwoContracts(
+          page: page,
+          size: size,
+          chucVu: "Dept Manager",
+          section: dept,
+        );
+        break;
+      case "Director":
+      case "General Director":
+        // Tìm vị trí bắt đầu của phần dept
+        if (controller.listSection.isEmpty) {
+          await controller.fetchSectionList(
+            authState.user!.chRSecCode?.toString(),
+            "Director",
+          );
+        }
+
+        await controller.fetchPagedTwoContracts(
+          page: page,
+          size: size,
+          chucVu: "Director",
+          section: authState.user!.chRSecCode?.toString(),
+        );
+        break;
+      default:
+        if (controller.listSection.isEmpty) {
+          await controller.fetchSectionList(null, "Admin");
+        }
+        await controller.fetchPagedTwoContracts(page: page, size: size);
+        break;
+    }
+    //controller.fetchDummyData(null);
   }
 }
