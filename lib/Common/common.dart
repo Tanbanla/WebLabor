@@ -231,7 +231,7 @@ class Common {
     return """---------------------------<br/>こんにちは,<br/><br/>完了した契約評価結果の修正依頼があったことをお知らせいたします。</span>.<br/><br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>評価契約類</th><th>発行コード</th><th>社員コード</th><th>修正前の結果</th><th>修正後の結果</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>以下のリンクをクリックして、内容をご確認ください。<br/><a href='$confirmLink'>Confirmation Link</a><br/><br/>※このメールはLCESシステムから自動的に送付されたので、返事をしないで下さい。<br/>ご質問がある場合は、人事課の課長までお問い合わせください。<br/>--------------------------------------<br/><br/>Xin chào,<br/><br/>Hệ thống thông tin tới bạn Yêu cầu sửa đánh giá hợp đồng <span style='color: green; font-weight: bold;'>ĐÃ HOÀN THÀNH</span>.<br/><br/><br/><table border='1' cellpadding='5' cellspacing='0' style='width: 100%;'><thead><tr style='background-color: #f2f2f2;'><th>Loại đánh giá</th><th>Mã đợt Phát hành</th><th>Mã Nhân viên</th><th>Kết quả trước sửa</th><th>Kết quả sau sửa</th></tr></thead><tbody>${buildTableRows()}</tbody></table><br/>Bạn vui lòng click vào đường link dưới đây để xác nhận lại:<br/><a href='$confirmLink'>Link xác nhận</a><br/><br/>※Email này được gửi tự động bởi hệ thống LCES, xin vui lòng không reply.<br/>Vui lòng liên lạc cho đảm nhiệm để xác nhận hiện trạng.""";
   }
 }
-// http://172.26.248.62:8501/api/ContractApprentice/search-by-condition
+// https://github.com/khanhmf-it/AspnetCoreMvcFull.git
 // {
 //   "pageNumber": 1,
 //   "pageSize": 3,
@@ -251,77 +251,3 @@ class Common {
 //   ]
 // }
 // {
-//     "success": true,
-//     "status": null,
-//     "message": null,
-//     "error": null,
-//     "data": {
-//         "totalPages": 240,
-//         "totalCount": 240,
-//         "totalFilter": 240,
-//         "pageSize": 1,
-//         "pageIndex": 1,
-//         "data": [
-//             {
-//                 "id": 245,
-//                 "vchR_CODE_APPROVER": "HDHN2025-11-10",
-//                 "vchR_CODE_SECTION": "7110-1 : EPE-PCB",
-//                 "vchR_NAME_SECTION": "7110-1 : EPE-PCB",
-//                 "vchR_EMPLOYEE_ID": "M0122900",
-//                 "vchR_TYPER_ID": "M",
-//                 "vchR_EMPLOYEE_NAME": "Phạm Đức Tấn Lộc",
-//                 "dtM_BRITHDAY": "2007-11-10T00:00:00",
-//                 "chR_POSITION": "Operator            ",
-//                 "chR_CODE_GRADE": "O1        ",
-//                 "chR_COST_CENTER_NAME": "7111: EPE-PCB SUB-PS PCB",
-//                 "dtM_JOIN_DATE": "2025-10-30T00:00:00",
-//                 "dtM_END_DATE": "2025-11-25T00:00:00",
-//                 "fL_GO_LEAVE_LATE": 0,
-//                 "fL_NOT_LEAVE_DAY": 0,
-//                 "inT_VIOLATION": 0,
-//                 "nvarchaR_VIOLATION": null,
-//                 "vchR_LY_THUYET": "OK",
-//                 "vchR_THUC_HANH": "OK",
-//                 "vchR_COMPLETE_WORK": "OK",
-//                 "vchR_LEARN_WORK": "OK",
-//                 "vchR_THICH_NGHI": "OK",
-//                 "vchR_USEFUL": "OK",
-//                 "vchR_CONTACT": "OK",
-//                 "vcH_NEED_VIOLATION": "OK",
-//                 "vchR_REASULTS_LEADER": "OK",
-//                 "biT_NO_RE_EMPLOYMENT": true,
-//                 "nvchR_NO_RE_EMPOYMENT": null,
-//                 "nvchR_PTHC_SECTION": null,
-//                 "vchR_LEADER_EVALUTION": null,
-//                 "dtM_LEADAER_EVALUTION": null,
-//                 "biT_APPROVER_PER": true,
-//                 "nvchR_APPROVER_PER": "",
-//                 "dtM_APPROVER_PER": "2025-11-10T17:00:25.64",
-//                 "biT_APPROVER_CHIEF": null,
-//                 "nvchR_APPROVER_CHIEF": null,
-//                 "dtM_APPROVER_CHIEF": null,
-//                 "biT_APPROVER_SECTION_MANAGER": null,
-//                 "nvchR_APPROVER_MANAGER": null,
-//                 "dtM_APPROVER_MANAGER": null,
-//                 "biT_APPROVER_DIRECTOR": null,
-//                 "nvchR_APPROVER_DIRECTOR": null,
-//                 "dtM_APPROVER_DIRECTOR": null,
-//                 "vchR_USER_CREATE": "huyenvg",
-//                 "dtM_CREATE": "2025-11-10T14:06:24.82",
-//                 "vchR_USER_UPDATE": "fujiokmi",
-//                 "dtM_UPDATE": "2025-11-10T17:00:25.64",
-//                 "inT_STATUS_ID": 3,
-//                 "vchR_NOTE": null,
-//                 "useR_APPROVER_PER": "fujiokmi",
-//                 "useR_APPROVER_CHIEF": null,
-//                 "useR_APPROVER_SECTION_MANAGER": null,
-//                 "useR_APPROVER_DIRECTOR": null,
-//                 "dtM_DUE_DATE": "2025-11-17T17:00:25.64",
-//                 "dtM_APPROVER_DEFT": null,
-//                 "useR_APPROVER_DEFT": null,
-//                 "biT_APRROVER_DEFT": null,
-//                 "nvchR_APROVER_DEFT": null
-//             }
-//         ]
-//     }
-// }

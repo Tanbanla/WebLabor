@@ -96,13 +96,13 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
     try {
-        // Tìm vị trí bắt đầu của phần dept
-        List<String> parts = section == null ? [] : (section).split(": ");
-        String prPart = parts[1];
+      // Tìm vị trí bắt đầu của phần dept
+      List<String> parts = section == null ? [] : (section).split(": ");
+      String prPart = parts[1];
 
-        // Tách phần phòng ban
-        List<String> prParts = prPart.split("-");
-        String dept = prParts[0];
+      // Tách phần phòng ban
+      List<String> prParts = prPart.split("-");
+      String dept = prParts[0];
       if (chucVu == "Dept" || chucVu == "Dept Manager") {
         await controller.fetchSectionList(dept, chucVu);
       } else {
@@ -730,7 +730,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     final frozenCols = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 20,
+        width: 40,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -752,7 +752,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 20,
+        width: 40,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -762,7 +762,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('department'),
-        //width: 120,
+        width: 120,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -936,10 +936,10 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
             child: SingleChildScrollView(
               controller: _leftVerticalController,
               child: DataTable(
-                headingRowHeight: 66,
-                dataRowHeight: 56,
-                horizontalMargin: 8, // Giảm margin
-                columnSpacing: 8, // Giảm khoảng cách cột
+                headingRowHeight: 60,
+                dataRowHeight: 52,
+                horizontalMargin: 5, // Giảm margin
+                columnSpacing: 5, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -969,10 +969,10 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
                 child: SingleChildScrollView(
                   controller: _rightVerticalController,
                   child: DataTable(
-                    headingRowHeight: 66,
-                    dataRowHeight: 56,
-                    horizontalMargin: 8, // Giảm margin
-                    columnSpacing: 8, // Giảm khoảng cách cột
+                    headingRowHeight: 60,
+                    dataRowHeight: 52,
+                    horizontalMargin: 5, // Giảm margin
+                    columnSpacing: 5, // Giảm khoảng cách cột
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
@@ -1758,6 +1758,7 @@ class MyData extends DataTableSource {
             final status = rawStatus ? 'OK' : 'NG';
             if (status == 'OK') {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.check_circle, color: Colors.green, size: 16),
                   SizedBox(width: 4),
@@ -1772,6 +1773,7 @@ class MyData extends DataTableSource {
               );
             } else {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.cancel, color: Colors.red, size: 16),
                   SizedBox(width: 4),
@@ -1798,90 +1800,97 @@ class MyData extends DataTableSource {
         ),
         // nguoi de xuat cua phong ban
         DataCell(
-          Text(
-            data.vchRLeaderEvalution ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRLeaderEvalution ?? '',
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // chief xác nhận kết quả
         DataCell(
-          Text(
-            data.useRApproverChief ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.useRApproverChief ?? '',
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // phe duyet
         DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus = () {
-              if (controller.filterdataList.length > index) {
-                return switch (data.inTStatusId) {
-                  6 =>
-                    controller
-                            .filterdataList[index]
-                            .biTApproverSectionManager ??
-                        true,
-                  7 => controller.filterdataList[index].bitApproverDeft ?? true,
-                  8 =>
-                    controller.filterdataList[index].biTApproverDirector ??
-                        true,
-                  _ => true,
-                };
-              }
-              return true;
-            }();
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatusApprovel(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                    data.inTStatusId,
-                  );
+          Center(
+            child: Obx(() {
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
+              );
+              final rawStatus = () {
+                if (controller.filterdataList.length > index) {
+                  return switch (data.inTStatusId) {
+                    6 =>
+                      controller
+                              .filterdataList[index]
+                              .biTApproverSectionManager ??
+                          true,
+                    7 =>
+                      controller.filterdataList[index].bitApproverDeft ?? true,
+                    8 =>
+                      controller.filterdataList[index].biTApproverDirector ??
+                          true,
+                    _ => true,
+                  };
                 }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
+                return true;
+              }();
+              final status = rawStatus ? 'OK' : 'NG';
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateRehireStatusApprovel(
+                      data.vchREmployeeId.toString(),
+                      newValue == 'OK',
+                      data.inTStatusId,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'O',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'X',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            }),
+          ),
         ),
 
         // ly do tu choi phe duyet
@@ -1918,6 +1927,7 @@ class MyData extends DataTableSource {
     switch (status) {
       case 'OK':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 16),
             SizedBox(width: 4),
@@ -1932,6 +1942,7 @@ class MyData extends DataTableSource {
         );
       case 'NG':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.cancel, color: Colors.red, size: 16),
             SizedBox(width: 4),
@@ -1943,6 +1954,7 @@ class MyData extends DataTableSource {
         );
       case 'Stop Working':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.pause_circle, color: Colors.orange, size: 16),
             SizedBox(width: 4),
@@ -1957,6 +1969,7 @@ class MyData extends DataTableSource {
         );
       case 'Finish L/C':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.done_all, color: Colors.blue, size: 16),
             SizedBox(width: 4),

@@ -555,7 +555,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     final frozenColumns = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 20,
+        width: 40,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -583,7 +583,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 20,
+        width: 40,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -826,10 +826,10 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                       child: SingleChildScrollView(
                         controller: _leftVerticalController,
                         child: DataTable(
-                          headingRowHeight: 66,
-                          dataRowHeight: 56,
-                          horizontalMargin: 8, // Giảm margin
-                          columnSpacing: 8, // Giảm khoảng cách cột
+                          headingRowHeight: 60,
+                          dataRowHeight: 52,
+                          horizontalMargin: 5, // Giảm margin
+                          columnSpacing: 5, // Giảm khoảng cách cột
                           showCheckboxColumn: true,
                           columns: frozenColumns,
                           rows: frozenRows,
@@ -865,10 +865,10 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                           child: SingleChildScrollView(
                             controller: _rightVerticalController,
                             child: DataTable(
-                              headingRowHeight: 66,
-                              dataRowHeight: 56,
-                              horizontalMargin: 8, // Giảm margin
-                              columnSpacing: 8, // Giảm khoảng cách cột
+                              headingRowHeight: 60,
+                              dataRowHeight: 52,
+                              horizontalMargin: 5, // Giảm margin
+                              columnSpacing: 5, // Giảm khoảng cách cột
                               showCheckboxColumn: false,
                               columns: scrollableColumns,
                               rows: scrollableRows,
@@ -1265,23 +1265,29 @@ class MyData extends DataTableSource {
           _buildCopyCell(data.chRCostCenterName ?? "", wrap: true, maxLines: 3),
         ),
         DataCell(
-          Text(
-            data.dtMBrithday != null
-                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
-                : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.dtMBrithday != null
+                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.chRPosition ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.chRPosition ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.chRCodeGrade?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.chRCodeGrade?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
@@ -1305,27 +1311,35 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.fLGoLeaveLate?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLGoLeaveLate?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.fLNotLeaveDay?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.fLNotLeaveDay?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.inTViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.inTViolation?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.nvarchaRViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.nvarchaRViolation?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // Đánh giá
@@ -1387,61 +1401,63 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus =
-                controller.filterdataList[index].biTNoReEmployment;
-            String status = rawStatus ? "OK" : "NG";
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatusApprovel(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                    data.inTStatusId,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
+          Center(
+            child: Obx(() {
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
+              );
+              final rawStatus =
+                  controller.filterdataList[index].biTNoReEmployment;
+              String status = rawStatus ? "OK" : "NG";
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateRehireStatusApprovel(
+                      data.vchREmployeeId.toString(),
+                      newValue == 'OK',
+                      data.inTStatusId,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'O',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'X',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
           Text(
@@ -1479,39 +1495,51 @@ class MyData extends DataTableSource {
         ),
         // Phê duyệt
         DataCell(
-          Text(
-            data.vchRUserCreate?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRUserCreate?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.useRApproverPer?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.useRApproverPer?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.vchRLeaderEvalution?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRLeaderEvalution?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.useRApproverChief?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.useRApproverChief?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.useRApproverSectionManager ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.useRApproverSectionManager ?? '',
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.userApproverDeft?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.userApproverDeft?.toString() ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
       ],
@@ -1522,6 +1550,7 @@ class MyData extends DataTableSource {
     switch (status) {
       case 'OK':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 16),
             SizedBox(width: 4),
@@ -1536,6 +1565,7 @@ class MyData extends DataTableSource {
         );
       case 'NG':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.cancel, color: Colors.red, size: 16),
             SizedBox(width: 4),
@@ -1547,6 +1577,7 @@ class MyData extends DataTableSource {
         );
       case 'Stop Working':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.pause_circle, color: Colors.orange, size: 16),
             SizedBox(width: 4),
@@ -1561,6 +1592,7 @@ class MyData extends DataTableSource {
         );
       case 'Finish L/C':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.done_all, color: Colors.blue, size: 16),
             SizedBox(width: 4),

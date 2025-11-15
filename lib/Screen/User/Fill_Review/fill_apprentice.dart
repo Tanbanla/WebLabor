@@ -1227,7 +1227,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
     final frozenCols = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 20,
+        width: 40,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -1254,7 +1254,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 20,
+        width: 40,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -1434,8 +1434,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
               child: DataTable(
                 headingRowHeight: 66,
                 dataRowHeight: 56,
-                horizontalMargin: 8, // Giảm margin
-                columnSpacing: 8, // Giảm khoảng cách cột
+                horizontalMargin: 5, // Giảm margin
+                columnSpacing: 5, // Giảm khoảng cách cột
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -1467,8 +1467,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   child: DataTable(
                     headingRowHeight: 66,
                     dataRowHeight: 56,
-                    horizontalMargin: 8, // Giảm margin
-                    columnSpacing: 8, // Giảm khoảng cách cột
+                    horizontalMargin: 5, // Giảm margin
+                    columnSpacing: 5, // Giảm khoảng cách cột
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
@@ -2146,16 +2146,25 @@ class MyData extends DataTableSource {
           _buildCopyCell(data.chRCostCenterName ?? "", highlight: isReturn),
         ),
         DataCell(
-          Text(
-            data.dtMBrithday != null
-                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
-                : "",
-            style: cellCenterStyle(),
+          Center(
+            child: Text(
+              data.dtMBrithday != null
+                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                  : "",
+              style: cellCenterStyle(),
+            ),
           ),
         ),
-        DataCell(Text(data.chRPosition ?? "", style: cellCenterStyle())),
         DataCell(
-          Text(data.chRCodeGrade?.toString() ?? "", style: cellCenterStyle()),
+          Center(child: Text(data.chRPosition ?? "", style: cellCenterStyle())),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              data.chRCodeGrade?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
         ),
         DataCell(
           Text(
@@ -2178,892 +2187,965 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(data.fLGoLeaveLate?.toString() ?? "", style: cellCenterStyle()),
+          Center(
+            child: Text(
+              data.fLGoLeaveLate?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
         ),
         DataCell(
-          Text(data.fLNotLeaveDay?.toString() ?? "", style: cellCenterStyle()),
+          Center(
+            child: Text(
+              data.fLNotLeaveDay?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
         ),
         DataCell(
-          Text(data.inTViolation?.toString() ?? "", style: cellCenterStyle()),
+          Center(
+            child: Text(
+              data.inTViolation?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
+          ),
         ),
         DataCell(
-          Text(
-            data.nvarchaRViolation?.toString() ?? "",
-            style: cellCenterStyle(),
+          Center(
+            child: Text(
+              data.nvarchaRViolation?.toString() ?? "",
+              style: cellCenterStyle(),
+            ),
           ),
         ),
 
         // Cac thuoc tinh danh gia
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRLyThuyet ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRLyThuyet ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRLyThuyet ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRLyThuyet ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateVchrLythuyet(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateVchrLythuyet(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRThucHanh ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRThucHanh ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRThucHanh ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRThucHanh ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateThucHanh(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateThucHanh(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRCompleteWork ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRCompleteWork ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRCompleteWork ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRCompleteWork ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateCompleteWork(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateCompleteWork(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRLearnWork ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRLearnWork ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRLearnWork ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRLearnWork ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateStudyWork(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateStudyWork(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRThichNghi ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRThichNghi ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRThichNghi ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRThichNghi ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateThichNghi(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateThichNghi(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status = controller.filterdataList[index].vchRUseful ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRUseful ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRUseful ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRUseful ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateUseful(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateUseful(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status = controller.filterdataList[index].vchRContact ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRContact ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRContact ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRContact ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateContact(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateContact(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vcHNeedViolation ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vcHNeedViolation ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vcHNeedViolation ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vcHNeedViolation ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateNoiQuy(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateNoiQuy(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
-          Obx(() {
-            final status =
-                controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
-            final intStatus = data.inTStatusId ?? 0;
-            // Hiển thị trống nếu IntStatus = 3
-            if (intStatus == 3) {
-              return Text(''); // hoặc SizedBox.shrink()
-            }
-            if (intStatus == 5) {
-              return _getDanhGiaView(
-                controller.filterdataList[index].vchRReasultsLeader ?? 'OK',
+          Center(
+            child: Obx(() {
+              final status =
+                  controller.filterdataList[index].vchRReasultsLeader ?? 'OK';
+              final intStatus = data.inTStatusId ?? 0;
+              // Hiển thị trống nếu IntStatus = 3
+              if (intStatus == 3) {
+                return Text(''); // hoặc SizedBox.shrink()
+              }
+              if (intStatus == 5) {
+                return _getDanhGiaView(
+                  controller.filterdataList[index].vchRReasultsLeader ?? 'OK',
+                );
+              }
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
               );
-            }
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateCuoicung(
-                    data.vchREmployeeId.toString(),
-                    newValue,
-                  );
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateCuoicung(
+                      data.vchREmployeeId.toString(),
+                      newValue,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'OK',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'NG',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'NG',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                  DropdownMenuItem(
+                    value: 'Stop Working',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.pause_circle,
+                          color: Colors.orange,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stop Working',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                  DropdownMenuItem(
+                    value: 'Finish L/C',
+                    child: Row(
+                      children: [
+                        Icon(Icons.done_all, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Finish L/C',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: _getStatusColor(status),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
         ),
 
         // Ghi chú
@@ -3095,89 +3177,101 @@ class MyData extends DataTableSource {
         ),
         // Truong hop tuyen dung lai hay khong
         DataCell(
-          Builder(
-            builder: (_) {
-              final intStatus = data.inTStatusId ?? 0;
-              if (intStatus == 3) {
-                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
-              }
-              // Chỉ wrap phần thật sự phụ thuộc vào observable bằng Obx
-              return Obx(() {
-                final list = controller.filterdataList; // observable read
-                if (index >= list.length) {
-                  return const SizedBox.shrink();
+          Center(
+            child: Builder(
+              builder: (_) {
+                final intStatus = data.inTStatusId ?? 0;
+                if (intStatus == 3) {
+                  return Text(
+                    '',
+                    style: TextStyle(fontSize: Common.sizeColumn),
+                  );
                 }
-                final raw = list[index].biTNoReEmployment ?? true;
-                if (intStatus == 5) {
-                  return Row(
-                    children: [
-                      Icon(
-                        raw ? Icons.check_circle : Icons.cancel,
-                        color: raw ? Colors.green : Colors.red,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        raw ? 'O' : 'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
+                // Chỉ wrap phần thật sự phụ thuộc vào observable bằng Obx
+                return Obx(() {
+                  final list = controller.filterdataList; // observable read
+                  if (index >= list.length) {
+                    return const SizedBox.shrink();
+                  }
+                  final raw = list[index].biTNoReEmployment ?? true;
+                  if (intStatus == 5) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          raw ? Icons.check_circle : Icons.cancel,
                           color: raw ? Colors.green : Colors.red,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          raw ? 'O' : 'X',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: raw ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return DropdownButton<String>(
+                    value: raw ? 'OK' : 'NG',
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        controller.updateRehireStatus(
+                          data.vchREmployeeId.toString(),
+                          newValue == 'OK',
+                        );
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: 'OK',
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'O',
+                              style: TextStyle(
+                                fontSize: Common.sizeColumn,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'NG',
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'X',
+                              style: TextStyle(
+                                fontSize: Common.sizeColumn,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   );
-                }
-                return DropdownButton<String>(
-                  value: raw ? 'OK' : 'NG',
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      controller.updateRehireStatus(
-                        data.vchREmployeeId.toString(),
-                        newValue == 'OK',
-                      );
-                    }
-                  },
-                  items: [
-                    DropdownMenuItem(
-                      value: 'OK',
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'O',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'NG',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.cancel, color: Colors.red, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            'X',
-                            style: TextStyle(
-                              fontSize: Common.sizeColumn,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              });
-            },
+                });
+              },
+            ),
           ),
         ),
         // Lý do không tuyển lại
@@ -3222,101 +3316,113 @@ class MyData extends DataTableSource {
         // thuộc tính approver
         if (data.inTStatusId == 5)
           DataCell(
-            Obx(() {
-              Visibility(
-                visible: false,
-                child: Text(controller.filterdataList[index].toString()),
-              );
-              final rawStatus = () {
-                if (controller.filterdataList.length > index) {
-                  return switch (data.inTStatusId) {
-                    5 =>
-                      controller.filterdataList[index].biTApproverChief ?? true,
-                    _ => true,
-                  };
-                }
-                return true;
-              }();
-              final status = rawStatus ? 'OK' : 'NG';
-              return DropdownButton<String>(
-                value: status,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    controller.updateRehireStatusApprovel(
-                      data.vchREmployeeId.toString(),
-                      newValue == 'OK',
-                      data.inTStatusId,
-                    );
+            Center(
+              child: Obx(() {
+                Visibility(
+                  visible: false,
+                  child: Text(controller.filterdataList[index].toString()),
+                );
+                final rawStatus = () {
+                  if (controller.filterdataList.length > index) {
+                    return switch (data.inTStatusId) {
+                      5 =>
+                        controller.filterdataList[index].biTApproverChief ??
+                            true,
+                      _ => true,
+                    };
                   }
-                },
-                items: [
-                  DropdownMenuItem(
-                    value: 'OK',
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.green, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          'O',
-                          style: TextStyle(
-                            fontSize: Common.sizeColumn,
+                  return true;
+                }();
+                final status = rawStatus ? 'OK' : 'NG';
+                return DropdownButton<String>(
+                  value: status,
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      controller.updateRehireStatusApprovel(
+                        data.vchREmployeeId.toString(),
+                        newValue == 'OK',
+                        data.inTStatusId,
+                      );
+                    }
+                  },
+                  items: [
+                    DropdownMenuItem(
+                      value: 'OK',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
                             color: Colors.green,
+                            size: 16,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  DropdownMenuItem(
-                    value: 'NG',
-                    child: Row(
-                      children: [
-                        Icon(Icons.cancel, color: Colors.red, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          'X',
-                          style: TextStyle(
-                            fontSize: Common.sizeColumn,
-                            color: Colors.red,
+                          SizedBox(width: 4),
+                          Text(
+                            'O',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.green,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }),
-          )
-        else
-          DataCell(
-            Obx(() {
-              Visibility(
-                visible: false,
-                child: Text(controller.filterdataList[index].toString()),
-              );
-              final rawStatus = [
-                data.nvchRApproverChief,
-                data.nvchRApproverManager,
-                data.nvchrApproverDeft,
-                data.nvchRApproverDirector,
-              ].firstWhere((e) => e != null && e != '', orElse: () => '');
-              if (rawStatus == '') {
-                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
-              } else {
-                return Row(
-                  children: [
-                    Icon(Icons.cancel, color: Colors.red, size: 16),
-                    SizedBox(width: 4),
-                    Text(
-                      'X',
-                      style: TextStyle(
-                        fontSize: Common.sizeColumn,
-                        color: Colors.red,
+                    DropdownMenuItem(
+                      value: 'NG',
+                      child: Row(
+                        children: [
+                          Icon(Icons.cancel, color: Colors.red, size: 16),
+                          SizedBox(width: 4),
+                          Text(
+                            'X',
+                            style: TextStyle(
+                              fontSize: Common.sizeColumn,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 );
-              }
-            }),
+              }),
+            ),
+          )
+        else
+          DataCell(
+            Center(
+              child: Obx(() {
+                Visibility(
+                  visible: false,
+                  child: Text(controller.filterdataList[index].toString()),
+                );
+                final rawStatus = [
+                  data.nvchRApproverChief,
+                  data.nvchRApproverManager,
+                  data.nvchrApproverDeft,
+                  data.nvchRApproverDirector,
+                ].firstWhere((e) => e != null && e != '', orElse: () => '');
+                if (rawStatus == '') {
+                  return Text(
+                    '',
+                    style: TextStyle(fontSize: Common.sizeColumn),
+                  );
+                } else {
+                  return Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.red, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'X',
+                        style: TextStyle(
+                          fontSize: Common.sizeColumn,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              }),
+            ),
           ),
         // ly do tu choi phe duyet
         if (data.inTStatusId == 5)
@@ -3384,6 +3490,7 @@ class MyData extends DataTableSource {
     switch (status) {
       case 'OK':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 16),
             SizedBox(width: 4),
@@ -3398,6 +3505,7 @@ class MyData extends DataTableSource {
         );
       case 'NG':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.cancel, color: Colors.red, size: 16),
             SizedBox(width: 4),
@@ -3409,6 +3517,7 @@ class MyData extends DataTableSource {
         );
       case 'Stop Working':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.pause_circle, color: Colors.orange, size: 16),
             SizedBox(width: 4),
@@ -3423,6 +3532,7 @@ class MyData extends DataTableSource {
         );
       case 'Finish L/C':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.done_all, color: Colors.blue, size: 16),
             SizedBox(width: 4),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
+
 // DataColumn2 custom
 class DataColumnCustom extends StatelessWidget {
   final String title;
@@ -34,8 +35,10 @@ class DataColumnCustom extends StatelessWidget {
   });
 
   DataColumn2 toDataColumn2() {
-    return DataColumn2(
-      label: Padding(
+    // Ensure width is respected even when rendered in a plain DataTable (fallback scenario)
+    final labelChild = SizedBox(
+      width: fixedWidth ? width : null,
+      child: Padding(
         padding: EdgeInsets.symmetric(
           vertical: verticalPadding!,
           horizontal: horizontalPadding!,
@@ -46,18 +49,22 @@ class DataColumnCustom extends StatelessWidget {
             fontSize: fontSize,
             color: textColor ?? Colors.black,
             fontWeight: fontWeight,
-            height: 1.5,
+            height: 1.3,
           ),
-          textAlign: textAlign,
+          textAlign: textAlign ?? TextAlign.center,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
+          softWrap: true,
         ),
       ),
+    );
+    return DataColumn2(
+      label: labelChild,
       size: fixedWidth ? ColumnSize.S : ColumnSize.L,
       fixedWidth: fixedWidth ? width : null,
       numeric: numeric,
       tooltip: maxLines != null && maxLines! > 1 ? title : null,
-      onSort: onSort, // Added onSort to DataColumn2
+      onSort: onSort,
     );
   }
 

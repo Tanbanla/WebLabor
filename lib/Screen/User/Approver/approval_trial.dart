@@ -748,39 +748,44 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final frozenCols = <DataColumn>[
       DataColumnCustom(
         title: tr('stt'),
-        width: 20,
+        width: 45,
         onSort: controller.sortById,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Hientrang'),
-        width: 100,
+        width: 90,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('DotDanhGia'),
-        width: 140,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('employeeCode'),
-        width: 70,
+        width: 80,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('gender'),
-        width: 20,
+        width: 50,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('fullName'),
         width: 140,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('department'),
-        //width: 120,
+        width: 130,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -789,6 +794,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
     final scrollCols = <DataColumn>[
       DataColumnCustom(
         title: tr('group'),
+        width: 110,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -796,30 +802,35 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         title: tr('age'),
         width: 70,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('position'),
-        width: 100,
+        width: 110,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('salaryGrade'),
-        width: 100,
+        width: 90,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('contractEffective'),
-        width: 120,
+        width: 110,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('contractEndDate'),
-        width: 120,
+        width: 110,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('earlyLateCount'),
-        width: 110,
+        width: 100,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -831,7 +842,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('violationCount'),
-        width: 130,
+        width: 120,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -842,88 +853,96 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('lythuyet'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('thuchanh'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
         maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('congviec'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('hochoi'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('thichnghi'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('tinhthan'),
-        width: 150,
-        maxLines: 3,
+        width: 140,
+        maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('baocao'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('chaphanh'),
-        width: 130,
+        width: 120,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('ketqua'),
-        width: 150,
+        width: 140,
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('note'),
         fontSize: Common.sizeColumn,
+        maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('notRehirable'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('notRehirableReason'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('DeXuat'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('ChiefApproval'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Apporval'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('LydoTuChoi'),
-        width: 170,
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -962,10 +981,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
             child: SingleChildScrollView(
               controller: _leftVerticalController,
               child: DataTable(
-                headingRowHeight: 66,
-                dataRowHeight: 56,
-                horizontalMargin: 8, // Giảm margin
-                columnSpacing: 8, // Giảm khoảng cách cột
+                headingRowHeight: 60,
+                dataRowHeight: 52,
+                horizontalMargin: 8,
+                columnSpacing: 8,
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -995,10 +1014,10 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 child: SingleChildScrollView(
                   controller: _rightVerticalController,
                   child: DataTable(
-                    headingRowHeight: 66,
-                    dataRowHeight: 56,
-                    horizontalMargin: 8, // Giảm margin
-                    columnSpacing: 8, // Giảm khoảng cách cột
+                    headingRowHeight: 60,
+                    dataRowHeight: 52,
+                    horizontalMargin: 8,
+                    columnSpacing: 8,
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
@@ -1621,17 +1640,21 @@ class MyData extends DataTableSource {
           _buildCopyCell(data.chRCostCenterName ?? "", wrap: true, maxLines: 3),
         ),
         DataCell(
-          Text(
-            data.dtMBrithday != null
-                ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
-                : "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.dtMBrithday != null
+                  ? '${DateTime.now().difference(DateTime.parse(data.dtMBrithday!)).inDays ~/ 365}'
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            data.chRPosition ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.chRPosition ?? "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         DataCell(
@@ -1766,6 +1789,7 @@ class MyData extends DataTableSource {
             final status = rawStatus ? 'OK' : 'NG';
             if (status == 'OK') {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.check_circle, color: Colors.green, size: 16),
                   SizedBox(width: 4),
@@ -1780,6 +1804,7 @@ class MyData extends DataTableSource {
               );
             } else {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.cancel, color: Colors.red, size: 16),
                   SizedBox(width: 4),
@@ -1806,87 +1831,94 @@ class MyData extends DataTableSource {
         ),
         // nguoi de xuat cua phong ban
         DataCell(
-          Text(
-            data.vchRLeaderEvalution ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.vchRLeaderEvalution ?? '',
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // chief xác nhận kết quả
         DataCell(
-          Text(
-            data.useRApproverChief ?? '',
-            style: TextStyle(fontSize: Common.sizeColumn),
+          Center(
+            child: Text(
+              data.useRApproverChief ?? '',
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
           ),
         ),
         // phe duyet
         DataCell(
-          Obx(() {
-            Visibility(
-              visible: false,
-              child: Text(controller.filterdataList[index].toString()),
-            );
-            final rawStatus = () {
-              if (controller.filterdataList.length > index) {
-                return switch (data.inTStatusId) {
-                  6 =>
-                    controller
-                            .filterdataList[index]
-                            .biTApproverSectionManager ??
-                        true,
-                  7 => controller.filterdataList[index].bitApproverDeft ?? true,
-                  _ => true,
-                };
-              }
-              return true;
-            }();
-            final status = rawStatus ? 'OK' : 'NG';
-            return DropdownButton<String>(
-              value: status,
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  controller.updateRehireStatusApprovel(
-                    data.vchREmployeeId.toString(),
-                    newValue == 'OK',
-                    data.inTStatusId,
-                  );
+          Center(
+            child: Obx(() {
+              Visibility(
+                visible: false,
+                child: Text(controller.filterdataList[index].toString()),
+              );
+              final rawStatus = () {
+                if (controller.filterdataList.length > index) {
+                  return switch (data.inTStatusId) {
+                    6 =>
+                      controller
+                              .filterdataList[index]
+                              .biTApproverSectionManager ??
+                          true,
+                    7 =>
+                      controller.filterdataList[index].bitApproverDeft ?? true,
+                    _ => true,
+                  };
                 }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 'OK',
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'O',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.green,
+                return true;
+              }();
+              final status = rawStatus ? 'OK' : 'NG';
+              return DropdownButton<String>(
+                value: status,
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    controller.updateRehireStatusApprovel(
+                      data.vchREmployeeId.toString(),
+                      newValue == 'OK',
+                      data.inTStatusId,
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'OK',
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'O',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                DropdownMenuItem(
-                  value: 'NG',
-                  child: Row(
-                    children: [
-                      Icon(Icons.cancel, color: Colors.red, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'X',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: Colors.red,
+                  DropdownMenuItem(
+                    value: 'NG',
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'X',
+                          style: TextStyle(
+                            fontSize: Common.sizeColumn,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            }),
+          ),
         ),
         DataCell(
           Focus(
@@ -2038,6 +2070,7 @@ class MyData extends DataTableSource {
     switch (status) {
       case 'OK':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle, color: Colors.green, size: 16),
             SizedBox(width: 4),
@@ -2052,6 +2085,7 @@ class MyData extends DataTableSource {
         );
       case 'NG':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.cancel, color: Colors.red, size: 16),
             SizedBox(width: 4),
@@ -2063,6 +2097,7 @@ class MyData extends DataTableSource {
         );
       case 'Stop Working':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.pause_circle, color: Colors.orange, size: 16),
             SizedBox(width: 4),
@@ -2077,6 +2112,7 @@ class MyData extends DataTableSource {
         );
       case 'Finish L/C':
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.done_all, color: Colors.blue, size: 16),
             SizedBox(width: 4),
