@@ -275,7 +275,7 @@ class DashboardControllerApprentice extends GetxController {
         if (jsonData['success'] == true) {
           final dataObj = jsonData['data'] ?? {};
           totalPages.value = dataObj['totalPages'] ?? 0;
-          totalCount.value = dataObj['totalCount'] ?? 0;
+          totalCount.value = dataObj['totalFilter'] ?? 0;
           pageSize.value = dataObj['pageSize'] ?? pageSize.value;
           currentPage.value = dataObj['pageIndex'] ?? currentPage.value;
           final List<dynamic> rows = dataObj['data'] ?? [];

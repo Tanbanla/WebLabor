@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
+import 'package:web_labor_contract/Common/SmartTooltip.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
@@ -893,7 +894,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     return Obx(() {
       final current = controller.currentPage.value;
       final totalP = controller.totalPages.value;
-      //final count = controller.totalCount.value;
+      final count = controller.totalCount.value;
       final isFirst = current <= 1;
       final isLast = totalP == 0 ? true : current >= totalP;
       return Container(
@@ -950,7 +951,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
               ],
             ),
             Text(
-              'Page $current / $totalP', //(${tr('total')}: $count)
+              'Page $current / $totalP (${tr('total')}: $count)',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[700],
@@ -1385,20 +1386,29 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          // Text(
-          //   data.vchRNote?.toString() ?? "",
-          //   style: TextStyle(fontSize: Common.sizeColumn),
-          // ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 450),
-            child: Text(
-              data.vchRNote ?? '',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
-              style: TextStyle(fontSize: Common.sizeColumn),
+          SmartTooltip(
+            text: data.vchRNote ?? '',
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                data.vchRNote ?? '',
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
             ),
           ),
+          // ConstrainedBox(
+          //   constraints: const BoxConstraints(maxWidth: 450),
+          //   child: Text(
+          //     data.vchRNote ?? '',
+          //     maxLines: 2,
+          //     overflow: TextOverflow.ellipsis,
+          //     softWrap: true,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //   ),
+          // ),
         ),
         DataCell(
           Center(
@@ -1460,38 +1470,42 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.nvchRNoReEmpoyment?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          // Text(
+          //   data.nvchRNoReEmpoyment?.toString() ?? "",
+          //   style: TextStyle(fontSize: Common.sizeColumn),
+          // ),
+          SmartTooltip(
+            text: data.nvchRNoReEmpoyment?.toString() ?? "",
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                data.nvchRNoReEmpoyment?.toString() ?? "",
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            reasonController.text,
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-          // Focus(
-          //   onFocusChange: (hasFocus) {
-          //     if (!hasFocus) {
-          //       controller.updateNotRehireReasonApprovel(
-          //         data.vchREmployeeId.toString(),
-          //         reasonController.text,
-          //         data.inTStatusId,
-          //       );
-          //     }
-          //   },
-          //   child: TextFormField(
-          //     controller: reasonController,
-          //     style: TextStyle(fontSize: Common.sizeColumn),
-          //     decoration: InputDecoration(
-          //       labelText: tr('reason'),
-          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(8),
-          //       ),
-          //     ),
-          //   ),
+          // Text(
+          //   reasonController.text,
+          //   style: TextStyle(fontSize: Common.sizeColumn),
           // ),
+          SmartTooltip(
+            text: reasonController.text,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                reasonController.text,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
+            ),
+          ),
         ),
         // Phê duyệt
         DataCell(

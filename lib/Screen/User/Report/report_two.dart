@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/PTHC_controller.dart';
 import 'package:web_labor_contract/API/Controller/Two_Contract_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
+import 'package:web_labor_contract/Common/SmartTooltip.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
@@ -591,23 +592,23 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       if (showAction)
         DataColumnCustom(
           title: tr('action'),
-          width: 100,
+          width: 80,
           fontSize: Common.sizeColumn,
         ).toDataColumn2(),
       DataColumnCustom(
         title: tr('Hientrang'),
-        width: 130,
+        width: 100,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('DotDanhGia'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('employeeCode'),
-        width: 100,
+        width: 70,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -617,7 +618,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       ).toDataColumn2(),
       DataColumnCustom(
         title: tr('fullName'),
-        width: 180,
+        width: 140,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
     ];
@@ -932,7 +933,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
               ],
             ),
             Text(
-              'Page ${controller.currentPage.value} / ${controller.totalPages.value}', //• ${controller.totalCount.value}
+              'Page ${controller.currentPage.value} / ${controller.totalPages.value} (${tr('total')}: ${controller.totalCount.value})',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[700],
@@ -1612,41 +1613,27 @@ class MyData extends DataTableSource {
         ),
         // ghi chu
         DataCell(
-          // Text(
-          //   noteController.text,
-          //   style: TextStyle(fontSize: Common.sizeColumn),
-          // ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 450),
-            child: Text(
-              noteController.text,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
-              style: TextStyle(fontSize: Common.sizeColumn),
+          SmartTooltip(
+            text: noteController.text,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                noteController.text,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
             ),
           ),
-
-          // Focus(
-          //   onFocusChange: (hasFocus) {
-          //     if (!hasFocus) {
-          //       // Chỉ update khi mất focus
-          //       controller.updateNote(
-          //         data.vchREmployeeId.toString(),
-          //         reasonController.text,
-          //       );
-          //     }
-          //   },
-          //   child: TextFormField(
-          //     controller: noteController,
+          // ConstrainedBox(
+          //   constraints: const BoxConstraints(maxWidth: 250),
+          //   child: Text(
+          //     noteController.text,
+          //     maxLines: 5,
+          //     overflow: TextOverflow.ellipsis,
+          //     softWrap: true,
           //     style: TextStyle(fontSize: Common.sizeColumn),
-          //     decoration: InputDecoration(
-          //       labelText: tr('note'),
-          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(8),
-          //       ),
-          //     ),
           //   ),
           // ),
         ),
@@ -1717,39 +1704,42 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.nvchRNoReEmpoyment?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          // Text(
+          //   data.nvchRNoReEmpoyment?.toString() ?? "",
+          //   style: TextStyle(fontSize: Common.sizeColumn),
+          // ),
+          SmartTooltip(
+            text: data.nvchRNoReEmpoyment?.toString() ?? "",
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                data.nvchRNoReEmpoyment?.toString() ?? "",
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
+            ),
           ),
         ),
         DataCell(
-          Text(
-            reasonController.text,
-            style: TextStyle(fontSize: Common.sizeColumn),
-          ),
-          // Focus(
-          //   onFocusChange: (hasFocus) {
-          //     if (!hasFocus) {
-          //       // Chỉ update khi mất focus
-          //       controller.updateNotRehireReasonApprovel(
-          //         data.vchREmployeeId.toString(),
-          //         reasonController.text,
-          //         data.inTStatusId,
-          //       );
-          //     }
-          //   },
-          //   child: TextFormField(
-          //     controller: reasonController,
-          //     style: TextStyle(fontSize: Common.sizeColumn),
-          //     decoration: InputDecoration(
-          //       labelText: tr('reason'),
-          //       labelStyle: TextStyle(fontSize: Common.sizeColumn),
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(8),
-          //       ),
-          //     ),
-          //   ),
+          // Text(
+          //   reasonController.text,
+          //   style: TextStyle(fontSize: Common.sizeColumn),
           // ),
+          SmartTooltip(
+            text: reasonController.text,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                reasonController.text,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
+            ),
+          ),
         ),
         // thong tin phe duyet
         DataCell(

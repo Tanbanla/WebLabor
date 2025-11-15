@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:web_labor_contract/API/Controller/Apprentice_Contract_controller.dart';
 import 'package:web_labor_contract/API/Controller/user_approver_controller.dart';
 import 'package:web_labor_contract/API/Login_Controller/api_login_controller.dart';
+import 'package:web_labor_contract/Common/SmartTooltip.dart';
 import 'package:web_labor_contract/class/User_Approver.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
@@ -1766,14 +1767,27 @@ class MyData extends DataTableSource {
         ),
         // ly do k tuyen dung lai
         DataCell(
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 450),
-            child: Text(
-              data.vchRNote ?? '',
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
-              style: TextStyle(fontSize: Common.sizeColumn),
+          // ConstrainedBox(
+          //   constraints: const BoxConstraints(maxWidth: 450),
+          //   child: Text(
+          //     data.vchRNote ?? '',
+          //     maxLines: 4,
+          //     overflow: TextOverflow.ellipsis,
+          //     softWrap: true,
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //   ),
+          // ),
+          SmartTooltip(
+            text: data.vchRNote ?? '',
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                data.vchRNote ?? '',
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
             ),
           ),
         ),
@@ -1822,10 +1836,23 @@ class MyData extends DataTableSource {
         ),
         // ly do k tuyen dung lai
         DataCell(
-          Center(
-            child: Text(
-              data.nvchRNoReEmpoyment ?? "",
-              style: TextStyle(fontSize: Common.sizeColumn),
+          // Center(
+          //   child: Text(
+          //     data.nvchRNoReEmpoyment ?? "",
+          //     style: TextStyle(fontSize: Common.sizeColumn),
+          //   ),
+          // ),
+          SmartTooltip(
+            text: data.nvchRNoReEmpoyment ?? '',
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: Text(
+                data.nvchRNoReEmpoyment ?? '',
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
             ),
           ),
         ),

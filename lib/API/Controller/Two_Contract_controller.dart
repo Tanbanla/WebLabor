@@ -444,8 +444,8 @@ class DashboardControllerTwo extends GetxController {
           totalPages.value = (wrapper is Map && wrapper['totalPages'] != null)
               ? wrapper['totalPages'] ?? 1
               : 1;
-          totalCount.value = (wrapper is Map && wrapper['totalCount'] != null)
-              ? wrapper['totalCount'] ?? rawData.length
+          totalCount.value = (wrapper is Map && wrapper['totalFilter'] != null)
+              ? wrapper['totalFilter'] ?? rawData.length
               : rawData.length;
           currentPage.value = (wrapper is Map && wrapper['pageIndex'] != null)
               ? (wrapper['pageIndex'] ?? page)
