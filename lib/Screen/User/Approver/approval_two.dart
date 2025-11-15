@@ -1522,7 +1522,7 @@ class MyData extends DataTableSource {
   DataRow? getRow(int index) {
     if (index < 0 || index >= controller.filterdataList.length) return null;
     final data = controller.filterdataList[index];
-    final noteController = TextEditingController(text: data.vchRNote ?? '');
+    //final noteController = TextEditingController(text: data.vchRNote ?? '');
     final reasonController = TextEditingController(
       text: switch (data.inTStatusId) {
         6 => data.nvchRApproverManager ?? '',
