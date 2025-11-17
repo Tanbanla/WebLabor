@@ -10,10 +10,15 @@ import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/custom_field.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
+import 'package:excel/excel.dart' hide Border;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:web_labor_contract/class/Apprentice_Contract.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 
 class ReportApprentice extends StatefulWidget {
@@ -1035,26 +1040,300 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     });
   }
 
-  void _showExportDialog() {
+void _showExportDialog() {
+    final controller = Get.find<DashboardControllerApprentice>();
+    String getStatusLabel(int? IntStatus) {
+      switch (IntStatus) {
+        case 1:
+          return 'New';
+        case 2:
+          return 'Per/人事課の中級管理職';
+        case 3:
+          return 'PTHC';
+        case 4:
+          return 'Leader';
+        case 5:
+          return 'Chief';
+        case 6:
+          return 'QLTC/中級管理職';
+        case 7:
+          return 'QLCC/上級管理職';
+        case 8:
+          return 'Director/管掌取締役';
+        case 9:
+          return 'Done';
+        default:
+          return 'Not Error';
+      }
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(tr('export')),
-        content: Text(tr('fickExport')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(tr('fickExport'), style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Icon(Iconsax.document_text, size: 40, color: Colors.blue),
+                    const SizedBox(height: 8),
+                    const Text('Excel', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(tr('Cancel')),
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(tr('close')),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                controller.isLoadingExport.value = true;
+
+                // 1. Đọc file template
+                final ByteData templateData = await rootBundle.load(
+                  'assets/templates/MauTV.xlsx',
+                );
+                final excel = Excel.decodeBytes(
+                  templateData.buffer.asUint8List(),
+                );
+                final sheet =
+                    excel['Sheet1']; //?? excel[excel.tables.keys.first];
+                const startRow = 15; // Dòng bắt đầu điền dữ liệu
+                // Xác nhận danh sách xuất dữ liệu
+                List<ApprenticeContract> dataToExport =
+                    controller.getSelectedItems().isNotEmpty
+                    ? controller.getSelectedItems()
+                    : List.from(controller.filterdataList);
+                // 2. Điền dữ liệu vào các ô
+                for (int i = 0; i < dataToExport.length; i++) {
+                  final item = dataToExport[i];
+                  final row = startRow + i;
+                  // Lấy style từ dòng mẫu (dòng 6)
+                  final templateRow = startRow - 1;
+                  getStyle(String column) => sheet
+                      .cell(CellIndex.indexByString('$column$templateRow'))
+                      .cellStyle;
+
+                  // Điền dữ liệu với style được copy từ template
+                  void setCellValue(String column, dynamic value) {
+                    final cell = sheet.cell(
+                      CellIndex.indexByString('$column$row'),
+                    );
+                    cell.value = value is DateTime
+                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                        : TextCellValue(value.toString());
+                    cell.cellStyle = getStyle(column);
+                  }
+
+                  // Điền từng giá trị vào các cột
+                  setCellValue('A', i + 1);
+                  setCellValue('B', getStatusLabel(item.inTStatusId));
+                  setCellValue('C', item.vchRCodeApprover ?? '');
+                  setCellValue('D', item.vchREmployeeId ?? '');
+                  setCellValue('E', item.vchRTyperId ?? '');
+                  setCellValue('F', item.vchREmployeeName ?? '');
+                  setCellValue('G', item.vchRNameSection ?? '');
+                  setCellValue('H', item.chRCostCenterName ?? '');
+                  setCellValue('I', getAgeFromBirthday(item.dtMBrithday));
+                  setCellValue('J', item.chRPosition ?? '');
+                  setCellValue('K', item.chRCodeGrade ?? '');
+                  if (item.dtMJoinDate != null) {
+                    setCellValue(
+                      'L',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMJoinDate!)),
+                    );
+                  }
+                  if (item.dtMEndDate != null) {
+                    setCellValue(
+                      'M',
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(item.dtMEndDate!)),
+                    );
+                  }
+                  setCellValue('N', item.fLGoLeaveLate ?? '0');
+                  setCellValue('O', item.fLNotLeaveDay ?? '0');
+                  setCellValue('P', item.inTViolation ?? '0');
+                  setCellValue(
+                    'Q',
+                    item.inTStatusId == 3 ? "" : (item.vchRLyThuyet ?? ''),
+                  );
+                  setCellValue(
+                    'R',
+                    item.inTStatusId == 3 ? "" : (item.vchRThucHanh ?? ''),
+                  );
+                  setCellValue(
+                    'S',
+                    item.inTStatusId == 3 ? "" : (item.vchRCompleteWork ?? ''),
+                  );
+                  setCellValue(
+                    'T',
+                    item.inTStatusId == 3 ? "" : (item.vchRLearnWork ?? ''),
+                  );
+                  setCellValue(
+                    'U',
+                    item.inTStatusId == 3 ? "" : (item.vchRThichNghi ?? ''),
+                  );
+                  setCellValue(
+                    'V',
+                    item.inTStatusId == 3 ? "" : (item.vchRUseful ?? ''),
+                  );
+                  setCellValue(
+                    'W',
+                    item.inTStatusId == 3 ? "" : (item.vchRContact ?? ''),
+                  );
+                  setCellValue(
+                    'X',
+                    item.inTStatusId == 3 ? "" : (item.vcHNeedViolation ?? ''),
+                  );
+                  setCellValue(
+                    'Y',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.vchRReasultsLeader ?? ''),
+                  );
+                  setCellValue(
+                    'Z',
+                    item.inTStatusId == 3 ? "" : (item.vchRNote ?? ''),
+                  );
+                  setCellValue(
+                    'AA',
+                    item.biTNoReEmployment == null
+                        ? ""
+                        : (item.biTNoReEmployment ? "" : "X"),
+                  );
+                  setCellValue(
+                    'AB',
+                    item.inTStatusId == 3
+                        ? ""
+                        : (item.nvchRNoReEmpoyment ?? ''),
+                  );
+                  setCellValue('AC', item.vchRUserCreate ?? '');
+                  setCellValue('AD', item.useRApproverPer ?? '');
+                  setCellValue('AE', item.vchRLeaderEvalution ?? '');
+                  setCellValue('AF', item.useRApproverChief ?? '');
+                  setCellValue('AG', item.useRApproverSectionManager ?? '');
+                  setCellValue('AH', item.userApproverDeft ?? '');
+                }
+
+                // 3. Xuất file
+                final bytes = excel.encode();
+                if (bytes == null) throw Exception(tr('Notsavefile'));
+
+                final fileName =
+                    'DanhSachDanhGiaHopDongThuViec_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.xlsx';
+
+                if (kIsWeb) {
+                  final blob = html.Blob(
+                    [bytes],
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  );
+                  final url = html.Url.createObjectUrlFromBlob(blob);
+                  html.AnchorElement(href: url)
+                    ..setAttribute('download', fileName)
+                    ..click();
+                  html.Url.revokeObjectUrl(url);
+                } else {
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: tr('savefile'),
+                    fileName: fileName,
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                  );
+
+                  if (outputFile != null) {
+                    await File(outputFile).writeAsBytes(bytes, flush: true);
+                  }
+                }
+
+                // 4. Hiển thị thông báo
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      icon: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      title: Text(
+                        tr('Done'),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(tr('exportDone')),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('${tr('exportError')}${e.toString()}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(tr('Cancel')),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } finally {
+                controller.isLoadingExport.value = false;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Obx(
+              () => controller.isLoadingExport.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(tr('Export')),
+            ),
           ),
         ],
       ),
     );
   }
-
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
