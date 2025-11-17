@@ -97,14 +97,14 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     if (controller.selectRows.isNotEmpty) controller.selectRows.clear();
     controller.isLoading.value = true;
     try {
-      // Tìm vị trí bắt đầu của phần dept
+      if (chucVu == "Dept" || chucVu == "Dept Manager") {
+              // Tìm vị trí bắt đầu của phần dept
       List<String> parts = section == null ? [] : (section).split(": ");
       String prPart = parts[1];
 
       // Tách phần phòng ban
       List<String> prParts = prPart.split("-");
       String dept = prParts[0];
-      if (chucVu == "Dept" || chucVu == "Dept Manager") {
         await controller.fetchSectionList(dept, chucVu);
       } else {
         if (controller.listSection.isEmpty) {
@@ -115,13 +115,13 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       controller.refreshSearch();
       controller.changeStatus('approval', null, userId, chucVu);
       if (chucVu == "Section Manager" || chucVu == "Admin") {
-        // // Tìm vị trí bắt đầu của phần dept
-        // List<String> parts = section == null ? [] : (section).split(": ");
-        // String prPart = parts[1];
+        // Tìm vị trí bắt đầu của phần dept
+        List<String> parts = section == null ? [] : (section).split(": ");
+        String prPart = parts[1];
 
-        // // Tách phần phòng ban
-        // List<String> prParts = prPart.split("-");
-        // String dept = prParts[0];
+        // Tách phần phòng ban
+        List<String> prParts = prPart.split("-");
+        String dept = prParts[0];
         await controllerUserApprover.changeStatus("", 'Dept Manager', dept);
       }
     } catch (e) {
