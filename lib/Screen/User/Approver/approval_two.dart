@@ -98,14 +98,14 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
     controller.isLoading.value = true;
     try {
       if (chucVu == "Dept" || chucVu == "Dept Manager") {
-              // Tìm vị trí bắt đầu của phần dept
-      List<String> parts = section == null ? [] : (section).split(": ");
-      String prPart = parts[1];
+        // // Tìm vị trí bắt đầu của phần dept
+        // List<String> parts = section == null ? [] : (section).split(": ");
+        // String prPart = parts[1];
 
-      // Tách phần phòng ban
-      List<String> prParts = prPart.split("-");
-      String dept = prParts[0];
-        await controller.fetchSectionList(dept, chucVu);
+        // // Tách phần phòng ban
+        // List<String> prParts = prPart.split("-");
+        // String dept = prParts[0];
+        await controller.fetchSectionList(section, "Admin");
       } else {
         if (controller.listSection.isEmpty) {
           await controller.fetchSectionList(section, chucVu);

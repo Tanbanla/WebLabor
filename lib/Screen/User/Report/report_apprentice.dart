@@ -1040,7 +1040,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     });
   }
 
-void _showExportDialog() {
+  void _showExportDialog() {
     final controller = Get.find<DashboardControllerApprentice>();
     String getStatusLabel(int? IntStatus) {
       switch (IntStatus) {
@@ -1334,6 +1334,7 @@ void _showExportDialog() {
       ),
     );
   }
+
   String getAgeFromBirthday(String? birthday) {
     if (birthday == null || birthday.isEmpty) return '';
     try {
@@ -3317,23 +3318,27 @@ Future<void> _phanQuyen(AuthState authState, int? page, int? size) async {
       case "Dept Manager":
       case "Dept":
         // Tìm vị trí bắt đầu của phần dept
-        List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
-            .split(": ");
-        String prPart = parts[1];
+        // List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+        //     .split(": ");
+        // String prPart = parts[1];
 
-        // Tách phần phòng ban
-        List<String> prParts = prPart.split("-");
-        String dept = prParts[0];
+        // // Tách phần phòng ban
+        // List<String> prParts = prPart.split("-");
+        // String dept = prParts[0];
+        // if (controller.listSection.isEmpty) {
+        //   await controller.fetchSectionList(dept, "Dept Manager");
+        // }
+
+        // await controller.fetchPagedApprenticeContracts(
+        //   page: page,
+        //   size: size,
+        //   chucVu: "Dept Manager",
+        //   section: dept,
+        // );
         if (controller.listSection.isEmpty) {
-          await controller.fetchSectionList(dept, "Dept Manager");
+          await controller.fetchSectionList(null, "Admin");
         }
-
-        await controller.fetchPagedApprenticeContracts(
-          page: page,
-          size: size,
-          chucVu: "Dept Manager",
-          section: dept,
-        );
+        await controller.fetchPagedApprenticeContracts(page: page, size: size);
         break;
       case "Director":
       case "General Director":

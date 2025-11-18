@@ -3363,24 +3363,28 @@ Future<void> _phanQuyen(AuthState authState, int? page, int? size) async {
         break;
       case "Dept Manager":
       case "Dept":
-        // Tìm vị trí bắt đầu của phần dept
-        List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
-            .split(": ");
-        String prPart = parts[1];
+        // // Tìm vị trí bắt đầu của phần dept
+        // List<String> parts = (authState.user!.chRSecCode?.toString() ?? '')
+        //     .split(": ");
+        // String prPart = parts[1];
 
-        // Tách phần phòng ban
-        List<String> prParts = prPart.split("-");
-        String dept = prParts[0];
+        // // Tách phần phòng ban
+        // List<String> prParts = prPart.split("-");
+        // String dept = prParts[0];
+        // if (controller.listSection.isEmpty) {
+        //   await controller.fetchSectionList(dept, "Dept Manager");
+        // }
+
+        // await controller.fetchPagedTwoContracts(
+        //   page: page,
+        //   size: size,
+        //   chucVu: "Dept Manager",
+        //   section: dept,
+        // );
         if (controller.listSection.isEmpty) {
-          await controller.fetchSectionList(dept, "Dept Manager");
+          await controller.fetchSectionList(null, "Admin");
         }
-
-        await controller.fetchPagedTwoContracts(
-          page: page,
-          size: size,
-          chucVu: "Dept Manager",
-          section: dept,
-        );
+        await controller.fetchPagedTwoContracts(page: page, size: size);
         break;
       case "Director":
       case "General Director":
