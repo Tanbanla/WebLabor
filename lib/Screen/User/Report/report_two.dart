@@ -43,7 +43,15 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   // Server-side pagination options
   int _rowsPerPage = 50;
-  final List<int> _availableServerRowsPerPage = const [50, 100, 150, 200];
+  final List<int> _availableServerRowsPerPage = const [
+    50,
+    100,
+    150,
+    200,
+    500,
+    1000,
+    2000,
+  ];
   bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
   void initState() {

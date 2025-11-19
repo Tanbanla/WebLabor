@@ -44,7 +44,15 @@ class _ReportApprenticeState extends State<ReportApprentice> {
   // Controller nội bộ cho phân trang tùy chỉnh (theo dõi chỉ số trang thủ công)
   // Không dùng PaginatorController vì PaginatedDataTable2 phiên bản hiện tại không hỗ trợ tham số này.
   int _rowsPerPage = 50;
-  final List<int> _availableRowsPerPage = const [50, 100, 150, 200];
+  final List<int> _availableRowsPerPage = const [
+    50,
+    100,
+    150,
+    200,
+    500,
+    1000,
+    2000,
+  ];
   bool _statusInitialized = false; // tránh gọi lại nhiều lần
   @override
   void initState() {
