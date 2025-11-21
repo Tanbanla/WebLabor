@@ -33,7 +33,7 @@ class _SmartTooltipState extends State<SmartTooltip> {
           color: Colors.white,
           child: Container(
             width: size.width > 300 ? size.width : 300, // Chiều rộng tối thiểu
-            constraints: BoxConstraints(maxHeight: 200),
+            //constraints: BoxConstraints(maxHeight: 200),
             padding: EdgeInsets.all(12),
             child: SingleChildScrollView(
               child: Text(
