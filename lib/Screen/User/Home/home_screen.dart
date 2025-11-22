@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .toString(),
                               width: size.width > 600 ? 500 : size.width * 0.75,
                               onTap: () {
-                                                                if (authState.user!.chRGroup.toString() ==
+                                if (authState.user!.chRGroup.toString() ==
                                         'Chief' ||
                                     authState.user!.chRGroup.toString() ==
                                         'Expert') {
@@ -161,13 +161,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     authState.user!.chRGroup.toString() ==
                                         'Admin') {
                                   context.go(AppRoutes.approvalPreparation);
-                                } else if (authState.user!.chRGroup.toString() == 'Section Manager'||
-                                    authState.user!.chRGroup.toString() =='Dept Manager'
-                                    || authState.user!.chRGroup.toString() == 'Director'
-                                    || authState.user!.chRGroup.toString() == 'General Director') {
+                                } else if (authState.user!.chRGroup
+                                            .toString() ==
+                                        'Section Manager' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Dept Manager' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Director' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'General Director') {
                                   context.go(AppRoutes.approvalTrial);
-                                }
-                                else {
+                                } else {
                                   context.go(AppRoutes.fillApprentice);
                                 }
                               },
@@ -222,13 +226,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     authState.user!.chRGroup.toString() ==
                                         'Admin') {
                                   context.go(AppRoutes.approvalPreparation);
-                                } else if (authState.user!.chRGroup.toString() == 'Section Manager'||
-                                    authState.user!.chRGroup.toString() =='Dept Manager'
-                                    || authState.user!.chRGroup.toString() == 'Director'
-                                    || authState.user!.chRGroup.toString() == 'General Director') {
+                                } else if (authState.user!.chRGroup
+                                            .toString() ==
+                                        'Section Manager' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Dept Manager' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'Director' ||
+                                    authState.user!.chRGroup.toString() ==
+                                        'General Director') {
                                   context.go(AppRoutes.approvalTwo);
-                                }
-                                else {
+                                } else {
                                   context.go(AppRoutes.fillTwo);
                                 }
                               },
