@@ -2238,38 +2238,38 @@ class MyData extends DataTableSource {
                     ],
                   ),
                 ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // DropdownMenuItem(
+                //   value: 'Stop Working',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Stop Working',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // DropdownMenuItem(
+                //   value: 'Finish L/C',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.done_all, color: Colors.blue, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Finish L/C',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             );
           }),
@@ -2335,38 +2335,38 @@ class MyData extends DataTableSource {
                     ],
                   ),
                 ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // DropdownMenuItem(
+                //   value: 'Stop Working',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Stop Working',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // DropdownMenuItem(
+                //   value: 'Finish L/C',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.done_all, color: Colors.blue, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Finish L/C',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             );
           }),
@@ -2432,38 +2432,38 @@ class MyData extends DataTableSource {
                     ],
                   ),
                 ),
-                DropdownMenuItem(
-                  value: 'Stop Working',
-                  child: Row(
-                    children: [
-                      Icon(Icons.pause_circle, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Stop Working',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Finish L/C',
-                  child: Row(
-                    children: [
-                      Icon(Icons.done_all, color: Colors.blue, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Finish L/C',
-                        style: TextStyle(
-                          fontSize: Common.sizeColumn,
-                          color: _getStatusColor(status),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // DropdownMenuItem(
+                //   value: 'Stop Working',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.pause_circle, color: Colors.orange, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Stop Working',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // DropdownMenuItem(
+                //   value: 'Finish L/C',
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.done_all, color: Colors.blue, size: 16),
+                //       SizedBox(width: 4),
+                //       Text(
+                //         'Finish L/C',
+                //         style: TextStyle(
+                //           fontSize: Common.sizeColumn,
+                //           color: _getStatusColor(status),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             );
           }),
