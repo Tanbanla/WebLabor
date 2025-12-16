@@ -33,6 +33,7 @@ class DashboardControllerTwo extends GetxController {
   final employeeNameQuery = ''.obs;
   final departmentQuery = ''.obs;
   final groupQuery = ''.obs;
+  final dueDateQuery = ''.obs;
   // Tracking import errors (file + messages) similar to Apprentice controller
   Rx<Uint8List?> lastImportErrorExcel = Rx<Uint8List?>(null);
   RxList<String> lastImportErrors = <String>[].obs;
@@ -129,6 +130,12 @@ class DashboardControllerTwo extends GetxController {
     applyFilters();
   }
 
+  // due date filter
+  void updateDueDate(String v) {
+    dueDateQuery.value = v.trim();
+    applyFilters();
+  }
+
   void updateEmployeeId(String v) {
     employeeIdQuery.value = v.trim();
     applyFilters();
@@ -158,7 +165,7 @@ class DashboardControllerTwo extends GetxController {
     final String empNameQ = employeeNameQuery.value.toLowerCase();
     final String deptQ = departmentQuery.value.toLowerCase();
     final String groupQ = groupQuery.value.toLowerCase();
-
+    final String dueQ = dueDateQuery.value.toLowerCase();
     bool matchesStatus(TwoContract item) {
       if (statusFilter.isEmpty || statusFilter == 'all') return true;
       if (statusFilter == 'Not Done')
@@ -207,6 +214,12 @@ class DashboardControllerTwo extends GetxController {
       if (groupQ.isNotEmpty &&
           !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ))
         continue;
+      if (dueQ.isNotEmpty) {
+        final dueDateStr = item.dtMDueDate != null
+            ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMDueDate!))
+            : '';
+        if (!dueDateStr.toLowerCase().contains(dueQ)) continue;
+      }
       result.add(item);
     }
 

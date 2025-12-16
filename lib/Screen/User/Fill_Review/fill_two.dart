@@ -854,9 +854,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             width: fw(240),
             child: _buildFilterFieldWithIcon(
               width: fw(240),
-              hint: tr('DotDanhGia'),
+              hint: tr('DualDate'),
               icon: Iconsax.document_filter,
-              onChanged: (v) => controller.updateApproverCode(v),
+              onChanged: (v) => controller.updateDueDate(v),
             ),
           ),
           SizedBox(
@@ -1211,8 +1211,8 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
-        title: tr('DotDanhGia'),
-        width: 140,
+        title: tr('DualDate'),
+        width: 100,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -2069,7 +2069,16 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(
-          _buildCopyCell(data.vchRCodeApprover ?? "", highlight: isReturn),
+          //_buildCopyCell(data.vchRCodeApprover ?? "", highlight: isReturn),
+          Center(
+            child: _buildCopyCell(
+              data.dtMDueDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMDueDate!))
+                  : "",
+            ),
+          ),
         ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId, highlight: isReturn)),
@@ -2621,7 +2630,7 @@ class MyData extends DataTableSource {
                 final raw = list[index].biTNoReEmployment ?? true;
                 if (intStatus == 5) {
                   return Row(
-                              mainAxisAlignment:  MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         raw ? Icons.check_circle : Icons.cancel,
@@ -2653,7 +2662,7 @@ class MyData extends DataTableSource {
                     DropdownMenuItem(
                       value: 'OK',
                       child: Row(
-                                  mainAxisAlignment:  MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(
                             Icons.check_circle,
@@ -2674,7 +2683,7 @@ class MyData extends DataTableSource {
                     DropdownMenuItem(
                       value: 'NG',
                       child: Row(
-                                  mainAxisAlignment:  MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.cancel, color: Colors.red, size: 16),
                           const SizedBox(width: 4),

@@ -26,6 +26,7 @@ class DashboardControllerApprentice extends GetxController {
   final employeeNameQuery = ''.obs;
   final departmentQuery = ''.obs;
   final groupQuery = ''.obs;
+  final dueDateQuery = ''.obs;
   // =========== Server side pagination state ===========
   final currentPage = 1.obs; // pageIndex from API (1-based)
   final pageSize = 50.obs; // pageSize used in request
@@ -367,6 +368,12 @@ class DashboardControllerApprentice extends GetxController {
     approverCodeQuery.value = v.trim();
     applyFilters();
   }
+  
+  // due date filter
+  void updateDueDate(String v) {
+    dueDateQuery.value = v.trim();
+    applyFilters();
+  }
 
   void updateEmployeeId(String v) {
     employeeIdQuery.value = v.trim();
@@ -397,6 +404,7 @@ class DashboardControllerApprentice extends GetxController {
     final String empNameQ = employeeNameQuery.value.toLowerCase();
     final String deptQ = departmentQuery.value.toLowerCase();
     final String groupQ = groupQuery.value.toLowerCase();
+    final String dueQ = dueDateQuery.value.toLowerCase();
 
     bool matchesStatus(ApprenticeContract item) {
       if (statusFilter.isEmpty || statusFilter == 'all') return true;
@@ -446,6 +454,12 @@ class DashboardControllerApprentice extends GetxController {
       if (groupQ.isNotEmpty &&
           !(item.chRCostCenterName ?? '').toLowerCase().contains(groupQ))
         continue;
+      if (dueQ.isNotEmpty) {
+        final dueDateStr = item.dtMDueDate != null
+            ? DateFormat('yyyy-MM-dd').format(DateTime.parse(item.dtMDueDate!))
+            : '';
+        if (!dueDateStr.toLowerCase().contains(dueQ)) continue;
+      }
       result.add(item);
     }
 

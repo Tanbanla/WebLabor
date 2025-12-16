@@ -767,6 +767,11 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         maxLines: 2,
       ).toDataColumn2(),
       DataColumnCustom(
+        title: tr('DualDate'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
         title: tr('employeeCode'),
         width: 80,
         fontSize: Common.sizeColumn,
@@ -975,7 +980,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 750),
+          constraints: const BoxConstraints(maxHeight: 850),
           child: Scrollbar(
             controller: _leftVerticalController,
             thumbVisibility: true,
@@ -984,8 +989,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
               child: DataTable(
                 headingRowHeight: 60,
                 dataRowHeight: 52,
-                horizontalMargin: 8,
-                columnSpacing: 8,
+                horizontalMargin: 5,
+                columnSpacing: 5,
                 showCheckboxColumn: true,
                 columns: frozenCols,
                 rows: frozenRows,
@@ -1017,8 +1022,8 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                   child: DataTable(
                     headingRowHeight: 60,
                     dataRowHeight: 52,
-                    horizontalMargin: 8,
-                    columnSpacing: 8,
+                    horizontalMargin: 5,
+                    columnSpacing: 5,
                     showCheckboxColumn: false,
                     columns: scrollCols,
                     rows: scrollRows,
@@ -1623,6 +1628,19 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        //
+        DataCell(
+          Center(
+            child: Text(
+              data.dtMJoinDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMJoinDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(

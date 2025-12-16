@@ -591,6 +591,11 @@ class _ReportApprenticeState extends State<ReportApprentice> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
+        title: tr('DualDate'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
         title: tr('employeeCode'),
         width: 70,
         fontSize: Common.sizeColumn,
@@ -781,7 +786,7 @@ class _ReportApprenticeState extends State<ReportApprentice> {
     final List<DataRow> scrollableRows = [];
     for (final r in fullRows) {
       final cells = r.cells;
-      final frozenCellCount = showAction ? 7 : 6; // number of left cells
+      final frozenCellCount = showAction ? 8 : 7; // number of left cells
       frozenRows.add(
         DataRow(
           selected: r.selected,
@@ -831,8 +836,8 @@ class _ReportApprenticeState extends State<ReportApprentice> {
                   // Frozen side with its own vertical scrollbar
                   ConstrainedBox(
                     constraints: const BoxConstraints(
-                      minWidth: 750,
-                      maxWidth: 750,
+                      minWidth: 850,
+                      maxWidth: 850,
                     ),
                     child: Scrollbar(
                       controller: _leftVerticalController,
@@ -1536,6 +1541,19 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        // Due Date
+        DataCell(
+          Center(
+            child: Text(
+              data.dtMDueDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMDueDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(

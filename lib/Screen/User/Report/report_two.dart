@@ -615,6 +615,11 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
+        title: tr('DualDate'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
         title: tr('employeeCode'),
         width: 70,
         fontSize: Common.sizeColumn,
@@ -816,7 +821,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
       );
     }
     final double leftMinWidth = showAction
-        ? 820
+        ? 850
         : 720; // approximate total width of frozen columns
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1494,6 +1499,19 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        // Due Date
+        DataCell(
+          Center(
+            child: Text(
+              data.dtMDueDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMDueDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(

@@ -180,4 +180,6 @@
   "InputError3":"評価基準のいずれかがNGである場合、最終評価はNGにのみ修正できます",
   "selectApprover":"次の承認者を選択"
   ,"pleaseSelectApprover":"次の承認者を選択してください"
+  ,"DualDate": "評価期限"
+  ,"HetHan": "期限切れ"
 }

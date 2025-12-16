@@ -688,9 +688,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             width: fw(240),
             child: _buildFilterFieldWithIcon(
               width: fw(240),
-              hint: tr('DotDanhGia'),
+              hint: tr('DualDate'),
               icon: Iconsax.document_filter,
-              onChanged: (v) => controller.updateApproverCode(v),
+              onChanged: (v) => controller.updateDueDate(v),
             ),
           ),
           SizedBox(
@@ -871,6 +871,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
       },
     );
   }
+
   // Combined layout for header, search, and evaluation note side-by-side (wide screens)
   Widget _buildHeaderSearchWithNote() {
     return LayoutBuilder(
@@ -1148,8 +1149,8 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
-        title: tr('DotDanhGia'),
-        width: 140,
+        title: tr('DualDate'),
+        width: 100,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
@@ -2035,7 +2036,16 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(
-          _buildCopyCell(data.vchRCodeApprover ?? "", highlight: isReturn),
+          //_buildCopyCell(data.vchRCodeApprover ?? "", highlight: isReturn),
+          Center(
+            child: _buildCopyCell(
+              data.dtMDueDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMDueDate!))
+                  : "",
+            ),
+          ),
         ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId, highlight: isReturn)),

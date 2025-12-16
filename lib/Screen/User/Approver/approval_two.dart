@@ -747,6 +747,11 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
       DataColumnCustom(
+        title: tr('DualDate'),
+        width: 100,
+        fontSize: Common.sizeColumn,
+      ).toDataColumn2(),
+      DataColumnCustom(
         title: tr('employeeCode'),
         width: 70,
         fontSize: Common.sizeColumn,
@@ -930,7 +935,7 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 750),
+          constraints: const BoxConstraints(maxWidth: 850),
           child: Scrollbar(
             controller: _leftVerticalController,
             thumbVisibility: true,
@@ -1578,6 +1583,18 @@ class MyData extends DataTableSource {
         DataCell(_getHienTrangColor(data.inTStatusId)),
         // Copyable vchRCodeApprover
         DataCell(_buildCopyCell(data.vchRCodeApprover ?? "")),
+        DataCell(
+          Center(
+            child: Text(
+              data.dtMJoinDate != null
+                  ? DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime.parse(data.dtMJoinDate!))
+                  : "",
+              style: TextStyle(fontSize: Common.sizeColumn),
+            ),
+          ),
+        ),
         // Copyable vchREmployeeId
         DataCell(_buildCopyCell(data.vchREmployeeId)),
         DataCell(
