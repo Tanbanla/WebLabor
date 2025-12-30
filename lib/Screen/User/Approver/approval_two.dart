@@ -888,9 +888,15 @@ class _ApprovalTwoScreenState extends State<ApprovalTwoScreen> {
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
+      // DataColumnCustom(
+      //   title: tr('ChiefApproval'),
+      //   width: 170,
+      //   maxLines: 2,
+      //   fontSize: Common.sizeColumn,
+      // ).toDataColumn2(),
       DataColumnCustom(
-        title: tr('ChiefApproval'),
-        width: 170,
+        title: tr('XacNhanTruoc'),
+        width: 150,
         maxLines: 2,
         fontSize: Common.sizeColumn,
       ).toDataColumn2(),
@@ -1536,6 +1542,14 @@ class MyData extends DataTableSource {
         _ => '', // Giá trị mặc định cho các trường hợp khác
       },
     );
+    final NguoiDanhGiaTrc = TextEditingController(
+      text: switch (data.inTStatusId) {
+        6 => data.useRApproverChief ?? '',
+        7 => data.useRApproverSectionManager ?? '',
+        8 => data.userApproverDeft ?? '',
+        _ => '', // Giá trị mặc định cho các trường hợp khác
+      },
+    );
     return DataRow2(
       color: MaterialStateProperty.resolveWith<Color?>((
         Set<MaterialState> states,
@@ -1830,10 +1844,19 @@ class MyData extends DataTableSource {
           ),
         ),
         // chief xác nhận kết quả
+        // DataCell(
+        //   Center(
+        //     child: Text(
+        //       data.useRApproverChief ?? '',
+        //       style: TextStyle(fontSize: Common.sizeColumn),
+        //     ),
+        //   ),
+        // ),
+        // Nguoi xac nhan trc
         DataCell(
           Center(
             child: Text(
-              data.useRApproverChief ?? '',
+              NguoiDanhGiaTrc.text,
               style: TextStyle(fontSize: Common.sizeColumn),
             ),
           ),
