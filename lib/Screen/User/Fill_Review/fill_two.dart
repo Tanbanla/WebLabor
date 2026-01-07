@@ -2704,43 +2704,94 @@ class MyData extends DataTableSource {
           ),
         ),
         // Lý do không tuyển lại
+        // DataCell(
+        //   (() {
+        //     final intStatus = data.inTStatusId ?? 0;
+        //     if (intStatus == 3) {
+        //       return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+        //     }
+        //     if (intStatus == 5) {
+        //       // Read-only hiển thị lý do không tuyển lại
+        //       return Text(
+        //         reasonController.text,
+        //         style: TextStyle(fontSize: Common.sizeColumn),
+        //       );
+        //     }
+        //     return Focus(
+        //       onFocusChange: (hasFocus) {
+        //         if (!hasFocus) {
+        //           controller.updateNotRehireReason(
+        //             data.vchREmployeeId.toString(),
+        //             reasonController.text,
+        //           );
+        //         }
+        //       },
+        //       child: TextFormField(
+        //         controller: reasonController,
+        //         style: TextStyle(fontSize: Common.sizeColumn),
+        //         decoration: InputDecoration(
+        //           labelText: tr('reason'),
+        //           labelStyle: TextStyle(fontSize: Common.sizeColumn),
+        //           border: OutlineInputBorder(
+        //             borderRadius: BorderRadius.circular(8),
+        //           ),
+        //         ),
+        //       ),
+        //     );
+        //   })(),
+        // ),
+        // Lý do không tuyển lại
         DataCell(
           (() {
             final intStatus = data.inTStatusId ?? 0;
             if (intStatus == 3) {
               return Text('', style: TextStyle(fontSize: Common.sizeColumn));
             }
-            if (intStatus == 5) {
-              // Read-only hiển thị lý do không tuyển lại
-              return Text(
-                reasonController.text,
-                style: TextStyle(fontSize: Common.sizeColumn),
-              );
-            }
-            return Focus(
-              onFocusChange: (hasFocus) {
-                if (!hasFocus) {
-                  controller.updateNotRehireReason(
-                    data.vchREmployeeId.toString(),
-                    reasonController.text,
-                  );
-                }
-              },
-              child: TextFormField(
-                controller: reasonController,
-                style: TextStyle(fontSize: Common.sizeColumn),
-                decoration: InputDecoration(
-                  labelText: tr('reason'),
-                  labelStyle: TextStyle(fontSize: Common.sizeColumn),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            // Chỉ hiển thị ô nhập lý do khi người dùng chọn 'X' (không tuyển lại)
+            return Obx(() {
+              final list = controller.filterdataList; // observable read
+              if (index >= list.length) {
+                return const SizedBox.shrink();
+              }
+              final raw =
+                  list[index].biTNoReEmployment ??
+                  true; // true => 'O', false => 'X'
+              final isX = !raw; // 'X' được chọn khi không tuyển lại
+              if (!isX) {
+                // Nếu chọn 'O' thì không hiển thị trường lý do
+                return Text('', style: TextStyle(fontSize: Common.sizeColumn));
+              }
+              if (intStatus == 5) {
+                // Read-only khi ở trạng thái đã phê duyệt/hoàn tất
+                return Text(
+                  reasonController.text,
+                  style: TextStyle(fontSize: Common.sizeColumn),
+                );
+              }
+              return Focus(
+                onFocusChange: (hasFocus) {
+                  if (!hasFocus) {
+                    controller.updateNotRehireReason(
+                      data.vchREmployeeId.toString(),
+                      reasonController.text,
+                    );
+                  }
+                },
+                child: TextFormField(
+                  controller: reasonController,
+                  style: TextStyle(fontSize: Common.sizeColumn),
+                  decoration: InputDecoration(
+                    labelText: tr('reason'),
+                    labelStyle: TextStyle(fontSize: Common.sizeColumn),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            });
           })(),
         ),
-
         // thuộc tính approver
         if (data.inTStatusId == 5)
           DataCell(
