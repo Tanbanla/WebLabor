@@ -1219,29 +1219,29 @@ class DashboardControllerApprentice extends GetxController {
           .map((item) => ApprenticeContract.fromJson(item.toJson()))
           .toList();
       // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
-      bool _hasMeaningfulChanges(
-        ApprenticeContract original,
-        ApprenticeContract edited,
-      ) {
-        bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
-        bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
-        return
-        // Điểm đánh giá/Leader
-        diffStr(original.vchRLyThuyet, edited.vchRLyThuyet) ||
-            diffStr(original.vchRThucHanh, edited.vchRThucHanh) ||
-            diffStr(original.vchRCompleteWork, edited.vchRCompleteWork) ||
-            diffStr(original.vchRLearnWork, edited.vchRLearnWork) ||
-            diffStr(original.vchRThichNghi, edited.vchRThichNghi) ||
-            diffStr(original.vchRUseful, edited.vchRUseful) ||
-            diffStr(original.vchRContact, edited.vchRContact) ||
-            diffStr(original.vcHNeedViolation, edited.vcHNeedViolation) ||
-            diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
-            // Tái tuyển dụng và lý do
-            diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
-            diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
-            // Ghi chú
-            diffStr(original.vchRNote, edited.vchRNote);
-      }
+      // bool _hasMeaningfulChanges(
+      //   ApprenticeContract original,
+      //   ApprenticeContract edited,
+      // ) {
+      //   bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
+      //   bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
+      //   return
+      //   // Điểm đánh giá/Leader
+      //   diffStr(original.vchRLyThuyet, edited.vchRLyThuyet) ||
+      //       diffStr(original.vchRThucHanh, edited.vchRThucHanh) ||
+      //       diffStr(original.vchRCompleteWork, edited.vchRCompleteWork) ||
+      //       diffStr(original.vchRLearnWork, edited.vchRLearnWork) ||
+      //       diffStr(original.vchRThichNghi, edited.vchRThichNghi) ||
+      //       diffStr(original.vchRUseful, edited.vchRUseful) ||
+      //       diffStr(original.vchRContact, edited.vchRContact) ||
+      //       diffStr(original.vcHNeedViolation, edited.vcHNeedViolation) ||
+      //       diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
+      //       // Tái tuyển dụng và lý do
+      //       diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
+      //       diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
+      //       // Ghi chú
+      //       diffStr(original.vchRNote, edited.vchRNote);
+      // }
 
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList

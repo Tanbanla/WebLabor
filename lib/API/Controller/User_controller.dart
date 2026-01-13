@@ -561,7 +561,7 @@ class DashboardControllerUser extends GetxController {
         "mail_cc": cc == "null" ? "" : cc,
         "mail_bcc": bcc == "null" ? "" : bcc,
         "body": Common.getRejectionEmailBody(
-          confirmLink: "http://172.26.248.62:8055/",
+          confirmLink: "http://apbivnap24:8055/",
           loaiTuChoi: loaituchoi,
           approverNG: approverNG,
           rejectedRequests: rejectedRequests,
@@ -606,7 +606,7 @@ class DashboardControllerUser extends GetxController {
         "mail_cc": cc == "null" ? "" : cc,
         "mail_bcc": bcc == "null" ? "" : bcc,
         "body": Common.getKetQuaEmailBody(
-          confirmLink: "http://172.26.248.62:8055/",
+          confirmLink: "http://apbivnap24:8055/",
           ketquaOld: ketquaOld,
           ketquaNew: ketquaNew,
           rejectedRequests: rejectedRequests,

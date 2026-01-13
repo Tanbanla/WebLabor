@@ -1233,22 +1233,22 @@ class DashboardControllerTwo extends GetxController {
           .map((item) => TwoContract.fromJson(item.toJson()))
           .toList();
       // So sánh những trường có ý nghĩa để xác định có thay đổi thực sự hay không
-      bool _hasMeaningfulChanges(TwoContract original, TwoContract edited) {
-        bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
-        bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
+      // bool _hasMeaningfulChanges(TwoContract original, TwoContract edited) {
+      //   bool diffStr(String? a, String? b) => (a ?? '') != (b ?? '');
+      //   bool diffBool(bool? a, bool? b) => (a ?? false) != (b ?? false);
 
-        return
-        // Điểm đánh giá/Leader
-        diffStr(original.nvchRCompleteWork, edited.nvchRCompleteWork) ||
-            diffStr(original.nvchRUseful, edited.nvchRUseful) ||
-            diffStr(original.vchRNote, edited.vchRNote) ||
-            diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
-            // Tái tuyển dụng và lý do
-            diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
-            diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
-            // Ghi chú
-            diffStr(original.vchRNote, edited.vchRNote);
-      }
+      //   return
+      //   // Điểm đánh giá/Leader
+      //   diffStr(original.nvchRCompleteWork, edited.nvchRCompleteWork) ||
+      //       diffStr(original.nvchRUseful, edited.nvchRUseful) ||
+      //       diffStr(original.vchRNote, edited.vchRNote) ||
+      //       diffStr(original.vchRReasultsLeader, edited.vchRReasultsLeader) ||
+      //       // Tái tuyển dụng và lý do
+      //       diffBool(original.biTNoReEmployment, edited.biTNoReEmployment) ||
+      //       diffStr(original.nvchRNoReEmpoyment, edited.nvchRNoReEmpoyment) ||
+      //       // Ghi chú
+      //       diffStr(original.vchRNote, edited.vchRNote);
+      // }
 
       // ⚡ PERFORMANCE OPTIMIZATION: Tạo Map để tìm kiếm O(1) thay vì O(n)
       // Tối ưu từ O(n²) xuống O(n) cho việc tìm kiếm originalList
@@ -1356,6 +1356,7 @@ class DashboardControllerTwo extends GetxController {
               twocontract[i].dtMLeadaerEvalution = formatDateTime(
                 DateTime.now(),
               );
+              twocontract[i].dtMApproverChief = formatDateTime(DateTime.now());
               twocontract[i].biTApproverChief = true;
               twocontract[i].nvchRApproverChief = '';
               twocontract[i].useRApproverSectionManager = userApprover;
