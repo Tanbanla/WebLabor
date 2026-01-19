@@ -172,7 +172,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
             // Tìm vị trí bắt đầu của phần dept
             List<String> parts =
                 authState.user!.chRSecCode?.toString().split(':') ?? [];
-            String prPart = parts[1];
+            String prPart = parts.length >= 2
+                ? parts[1]
+                : (parts.isNotEmpty ? parts[0] : '');
 
             // Tách phần phòng ban
             List<String> prParts = prPart.split("-");
@@ -587,10 +589,10 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
   Widget _buildSearchAndActions() {
     final authState = Provider.of<AuthState>(context, listen: true);
-    String sectionName = authState.user!.chRSecCode
-        .toString()
-        .split(':')[1]
-        .trim();
+    final secParts = authState.user!.chRSecCode?.toString().split(':') ?? [];
+    String sectionName = secParts.length >= 2
+        ? '${secParts[0].trim()} : ${secParts[1].trim()}'
+        : (secParts.isNotEmpty ? secParts[0].trim() : '');
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxW = constraints.maxWidth;
