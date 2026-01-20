@@ -368,7 +368,7 @@ class DashboardControllerApprentice extends GetxController {
     approverCodeQuery.value = v.trim();
     applyFilters();
   }
-  
+
   // due date filter
   void updateDueDate(String v) {
     dueDateQuery.value = v.trim();
@@ -1402,10 +1402,34 @@ class DashboardControllerApprentice extends GetxController {
                   contract[i].bitApproverDeft = true;
                   break;
                 default:
-                  contract[i].inTStatusId = 6;
-                  contract[i].useRApproverChief = userUpdate;
-                  contract[i].useRApproverSectionManager = userApprover;
-                  contract[i].dtMApproverChief = formatDateTime(DateTime.now());
+                  if (chucVu == "Section Manager") {
+                    contract[i].inTStatusId = 7;
+                    contract[i].vchRLeaderEvalution = userUpdate;
+                    contract[i].useRApproverChief = userUpdate;
+                    contract[i].useRApproverSectionManager = userUpdate;
+                    contract[i].dtMApproverManager = formatDateTime(
+                      DateTime.now(),
+                    );
+                    contract[i].dtMLeadaerEvalution = formatDateTime(
+                      DateTime.now(),
+                    );
+                    contract[i].dtMApproverChief = formatDateTime(
+                      DateTime.now(),
+                    );
+                    contract[i].biTApproverChief = false;
+                    contract[i].nvchRApproverChief = '';
+                    contract[i].biTApproverSectionManager = true;
+                    contract[i].nvchRApproverManager = '';
+                    contract[i].userApproverDeft = userApprover;
+                    contract[i].bitApproverDeft = true;
+                  } else {
+                    contract[i].inTStatusId = 6;
+                    contract[i].useRApproverChief = userUpdate;
+                    contract[i].useRApproverSectionManager = userApprover;
+                    contract[i].dtMApproverChief = formatDateTime(
+                      DateTime.now(),
+                    );
+                  }
                   break;
               }
             }

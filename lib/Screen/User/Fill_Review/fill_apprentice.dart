@@ -213,7 +213,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
 
           controllerUserApprover.changeStatus(
             sectionName,
-            'Chief,Expert',
+            'Chief,Expert,Section Manager',
             null,
           );
       }

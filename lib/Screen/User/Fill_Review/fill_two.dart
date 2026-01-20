@@ -210,7 +210,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           }
           controllerUserApprover.changeStatus(
             sectionName,
-            'Chief,Expert',
+            'Chief,Expert,Section Manager',
             null,
           );
       }
