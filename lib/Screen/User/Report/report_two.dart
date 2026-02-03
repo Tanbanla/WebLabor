@@ -1620,10 +1620,23 @@ class MyData extends DataTableSource {
           ),
         ),
         DataCell(
-          Text(
-            data.nvarchaRViolation?.toString() ?? "",
-            style: TextStyle(fontSize: Common.sizeColumn),
+          SmartTooltip(
+            text: data.nvarchaRViolation?.toString() ?? "",
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(
+                data.nvarchaRViolation?.toString() ?? "",
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(fontSize: Common.sizeColumn),
+              ),
+            ),
           ),
+          // Text(
+          //   data.nvarchaRViolation?.toString() ?? "",
+          //   style: TextStyle(fontSize: Common.sizeColumn),
+          // ),
         ),
         //4 thuộc tính đánh giá
         DataCell(
