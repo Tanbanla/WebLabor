@@ -1115,7 +1115,7 @@ class _ReportTwoScreenState extends State<ReportTwoScreen> {
                       CellIndex.indexByString('$column$row'),
                     );
                     cell.value = value is DateTime
-                        ? TextCellValue(DateFormat('yyyy-MM-dd').format(value))
+                        ? TextCellValue(DateFormat('dd-MM-yyyy').format(value))
                         : TextCellValue(value.toString());
                     cell.cellStyle = getStyle(column);
                   }
@@ -1505,7 +1505,7 @@ class MyData extends DataTableSource {
             child: Text(
               data.dtMDueDate != null
                   ? DateFormat(
-                      'yyyy-MM-dd',
+                      'dd-MM-yyyy',
                     ).format(DateTime.parse(data.dtMDueDate!))
                   : "",
               style: TextStyle(fontSize: Common.sizeColumn),
@@ -1560,7 +1560,7 @@ class MyData extends DataTableSource {
             child: Text(
               data.dtMJoinDate != null
                   ? DateFormat(
-                      'yyyy-MM-dd',
+                      'dd-MM-yyyy',
                     ).format(DateTime.parse(data.dtMJoinDate!))
                   : "",
               style: TextStyle(fontSize: Common.sizeColumn),
@@ -1572,7 +1572,7 @@ class MyData extends DataTableSource {
             child: Text(
               data.dtMEndDate != null
                   ? DateFormat(
-                      'yyyy-MM-dd',
+                      'dd-MM-yyyy',
                     ).format(DateTime.parse(data.dtMEndDate!))
                   : "",
               style: TextStyle(fontSize: Common.sizeColumn),
@@ -2237,7 +2237,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactReadOnlyField(
                       value: DateFormat(
-                        'yyyy-MM-dd',
+                        'dd-MM-yyyy',
                       ).format(DateTime.parse(twoContract.dtMJoinDate!)),
                       label: tr('contractEffective'),
                       width: 250,
@@ -2247,7 +2247,7 @@ class _EditTwoContractDialog extends StatelessWidget {
                   Expanded(
                     child: _buildCompactReadOnlyField(
                       value: DateFormat(
-                        'yyyy-MM-dd',
+                        'dd-MM-yyyy',
                       ).format(DateTime.parse(twoContract.dtMEndDate!)),
                       label: tr('contractEndDate'),
                       width: 250,
@@ -2687,7 +2687,7 @@ class _UpdateDtmDue extends StatelessWidget {
                   child: Text(
                     tr("NgayHetHan") +
                         DateFormat(
-                          'yyyy-MM-dd',
+                          'dd-MM-yyyy',
                         ).format(DateTime.parse(edited.dtMDueDate!)),
                     style: TextStyle(
                       color: Colors.grey[700],
@@ -2700,12 +2700,12 @@ class _UpdateDtmDue extends StatelessWidget {
               _buildDatePickerField(
                 context: context,
                 initialDate: contract.dtMDueDate != null
-                    ? DateFormat('yyyy-MM-dd').parse(contract.dtMDueDate!)
+                    ? DateFormat('dd-MM-yyyy').parse(contract.dtMDueDate!)
                     : DateTime.now().add(const Duration(days: 30)),
                 label: tr("NgayMoi"),
                 onDateSelected: (date) {
                   selectedDate = date;
-                  edited.dtMDueDate = DateFormat('yyyy-MM-dd').format(date);
+                  edited.dtMDueDate = DateFormat('dd-MM-yyyy').format(date);
                 },
               ),
 
