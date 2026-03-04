@@ -10,7 +10,7 @@ import 'package:web_labor_contract/class/User_Approver.dart';
 import 'package:web_labor_contract/Common/action_button.dart';
 import 'package:web_labor_contract/Common/common.dart';
 import 'package:web_labor_contract/Common/data_column_custom.dart';
-import 'package:excel/excel.dart' hide Border;
+import 'package:excel/excel.dart' hide Border, TextSpan;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -163,12 +163,7 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Section
-            _buildHeader(),
-            const SizedBox(height: 10),
-
-            // Search and Action Buttons
-            _buildSearchAndActions(),
+            _titleView(),
             const SizedBox(height: 10),
 
             // Data Table
@@ -218,6 +213,159 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
                 );
               }),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _titleView() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              _buildHeader(),
+              const SizedBox(height: 10),
+
+              // Search and Action Buttons
+              _buildSearchAndActions(),
+            ],
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(flex: 4, child: _buildEvaluationNoteStandalone()),
+      ],
+    );
+  }
+
+  // phan chu thich
+  Widget _buildEvaluationNoteStandalone() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+              const SizedBox(width: 6),
+              Text(
+                'Lý giải / 説明',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildNoteLine(
+            'Cột kết quả đánh giá hiển thị 1 trong các kết quả sau: 評価結果列には、次のいずれかの結果が表示されます:',
+          ),
+          _buildStatusLine(
+            'NG',
+            'Không đạt. Công ty không ký tiếp hợp đồng /不合格。会社は契約を更新されない。',
+            Colors.red,
+          ),
+          _buildNoteLine(
+            'Kết quả chung là NG khi có ít nhất một hạng mục bị đánh giá là NG /評価案内：一般評価には一項がNGであれば、評価がNGとなる',
+            leading: '※',
+          ),
+          _buildStatusLine(
+            'OK',
+            'Đạt. Công ty sẽ tiếp tục ký Hợp đồng kế tiếp /合格。当社は次の契約の締結に進む予定です。',
+            Colors.green,
+          ),
+          _buildStatusLine(
+            'Finish L/C',
+            'CNV không muốn ký tiếp hợp đồng/ 従業者が契約を続けたくない',
+            Colors.blue,
+          ),
+          _buildStatusLine(
+            'Stop Working',
+            'CNV đã viết đơn nghỉ việc/ 従業者が退職書を書きました',
+            Colors.orange,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoteLine(String text, {String? leading}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (leading != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4, top: 2),
+              child: Text(
+                leading,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[700],
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusLine(String code, String desc, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                margin: const EdgeInsets.only(right: 6, bottom: 2),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: color.withOpacity(0.6), width: 0.8),
+                ),
+                child: Text(
+                  code,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: color.darken(),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ),
+            TextSpan(text: desc),
           ],
         ),
       ),
@@ -2203,4 +2351,14 @@ class MyData extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+}
+
+// Extension method to slightly darken a Color
+extension _ColorShade on Color {
+  Color darken([double amount = .15]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
+  }
 }
