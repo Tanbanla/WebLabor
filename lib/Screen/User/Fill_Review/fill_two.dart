@@ -155,6 +155,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           );
           break;
         case 'Chief':
+        case 'Chief Per':
         case 'Expert':
           controller.changeStatus(
             'Chief',

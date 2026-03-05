@@ -153,6 +153,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           );
           break;
         case 'Chief':
+        case 'Chief Per':
         case 'Expert':
           controller.changeStatus(
             'Chief',
