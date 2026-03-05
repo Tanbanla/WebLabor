@@ -730,7 +730,7 @@ class DashboardControllerApprentice extends GetxController {
       } else if (statusId == 'PTHC') {
         filters.add({
           "field": "INT_STATUS_ID",
-          "value": ["3", "4"],
+          "value": ["3", "4", "5"],
           "operator": "IN",
           "logicType": "AND",
         });
@@ -795,7 +795,9 @@ class DashboardControllerApprentice extends GetxController {
                     (a) =>
                         (a['vchR_LEADER_EVALUTION'] == adid &&
                             a['inT_STATUS_ID'] == 4) ||
-                        (a['inT_STATUS_ID'] == 3),
+                        (a['inT_STATUS_ID'] == 3) ||
+                        (a['inT_STATUS_ID'] == 5 &&
+                            a['useR_APPROVER_CHIEF'] == adid),
                   )
                   .map((contract) => ApprenticeContract.fromJson(contract))
                   .toList(),
@@ -807,7 +809,9 @@ class DashboardControllerApprentice extends GetxController {
                     (a) =>
                         (a['vchR_LEADER_EVALUTION'] == adid &&
                             a['inT_STATUS_ID'] == 4) ||
-                        (a['inT_STATUS_ID'] == 3),
+                        (a['inT_STATUS_ID'] == 3) ||
+                        (a['inT_STATUS_ID'] == 5 &&
+                            a['useR_APPROVER_CHIEF'] == adid),
                   )
                   .map((contract) => ApprenticeContract.fromJson(contract))
                   .toList(),

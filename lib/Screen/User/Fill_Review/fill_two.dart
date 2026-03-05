@@ -139,7 +139,12 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           );
           break;
         case 'Admin':
-          controller.changeStatus('PTHC', null, null, null);
+          controller.changeStatus(
+            'PTHC',
+            null,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
           if (controller.listSection.isEmpty) {
             await controller.fetchSectionList(null, 'Admin');
           }
