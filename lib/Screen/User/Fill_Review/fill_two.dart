@@ -587,6 +587,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                   //   null,
                   // );
                 } else if (authState.user!.chRGroup.toString() == "Chief" ||
+                    authState.user!.chRGroup.toString() == "Chief Per" ||
                     authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     'Chief',
@@ -1893,7 +1894,9 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
                     adid,
                     null,
                   );
-                } else if (group == "Chief" || group == "Export") {
+                } else if (group == "Chief" ||
+                    group == "Chief Per" ||
+                    group == "Export") {
                   await controller.changeStatus(
                     'Chief',
                     sectionName,
@@ -3348,6 +3351,7 @@ class _ReturnTwoContract extends StatelessWidget {
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                               "Chief" ||
+                          authState.user!.chRGroup.toString() == "Chief Per" ||
                           authState.user!.chRGroup.toString() == "Expert") {
                         await controller.changeStatus(
                           'Chief',

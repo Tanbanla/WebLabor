@@ -142,7 +142,12 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
           );
           break;
         case 'Admin':
-          controller.changeStatus('PTHC', null, authState.user!.chRUserid.toString(), null);
+          controller.changeStatus(
+            'PTHC',
+            null,
+            authState.user!.chRUserid.toString(),
+            null,
+          );
           if (controller.listSection.isEmpty) {
             await controller.fetchSectionList(null, 'Admin');
           }
@@ -418,6 +423,7 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                   //   null,
                   // );
                 } else if (authState.user!.chRGroup.toString() == "Chief" ||
+                    authState.user!.chRGroup.toString() == "Chief Per" ||
                     authState.user!.chRGroup.toString() == "Expert") {
                   await controllerTwo.changeStatus(
                     'Chief',
@@ -1859,7 +1865,9 @@ class _FillApprenticeScreenState extends State<FillApprenticeScreen> {
                     adid,
                     null,
                   );
-                } else if (group == "Chief" || group == "Expert") {
+                } else if (group == "Chief" ||
+                    group == "Chief Per" ||
+                    group == "Expert") {
                   await controller.changeStatus(
                     'Chief',
                     sectionName,
@@ -3829,6 +3837,7 @@ class _ReturnConApprenticetract extends StatelessWidget {
                         );
                       } else if (authState.user!.chRGroup.toString() ==
                               "Chief" ||
+                          authState.user!.chRGroup.toString() == "Chief Per" ||
                           authState.user!.chRGroup.toString() == "Expert") {
                         await controller.changeStatus(
                           'Chief',

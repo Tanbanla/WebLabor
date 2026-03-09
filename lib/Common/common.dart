@@ -10,9 +10,9 @@ class Common {
   // If the app is served via https we must call the https backend (port 44351).
   // If the app is served via http we call the http backend (port 8501).
   // For non-web platforms we default to the http base unless overridden.
-  static const String _httpBase = "http://172.26.248.62:8501/api/";
+  static const String _httpBase = "http://apbivnap18:8501/api/";
   static const String _httpsBase =
-      "https://172.26.248.62:44351/api/"; // already ends with /
+      "https://apbivnap18:44351/api/"; // already ends with /
 
   // Use a getter instead of const so callers always get the right value at runtime.
   static String get API {
