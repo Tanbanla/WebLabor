@@ -96,16 +96,29 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
       String sectionName = parts.length >= 2
           ? '${parts[0].trim()} : ${parts[1].trim()}'
           : (parts.isNotEmpty ? parts[0].trim() : '');
-
+      String sectionNameForQuery = sectionName;
       switch (group) {
         case 'PTHC':
+          // if (controllerPTHC.listPTHCsection.isNotEmpty) {
+          //   sectionName =
+          //       '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+          // } else {
+          //   sectionName = parts.length >= 2
+          //       ? '${parts[0].trim()} : ${parts[1].trim()}'
+          //       : (parts.isNotEmpty ? parts[0].trim() : '');
+          // }
           if (controllerPTHC.listPTHCsection.isNotEmpty) {
             sectionName =
                 '[${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
+            sectionNameForQuery =
+                '["$sectionNameForQuery",${controllerPTHC.listPTHCsection.map((e) => '"$e"').join(',')}]';
           } else {
             sectionName = parts.length >= 2
                 ? '${parts[0].trim()} : ${parts[1].trim()}'
                 : (parts.isNotEmpty ? parts[0].trim() : '');
+            sectionNameForQuery = sectionName.isNotEmpty
+                ? '["$sectionNameForQuery",$sectionName]'
+                : '["$sectionNameForQuery"]';
           }
           controller.changeStatus(
             'PTHC',
@@ -117,7 +130,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
             await controller.fetchSectionList(sectionName, 'PTHC');
           }
           controllerUserApprover.changeStatus(
-            sectionName,
+            sectionNameForQuery,
             'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
             null,
           );
