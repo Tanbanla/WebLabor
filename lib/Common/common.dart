@@ -146,9 +146,9 @@ class Common {
   static const String ContractTotalByUser =
       "Report/get-quantity-total-contract-statistic-by-adid-role/";
   // Send mail
-  static const String SendMail = "http://172.26.248.62:8501/send-email-notify";
+  static const String SendMail = "http://apbivnap18:8501/send-email-notify";
   static const String SendMailCustom =
-      "http://172.26.248.62:8501/send-email-notify-custom";
+      "http://apbivnap18:8501/send-email-notify-custom";
 
   // font size
   static double sizeColumn = 12;

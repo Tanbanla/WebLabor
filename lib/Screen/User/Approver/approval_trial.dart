@@ -1129,65 +1129,70 @@ class _ApprovalTrialScreenState extends State<ApprovalTrialScreen> {
         ),
       );
     }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 850),
-          child: Scrollbar(
-            controller: _leftVerticalController,
-            thumbVisibility: true,
-            child: SingleChildScrollView(
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Frozen side with its own vertical scrollbar
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 850, maxWidth: 850),
+            child: Scrollbar(
               controller: _leftVerticalController,
-              child: DataTable(
-                headingRowHeight: 60,
-                dataRowHeight: 52,
-                horizontalMargin: 5,
-                columnSpacing: 5,
-                showCheckboxColumn: true,
-                columns: frozenCols,
-                rows: frozenRows,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                controller: _leftVerticalController,
+                child: DataTable(
+                  headingRowHeight: 60,
+                  dataRowHeight: 52,
+                  horizontalMargin: 5, // Giảm margin
+                  columnSpacing: 5, // Giảm khoảng cách cột
+                  showCheckboxColumn: true,
+                  columns: frozenCols,
+                  rows: frozenRows,
+                ),
               ),
             ),
           ),
-        ),
-        Container(width: 1, color: Colors.grey[300]),
-        Expanded(
-          child: RawScrollbar(
-            controller: _rightScrollController,
-            thumbVisibility: true,
-            trackVisibility: true,
-            thickness: 10,
-            radius: const Radius.circular(8),
-            thumbColor: Common.primaryColor.withOpacity(0.7),
-            trackColor: Colors.white.withOpacity(0.15),
-            fadeDuration: const Duration(milliseconds: 500),
-            timeToFade: const Duration(seconds: 2),
-            scrollbarOrientation: ScrollbarOrientation.bottom,
-            child: SingleChildScrollView(
+          // Divider
+          Container(width: 1, height: double.infinity, color: Colors.grey[300]),
+          // Scrollable side (horizontal + synced vertical)
+          Expanded(
+            child: RawScrollbar(
               controller: _rightScrollController,
-              scrollDirection: Axis.horizontal,
-              child: Scrollbar(
-                controller: _rightVerticalController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
+              thumbVisibility: true,
+              trackVisibility: true,
+              thickness: 10,
+              radius: const Radius.circular(8),
+              thumbColor: Common.primaryColor.withOpacity(0.7),
+              trackColor: Colors.white.withOpacity(0.15),
+              fadeDuration: const Duration(milliseconds: 500),
+              timeToFade: const Duration(seconds: 2),
+              scrollbarOrientation: ScrollbarOrientation.bottom,
+              child: SingleChildScrollView(
+                controller: _rightScrollController,
+                scrollDirection: Axis.horizontal,
+                child: Scrollbar(
                   controller: _rightVerticalController,
-                  child: DataTable(
-                    headingRowHeight: 60,
-                    dataRowHeight: 52,
-                    horizontalMargin: 5,
-                    columnSpacing: 5,
-                    showCheckboxColumn: false,
-                    columns: scrollCols,
-                    rows: scrollRows,
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    controller: _rightVerticalController,
+                    child: DataTable(
+                      headingRowHeight: 60,
+                      dataRowHeight: 52,
+                      horizontalMargin: 5, // Giảm margin
+                      columnSpacing: 5, // Giảm khoảng cách cột
+                      showCheckboxColumn: false,
+                      columns: scrollCols,
+                      rows: scrollRows,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

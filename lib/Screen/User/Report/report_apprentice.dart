@@ -2574,19 +2574,43 @@ class _EditContractDialog extends StatelessWidget {
 }
 
 // Update gia hạn thời gian
-class _UpdateDtmDue extends StatelessWidget {
+class _UpdateDtmDue extends StatefulWidget {
   final ApprenticeContract contract;
-  final DashboardControllerApprentice controller = Get.find();
   final int? size;
 
-  _UpdateDtmDue({required this.contract, this.size});
+  const _UpdateDtmDue({required this.contract, this.size});
+
+  @override
+  State<_UpdateDtmDue> createState() => _UpdateDtmDueState();
+}
+
+class _UpdateDtmDueState extends State<_UpdateDtmDue> {
+  final DashboardControllerApprentice controller = Get.find();
+  late ApprenticeContract edited;
+  late DateTime selectedDate;
+  final RxString errorMessage = ''.obs;
+  late AuthState authState;
+
+  @override
+  void initState() {
+    super.initState();
+    edited = ApprenticeContract.fromJson(widget.contract.toJson());
+
+    // Khởi tạo selectedDate từ contract
+    if (widget.contract.dtMDueDate != null &&
+        widget.contract.dtMDueDate!.isNotEmpty) {
+      selectedDate = DateTime.parse(widget.contract.dtMDueDate!);
+    } else {
+      selectedDate = DateTime.now().add(const Duration(days: 30));
+    }
+
+    // Cập nhật edited với ngày đã chọn
+    edited.dtMDueDate = selectedDate.toIso8601String();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final edited = ApprenticeContract.fromJson(contract.toJson());
-    RxString errorMessage = ''.obs;
-    final authState = Provider.of<AuthState>(context, listen: true);
-    DateTime? selectedDate;
+    authState = Provider.of<AuthState>(context, listen: false);
 
     return AlertDialog(
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -2605,7 +2629,7 @@ class _UpdateDtmDue extends StatelessWidget {
             ),
           ),
           Text(
-            ' ${contract.vchREmployeeName}',
+            ' ${widget.contract.vchREmployeeName}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -2620,33 +2644,20 @@ class _UpdateDtmDue extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Hiển thị ngày hết hạn hiện tại
-              if (contract.dtMDueDate != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    tr("NgayHetHan") +
-                        DateFormat(
-                          'dd-MM-yyyy',
-                        ).format(DateTime.parse(edited.dtMDueDate!)),
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              if (widget.contract.dtMDueDate != null &&
+                  widget.contract.dtMDueDate!.isNotEmpty)
+                // Date picker để chọn ngày mới
+                _buildDatePickerField(
+                  context: context,
+                  selectedDate: selectedDate,
+                  label: tr("NgayMoi"),
+                  onDateSelected: (date) {
+                    setState(() {
+                      selectedDate = date;
+                      edited.dtMDueDate = date.toIso8601String();
+                    });
+                  },
                 ),
-
-              // Date picker để chọn ngày mới
-              _buildDatePickerField(
-                context: context,
-                initialDate: contract.dtMDueDate != null
-                    ? DateFormat('dd-MM-yyyy').parse(contract.dtMDueDate!)
-                    : DateTime.now().add(const Duration(days: 30)),
-                label: tr("NgayMoi"),
-                onDateSelected: (date) {
-                  selectedDate = date;
-                  edited.dtMDueDate = DateFormat('dd-MM-yyyy').format(date);
-                },
-              ),
 
               // Hiển thị thông báo lỗi
               Obx(
@@ -2690,17 +2701,12 @@ class _UpdateDtmDue extends StatelessWidget {
                 : () async {
                     errorMessage.value = '';
 
-                    // Kiểm tra nếu ngày mới không được chọn
-                    if (selectedDate == null) {
-                      errorMessage.value = tr('ChonNgay');
-                      return;
-                    }
-
                     // Kiểm tra nếu ngày mới không sau ngày hiện tại
-                    if (selectedDate!.isBefore(DateTime.now())) {
+                    if (selectedDate.isBefore(DateTime.now())) {
                       errorMessage.value = tr('NgayChonSai');
                       return;
                     }
+
                     controller.isLoading(true);
                     try {
                       await controller.updateApprenticeContract(
@@ -2708,8 +2714,8 @@ class _UpdateDtmDue extends StatelessWidget {
                         authState.user!.chRUserid.toString(),
                       );
 
-                      await _phanQuyen(authState, 1, size ?? 50);
-                      // await controller.fetchDummyData();
+                      await _phanQuyen(authState, 1, widget.size ?? 50);
+
                       if (context.mounted) {
                         Navigator.of(context).pop();
                         // Hiển thị thông báo thành công
@@ -2745,7 +2751,7 @@ class _UpdateDtmDue extends StatelessWidget {
 
   Widget _buildDatePickerField({
     required BuildContext context,
-    required DateTime initialDate,
+    required DateTime selectedDate,
     required String label,
     required Function(DateTime) onDateSelected,
   }) {
@@ -2764,7 +2770,7 @@ class _UpdateDtmDue extends StatelessWidget {
           onTap: () async {
             final DateTime? picked = await showDatePicker(
               context: context,
-              initialDate: initialDate,
+              initialDate: selectedDate,
               firstDate: DateTime.now(),
               lastDate: DateTime(2100),
               builder: (context, child) {
@@ -2785,7 +2791,7 @@ class _UpdateDtmDue extends StatelessWidget {
                 );
               },
             );
-            if (picked != null && picked != initialDate) {
+            if (picked != null && picked != selectedDate) {
               onDateSelected(picked);
             }
           },
@@ -2799,7 +2805,7 @@ class _UpdateDtmDue extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  DateFormat('dd/MM/yyyy').format(initialDate),
+                  DateFormat('dd/MM/yyyy').format(selectedDate),
                   style: const TextStyle(fontSize: 14),
                 ),
                 Icon(
@@ -2815,6 +2821,247 @@ class _UpdateDtmDue extends StatelessWidget {
     );
   }
 }
+// class _UpdateDtmDue extends StatelessWidget {
+//   final ApprenticeContract contract;
+//   final DashboardControllerApprentice controller = Get.find();
+//   final int? size;
+
+//   _UpdateDtmDue({required this.contract, this.size});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final edited = ApprenticeContract.fromJson(contract.toJson());
+//     RxString errorMessage = ''.obs;
+//     final authState = Provider.of<AuthState>(context, listen: true);
+//     DateTime? selectedDate;
+
+//     return AlertDialog(
+//       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+//       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+//       actionsPadding: const EdgeInsets.all(20),
+//       title: Row(
+//         children: [
+//           Icon(Iconsax.lamp1, color: Common.primaryColor),
+//           const SizedBox(width: 10),
+//           Text(
+//             tr("GiaHan"),
+//             style: TextStyle(
+//               fontSize: 16,
+//               fontWeight: FontWeight.bold,
+//               color: Common.blackColor,
+//             ),
+//           ),
+//           Text(
+//             ' ${contract.vchREmployeeName}',
+//             style: TextStyle(
+//               fontSize: 18,
+//               fontWeight: FontWeight.bold,
+//               color: Common.primaryColor,
+//             ),
+//           ),
+//         ],
+//       ),
+//       content: SingleChildScrollView(
+//         child: Form(
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               // Hiển thị ngày hết hạn hiện tại
+//               if (contract.dtMDueDate != null)
+//                 Padding(
+//                   padding: const EdgeInsets.only(bottom: 16),
+//                   child: Text(
+//                     tr("NgayHetHan") +
+//                         DateFormat(
+//                           'dd-MM-yyyy',
+//                         ).format(DateTime.parse(edited.dtMDueDate!)),
+//                     style: TextStyle(
+//                       color: Colors.grey[700],
+//                       fontWeight: FontWeight.w500,
+//                     ),
+//                   ),
+//                 ),
+
+//               // Date picker để chọn ngày mới
+//               _buildDatePickerField(
+//                 context: context,
+//                 initialDate: contract.dtMDueDate != null
+//                     ? DateFormat('dd-MM-yyyy').parse(contract.dtMDueDate!)
+//                     : DateTime.now().add(const Duration(days: 30)),
+//                 label: tr("NgayMoi"),
+//                 onDateSelected: (date) {
+//                   selectedDate = date;
+//                   edited.dtMDueDate = DateFormat('dd-MM-yyyy').format(date);
+//                 },
+//               ),
+
+//               // Hiển thị thông báo lỗi
+//               Obx(
+//                 () => errorMessage.value.isNotEmpty
+//                     ? Padding(
+//                         padding: const EdgeInsets.only(top: 10),
+//                         child: Text(
+//                           errorMessage.value,
+//                           style: TextStyle(color: Colors.red, fontSize: 12),
+//                         ),
+//                       )
+//                     : const SizedBox(),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//       actions: [
+//         TextButton(
+//           style: TextButton.styleFrom(
+//             foregroundColor: Colors.grey[700],
+//             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//           ),
+//           onPressed: controller.isLoading.value
+//               ? null
+//               : () => Navigator.of(context).pop(),
+//           child: Text(tr('Cancel')),
+//         ),
+//         Obx(
+//           () => ElevatedButton(
+//             style: ElevatedButton.styleFrom(
+//               backgroundColor: Common.primaryColor,
+//               foregroundColor: Colors.white,
+//               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(8),
+//               ),
+//             ),
+//             onPressed: (controller.isLoading.value)
+//                 ? null
+//                 : () async {
+//                     errorMessage.value = '';
+
+//                     // Kiểm tra nếu ngày mới không được chọn
+//                     if (selectedDate == null) {
+//                       errorMessage.value = tr('ChonNgay');
+//                       return;
+//                     }
+
+//                     // Kiểm tra nếu ngày mới không sau ngày hiện tại
+//                     if (selectedDate!.isBefore(DateTime.now())) {
+//                       errorMessage.value = tr('NgayChonSai');
+//                       return;
+//                     }
+//                     controller.isLoading(true);
+//                     try {
+//                       await controller.updateApprenticeContract(
+//                         edited,
+//                         authState.user!.chRUserid.toString(),
+//                       );
+
+//                       await _phanQuyen(authState, 1, size ?? 50);
+//                       // await controller.fetchDummyData();
+//                       if (context.mounted) {
+//                         Navigator.of(context).pop();
+//                         // Hiển thị thông báo thành công
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           SnackBar(
+//                             content: Text(tr('GiaHanSusses')),
+//                             backgroundColor: Colors.green,
+//                           ),
+//                         );
+//                       }
+//                     } catch (e) {
+//                       errorMessage.value =
+//                           '${tr('ErrorUpdate')}${e.toString()}';
+//                     } finally {
+//                       controller.isLoading(false);
+//                     }
+//                   },
+//             child: controller.isLoading.value
+//                 ? const SizedBox(
+//                     width: 20,
+//                     height: 20,
+//                     child: CircularProgressIndicator(
+//                       color: Colors.white,
+//                       strokeWidth: 2,
+//                     ),
+//                   )
+//                 : Text(tr('Save')),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+
+//   Widget _buildDatePickerField({
+//     required BuildContext context,
+//     required DateTime initialDate,
+//     required String label,
+//     required Function(DateTime) onDateSelected,
+//   }) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           label,
+//           style: TextStyle(
+//             fontWeight: FontWeight.w500,
+//             color: Colors.grey[700],
+//           ),
+//         ),
+//         const SizedBox(height: 8),
+//         GestureDetector(
+//           onTap: () async {
+//             final DateTime? picked = await showDatePicker(
+//               context: context,
+//               initialDate: initialDate,
+//               firstDate: DateTime.now(),
+//               lastDate: DateTime(2100),
+//               builder: (context, child) {
+//                 return Theme(
+//                   data: Theme.of(context).copyWith(
+//                     colorScheme: ColorScheme.light(
+//                       primary: Common.primaryColor,
+//                       onPrimary: Colors.white,
+//                       onSurface: Colors.black,
+//                     ),
+//                     textButtonTheme: TextButtonThemeData(
+//                       style: TextButton.styleFrom(
+//                         foregroundColor: Common.primaryColor,
+//                       ),
+//                     ),
+//                   ),
+//                   child: child!,
+//                 );
+//               },
+//             );
+//             if (picked != null && picked != initialDate) {
+//               onDateSelected(picked);
+//             }
+//           },
+//           child: Container(
+//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+//             decoration: BoxDecoration(
+//               border: Border.all(color: Colors.grey[300]!),
+//               borderRadius: BorderRadius.circular(8),
+//             ),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text(
+//                   DateFormat('dd-MM-yyyy').format(initialDate),
+//                   style: const TextStyle(fontSize: 14),
+//                 ),
+//                 Icon(
+//                   Icons.calendar_today,
+//                   color: Common.primaryColor,
+//                   size: 18,
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 // update kết quả đánh giá cuối cùng
 class _UpdateKetQua extends StatelessWidget {
