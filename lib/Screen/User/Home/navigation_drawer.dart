@@ -201,6 +201,7 @@ class _ComplexDrawerState extends State<ComplexDrawer> {
             .toList();
       case 'Technician':
       case 'Staff':
+      case 'Engineer':
       case 'Chief':
       case 'Expert':
       case 'Operator':

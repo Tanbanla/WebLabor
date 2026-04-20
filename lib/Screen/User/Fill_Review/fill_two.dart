@@ -131,7 +131,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           }
           controllerUserApprover.changeStatus(
             sectionNameForQuery,
-            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+            'Technician,Leader,Supervisor,Operator,Staff,Engineer,Section Manager,Expert,Chief',
             null,
           );
           break;
@@ -147,7 +147,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           }
           controllerUserApprover.changeStatus(
             sectionName,
-            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+            'Technician,Leader,Supervisor,Operator,Staff,Engineer,Section Manager,Expert,Chief',
             null,
           );
           break;
@@ -163,7 +163,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           }
           controllerUserApprover.changeStatus(
             sectionName,
-            'Technician,Leader,Supervisor,Operator,Staff,Section Manager,Expert,Chief',
+            'Technician,Leader,Supervisor,Operator,Staff,Engineer,Section Manager,Expert,Chief',
             null,
           );
           break;
@@ -229,7 +229,7 @@ class _FillTwoScreenState extends State<FillTwoScreen> {
           }
           controllerUserApprover.changeStatus(
             sectionName,
-            'Chief,Expert,Section Manager',
+            'Chief,Expert,Section Manager,Engineer',
             null,
           );
       }
